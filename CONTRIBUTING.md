@@ -96,7 +96,10 @@ prompt templates, or skill registration logic.
 6. **CI must pass** — the GitHub Actions workflow runs `ktlintCheck`, `build`,
    and `jvmTest` on every PR. Fix any failures before requesting review.
 
-7. **Review** — at least one maintainer approval is required before merge.
+7. **Review** — approval from the repository owner is required. Accepted
+   changes are applied to the source-of-truth monorepo and returned through
+   the protected synchronization pull request; public `main` is never updated
+   directly.
 
 ## Reporting Issues
 
