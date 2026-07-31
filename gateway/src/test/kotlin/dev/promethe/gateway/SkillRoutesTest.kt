@@ -1,0 +1,285 @@
+package dev.promethe.gateway
+
+import dev.promethe.api.*
+import dev.promethe.core.SkillLoader
+import dev.promethe.core.SkillWriter
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
+import io.ktor.server.application.*
+import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.routing.*
+import io.ktor.server.testing.*
+import kotlinx.serialization.json.*
+import okio.Path
+import okio.Path.Companion.toPath
+import okio.buffer
+import okio.fakefilesystem.FakeFileSystem
+import kotlin.test.*
+
+/**
+ * Integration tests for SkillRoutes — focuses on the isSystem slug matching
+ * logic that guards system skills from deletion and correctly tags them.
+ *
+ * Uses a real [SkillLoader]/[SkillWriter] backed by okio [FakeFileSystem]
+ * so the full route → loader → filesystem chain is exercised.
+ *
+ * The [SkillSeeder.isSystemSkill] check reads from the real manifest resource,
+ * so "clean-code" (a bundled skill) is treated as a system skill, while
+ * "my-custom-skill" is not.
+ */
+class SkillRoutesTest {
+    private val json = Json { ignoreUnknownKeys = true }
+    private lateinit var fs: FakeFileSystem
+    private val skillsDir: Path = "/skills".toPath()
+
+    @BeforeTest
+    fun setUp() {
+        fs = FakeFileSystem()
+        fs.createDirectories(skillsDir)
+    }
+
+    @AfterTest
+    fun tearDown() {
+        fs.checkNoOpenFiles()
+    }
+
+    // ── helpers ──────────────────────────────────────────────────
+
+    private fun writeSkillDir(
+        name: String,
+        content: String,
+    ) {
+        val dir = skillsDir / name
+        fs.createDirectories(dir)
+        fs.sink(dir / "SKILL.md").buffer().use { it.writeUtf8(content) }
+    }
+
+    /**
+     * Configures the Ktor test application with ContentNegotiation and
+     * skill routes mounted at /api. SkillCurator is NOT wired (no LLM
+     * in tests) — the curate endpoint is not under test here.
+     */
+    private fun ApplicationTestBuilder.configureApp(
+        skillLoader: SkillLoader,
+        skillWriter: SkillWriter,
+    ) {
+        application {
+            install(ContentNegotiation) {
+                json(
+                    Json {
+                        ignoreUnknownKeys = true
+                        encodeDefaults = true
+                    },
+                )
+            }
+        }
+        routing {
+            route("/api/v1") {
+                // We create a stub SkillCurator-free route subset by manually
+                // mounting only the endpoints we test. But since skillRoutes
+                // requires a SkillCurator parameter, we use a no-op proxy.
+                skillRoutes(
+                    skillLoader = skillLoader,
+                    skillWriter = skillWriter,
+                    skillCurator = stubSkillCurator(skillLoader, skillWriter),
+                    fs = fs,
+                    skillsDir = skillsDir,
+                )
+            }
+        }
+    }
+
+    /**
+     * Builds a real [SkillCurator] with a no-op LLM adapter.
+     * Its [curate] method is never called in these tests.
+     */
+    private fun stubSkillCurator(
+        loader: SkillLoader,
+        writer: SkillWriter,
+    ): dev.promethe.core.SkillCurator {
+        val defaultConfig = dev.promethe.core.AgentConfig(
+            modelName = "test-model",
+        )
+        val noOpLlm = object : dev.promethe.core.KoogLlmAdapter(defaultConfig) {
+            override suspend fun complete(
+                systemPrompt: String,
+                messages: List<Pair<String, String>>,
+                model: String,
+                temperature: Double,
+            ): dev.promethe.core.LlmResponse =
+                dev.promethe.core.LlmResponse(
+                    content = "",
+                    promptTokens = 0,
+                    completionTokens = 0,
+                    model = "test",
+                    provider = "test",
+                )
+        }
+        return dev.promethe.core.SkillCurator(loader, writer, noOpLlm, defaultConfig)
+    }
+
+    private fun systemSkillContent() =
+        """
+        ---
+        name: Clean Code
+        description: Write clean, maintainable code
+        ---
+        # Clean Code
+        Best practices for clean code.
+        """.trimIndent()
+
+    private fun customSkillContent() =
+        """
+        ---
+        name: My Custom Skill
+        description: A custom user skill
+        ---
+        # My Custom Skill
+        Custom content here.
+        """.trimIndent()
+
+    // ── 1. GET /api/v1/skills returns list with correct isSystem flags ──
+
+    @Test
+    fun `GET skills returns list with correct isSystem flags`() =
+        testApplication {
+            writeSkillDir("clean-code", systemSkillContent())
+            writeSkillDir("my-custom-skill", customSkillContent())
+
+            val loader = SkillLoader(fs, skillsDir)
+            val writer = SkillWriter(fs, skillsDir)
+            configureApp(loader, writer)
+
+            val response = client.get("/api/v1/skills")
+            assertEquals(HttpStatusCode.OK, response.status)
+
+            val body = json.decodeFromString<SkillListResponse>(response.bodyAsText())
+            assertEquals(2, body.skills.size)
+
+            val system = body.skills.find { it.name == "Clean Code" }
+            val custom = body.skills.find { it.name == "My Custom Skill" }
+            assertNotNull(system, "Should contain system skill")
+            assertNotNull(custom, "Should contain custom skill")
+            assertTrue(system.isSystem, "clean-code should be isSystem=true")
+            assertFalse(custom.isSystem, "my-custom-skill should be isSystem=false")
+        }
+
+    // ── 2. System skill (slug=clean-code) has isSystem = true ──
+
+    @Test
+    fun `system skill clean-code has isSystem true`() =
+        testApplication {
+            writeSkillDir("clean-code", systemSkillContent())
+
+            val loader = SkillLoader(fs, skillsDir)
+            val writer = SkillWriter(fs, skillsDir)
+            configureApp(loader, writer)
+
+            val response = client.get("/api/v1/skills")
+            assertEquals(HttpStatusCode.OK, response.status)
+
+            val body = json.decodeFromString<SkillListResponse>(response.bodyAsText())
+            val skill = body.skills.single()
+            assertTrue(skill.isSystem, "clean-code slug should mark isSystem=true")
+        }
+
+    // ── 3. Custom skill (slug=my-custom-skill) has isSystem = false ──
+
+    @Test
+    fun `custom skill my-custom-skill has isSystem false`() =
+        testApplication {
+            writeSkillDir("my-custom-skill", customSkillContent())
+
+            val loader = SkillLoader(fs, skillsDir)
+            val writer = SkillWriter(fs, skillsDir)
+            configureApp(loader, writer)
+
+            val response = client.get("/api/v1/skills")
+            assertEquals(HttpStatusCode.OK, response.status)
+
+            val body = json.decodeFromString<SkillListResponse>(response.bodyAsText())
+            val skill = body.skills.single()
+            assertFalse(skill.isSystem, "my-custom-skill should be isSystem=false")
+        }
+
+    // ── 4. GET /api/v1/skills/clean-code returns skill with isSystem = true ──
+
+    @Test
+    fun `GET skill by slug returns isSystem true for system skill`() =
+        testApplication {
+            writeSkillDir("clean-code", systemSkillContent())
+
+            val loader = SkillLoader(fs, skillsDir)
+            val writer = SkillWriter(fs, skillsDir)
+            configureApp(loader, writer)
+
+            val response = client.get("/api/v1/skills/clean-code")
+            assertEquals(HttpStatusCode.OK, response.status)
+
+            val skill = json.decodeFromString<SkillDto>(response.bodyAsText())
+            assertEquals("Clean Code", skill.name)
+            assertTrue(skill.isSystem, "GET by slug should return isSystem=true for system skill")
+        }
+
+    // ── 5. DELETE /api/v1/skills/clean-code returns 403 Forbidden ──
+
+    @Test
+    fun `DELETE system skill returns 403 Forbidden`() =
+        testApplication {
+            writeSkillDir("clean-code", systemSkillContent())
+
+            val loader = SkillLoader(fs, skillsDir)
+            val writer = SkillWriter(fs, skillsDir)
+            configureApp(loader, writer)
+
+            val response = client.delete("/api/v1/skills/clean-code")
+            assertEquals(HttpStatusCode.Forbidden, response.status)
+
+            val error = json.decodeFromString<ErrorResponse>(response.bodyAsText())
+            assertTrue(error.error.contains("system skill"), "Error message should mention system skill")
+        }
+
+    // ── 6. DELETE /api/v1/skills/my-custom-skill succeeds ──
+
+    @Test
+    fun `DELETE custom skill succeeds`() =
+        testApplication {
+            writeSkillDir("my-custom-skill", customSkillContent())
+
+            val loader = SkillLoader(fs, skillsDir)
+            val writer = SkillWriter(fs, skillsDir)
+            configureApp(loader, writer)
+
+            val response = client.delete("/api/v1/skills/my-custom-skill")
+            assertEquals(HttpStatusCode.OK, response.status)
+
+            // Verify the skill is actually gone from the filesystem
+            assertFalse(
+                fs.exists(skillsDir / "my-custom-skill" / "SKILL.md"),
+                "Skill file should be deleted from disk",
+            )
+        }
+
+    // ── 7. POST /api/v1/skills creates with sanitized name ──
+
+    @Test
+    fun `POST skills creates with sanitized name`() =
+        testApplication {
+            val loader = SkillLoader(fs, skillsDir)
+            val writer = SkillWriter(fs, skillsDir)
+            configureApp(loader, writer)
+
+            val response = client.post("/api/v1/skills") {
+                contentType(ContentType.Application.Json)
+                setBody("""{"name":"My Cool Skill!","description":"test desc","content":"# Content\nHello world"}""")
+            }
+            assertEquals(HttpStatusCode.Created, response.status)
+
+            val created = json.decodeFromString<SkillDto>(response.bodyAsText())
+            // Sanitization: lowercase, non-alnum → underscore, collapse, trim
+            assertEquals("my_cool_skill", created.name, "Name should be sanitized to lowercase underscored")
+            assertEquals("test desc", created.description)
+        }
+}

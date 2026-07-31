@@ -1,0 +1,100 @@
+# LiteLLM Proxy Configuration
+# Docs: https://docs.litellm.ai/docs/proxy/configs
+
+model_list:
+  # ── OpenRouter (200+ models) ────────────────────────────
+  - model_name: "hermes-3-405b"
+    litellm_params:
+      model: openrouter/nousresearch/hermes-3-llama-3.1-405b
+      api_key: os.environ/OPENROUTER_API_KEY
+
+  - model_name: "llama-3.1-70b"
+    litellm_params:
+      model: openrouter/meta-llama/llama-3.1-70b-instruct
+      api_key: os.environ/OPENROUTER_API_KEY
+
+  # ── DeepSeek ────────────────────────────────────────────
+  - model_name: "deepseek-chat"
+    litellm_params:
+      model: deepseek/deepseek-chat
+      api_key: os.environ/DEEPSEEK_API_KEY
+      api_base: https://api.deepseek.com
+
+  - model_name: "deepseek-reasoner"
+    litellm_params:
+      model: deepseek/deepseek-reasoner
+      api_key: os.environ/DEEPSEEK_API_KEY
+      api_base: https://api.deepseek.com
+
+  # ── NVIDIA Nemotron ─────────────────────────────────────
+  - model_name: "nemotron-super-49b"
+    litellm_params:
+      model: nvidia_nim/nvidia/llama-3.3-nemotron-super-49b-v1
+      api_key: os.environ/NVIDIA_NIM_API_KEY
+
+  - model_name: "nemotron-70b"
+    litellm_params:
+      model: nvidia_nim/nvidia/llama-3.1-nemotron-70b-instruct
+      api_key: os.environ/NVIDIA_NIM_API_KEY
+
+  # ── OpenAI ──────────────────────────────────────────────
+  - model_name: "gpt-4o"
+    litellm_params:
+      model: openai/gpt-4o
+      api_key: os.environ/OPENAI_API_KEY
+
+  - model_name: "gpt-4o-mini"
+    litellm_params:
+      model: openai/gpt-4o-mini
+      api_key: os.environ/OPENAI_API_KEY
+
+  - model_name: "o3-mini"
+    litellm_params:
+      model: openai/o3-mini
+      api_key: os.environ/OPENAI_API_KEY
+
+  # ── Anthropic ───────────────────────────────────────────
+  - model_name: "claude-sonnet-4"
+    litellm_params:
+      model: anthropic/claude-sonnet-4-20250514
+      api_key: os.environ/ANTHROPIC_API_KEY
+
+  - model_name: "claude-3.5-haiku"
+    litellm_params:
+      model: anthropic/claude-3-5-haiku-20241022
+      api_key: os.environ/ANTHROPIC_API_KEY
+
+  # ── Google ──────────────────────────────────────────────
+  - model_name: "gemini-2.5-pro"
+    litellm_params:
+      model: gemini/gemini-2.5-pro
+      api_key: os.environ/GOOGLE_API_KEY
+
+  - model_name: "gemini-2.5-flash"
+    litellm_params:
+      model: gemini/gemini-2.5-flash
+      api_key: os.environ/GOOGLE_API_KEY
+
+  # ── Ollama (local) ─────────────────────────────────────
+  - model_name: "ollama-*"
+    litellm_params:
+      model: ollama/*
+      api_base: http://host.docker.internal:11434
+
+# General settings
+litellm_settings:
+  # Enable cost tracking
+  success_callback: ["langfuse"]  # optional: remove if not using Langfuse
+  set_verbose: false
+  drop_params: true  # Drop unsupported params instead of erroring
+  num_retries: 2
+  request_timeout: 120
+  cache: true
+  cache_params:
+    type: "local"
+    ttl: 3600
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+  # Enable /model/info endpoint for pricing
+  enable_model_cost: true

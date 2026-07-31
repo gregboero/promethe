@@ -1,0 +1,15 @@
+{$PROMETHE_DOMAIN} {
+    encode zstd gzip
+    request_body {
+        max_size 50MB
+    }
+    reverse_proxy promethe-core:8080 {
+        header_up X-Forwarded-Proto https
+    }
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "no-referrer"
+        -Server
+    }
+}

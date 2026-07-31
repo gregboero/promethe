@@ -1,0 +1,12 @@
+Promethe
+Copyright 2026 Gregory Boero-Teyssier
+
+The native sandbox implementation is informed by the architecture and
+security boundaries of OpenAI Codex:
+
+OpenAI Codex
+Copyright 2025 OpenAI
+
+OpenAI Codex is licensed under the Apache License, Version 2.0. No Codex
+source file is vendored verbatim. Provenance and referenced modules are
+documented in sandbox-native/UPSTREAM_CODEX.md.

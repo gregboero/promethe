@@ -1,0 +1,241 @@
+---
+title: Prométhé — Architecture Complète
+---
+graph TB
+    subgraph Clients["🖥️ Clients"]
+        direction LR
+        Desktop["Compose Desktop<br/>(Windows/Mac/Linux)"]
+        Wasm["Compose WasmJS<br/>(Browser)"]
+        Android["Compose Android<br/>(Mobile)"]
+        iOS["Compose iOS<br/>(Mobile)"]
+        CLI["CLI (--cli / --connect)"]
+    end
+
+    subgraph Gateway["⚡ Gateway (Ktor Server — :8080)"]
+        direction TB
+        subgraph Routes["Routes HTTP/WS"]
+            REST["/api/v1/sessions GET/POST<br/>/api/v1/agents CRUD<br/>/api/v1/status GET<br/>/api/v1/feedback GET/POST<br/>/api/v1/mcp/servers CRUD<br/>/api/v1/skills CRUD<br/>/api/v1/goals<br/>/health GET"]
+            MemRoutes["/api/v1/memory/facts GET/DELETE<br/>/api/v1/memory/status GET"]
+            ConfigRoutes["/api/v1/config/env GET/PUT/DELETE<br/>/api/v1/channels GET/PUT/POST<br/>/api/v1/scheduler/tasks CRUD"]
+            ApprovalRoutes["/approval/pending GET<br/>/approval/{id} POST"]
+            WS["/ws/agents WebSocket (monitor)"]            A2ARoute["/agents/ JSON-RPC POST<br/>/.well-known/agent.json GET"]
+            Webhooks["/webhook/telegram POST<br/>/webhook/discord POST<br/>/webhook/slack POST"]
+            Export["/api/v1/sessions/{id}/export GET"]
+        end
+        subgraph Security["🔒 Security Layer"]
+            Auth["AuthMiddleware (JWT)"]
+            RL["RateLimiter (token bucket)"]
+            WH["WebhookAuth (HMAC/Ed25519)"]
+        end
+    end
+
+    subgraph Core["🧠 Agent Core (commonMain — KMP)"]
+        direction TB
+        subgraph PRA["Plan-Reason-Act Loop"]
+            Agent["AIAgent — executeLoop()"]
+            RS["ResilienceStrategy<br/>L1:Retry → L2:Replan → L3:Decompose"]
+        end
+        subgraph Tools["🔧 Tool System"]
+            TR["ToolRegistry"]
+            BT["BuiltinTools<br/>(terminal, file_read, file_write, http_fetch)"]
+            GT["GitTool"]
+            PT["PatchFileTool"]
+            MCP_P["McpProxyTool"]
+            ST["ScopedToolRegistry (per-agent)"]
+        end
+        subgraph MemoryCtx["💾 Memory and Context"]
+            ML["MemoryLayer<br/>4 tiers: ATOMIC → COMPOUND → SYNTHESIS → META"]
+            CC["ContextCompressor (auto @75%)"]
+            SL["SkillLoader + Cache + KeywordIndex"]
+            subgraph MemProviders["Memory Providers"]
+                EMP["EmbeddedMemoryProvider<br/>(SQLite + FTS5)"]
+                HMP["HonchoMemoryProvider<br/>(REST)"]
+                TMP["TencentMemoryProvider<br/>(REST)"]
+                FBP["FallbackMemoryProvider<br/>(primary + fallback)"]
+            end
+        end
+        subgraph Eval["📊 Evaluation"]
+            TE["TrajectoryEvaluator"]
+            RW["RewardSignal"]
+            FC_E["FeedbackCollector"]
+            GEPA["GepaEngine + Mutations + ParetoSelector"]
+        end
+        subgraph MultiAgent["👥 Multi-Agent"]
+            AO["AgentOrchestrator"]
+            DT["DelegateTaskTool"]
+        end
+    end
+
+    subgraph LLM["🤖 LLM Routing"]
+        KLA["KoogLlmAdapter"]
+        MMR["MultiModelRouter"]
+        FCH["FallbackChain (auto-discovery)"]
+        MPS["ModelPricingService"]
+    end
+
+    subgraph MCP_System["🔌 MCP Protocol"]
+        Bridge["McpBridge"]
+        Stdio["McpStdioTransport (disabled until sandbox IPC v2)"]
+        SSE["McpSseTransport (HTTP + SSE)"]
+        Factory["JvmMcpTransportFactory"]
+    end
+
+    subgraph Observability["📡 Observability (expect/actual)"]
+        Tracing["TracingService"]
+        ConsoleExp["ConsoleExporter"]
+        LangfuseExp["LangfuseExporter"]
+        OtlpExp["OTLP Exporter"]
+    end
+
+    subgraph A2A_System["🤝 A2A Protocol"]
+        A2AExec["PrometheA2AExecutor (streaming)"]
+        A2AClient["A2AClientTool (discover + send)"]
+    end
+
+    subgraph Channels["📡 Channels"]
+        TG["TelegramChannel (Bot API)"]
+        DC["DiscordChannel (REST v10)"]
+        SLK["SlackChannel (Web API + Events)"]
+        WA["WhatsAppChannel (Cloud API)"]
+        SIG["SignalChannel (signal-cli REST)"]
+        MTX["MatrixChannel (Client-Server API)"]
+    end
+
+    subgraph Persistence["🗄️ Database (SQLite + Exposed)"]
+        DB[(SQLite)]
+        T1["Sessions | Messages+FTS5 | Feedbacks"]
+        T2["AgentProfiles | Checkpoints | UserFacts"]
+        CS_DB["CredentialsStore"]
+        ENV_DB["EnvConfigStore<br/>(~/.promethe/env.json)"]
+    end
+
+    subgraph External_LLM["☁️ LLM Providers"]
+        OpenAI["OpenAI"]
+        Anthropic["Anthropic"]
+        Google["Google AI"]
+        Ollama["Ollama (local)"]
+        OpenRouter["OpenRouter"]
+        DeepSeek["DeepSeek"]
+        NVIDIA["NVIDIA NIM"]
+        LiteLLM["LiteLLM"]
+    end
+
+    subgraph External_Search["🔍 Search"]
+        Tavily["Tavily"]
+        Brave["Brave"]
+        DDG["DuckDuckGo"]
+        SearX["SearXNG"]
+    end
+
+    subgraph External_MCP["🔌 MCP Servers"]
+        MCP1["FS / Git / DB / Custom"]
+    end
+
+    subgraph External_Msg["💬 Messaging"]
+        TG_API["Telegram API"]
+        DC_API["Discord API"]
+        SLK_API["Slack API"]
+        WA_API["WhatsApp Cloud API"]
+        SIG_API["Signal-CLI REST"]
+        MTX_API["Matrix Homeserver"]
+    end
+
+    subgraph External_A2A["🤝 External Agents"]
+        EA["Agent X / Agent Y"]
+    end
+
+    %% Client to Gateway
+    Desktop -->|"HTTP + WS"| Gateway
+    Wasm -->|"HTTP + WS"| Gateway
+    Android -->|"HTTP + WS"| Gateway
+    iOS -->|"HTTP + WS"| Gateway
+    CLI -->|"HTTP"| Gateway
+
+    %% Gateway to Core
+    REST --> Auth --> Agent
+    WS --> Agent
+    Webhooks --> WH --> Agent
+    A2ARoute --> A2AExec --> Agent
+
+    %% Core internal
+    Agent --> RS
+    Agent --> TR
+    Agent --> ML
+    Agent --> CC
+    Agent --> AO --> DT --> Agent
+    TR --> BT
+    TR --> GT
+    TR --> PT
+    TR --> MCP_P
+    Agent --> TE --> GEPA
+
+    %% Core to LLM
+    Agent --> KLA --> MMR --> FCH
+    FCH --> MPS
+
+    %% Core to MCP
+    MCP_P --> Bridge --> Factory
+    Factory --> Stdio
+    Factory --> SSE
+
+    %% Core to DB
+    Agent --> DB
+    ML --> FBP --> EMP
+    FBP -.-> HMP
+    FBP -.-> TMP
+    EMP --> DB
+    CS_DB --> DB
+
+    %% Observability
+    Agent --> Tracing
+    Tracing --> ConsoleExp
+    Tracing -.-> LangfuseExp
+    Tracing -.-> OtlpExp
+
+    %% LLM to External
+    FCH -->|"HTTPS"| OpenAI
+    FCH -->|"HTTPS"| Anthropic
+    FCH -->|"HTTPS"| Google
+    FCH -->|"HTTP"| Ollama
+    FCH -->|"HTTPS"| OpenRouter
+    FCH -->|"HTTPS"| DeepSeek
+    FCH -->|"HTTPS"| NVIDIA
+    FCH -->|"HTTP"| LiteLLM
+
+    %% MCP to External
+    Stdio -->|"stdin/stdout JSON-RPC"| MCP1
+    SSE -->|"HTTP/SSE JSON-RPC"| MCP1
+
+    %% Search
+    BT -->|"HTTPS"| Tavily
+    BT -->|"HTTPS"| Brave
+    BT -->|"HTTPS"| DDG
+    BT -->|"HTTP"| SearX
+
+    %% Channels to External
+    TG -->|"HTTPS"| TG_API
+    DC -->|"HTTPS"| DC_API
+    SLK -->|"HTTPS"| SLK_API
+    TG_API -.->|"Webhook"| Webhooks
+    SLK_API -.->|"Events"| Webhooks
+
+    %% A2A
+    A2AClient -->|"HTTPS JSON-RPC"| EA
+    EA -.->|"JSON-RPC"| A2ARoute
+
+    %% Channel wiring
+    Gateway --> TG
+    Gateway --> DC
+    Gateway --> SLK
+    Gateway --> WA
+    Gateway --> SIG
+    Gateway --> MTX
+
+    %% Channels to External
+    WA -->|"HTTPS"| WA_API
+    SIG -->|"HTTP"| SIG_API
+    MTX -->|"HTTPS"| MTX_API
+
+    %% Config Env wiring
+    ConfigRoutes --> ENV_DB
+    ApprovalRoutes --> Agent

@@ -1,0 +1,197 @@
+=== CLASS: ai.koog.prompt.message.RequestMetaInfo ===
+Constructors:
+  public ai.koog.prompt.message.RequestMetaInfo(int,kotlin.time.Instant,kotlinx.serialization.json.JsonObject,kotlinx.serialization.internal.SerializationConstructorMarker)
+  public ai.koog.prompt.message.RequestMetaInfo(kotlin.time.Instant)
+  public ai.koog.prompt.message.RequestMetaInfo(kotlin.time.Instant,kotlinx.serialization.json.JsonObject,int,kotlin.jvm.internal.DefaultConstructorMarker)
+  public ai.koog.prompt.message.RequestMetaInfo(kotlin.time.Instant,kotlinx.serialization.json.JsonObject)
+Methods:
+  public boolean ai.koog.prompt.message.RequestMetaInfo.equals(java.lang.Object)
+  public java.lang.String ai.koog.prompt.message.RequestMetaInfo.toString()
+  public int ai.koog.prompt.message.RequestMetaInfo.hashCode()
+  public final ai.koog.prompt.message.RequestMetaInfo ai.koog.prompt.message.RequestMetaInfo.copy(kotlin.time.Instant,kotlinx.serialization.json.JsonObject)
+  public kotlin.time.Instant ai.koog.prompt.message.RequestMetaInfo.getTimestamp()
+  public final kotlin.time.Instant ai.koog.prompt.message.RequestMetaInfo.component1()
+  public final kotlinx.serialization.json.JsonObject ai.koog.prompt.message.RequestMetaInfo.component2()
+  public static final ai.koog.prompt.message.RequestMetaInfo ai.koog.prompt.message.RequestMetaInfo.access$getEmpty$cp()
+  public kotlinx.serialization.json.JsonObject ai.koog.prompt.message.RequestMetaInfo.getMetadata()
+  public static ai.koog.prompt.message.RequestMetaInfo ai.koog.prompt.message.RequestMetaInfo.copy$default(ai.koog.prompt.message.RequestMetaInfo,kotlin.time.Instant,kotlinx.serialization.json.JsonObject,int,java.lang.Object)
+  public static final void ai.koog.prompt.message.RequestMetaInfo.write$Self$prompt_model(ai.koog.prompt.message.RequestMetaInfo,kotlinx.serialization.encoding.CompositeEncoder,kotlinx.serialization.descriptors.SerialDescriptor)
+Fields:
+  public static final ai.koog.prompt.message.RequestMetaInfo$Companion ai.koog.prompt.message.RequestMetaInfo.Companion
+  private final kotlin.time.Instant ai.koog.prompt.message.RequestMetaInfo.timestamp
+  private final kotlinx.serialization.json.JsonObject ai.koog.prompt.message.RequestMetaInfo.metadata
+  private static final ai.koog.prompt.message.RequestMetaInfo ai.koog.prompt.message.RequestMetaInfo.Empty
+
+=== CLASS: ai.koog.prompt.message.ResponseMetaInfo ===
+Constructors:
+  public ai.koog.prompt.message.ResponseMetaInfo(kotlin.time.Instant,java.lang.Integer,java.lang.Integer)
+  public ai.koog.prompt.message.ResponseMetaInfo(kotlin.time.Instant,java.lang.Integer,java.lang.Integer,java.lang.Integer)
+  public ai.koog.prompt.message.ResponseMetaInfo(kotlin.time.Instant,java.lang.Integer,java.lang.Integer,java.lang.Integer,java.lang.String)
+  public ai.koog.prompt.message.ResponseMetaInfo(int,kotlin.time.Instant,java.lang.Integer,java.lang.Integer,java.lang.Integer,java.lang.String,kotlinx.serialization.json.JsonObject,kotlinx.serialization.internal.SerializationConstructorMarker)
+  public ai.koog.prompt.message.ResponseMetaInfo(kotlin.time.Instant,java.lang.Integer,java.lang.Integer,java.lang.Integer,java.lang.String,kotlinx.serialization.json.JsonObject)
+  public ai.koog.prompt.message.ResponseMetaInfo(kotlin.time.Instant,java.lang.Integer,java.lang.Integer,java.lang.Integer,java.lang.String,kotlinx.serialization.json.JsonObject,int,kotlin.jvm.internal.DefaultConstructorMarker)
+  public ai.koog.prompt.message.ResponseMetaInfo(kotlin.time.Instant)
+  public ai.koog.prompt.message.ResponseMetaInfo(kotlin.time.Instant,java.lang.Integer)
+Methods:
+  public boolean ai.koog.prompt.message.ResponseMetaInfo.equals(java.lang.Object)
+  public java.lang.String ai.koog.prompt.message.ResponseMetaInfo.toString()
+  public int ai.koog.prompt.message.ResponseMetaInfo.hashCode()
+  public final ai.koog.prompt.message.ResponseMetaInfo ai.koog.prompt.message.ResponseMetaInfo.copy(kotlin.time.Instant,java.lang.Integer,java.lang.Integer,java.lang.Integer,java.lang.String,kotlinx.serialization.json.JsonObject)
+  public kotlin.time.Instant ai.koog.prompt.message.ResponseMetaInfo.getTimestamp()
+  public final java.lang.String ai.koog.prompt.message.ResponseMetaInfo.component5()
+  public final kotlin.time.Instant ai.koog.prompt.message.ResponseMetaInfo.component1()
+  public final java.lang.Integer ai.koog.prompt.message.ResponseMetaInfo.component4()
+  public final java.lang.Integer ai.koog.prompt.message.ResponseMetaInfo.component2()
+  public final java.lang.Integer ai.koog.prompt.message.ResponseMetaInfo.component3()
+  public final java.lang.Integer ai.koog.prompt.message.ResponseMetaInfo.getTotalTokensCount()
+  public final java.lang.Integer ai.koog.prompt.message.ResponseMetaInfo.getInputTokensCount()
+  public final java.lang.Integer ai.koog.prompt.message.ResponseMetaInfo.getOutputTokensCount()
+  public static final ai.koog.prompt.message.ResponseMetaInfo ai.koog.prompt.message.ResponseMetaInfo.access$getEmpty$cp()
+  public kotlinx.serialization.json.JsonObject ai.koog.prompt.message.ResponseMetaInfo.getMetadata()
+  public static ai.koog.prompt.message.ResponseMetaInfo ai.koog.prompt.message.ResponseMetaInfo.copy$default(ai.koog.prompt.message.ResponseMetaInfo,kotlin.time.Instant,java.lang.Integer,java.lang.Integer,java.lang.Integer,java.lang.String,kotlinx.serialization.json.JsonObject,int,java.lang.Object)
+  public static final void ai.koog.prompt.message.ResponseMetaInfo.write$Self$prompt_model(ai.koog.prompt.message.ResponseMetaInfo,kotlinx.serialization.encoding.CompositeEncoder,kotlinx.serialization.descriptors.SerialDescriptor)
+  public final java.lang.String ai.koog.prompt.message.ResponseMetaInfo.getModelId()
+  public final kotlinx.serialization.json.JsonObject ai.koog.prompt.message.ResponseMetaInfo.component6()
+Fields:
+  public static final ai.koog.prompt.message.ResponseMetaInfo$Companion ai.koog.prompt.message.ResponseMetaInfo.Companion
+  private final kotlin.time.Instant ai.koog.prompt.message.ResponseMetaInfo.timestamp
+  private final java.lang.Integer ai.koog.prompt.message.ResponseMetaInfo.totalTokensCount
+  private final java.lang.Integer ai.koog.prompt.message.ResponseMetaInfo.inputTokensCount
+  private final java.lang.Integer ai.koog.prompt.message.ResponseMetaInfo.outputTokensCount
+  private final java.lang.String ai.koog.prompt.message.ResponseMetaInfo.modelId
+  private final kotlinx.serialization.json.JsonObject ai.koog.prompt.message.ResponseMetaInfo.metadata
+  private static final ai.koog.prompt.message.ResponseMetaInfo ai.koog.prompt.message.ResponseMetaInfo.Empty
+
+=== CLASS: ai.koog.prompt.Prompt ===
+Constructors:
+  public ai.koog.prompt.Prompt(int,java.util.List,java.lang.String,ai.koog.prompt.params.LLMParams,kotlinx.serialization.internal.SerializationConstructorMarker)
+  public ai.koog.prompt.Prompt(java.util.List,java.lang.String)
+  public ai.koog.prompt.Prompt(java.util.List,java.lang.String,ai.koog.prompt.params.LLMParams,int,kotlin.jvm.internal.DefaultConstructorMarker)
+  public ai.koog.prompt.Prompt(java.util.List,java.lang.String,ai.koog.prompt.params.LLMParams)
+Methods:
+  public boolean ai.koog.prompt.Prompt.equals(java.lang.Object)
+  public java.lang.String ai.koog.prompt.Prompt.toString()
+  public int ai.koog.prompt.Prompt.hashCode()
+  public static final ai.koog.prompt.dsl.PromptBuilder ai.koog.prompt.Prompt.builder(java.lang.String)
+  public static final ai.koog.prompt.dsl.PromptBuilder ai.koog.prompt.Prompt.builder(java.lang.String,ai.koog.utils.time.KoogClock)
+  public final java.lang.String ai.koog.prompt.Prompt.getId()
+  public final ai.koog.prompt.Prompt ai.koog.prompt.Prompt.copy(java.util.List,java.lang.String,ai.koog.prompt.params.LLMParams)
+  public final java.util.List ai.koog.prompt.Prompt.component1()
+  public final java.lang.String ai.koog.prompt.Prompt.component2()
+  public final ai.koog.prompt.params.LLMParams ai.koog.prompt.Prompt.component3()
+  private static final kotlinx.serialization.KSerializer ai.koog.prompt.Prompt._childSerializers$_anonymous_()
+  public static final kotlin.Lazy[] ai.koog.prompt.Prompt.access$get$childSerializers$cp()
+  public static ai.koog.prompt.Prompt ai.koog.prompt.Prompt.copy$default(ai.koog.prompt.Prompt,java.util.List,java.lang.String,ai.koog.prompt.params.LLMParams,int,java.lang.Object)
+  public static final void ai.koog.prompt.Prompt.write$Self$prompt_model(ai.koog.prompt.Prompt,kotlinx.serialization.encoding.CompositeEncoder,kotlinx.serialization.descriptors.SerialDescriptor)
+  public final ai.koog.prompt.params.LLMParams ai.koog.prompt.Prompt.getParams()
+  public final ai.koog.prompt.Prompt ai.koog.prompt.Prompt.withParams(ai.koog.prompt.params.LLMParams)
+  public final java.util.List ai.koog.prompt.Prompt.getMessages()
+  public final ai.koog.prompt.Prompt ai.koog.prompt.Prompt.withUpdatedParams(kotlin.jvm.functions.Function1)
+  public final ai.koog.prompt.Prompt ai.koog.prompt.Prompt.withMessages(kotlin.jvm.functions.Function1)
+  public final long ai.koog.prompt.Prompt.totalTimeSpent()
+  public final int ai.koog.prompt.Prompt.latestTokenUsage()
+Fields:
+  public static final ai.koog.prompt.Prompt$Companion ai.koog.prompt.Prompt.Companion
+  private final java.util.List ai.koog.prompt.Prompt.messages
+  private final java.lang.String ai.koog.prompt.Prompt.id
+  private final ai.koog.prompt.params.LLMParams ai.koog.prompt.Prompt.params
+  private static final kotlin.Lazy[] ai.koog.prompt.Prompt.$childSerializers
+  public static final ai.koog.prompt.Prompt ai.koog.prompt.Prompt.Empty
+
+=== CLASS: ai.koog.prompt.Prompt$Companion ===
+Constructors:
+  public ai.koog.prompt.Prompt$Companion(kotlin.jvm.internal.DefaultConstructorMarker)
+  private ai.koog.prompt.Prompt$Companion()
+Methods:
+  public final ai.koog.prompt.dsl.PromptBuilder ai.koog.prompt.Prompt$Companion.builder(java.lang.String)
+  public final ai.koog.prompt.dsl.PromptBuilder ai.koog.prompt.Prompt$Companion.builder(java.lang.String,ai.koog.utils.time.KoogClock)
+  public final ai.koog.prompt.Prompt ai.koog.prompt.Prompt$Companion.build(java.lang.String,ai.koog.prompt.params.LLMParams,kotlin.jvm.functions.Function1)
+  public final ai.koog.prompt.Prompt ai.koog.prompt.Prompt$Companion.build(java.lang.String,ai.koog.prompt.params.LLMParams,ai.koog.utils.time.KoogClock,kotlin.jvm.functions.Function1)
+  public final ai.koog.prompt.Prompt ai.koog.prompt.Prompt$Companion.build(ai.koog.prompt.Prompt,ai.koog.utils.time.KoogClock,kotlin.jvm.functions.Function1)
+  public final ai.koog.prompt.Prompt ai.koog.prompt.Prompt$Companion.build(java.lang.String,kotlin.jvm.functions.Function1)
+  public final kotlinx.serialization.KSerializer ai.koog.prompt.Prompt$Companion.serializer()
+  public static ai.koog.prompt.dsl.PromptBuilder ai.koog.prompt.Prompt$Companion.builder$default(ai.koog.prompt.Prompt$Companion,java.lang.String,ai.koog.utils.time.KoogClock,int,java.lang.Object)
+  public static ai.koog.prompt.Prompt ai.koog.prompt.Prompt$Companion.build$default(ai.koog.prompt.Prompt$Companion,ai.koog.prompt.Prompt,ai.koog.utils.time.KoogClock,kotlin.jvm.functions.Function1,int,java.lang.Object)
+  public static ai.koog.prompt.Prompt ai.koog.prompt.Prompt$Companion.build$default(ai.koog.prompt.Prompt$Companion,java.lang.String,ai.koog.prompt.params.LLMParams,ai.koog.utils.time.KoogClock,kotlin.jvm.functions.Function1,int,java.lang.Object)
+Fields:
+
+=== CLASS: ai.koog.prompt.llm.LLModel ===
+Constructors:
+  public ai.koog.prompt.llm.LLModel(int,ai.koog.prompt.llm.LLMProvider,java.lang.String,java.util.List,java.lang.Long,java.lang.Long,kotlinx.serialization.internal.SerializationConstructorMarker)
+  public ai.koog.prompt.llm.LLModel(ai.koog.prompt.llm.LLMProvider,java.lang.String,java.util.List,java.lang.Long)
+  public ai.koog.prompt.llm.LLModel(ai.koog.prompt.llm.LLMProvider,java.lang.String,java.util.List)
+  public ai.koog.prompt.llm.LLModel(ai.koog.prompt.llm.LLMProvider,java.lang.String,java.util.List,java.lang.Long,java.lang.Long)
+  public ai.koog.prompt.llm.LLModel(ai.koog.prompt.llm.LLMProvider,java.lang.String,java.util.List,java.lang.Long,java.lang.Long,int,kotlin.jvm.internal.DefaultConstructorMarker)
+  public ai.koog.prompt.llm.LLModel(ai.koog.prompt.llm.LLMProvider,java.lang.String)
+Methods:
+  public boolean ai.koog.prompt.llm.LLModel.equals(java.lang.Object)
+  public java.lang.String ai.koog.prompt.llm.LLModel.toString()
+  public int ai.koog.prompt.llm.LLModel.hashCode()
+  public final java.lang.String ai.koog.prompt.llm.LLModel.getId()
+  public final ai.koog.prompt.llm.LLModel ai.koog.prompt.llm.LLModel.copy(ai.koog.prompt.llm.LLMProvider,java.lang.String,java.util.List,java.lang.Long,java.lang.Long)
+  public final ai.koog.prompt.llm.LLMProvider ai.koog.prompt.llm.LLModel.getProvider()
+  public final java.lang.Long ai.koog.prompt.llm.LLModel.component5()
+  public final ai.koog.prompt.llm.LLMProvider ai.koog.prompt.llm.LLModel.component1()
+  public final java.lang.Long ai.koog.prompt.llm.LLModel.component4()
+  public final java.lang.String ai.koog.prompt.llm.LLModel.component2()
+  public final java.util.List ai.koog.prompt.llm.LLModel.component3()
+  private static final kotlinx.serialization.KSerializer ai.koog.prompt.llm.LLModel._childSerializers$_anonymous_()
+  public static final kotlin.Lazy[] ai.koog.prompt.llm.LLModel.access$get$childSerializers$cp()
+  public static final void ai.koog.prompt.llm.LLModel.write$Self$prompt_llm(ai.koog.prompt.llm.LLModel,kotlinx.serialization.encoding.CompositeEncoder,kotlinx.serialization.descriptors.SerialDescriptor)
+  public final boolean ai.koog.prompt.llm.LLModel.supports(ai.koog.prompt.llm.LLMCapability)
+  public static ai.koog.prompt.llm.LLModel ai.koog.prompt.llm.LLModel.copy$default(ai.koog.prompt.llm.LLModel,ai.koog.prompt.llm.LLMProvider,java.lang.String,java.util.List,java.lang.Long,java.lang.Long,int,java.lang.Object)
+  public final java.util.List ai.koog.prompt.llm.LLModel.getCapabilities()
+  public final java.lang.Long ai.koog.prompt.llm.LLModel.getMaxOutputTokens()
+  public final java.lang.Long ai.koog.prompt.llm.LLModel.getContextLength()
+Fields:
+  public static final ai.koog.prompt.llm.LLModel$Companion ai.koog.prompt.llm.LLModel.Companion
+  private final ai.koog.prompt.llm.LLMProvider ai.koog.prompt.llm.LLModel.provider
+  private final java.lang.String ai.koog.prompt.llm.LLModel.id
+  private final java.util.List ai.koog.prompt.llm.LLModel.capabilities
+  private final java.lang.Long ai.koog.prompt.llm.LLModel.contextLength
+  private final java.lang.Long ai.koog.prompt.llm.LLModel.maxOutputTokens
+  private static final kotlin.Lazy[] ai.koog.prompt.llm.LLModel.$childSerializers
+
+=== CLASS: ai.koog.prompt.executor.clients.LLMClient ===
+Constructors:
+  public ai.koog.prompt.executor.clients.LLMClient()
+Methods:
+  public final ai.koog.prompt.message.Message$Assistant ai.koog.prompt.executor.clients.LLMClient.execute(ai.koog.prompt.Prompt,ai.koog.prompt.llm.LLModel)
+  public final ai.koog.prompt.message.Message$Assistant ai.koog.prompt.executor.clients.LLMClient.execute(ai.koog.prompt.Prompt,ai.koog.prompt.llm.LLModel,java.util.List)
+  public ai.koog.prompt.structure.json.generator.StandardJsonSchemaGenerator ai.koog.prompt.executor.clients.LLMClient.getStandardJsonSchemaGenerator()
+  public ai.koog.prompt.structure.json.generator.BasicJsonSchemaGenerator ai.koog.prompt.executor.clients.LLMClient.getBasicJsonSchemaGenerator()
+  public final ai.koog.prompt.dsl.ModerationResult ai.koog.prompt.executor.clients.LLMClient.moderate(ai.koog.prompt.Prompt,ai.koog.prompt.llm.LLModel)
+  public java.lang.Object ai.koog.prompt.executor.clients.LLMClient.models(kotlin.coroutines.Continuation)
+  public final java.util.List ai.koog.prompt.executor.clients.LLMClient.models()
+  public static java.util.List ai.koog.prompt.executor.clients.LLMClient.executeMultipleChoices$default(ai.koog.prompt.executor.clients.LLMClient,ai.koog.prompt.Prompt,ai.koog.prompt.llm.LLModel,java.util.List,int,java.lang.Object)
+  public static java.util.concurrent.Flow$Publisher ai.koog.prompt.executor.clients.LLMClient.executeStreaming$default(ai.koog.prompt.executor.clients.LLMClient,ai.koog.prompt.Prompt,ai.koog.prompt.llm.LLModel,java.util.List,int,java.lang.Object)
+  public final java.util.List ai.koog.prompt.executor.clients.LLMClient.executeMultipleChoices(ai.koog.prompt.Prompt,ai.koog.prompt.llm.LLModel)
+  public java.lang.Object ai.koog.prompt.executor.clients.LLMClient.executeMultipleChoices(ai.koog.prompt.Prompt,ai.koog.prompt.llm.LLModel,java.util.List,kotlin.coroutines.Continuation)
+  public final java.util.List ai.koog.prompt.executor.clients.LLMClient.executeMultipleChoices(ai.koog.prompt.Prompt,ai.koog.prompt.llm.LLModel,java.util.List)
+  public final java.util.concurrent.Flow$Publisher ai.koog.prompt.executor.clients.LLMClient.executeStreaming(ai.koog.prompt.Prompt,ai.koog.prompt.llm.LLModel)
+  public final java.util.concurrent.Flow$Publisher ai.koog.prompt.executor.clients.LLMClient.executeStreaming(ai.koog.prompt.Prompt,ai.koog.prompt.llm.LLModel,java.util.List)
+  public kotlinx.coroutines.flow.Flow ai.koog.prompt.executor.clients.LLMClient.executeStreaming(ai.koog.prompt.Prompt,ai.koog.prompt.llm.LLModel)
+  public kotlinx.coroutines.flow.Flow ai.koog.prompt.executor.clients.LLMClient.executeStreaming(ai.koog.prompt.Prompt,ai.koog.prompt.llm.LLModel,java.util.List)
+  public java.lang.String ai.koog.prompt.executor.clients.LLMClient.getClientName()
+  public static ai.koog.prompt.message.Message$Assistant ai.koog.prompt.executor.clients.LLMClient.execute$default(ai.koog.prompt.executor.clients.LLMClient,ai.koog.prompt.Prompt,ai.koog.prompt.llm.LLModel,java.util.List,int,java.lang.Object)
+Fields:
+
+=== CLASS: ai.koog.agents.core.agent.AIAgentBuilder ===
+Constructors:
+  public ai.koog.agents.core.agent.AIAgentBuilder()
+Methods:
+  public ai.koog.agents.core.agent.AIAgentServiceBuilderBase ai.koog.agents.core.agent.AIAgentBuilder.self()
+  protected ai.koog.agents.core.agent.AIAgentBuilder ai.koog.agents.core.agent.AIAgentBuilder.self()
+  public static ai.koog.agents.core.agent.GraphAgentBuilder ai.koog.agents.core.agent.AIAgentBuilder.graphStrategy$default(ai.koog.agents.core.agent.AIAgentBuilder,java.lang.String,ai.koog.agents.core.utils.BuilderChainAction,int,java.lang.Object)
+  public static ai.koog.agents.core.agent.FunctionalAgentBuilder ai.koog.agents.core.agent.AIAgentBuilder.functionalStrategy$default(ai.koog.agents.core.agent.AIAgentBuilder,java.lang.String,java.util.function.BiFunction,int,java.lang.Object)
+  public final ai.koog.agents.core.agent.FunctionalAgentBuilder ai.koog.agents.core.agent.AIAgentBuilder.functionalStrategy(java.util.function.BiFunction)
+  public final ai.koog.agents.core.agent.FunctionalAgentBuilder ai.koog.agents.core.agent.AIAgentBuilder.functionalStrategy(java.lang.String,java.util.function.BiFunction)
+  public final ai.koog.agents.core.agent.GraphAgentBuilder ai.koog.agents.core.agent.AIAgentBuilder.graphStrategy(ai.koog.agents.core.utils.BuilderChainAction)
+  public final ai.koog.agents.core.agent.GraphAgentBuilder ai.koog.agents.core.agent.AIAgentBuilder.graphStrategy(java.lang.String,ai.koog.agents.core.utils.BuilderChainAction)
+Fields:
+
+=== CLASS: ai.koog.prompt.message.CacheControl ===
+Constructors:
+Methods:
+Fields:
+

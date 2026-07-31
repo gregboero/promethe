@@ -1,0 +1,2 @@
+Superclass: ai.koog.prompt.executor.model.PromptExecutor
+Interfaces:

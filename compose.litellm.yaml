@@ -1,0 +1,39 @@
+# ── LiteLLM Proxy Overlay ────────────────────────────────────
+# Usage: docker compose -f docker-compose.yml -f compose.litellm.yaml up
+#
+# Adds a LiteLLM proxy for unified multi-provider LLM routing.
+# UI: http://localhost:4000/ui  |  API: http://localhost:4000/v1
+
+services:
+  litellm:
+    image: ghcr.io/berriai/litellm:main-latest
+    ports:
+      - "4000:4000"
+    environment:
+      - LITELLM_MASTER_KEY=${LITELLM_MASTER_KEY:-sk-promethe-dev}
+      # Pass-through provider keys to LiteLLM
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
+      - NVIDIA_NIM_API_KEY=${NVIDIA_NIM_API_KEY:-}
+    volumes:
+      - ./litellm-config.yaml:/app/config.yaml
+    command: ["--config", "/app/config.yaml", "--port", "4000"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  promethe-core:
+    depends_on:
+      litellm:
+        condition: service_healthy
+    environment:
+      - LLM_PROVIDER=litellm
+      - LLM_MODEL=${LITELLM_MODEL:?Set LITELLM_MODEL to a configured LiteLLM alias}
+      - LLM_BASE_URL=http://litellm:4000
+      - LITELLM_API_KEY=${LITELLM_MASTER_KEY:-sk-promethe-dev}

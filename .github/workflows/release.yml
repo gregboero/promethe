@@ -1,0 +1,343 @@
+name: Release - Promethe
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing semantic tag to release
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/promethe-gateway
+
+jobs:
+  validate-tag:
+    name: Validate semantic release tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
+      - name: Check tag format
+        env:
+          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+        run: |
+          if [[ ! "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "Unsupported release tag: $RELEASE_TAG" >&2
+            exit 1
+          fi
+          TAG_VERSION="${RELEASE_TAG#v}"
+          TAG_VERSION="${TAG_VERSION%%-*}"
+          CODE_VERSION="$(sed -n 's/.*CURRENT = "\([^"]*\)".*/\1/p' api/src/commonMain/kotlin/dev/api/PrometheVersion.kt)"
+          if [[ "$TAG_VERSION" != "$CODE_VERSION" ]]; then
+            echo "Tag version $TAG_VERSION does not match code version $CODE_VERSION" >&2
+            exit 1
+          fi
+
+  codeql:
+    name: CodeQL
+    runs-on: ubuntu-latest
+    needs: validate-tag
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
+      - uses: github/codeql-action/init@v3.28.17
+        with:
+          languages: java-kotlin
+      - uses: github/codeql-action/autobuild@v3.28.17
+      - uses: github/codeql-action/analyze@v3.28.17
+
+  source-trivy:
+    name: Trivy Source Scan
+    runs-on: ubuntu-latest
+    needs: validate-tag
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
+      - uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln,secret,misconfig
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: '1'
+          format: table
+
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: validate-tag
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
+      - uses: actions/setup-java@v4.7.1
+        with:
+          distribution: corretto
+          java-version: '21'
+          cache: gradle
+      - run: chmod +x gradlew
+      - run: ./gradlew shared:compileKotlinJvm gateway:compileKotlin api:compileKotlinJvm composeApp:compileKotlinDesktop composeApp:compileKotlinWasmJs --no-daemon
+      - run: ./gradlew shared:jvmTest gateway:test api:jvmTest composeApp:desktopTest --no-daemon
+
+  docs-consistency:
+    name: Docs Consistency
+    runs-on: ubuntu-latest
+    needs: validate-tag
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
+      - run: pwsh docs/verify-docs.ps1
+
+  lint:
+    name: Lint (ktlint)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: validate-tag
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
+      - uses: actions/setup-java@v4.7.1
+        with:
+          distribution: corretto
+          java-version: '21'
+          cache: gradle
+      - run: chmod +x gradlew
+      - run: ./gradlew ktlintCheck --no-daemon
+
+  analysis:
+    name: Qodana Community
+    runs-on: ubuntu-latest
+    needs: validate-tag
+    permissions:
+      contents: read
+      checks: write
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
+          fetch-depth: 0
+      - uses: JetBrains/qodana-action@v2025.1
+        with:
+          args: --project-dir,.
+          pr-mode: false
+        env:
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+
+  container-scan:
+    name: Scan release container candidates
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    needs: [build-and-test, docs-consistency, lint, analysis, codeql, source-trivy]
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
+      - uses: docker/setup-buildx-action@v3.10.0
+      - name: Build gateway candidate locally
+        uses: docker/build-push-action@v6.18.0
+        with:
+          context: .
+          load: true
+          platforms: linux/amd64
+          tags: promethe-gateway:release-scan
+          cache-from: type=gha
+      - name: Scan gateway candidate
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: promethe-gateway:release-scan
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: '1'
+          format: table
+      - name: Build runner candidate locally
+        uses: docker/build-push-action@v6.18.0
+        with:
+          context: .
+          file: Dockerfile.runner
+          load: true
+          platforms: linux/amd64
+          tags: promethe-runner:release-scan
+          cache-from: type=gha,scope=runner
+      - name: Scan runner candidate
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: promethe-runner:release-scan
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: '1'
+          format: table
+
+  docker-release:
+    name: Publish container and security metadata
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [build-and-test, docs-consistency, lint, analysis, codeql, source-trivy, container-scan]
+    env:
+      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
+      - uses: docker/setup-buildx-action@v3.10.0
+      - uses: docker/login-action@v3.5.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: meta
+        uses: docker/metadata-action@v5.7.0
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          flavor: latest=false
+          tags: |
+            type=sha,prefix=sha-
+            type=semver,pattern={{version}},value=${{ env.RELEASE_TAG }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ env.RELEASE_TAG }}
+            type=semver,pattern={{major}},value=${{ env.RELEASE_TAG }}
+            type=raw,value=latest,enable=${{ !contains(env.RELEASE_TAG, '-') }}
+      - id: build
+        uses: docker/build-push-action@v6.18.0
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: mode=max
+          sbom: true
+      - name: Trivy vulnerability scan
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}
+          format: table
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: '1'
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3.7.0
+
+      - name: Sign published image digest
+        env:
+          COSIGN_EXPERIMENTAL: '1'
+          IMAGE_DIGEST: ${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}
+        run: cosign sign --yes "$IMAGE_DIGEST"
+
+  desktop-package:
+    name: Desktop (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    needs: [build-and-test, docs-consistency, lint, analysis, codeql, source-trivy]
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
+      - uses: actions/setup-java@v4.7.1
+        with:
+          distribution: corretto
+          java-version: '21'
+          cache: gradle
+      - name: Package Desktop app
+        run: ./gradlew composeApp:packageDistributionForCurrentOS --console=plain --no-daemon
+      - uses: actions/upload-artifact@v4.6.2
+        with:
+          name: desktop-${{ matrix.os }}
+          path: composeApp/build/compose/binaries/
+          if-no-files-found: error
+          retention-days: 30
+
+  checksums:
+    name: Create checksums
+    runs-on: ubuntu-latest
+    needs: [build-and-test, docs-consistency, lint, analysis, docker-release, desktop-package]
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4.3.0
+        with:
+          pattern: desktop-*
+          path: release-assets
+      - name: Generate SHA-256 checksums
+        shell: bash
+        run: find release-assets -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > release-assets/SHA256SUMS.txt
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3.7.0
+      - name: Sign checksum manifest
+        shell: bash
+        run: cosign sign-blob --yes --bundle release-assets/SHA256SUMS.txt.sigstore.json release-assets/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4.6.2
+        with:
+          name: release-checksums
+          path: |
+            release-assets/SHA256SUMS.txt
+            release-assets/SHA256SUMS.txt.sigstore.json
+          if-no-files-found: error
+          retention-days: 30
+
+  publish-release:
+    name: Create GitHub release
+    runs-on: ubuntu-latest
+    needs: [build-and-test, docs-consistency, lint, analysis, docker-release, desktop-package, checksums]
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4.3.0
+        with:
+          pattern: desktop-*
+          path: release-assets
+      - uses: actions/download-artifact@v4.3.0
+        with:
+          name: release-checksums
+          path: release-assets
+      - name: Publish release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+        shell: bash
+        run: |
+          if [[ "$RELEASE_TAG" =~ - ]]; then
+            gh release create "$RELEASE_TAG" --verify-tag --generate-notes --title "$RELEASE_TAG" --prerelease
+          else
+            gh release create "$RELEASE_TAG" --verify-tag --generate-notes --title "$RELEASE_TAG"
+          fi
+          find release-assets -type f -print0 | xargs -0 -r gh release upload "$RELEASE_TAG" --clobber

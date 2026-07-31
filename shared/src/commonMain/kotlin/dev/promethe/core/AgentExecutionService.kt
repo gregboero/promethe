@@ -1,0 +1,228 @@
+package dev.promethe.core
+
+import dev.promethe.db.PrometheDatabaseApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonPrimitive
+import kotlin.time.Clock
+
+enum class AgentExecutionOrigin {
+    A2A,
+    ACP,
+    OPENAI_COMPAT,
+    CHANNEL,
+    WEBHOOK,
+    SCHEDULER,
+    GOAL,
+    VOICE,
+    INTERNAL,
+}
+
+data class AgentHistoryMessage(
+    val role: String,
+    val content: String,
+)
+
+data class AgentExecutionRequest(
+    val sessionId: String,
+    val text: String,
+    val history: List<AgentHistoryMessage> = emptyList(),
+    val profileId: String? = null,
+    val provider: String? = null,
+    val model: String? = null,
+    val origin: AgentExecutionOrigin = AgentExecutionOrigin.INTERNAL,
+    val channelHint: String = "internal",
+)
+
+sealed interface AgentExecutionEvent {
+    data class Step(
+        val index: Int,
+        val trajectory: ConversationTrajectory,
+    ) : AgentExecutionEvent
+
+    data class Completed(
+        val response: String,
+        val steps: Int,
+    ) : AgentExecutionEvent
+
+    data class Failed(
+        val code: String,
+        val message: String,
+        val steps: Int,
+    ) : AgentExecutionEvent
+}
+
+class AgentExecutionException(
+    val code: String,
+    message: String,
+    cause: Throwable? = null,
+) : IllegalStateException(message, cause)
+
+/**
+ * The single application service allowed to enter [AIAgent.executeLoop].
+ * Network protocols and background jobs adapt their requests to this contract.
+ */
+class AgentExecutionService(
+    private val agent: AIAgent,
+    private val database: PrometheDatabaseApi,
+) : AgentExecutionPort {
+    private val logger = Log.create("AgentExecutionService")
+
+    override fun execute(request: AgentExecutionRequest): Flow<AgentExecutionEvent> {
+        var stepCount = 0
+        return flow {
+            val input = request.text.trim()
+            if (input.isBlank()) {
+                emit(AgentExecutionEvent.Failed("empty_input", "Agent input must contain text", 0))
+                return@flow
+            }
+
+            val resolved = resolveProfile(request)
+            persistHistory(request)
+
+            var finalResponse: String? = null
+            agent.executeLoop(
+                sessionId = request.sessionId,
+                userInput = input,
+                overrideProvider = resolved.provider,
+                overrideModel = resolved.model,
+                personaOverlay = resolved.persona,
+                personaSkillNames = resolved.skills,
+                toolCallOrigin = request.origin.toToolCallOrigin(),
+                overrideReasoningEffort = resolved.reasoningEffort,
+                llmRequestContext = LlmRequestContext(request.sessionId, request.origin),
+            ).collect { trajectory ->
+                stepCount++
+                emit(AgentExecutionEvent.Step(stepCount, trajectory))
+                trajectory.outputs["response"]
+                    ?.trim()
+                    ?.takeIf { it.isNotBlank() }
+                    ?.let { finalResponse = it }
+            }
+
+            val response = finalResponse
+            if (response == null) {
+                logger.warn {
+                    "Agent execution ended without a final response: " +
+                        "session=${request.sessionId}, origin=${request.origin}, steps=$stepCount"
+                }
+                emit(
+                    AgentExecutionEvent.Failed(
+                        code = "missing_final_response",
+                        message = "The agent completed without producing a final response",
+                        steps = stepCount,
+                    ),
+                )
+            } else {
+                emit(AgentExecutionEvent.Completed(response, stepCount))
+            }
+        }.catch { e ->
+            logger.error(e) { "Agent execution failed for session ${request.sessionId}" }
+            emit(
+                AgentExecutionEvent.Failed(
+                    code = "agent_execution_failed",
+                    message = e.message ?: "Agent execution failed",
+                    steps = stepCount,
+                ),
+            )
+        }
+    }
+
+    override suspend fun executeToCompletion(request: AgentExecutionRequest): String {
+        var response: String? = null
+        var failure: AgentExecutionEvent.Failed? = null
+        execute(request).collect { event ->
+            when (event) {
+                is AgentExecutionEvent.Completed -> response = event.response
+                is AgentExecutionEvent.Failed -> failure = event
+                is AgentExecutionEvent.Step -> Unit
+            }
+        }
+        failure?.let { throw AgentExecutionException(it.code, it.message) }
+        return response ?: throw AgentExecutionException(
+            "missing_final_response",
+            "The agent completed without producing a final response",
+        )
+    }
+
+    private suspend fun persistHistory(request: AgentExecutionRequest) {
+        if (request.history.isEmpty()) return
+        val now = Clock.System.now().toEpochMilliseconds()
+        database.insertSessionOrIgnore(request.sessionId, now, "{}")
+        request.history
+            .filter { it.content.isNotBlank() }
+            .forEachIndexed { index, message ->
+                database.insertMessage(
+                    sessionId = request.sessionId,
+                    role = message.role,
+                    content = message.content,
+                    timestamp = now + index,
+                )
+            }
+    }
+
+    private suspend fun resolveProfile(request: AgentExecutionRequest): ResolvedExecution {
+        var provider = request.provider
+        var model = request.model
+        var persona: String? = null
+        var skills = emptyList<String>()
+        var reasoningEffort: dev.promethe.api.ReasoningEffort? = null
+
+        val profileId = request.profileId
+        if (!profileId.isNullOrBlank()) {
+            val profile = database.getAgentProfile(profileId)
+            if (profile != null) {
+                if (profile.provider.isNotBlank()) provider = profile.provider
+                if (profile.model.isNotBlank()) model = profile.model
+                persona = profile.systemPrompt.takeIf { it.isNotBlank() }
+                skills = parseSkills(profile.skills)
+                reasoningEffort = profile.reasoningEffort
+            } else {
+                logger.warn { "Agent profile '$profileId' was not found; using request defaults" }
+            }
+        }
+
+        return ResolvedExecution(provider, model, persona, skills, reasoningEffort)
+    }
+
+    private fun parseSkills(value: String): List<String> =
+        try {
+            (PrometheJson.parseToJsonElement(value) as? JsonArray)
+                ?.mapNotNull { (it as? JsonPrimitive)?.content }
+                ?: emptyList()
+        } catch (_: Exception) {
+            emptyList()
+        }
+
+    private fun AgentExecutionOrigin.toToolCallOrigin(): ToolCallOrigin =
+        when (this) {
+            AgentExecutionOrigin.A2A -> ToolCallOrigin.A2A
+
+            AgentExecutionOrigin.ACP -> ToolCallOrigin.ACP
+
+            AgentExecutionOrigin.OPENAI_COMPAT -> ToolCallOrigin.OPENAI_COMPAT
+
+            AgentExecutionOrigin.CHANNEL,
+            AgentExecutionOrigin.WEBHOOK,
+            -> ToolCallOrigin.CHANNEL
+
+            AgentExecutionOrigin.SCHEDULER -> ToolCallOrigin.SCHEDULER
+
+            AgentExecutionOrigin.GOAL -> ToolCallOrigin.AUTONOMY
+
+            AgentExecutionOrigin.VOICE -> ToolCallOrigin.VOICE
+
+            AgentExecutionOrigin.INTERNAL -> ToolCallOrigin.AGENT
+        }
+
+    private data class ResolvedExecution(
+        val provider: String?,
+        val model: String?,
+        val persona: String?,
+        val skills: List<String>,
+        val reasoningEffort: dev.promethe.api.ReasoningEffort?,
+    )
+}

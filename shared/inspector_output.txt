@@ -1,0 +1,263 @@
+=== CLASS: ai.koog.prompt.message.Message ===
+Constructors:
+Methods:
+  public abstract java.lang.String ai.koog.prompt.message.Message.getId()
+  private static java.lang.CharSequence ai.koog.prompt.message.Message.textContent$lambda$0(ai.koog.prompt.message.MessagePart$Text)
+  public static java.lang.String ai.koog.prompt.message.Message.access$textContent$jd(ai.koog.prompt.message.Message,java.lang.String)
+  public static java.lang.String ai.koog.prompt.message.Message.access$textContent$jd(ai.koog.prompt.message.Message)
+  public abstract ai.koog.prompt.message.Message$Role ai.koog.prompt.message.Message.getRole()
+  public abstract java.util.List ai.koog.prompt.message.Message.getParts()
+  public abstract ai.koog.prompt.message.MessageMetaInfo ai.koog.prompt.message.Message.getMetaInfo()
+  public default java.lang.String ai.koog.prompt.message.Message.textContent(java.lang.String)
+  public default java.lang.String ai.koog.prompt.message.Message.textContent()
+Fields:
+  public static final ai.koog.prompt.message.Message$Companion ai.koog.prompt.message.Message.Companion
+
+=== CLASS: ai.koog.prompt.message.Message$User ===
+Constructors:
+  public ai.koog.prompt.message.Message$User(java.util.List,ai.koog.prompt.message.RequestMetaInfo)
+  public ai.koog.prompt.message.Message$User(ai.koog.prompt.message.MessagePart$RequestPart,ai.koog.prompt.message.RequestMetaInfo,java.lang.String)
+  public ai.koog.prompt.message.Message$User(ai.koog.prompt.message.MessagePart$RequestPart,ai.koog.prompt.message.RequestMetaInfo,java.lang.String,int,kotlin.jvm.internal.DefaultConstructorMarker)
+  public ai.koog.prompt.message.Message$User(java.lang.String,ai.koog.prompt.message.RequestMetaInfo,ai.koog.prompt.message.CacheControl,java.lang.String)
+  public ai.koog.prompt.message.Message$User(java.lang.String,ai.koog.prompt.message.RequestMetaInfo,ai.koog.prompt.message.CacheControl,java.lang.String,int,kotlin.jvm.internal.DefaultConstructorMarker)
+  public ai.koog.prompt.message.Message$User(int,java.util.List,ai.koog.prompt.message.RequestMetaInfo,java.lang.String,ai.koog.prompt.message.Message$Role,kotlinx.serialization.internal.SerializationConstructorMarker)
+  public ai.koog.prompt.message.Message$User(java.util.List,ai.koog.prompt.message.RequestMetaInfo,java.lang.String)
+  public ai.koog.prompt.message.Message$User(java.util.List,ai.koog.prompt.message.RequestMetaInfo,java.lang.String,int,kotlin.jvm.internal.DefaultConstructorMarker)
+  public ai.koog.prompt.message.Message$User(java.lang.String,ai.koog.prompt.message.RequestMetaInfo)
+  public ai.koog.prompt.message.Message$User(java.lang.String,ai.koog.prompt.message.RequestMetaInfo,ai.koog.prompt.message.CacheControl)
+  public ai.koog.prompt.message.Message$User(ai.koog.prompt.message.MessagePart$RequestPart,ai.koog.prompt.message.RequestMetaInfo)
+Methods:
+  public boolean ai.koog.prompt.message.Message$User.equals(java.lang.Object)
+  public java.lang.String ai.koog.prompt.message.Message$User.toString()
+  public int ai.koog.prompt.message.Message$User.hashCode()
+  public java.lang.String ai.koog.prompt.message.Message$User.getId()
+  public final ai.koog.prompt.message.Message$User ai.koog.prompt.message.Message$User.copy(java.util.List,ai.koog.prompt.message.RequestMetaInfo,java.lang.String)
+  private static final kotlinx.serialization.KSerializer ai.koog.prompt.message.Message$User._childSerializers$_anonymous_$0()
+  public static final kotlin.Lazy[] ai.koog.prompt.message.Message$User.access$get$childSerializers$cp()
+  private static final kotlinx.serialization.KSerializer ai.koog.prompt.message.Message$User._childSerializers$_anonymous_()
+  public ai.koog.prompt.message.Message$Role ai.koog.prompt.message.Message$User.getRole()
+  public java.util.List ai.koog.prompt.message.Message$User.getParts()
+  public static final void ai.koog.prompt.message.Message$User.write$Self$prompt_model(ai.koog.prompt.message.Message$User,kotlinx.serialization.encoding.CompositeEncoder,kotlinx.serialization.descriptors.SerialDescriptor)
+  public final java.util.List ai.koog.prompt.message.Message$User.component1()
+  public final ai.koog.prompt.message.RequestMetaInfo ai.koog.prompt.message.Message$User.component2()
+  public final java.lang.String ai.koog.prompt.message.Message$User.component3()
+  public static ai.koog.prompt.message.Message$User ai.koog.prompt.message.Message$User.copy$default(ai.koog.prompt.message.Message$User,java.util.List,ai.koog.prompt.message.RequestMetaInfo,java.lang.String,int,java.lang.Object)
+  public ai.koog.prompt.message.MessageMetaInfo ai.koog.prompt.message.Message$User.getMetaInfo()
+  public ai.koog.prompt.message.RequestMetaInfo ai.koog.prompt.message.Message$User.getMetaInfo()
+  public java.lang.String ai.koog.prompt.message.Message$User.textContent(java.lang.String)
+  public java.lang.String ai.koog.prompt.message.Message$User.textContent()
+Fields:
+  public static final ai.koog.prompt.message.Message$User$Companion ai.koog.prompt.message.Message$User.Companion
+  private final java.util.List ai.koog.prompt.message.Message$User.parts
+  private final ai.koog.prompt.message.RequestMetaInfo ai.koog.prompt.message.Message$User.metaInfo
+  private final java.lang.String ai.koog.prompt.message.Message$User.id
+  private final ai.koog.prompt.message.Message$Role ai.koog.prompt.message.Message$User.role
+  private static final kotlin.Lazy[] ai.koog.prompt.message.Message$User.$childSerializers
+
+=== CLASS: ai.koog.prompt.message.Message$Assistant ===
+Constructors:
+  public ai.koog.prompt.message.Message$Assistant(java.lang.String,ai.koog.prompt.message.ResponseMetaInfo,java.lang.String,kotlinx.serialization.json.JsonObject,java.lang.String,int,kotlin.jvm.internal.DefaultConstructorMarker)
+  public ai.koog.prompt.message.Message$Assistant(java.lang.String,ai.koog.prompt.message.ResponseMetaInfo,java.lang.String,kotlinx.serialization.json.JsonObject,java.lang.String)
+  public ai.koog.prompt.message.Message$Assistant(ai.koog.prompt.message.MessagePart$ResponsePart,ai.koog.prompt.message.ResponseMetaInfo,java.lang.String,kotlinx.serialization.json.JsonObject,java.lang.String,int,kotlin.jvm.internal.DefaultConstructorMarker)
+  public ai.koog.prompt.message.Message$Assistant(ai.koog.prompt.message.MessagePart$ResponsePart,ai.koog.prompt.message.ResponseMetaInfo,java.lang.String,kotlinx.serialization.json.JsonObject,java.lang.String)
+  public ai.koog.prompt.message.Message$Assistant(int,java.util.List,ai.koog.prompt.message.ResponseMetaInfo,java.lang.String,kotlinx.serialization.json.JsonObject,java.lang.String,ai.koog.prompt.message.Message$Role,kotlinx.serialization.internal.SerializationConstructorMarker)
+  public ai.koog.prompt.message.Message$Assistant(java.util.List,ai.koog.prompt.message.ResponseMetaInfo,java.lang.String,kotlinx.serialization.json.JsonObject)
+  public ai.koog.prompt.message.Message$Assistant(java.util.List,ai.koog.prompt.message.ResponseMetaInfo,java.lang.String)
+  public ai.koog.prompt.message.Message$Assistant(java.util.List,ai.koog.prompt.message.ResponseMetaInfo)
+  public ai.koog.prompt.message.Message$Assistant(java.lang.String,ai.koog.prompt.message.ResponseMetaInfo,java.lang.String)
+  public ai.koog.prompt.message.Message$Assistant(java.lang.String,ai.koog.prompt.message.ResponseMetaInfo)
+  public ai.koog.prompt.message.Message$Assistant(java.util.List,ai.koog.prompt.message.ResponseMetaInfo,java.lang.String,kotlinx.serialization.json.JsonObject,java.lang.String,int,kotlin.jvm.internal.DefaultConstructorMarker)
+  public ai.koog.prompt.message.Message$Assistant(java.util.List,ai.koog.prompt.message.ResponseMetaInfo,java.lang.String,kotlinx.serialization.json.JsonObject,java.lang.String)
+  public ai.koog.prompt.message.Message$Assistant(ai.koog.prompt.message.MessagePart$ResponsePart,ai.koog.prompt.message.ResponseMetaInfo,java.lang.String,kotlinx.serialization.json.JsonObject)
+  public ai.koog.prompt.message.Message$Assistant(ai.koog.prompt.message.MessagePart$ResponsePart,ai.koog.prompt.message.ResponseMetaInfo,java.lang.String)
+  public ai.koog.prompt.message.Message$Assistant(ai.koog.prompt.message.MessagePart$ResponsePart,ai.koog.prompt.message.ResponseMetaInfo)
+  public ai.koog.prompt.message.Message$Assistant(java.lang.String,ai.koog.prompt.message.ResponseMetaInfo,java.lang.String,kotlinx.serialization.json.JsonObject)
+Methods:
+  public boolean ai.koog.prompt.message.Message$Assistant.equals(java.lang.Object)
+  public java.lang.String ai.koog.prompt.message.Message$Assistant.toString()
+  public int ai.koog.prompt.message.Message$Assistant.hashCode()
+  public java.lang.String ai.koog.prompt.message.Message$Assistant.getId()
+  public final ai.koog.prompt.message.Message$Assistant ai.koog.prompt.message.Message$Assistant.copy(java.util.List,ai.koog.prompt.message.ResponseMetaInfo,java.lang.String,kotlinx.serialization.json.JsonObject,java.lang.String)
+  private static final kotlinx.serialization.KSerializer ai.koog.prompt.message.Message$Assistant._childSerializers$_anonymous_$0()
+  public static final kotlin.Lazy[] ai.koog.prompt.message.Message$Assistant.access$get$childSerializers$cp()
+  private static final kotlinx.serialization.KSerializer ai.koog.prompt.message.Message$Assistant._childSerializers$_anonymous_()
+  public ai.koog.prompt.message.Message$Role ai.koog.prompt.message.Message$Assistant.getRole()
+  public java.util.List ai.koog.prompt.message.Message$Assistant.getParts()
+  public static final void ai.koog.prompt.message.Message$Assistant.write$Self$prompt_model(ai.koog.prompt.message.Message$Assistant,kotlinx.serialization.encoding.CompositeEncoder,kotlinx.serialization.descriptors.SerialDescriptor)
+  public final java.util.List ai.koog.prompt.message.Message$Assistant.component1()
+  public final java.lang.String ai.koog.prompt.message.Message$Assistant.component5()
+  public final ai.koog.prompt.message.ResponseMetaInfo ai.koog.prompt.message.Message$Assistant.component2()
+  public final java.lang.String ai.koog.prompt.message.Message$Assistant.component3()
+  public final kotlinx.serialization.json.JsonObject ai.koog.prompt.message.Message$Assistant.component4()
+  public static ai.koog.prompt.message.Message$Assistant ai.koog.prompt.message.Message$Assistant.copy$default(ai.koog.prompt.message.Message$Assistant,java.util.List,ai.koog.prompt.message.ResponseMetaInfo,java.lang.String,kotlinx.serialization.json.JsonObject,java.lang.String,int,java.lang.Object)
+  public ai.koog.prompt.message.ResponseMetaInfo ai.koog.prompt.message.Message$Assistant.getMetaInfo()
+  public ai.koog.prompt.message.MessageMetaInfo ai.koog.prompt.message.Message$Assistant.getMetaInfo()
+  public java.lang.String ai.koog.prompt.message.Message$Assistant.textContent()
+  public java.lang.String ai.koog.prompt.message.Message$Assistant.textContent(java.lang.String)
+  public final kotlinx.serialization.json.JsonObject ai.koog.prompt.message.Message$Assistant.getRawResponse()
+  public final java.lang.String ai.koog.prompt.message.Message$Assistant.getFinishReason()
+Fields:
+  public static final ai.koog.prompt.message.Message$Assistant$Companion ai.koog.prompt.message.Message$Assistant.Companion
+  private final java.util.List ai.koog.prompt.message.Message$Assistant.parts
+  private final ai.koog.prompt.message.ResponseMetaInfo ai.koog.prompt.message.Message$Assistant.metaInfo
+  private final java.lang.String ai.koog.prompt.message.Message$Assistant.finishReason
+  private final kotlinx.serialization.json.JsonObject ai.koog.prompt.message.Message$Assistant.rawResponse
+  private final java.lang.String ai.koog.prompt.message.Message$Assistant.id
+  private final ai.koog.prompt.message.Message$Role ai.koog.prompt.message.Message$Assistant.role
+  private static final kotlin.Lazy[] ai.koog.prompt.message.Message$Assistant.$childSerializers
+
+=== CLASS: ai.koog.prompt.message.Message$System ===
+Constructors:
+  public ai.koog.prompt.message.Message$System(java.util.List,ai.koog.prompt.message.RequestMetaInfo)
+  public ai.koog.prompt.message.Message$System(ai.koog.prompt.message.MessagePart$Text,ai.koog.prompt.message.RequestMetaInfo,java.lang.String)
+  public ai.koog.prompt.message.Message$System(ai.koog.prompt.message.MessagePart$Text,ai.koog.prompt.message.RequestMetaInfo,java.lang.String,int,kotlin.jvm.internal.DefaultConstructorMarker)
+  public ai.koog.prompt.message.Message$System(java.lang.String,ai.koog.prompt.message.RequestMetaInfo,ai.koog.prompt.message.CacheControl,java.lang.String)
+  public ai.koog.prompt.message.Message$System(java.lang.String,ai.koog.prompt.message.RequestMetaInfo,ai.koog.prompt.message.CacheControl,java.lang.String,int,kotlin.jvm.internal.DefaultConstructorMarker)
+  public ai.koog.prompt.message.Message$System(int,java.util.List,ai.koog.prompt.message.RequestMetaInfo,java.lang.String,ai.koog.prompt.message.Message$Role,kotlinx.serialization.internal.SerializationConstructorMarker)
+  public ai.koog.prompt.message.Message$System(java.util.List,ai.koog.prompt.message.RequestMetaInfo,java.lang.String)
+  public ai.koog.prompt.message.Message$System(java.util.List,ai.koog.prompt.message.RequestMetaInfo,java.lang.String,int,kotlin.jvm.internal.DefaultConstructorMarker)
+  public ai.koog.prompt.message.Message$System(java.lang.String,ai.koog.prompt.message.RequestMetaInfo)
+  public ai.koog.prompt.message.Message$System(java.lang.String,ai.koog.prompt.message.RequestMetaInfo,ai.koog.prompt.message.CacheControl)
+  public ai.koog.prompt.message.Message$System(ai.koog.prompt.message.MessagePart$Text,ai.koog.prompt.message.RequestMetaInfo)
+Methods:
+  public boolean ai.koog.prompt.message.Message$System.equals(java.lang.Object)
+  public java.lang.String ai.koog.prompt.message.Message$System.toString()
+  public int ai.koog.prompt.message.Message$System.hashCode()
+  public java.lang.String ai.koog.prompt.message.Message$System.getId()
+  public final ai.koog.prompt.message.Message$System ai.koog.prompt.message.Message$System.copy(java.util.List,ai.koog.prompt.message.RequestMetaInfo,java.lang.String)
+  private static final kotlinx.serialization.KSerializer ai.koog.prompt.message.Message$System._childSerializers$_anonymous_$0()
+  public static final kotlin.Lazy[] ai.koog.prompt.message.Message$System.access$get$childSerializers$cp()
+  private static final kotlinx.serialization.KSerializer ai.koog.prompt.message.Message$System._childSerializers$_anonymous_()
+  public ai.koog.prompt.message.Message$Role ai.koog.prompt.message.Message$System.getRole()
+  public java.util.List ai.koog.prompt.message.Message$System.getParts()
+  public static final void ai.koog.prompt.message.Message$System.write$Self$prompt_model(ai.koog.prompt.message.Message$System,kotlinx.serialization.encoding.CompositeEncoder,kotlinx.serialization.descriptors.SerialDescriptor)
+  public final java.util.List ai.koog.prompt.message.Message$System.component1()
+  public final ai.koog.prompt.message.RequestMetaInfo ai.koog.prompt.message.Message$System.component2()
+  public final java.lang.String ai.koog.prompt.message.Message$System.component3()
+  public static ai.koog.prompt.message.Message$System ai.koog.prompt.message.Message$System.copy$default(ai.koog.prompt.message.Message$System,java.util.List,ai.koog.prompt.message.RequestMetaInfo,java.lang.String,int,java.lang.Object)
+  public ai.koog.prompt.message.MessageMetaInfo ai.koog.prompt.message.Message$System.getMetaInfo()
+  public ai.koog.prompt.message.RequestMetaInfo ai.koog.prompt.message.Message$System.getMetaInfo()
+  public java.lang.String ai.koog.prompt.message.Message$System.textContent(java.lang.String)
+  public java.lang.String ai.koog.prompt.message.Message$System.textContent()
+Fields:
+  public static final ai.koog.prompt.message.Message$System$Companion ai.koog.prompt.message.Message$System.Companion
+  private final java.util.List ai.koog.prompt.message.Message$System.parts
+  private final ai.koog.prompt.message.RequestMetaInfo ai.koog.prompt.message.Message$System.metaInfo
+  private final java.lang.String ai.koog.prompt.message.Message$System.id
+  private final ai.koog.prompt.message.Message$Role ai.koog.prompt.message.Message$System.role
+  private static final kotlin.Lazy[] ai.koog.prompt.message.Message$System.$childSerializers
+
+=== CLASS: ai.koog.prompt.executor.llms.MultiLLMPromptExecutor ===
+Constructors:
+  public ai.koog.prompt.executor.llms.MultiLLMPromptExecutor(java.util.List,ai.koog.prompt.executor.llms.MultiLLMPromptExecutor$FallbackPromptExecutorSettings,int,kotlin.jvm.internal.DefaultConstructorMarker)
+  public ai.koog.prompt.executor.llms.MultiLLMPromptExecutor(ai.koog.prompt.executor.clients.LLMClient[])
+  public ai.koog.prompt.executor.llms.MultiLLMPromptExecutor(java.util.List)
+  public ai.koog.prompt.executor.llms.MultiLLMPromptExecutor(kotlin.Pair[])
+  public ai.koog.prompt.executor.llms.MultiLLMPromptExecutor(java.util.Map)
+  public ai.koog.prompt.executor.llms.MultiLLMPromptExecutor(java.util.Map,ai.koog.prompt.executor.llms.MultiLLMPromptExecutor$FallbackPromptExecutorSettings)
+  public ai.koog.prompt.executor.llms.MultiLLMPromptExecutor(java.util.Map,ai.koog.prompt.executor.llms.MultiLLMPromptExecutor$FallbackPromptExecutorSettings,int,kotlin.jvm.internal.DefaultConstructorMarker)
+  public ai.koog.prompt.executor.llms.MultiLLMPromptExecutor(kotlin.Pair[],ai.koog.prompt.executor.llms.MultiLLMPromptExecutor$FallbackPromptExecutorSettings)
+  public ai.koog.prompt.executor.llms.MultiLLMPromptExecutor(kotlin.Pair[],ai.koog.prompt.executor.llms.MultiLLMPromptExecutor$FallbackPromptExecutorSettings,int,kotlin.jvm.internal.DefaultConstructorMarker)
+  public ai.koog.prompt.executor.llms.MultiLLMPromptExecutor(java.util.List,ai.koog.prompt.executor.llms.MultiLLMPromptExecutor$FallbackPromptExecutorSettings)
+Methods:
+  public java.lang.Object ai.koog.prompt.executor.llms.MultiLLMPromptExecutor.execute(ai.koog.prompt.Prompt,ai.koog.prompt.llm.LLModel,java.util.List,kotlin.coroutines.Continuation)
+  public void ai.koog.prompt.executor.llms.MultiLLMPromptExecutor.close()
+  private static final ai.koog.prompt.executor.clients.LLMClient ai.koog.prompt.executor.llms.MultiLLMPromptExecutor.fallbackClient_delegate$lambda$0(ai.koog.prompt.executor.llms.MultiLLMPromptExecutor)
+  private static final java.lang.Object ai.koog.prompt.executor.llms.MultiLLMPromptExecutor.executeMultipleChoices$lambda$0(ai.koog.prompt.Prompt,java.util.List,ai.koog.prompt.llm.LLModel)
+  public ai.koog.prompt.structure.json.generator.BasicJsonSchemaGenerator ai.koog.prompt.executor.llms.MultiLLMPromptExecutor.getBasicJsonSchemaGenerator(ai.koog.prompt.llm.LLModel)
+  static java.lang.Object ai.koog.prompt.executor.llms.MultiLLMPromptExecutor.executeMultipleChoices$suspendImpl(ai.koog.prompt.executor.llms.MultiLLMPromptExecutor,ai.koog.prompt.Prompt,ai.koog.prompt.llm.LLModel,java.util.List,kotlin.coroutines.Continuation)
+  private static final java.lang.Object ai.koog.prompt.executor.llms.MultiLLMPromptExecutor.executeMultipleChoices$lambda$1(java.util.List)
+  public ai.koog.prompt.structure.json.generator.StandardJsonSchemaGenerator ai.koog.prompt.executor.llms.MultiLLMPromptExecutor.getStandardJsonSchemaGenerator(ai.koog.prompt.llm.LLModel)
+  public static final java.util.Map ai.koog.prompt.executor.llms.MultiLLMPromptExecutor.access$getLlmClients$p(ai.koog.prompt.executor.llms.MultiLLMPromptExecutor)
+  private static final java.lang.Object ai.koog.prompt.executor.llms.MultiLLMPromptExecutor.executeStreaming$lambda$0(ai.koog.prompt.Prompt,ai.koog.prompt.llm.LLModel)
+  public java.lang.Object ai.koog.prompt.executor.llms.MultiLLMPromptExecutor.executeMultipleChoices(ai.koog.prompt.Prompt,ai.koog.prompt.llm.LLModel,java.util.List,kotlin.coroutines.Continuation)
+  static java.lang.Object ai.koog.prompt.executor.llms.MultiLLMPromptExecutor.moderate$suspendImpl(ai.koog.prompt.executor.llms.MultiLLMPromptExecutor,ai.koog.prompt.Prompt,ai.koog.prompt.llm.LLModel,kotlin.coroutines.Continuation)
+  static java.lang.Object ai.koog.prompt.executor.llms.MultiLLMPromptExecutor.execute$suspendImpl(ai.koog.prompt.executor.llms.MultiLLMPromptExecutor,ai.koog.prompt.Prompt,ai.koog.prompt.llm.LLModel,java.util.List,kotlin.coroutines.Continuation)
+  public java.lang.Object ai.koog.prompt.executor.llms.MultiLLMPromptExecutor.models(kotlin.coroutines.Continuation)
+  public java.lang.Object ai.koog.prompt.executor.llms.MultiLLMPromptExecutor.moderate(ai.koog.prompt.Prompt,ai.koog.prompt.llm.LLModel,kotlin.coroutines.Continuation)
+  private final ai.koog.prompt.executor.clients.LLMClient ai.koog.prompt.executor.llms.MultiLLMPromptExecutor.getFallbackClient()
+  private static final java.lang.Object ai.koog.prompt.executor.llms.MultiLLMPromptExecutor.execute$lambda$0(ai.koog.prompt.Prompt,java.util.List,ai.koog.prompt.llm.LLModel)
+  public kotlinx.coroutines.flow.Flow ai.koog.prompt.executor.llms.MultiLLMPromptExecutor.executeStreaming(ai.koog.prompt.Prompt,ai.koog.prompt.llm.LLModel,java.util.List)
+  private static final java.lang.Object ai.koog.prompt.executor.llms.MultiLLMPromptExecutor.moderate$lambda$0(ai.koog.prompt.llm.LLModel)
+  static java.lang.Object ai.koog.prompt.executor.llms.MultiLLMPromptExecutor.models$suspendImpl(ai.koog.prompt.executor.llms.MultiLLMPromptExecutor,kotlin.coroutines.Continuation)
+  private static final java.lang.Object ai.koog.prompt.executor.llms.MultiLLMPromptExecutor.models$lambda$0()
+  private static final java.lang.Object ai.koog.prompt.executor.llms.MultiLLMPromptExecutor.execute$lambda$1(ai.koog.prompt.message.Message$Assistant)
+Fields:
+  private static final ai.koog.prompt.executor.llms.MultiLLMPromptExecutor$Companion ai.koog.prompt.executor.llms.MultiLLMPromptExecutor.Companion
+  private final java.util.Map ai.koog.prompt.executor.llms.MultiLLMPromptExecutor.llmClients
+  private final ai.koog.prompt.executor.llms.MultiLLMPromptExecutor$FallbackPromptExecutorSettings ai.koog.prompt.executor.llms.MultiLLMPromptExecutor.fallback
+  private final kotlin.Lazy ai.koog.prompt.executor.llms.MultiLLMPromptExecutor.fallbackClient$delegate
+  private static final io.github.oshai.kotlinlogging.KLogger ai.koog.prompt.executor.llms.MultiLLMPromptExecutor.logger
+
+=== CLASS: ai.koog.prompt.api.PromptExecutor ===
+  Failed to load class: ai.koog.prompt.api.PromptExecutor
+
+=== CLASS: ai.koog.prompt.executor.PromptExecutor ===
+  Failed to load class: ai.koog.prompt.executor.PromptExecutor
+
+=== CLASS: ai.koog.agents.core.tools.Tool ===
+Constructors:
+  public ai.koog.agents.core.tools.Tool(ai.koog.serialization.TypeToken,ai.koog.serialization.TypeToken,java.lang.String,java.lang.String,kotlinx.schema.generator.json.JsonSchemaConfig,int,kotlin.jvm.internal.DefaultConstructorMarker)
+  public ai.koog.agents.core.tools.Tool(ai.koog.serialization.TypeToken,ai.koog.serialization.TypeToken,java.lang.String,java.lang.String,kotlinx.schema.generator.json.JsonSchemaConfig)
+  public ai.koog.agents.core.tools.Tool(ai.koog.serialization.TypeToken,ai.koog.serialization.TypeToken,ai.koog.agents.core.tools.ToolDescriptor,java.util.Map,int,kotlin.jvm.internal.DefaultConstructorMarker)
+  public ai.koog.agents.core.tools.Tool(ai.koog.serialization.TypeToken,ai.koog.serialization.TypeToken,ai.koog.agents.core.tools.ToolDescriptor,java.util.Map)
+Methods:
+  public final java.lang.Object ai.koog.agents.core.tools.Tool.execute(java.lang.Object,ai.koog.agents.core.tools.ToolCallMetadata,kotlin.coroutines.Continuation)
+  public abstract java.lang.Object ai.koog.agents.core.tools.Tool.execute(java.lang.Object,kotlin.coroutines.Continuation)
+Fields:
+
+=== CLASS: ai.koog.agents.core.tools.ToolDescriptor ===
+Constructors:
+  public ai.koog.agents.core.tools.ToolDescriptor(java.lang.String,java.lang.String,java.util.List,java.util.List,ai.koog.prompt.message.CacheControl)
+  public ai.koog.agents.core.tools.ToolDescriptor(java.lang.String,java.lang.String,java.util.List,java.util.List,ai.koog.prompt.message.CacheControl,int,kotlin.jvm.internal.DefaultConstructorMarker)
+Methods:
+  public final java.lang.String ai.koog.agents.core.tools.ToolDescriptor.getName()
+  public boolean ai.koog.agents.core.tools.ToolDescriptor.equals(java.lang.Object)
+  public java.lang.String ai.koog.agents.core.tools.ToolDescriptor.toString()
+  public int ai.koog.agents.core.tools.ToolDescriptor.hashCode()
+  public final ai.koog.agents.core.tools.ToolDescriptor ai.koog.agents.core.tools.ToolDescriptor.copy(java.lang.String,java.lang.String,java.util.List,java.util.List,ai.koog.prompt.message.CacheControl)
+  public final java.lang.String ai.koog.agents.core.tools.ToolDescriptor.getDescription()
+  public static ai.koog.agents.core.tools.ToolDescriptor ai.koog.agents.core.tools.ToolDescriptor.copy$default(ai.koog.agents.core.tools.ToolDescriptor,java.lang.String,java.lang.String,java.util.List,java.util.List,ai.koog.prompt.message.CacheControl,int,java.lang.Object)
+  public final ai.koog.prompt.message.CacheControl ai.koog.agents.core.tools.ToolDescriptor.getCacheControl()
+  public final ai.koog.agents.core.tools.ToolDescriptor ai.koog.agents.core.tools.ToolDescriptor.withCacheControl(ai.koog.prompt.message.CacheControl)
+  private static final void ai.koog.agents.core.tools.ToolDescriptor.toString$lambda$0$appendParameters(java.lang.StringBuilder,java.util.List)
+  public final java.util.List ai.koog.agents.core.tools.ToolDescriptor.getRequiredParameters()
+  public final java.util.List ai.koog.agents.core.tools.ToolDescriptor.getOptionalParameters()
+Fields:
+  private final java.lang.String ai.koog.agents.core.tools.ToolDescriptor.name
+  private final java.lang.String ai.koog.agents.core.tools.ToolDescriptor.description
+  private final java.util.List ai.koog.agents.core.tools.ToolDescriptor.requiredParameters
+  private final java.util.List ai.koog.agents.core.tools.ToolDescriptor.optionalParameters
+  private final ai.koog.prompt.message.CacheControl ai.koog.agents.core.tools.ToolDescriptor.cacheControl
+
+=== CLASS: ai.koog.agents.core.tracing.TracingConfig ===
+  Failed to load class: ai.koog.agents.core.tracing.TracingConfig
+
+=== CLASS: ai.koog.agents.core.agent.AIAgent ===
+Constructors:
+  public ai.koog.agents.core.agent.AIAgent()
+Methods:
+  public final java.lang.Object ai.koog.agents.core.agent.AIAgent.run(java.lang.Object)
+  public final java.lang.Object ai.koog.agents.core.agent.AIAgent.run(java.lang.Object,java.lang.String)
+  public abstract java.lang.Object ai.koog.agents.core.agent.AIAgent.run(java.lang.Object,java.lang.String,kotlin.coroutines.Continuation)
+  public static final ai.koog.agents.core.agent.AIAgentBuilder ai.koog.agents.core.agent.AIAgent.builder()
+  public abstract java.lang.String ai.koog.agents.core.agent.AIAgent.getId()
+  public static java.lang.Object ai.koog.agents.core.agent.AIAgent.run$default(ai.koog.agents.core.agent.AIAgent,java.lang.Object,java.lang.String,kotlin.coroutines.Continuation,int,java.lang.Object)
+  public static java.lang.Object ai.koog.agents.core.agent.AIAgent.run$default(ai.koog.agents.core.agent.AIAgent,java.lang.Object,java.lang.String,int,java.lang.Object)
+  public abstract ai.koog.agents.core.agent.config.AIAgentConfig ai.koog.agents.core.agent.AIAgent.getAgentConfig()
+  public abstract ai.koog.agents.core.agent.session.AIAgentRunSession ai.koog.agents.core.agent.AIAgent.createSession(java.lang.String)
+  public static ai.koog.agents.core.agent.session.AIAgentRunSession ai.koog.agents.core.agent.AIAgent.createSession$default(ai.koog.agents.core.agent.AIAgent,java.lang.String,int,java.lang.Object)
+Fields:
+  public static final ai.koog.agents.core.agent.AIAgent$Companion ai.koog.agents.core.agent.AIAgent.Companion
+
+=== CLASS: ai.koog.agents.core.agent.AIAgent$Companion ===
+Constructors:
+  private ai.koog.agents.core.agent.AIAgent$Companion()
+  public ai.koog.agents.core.agent.AIAgent$Companion(kotlin.jvm.internal.DefaultConstructorMarker)
+Methods:
+  public final ai.koog.agents.core.agent.AIAgentBuilder ai.koog.agents.core.agent.AIAgent$Companion.builder()
+Fields:
+
+=== CLASS: ai.koog.agents.core.agent.AIAgent$Builder ===
+  Failed to load class: ai.koog.agents.core.agent.AIAgent$Builder
+

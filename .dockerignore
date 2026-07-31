@@ -1,0 +1,9 @@
+.git
+.gradle
+.idea
+**/build
+sandbox-native/target
+*.db
+*.log
+.env
+credentials.json

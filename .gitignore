@@ -1,0 +1,52 @@
+# Build
+build/
+.gradle/
+*.class
+*.jar
+!gradle-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment (secrets)
+.env
+.env.local
+.env.*.local
+
+# Database
+/data/
+*.db
+
+# Runtime data (now in ~/.promethe/)
+profiles/
+plugins/
+
+# Kotlin
+*.kotlin_module
+
+# Docker
+promethe-data/
+
+# Logs & debug
+*.log
+logs/
+docs/tmp/
+*_inspect.txt
+all_koog_classes.txt
+jar_classes.txt
+
+# Toolchain
+.kotlin/
+.temp_sdk/
+sandbox-native/target/
+
+# Secrets & machine-specific
+credentials.json
+env.json*
+local.properties

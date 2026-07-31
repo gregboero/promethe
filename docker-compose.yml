@@ -1,0 +1,92 @@
+services:
+  # ── Promethe Core Gateway ──────────────────────────────────
+  # Standalone mode: embedded memory, direct provider API keys
+  # Combine with overlays for LiteLLM, Honcho, TencentDB, etc.
+  #   docker compose -f docker-compose.yml -f compose.litellm.yaml up
+  promethe-core:
+    build: .
+    ports:
+      # Loopback only by default. A LAN/Internet publication requires an
+      # explicit compose override and REMOTE_ACCESS_ENABLED=true.
+      - "127.0.0.1:8080:8080"
+    environment:
+      # LLM provider (override with compose.litellm.yaml for proxy mode)
+      - LLM_PROVIDER=${LLM_PROVIDER:-openai}
+      - LLM_MODEL=${LLM_MODEL:-}
+      - LLM_BASE_URL=${LLM_BASE_URL:-}
+      # Direct provider API keys
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
+      - NVIDIA_NIM_API_KEY=${NVIDIA_NIM_API_KEY:-}
+      - LITELLM_API_KEY=${LITELLM_API_KEY:-}
+      - STABILITY_API_KEY=${STABILITY_API_KEY:-}
+      - REPLICATE_API_TOKEN=${REPLICATE_API_TOKEN:-}
+      - FAL_KEY=${FAL_KEY:-}
+      - RUNWAY_API_KEY=${RUNWAY_API_KEY:-}
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY:-}
+      - DEEPGRAM_API_KEY=${DEEPGRAM_API_KEY:-}
+      - COHERE_API_KEY=${COHERE_API_KEY:-}
+      - VOYAGE_API_KEY=${VOYAGE_API_KEY:-}
+      - MISTRAL_API_KEY=${MISTRAL_API_KEY:-}
+      # Memory provider (default: embedded SQLite)
+      # Override with compose.honcho.yaml or compose.tencent.yaml
+      - MEMORY_PROVIDER=${MEMORY_PROVIDER:-embedded}
+      - HONCHO_URL=${HONCHO_URL:-}
+      - HONCHO_API_KEY=${HONCHO_API_KEY:-}
+      - TENCENT_MEMORY_URL=${TENCENT_MEMORY_URL:-}
+      - TENCENT_MEMORY_API_KEY=${TENCENT_MEMORY_API_KEY:-}
+      - TENCENT_SERVICE_ID=${TENCENT_SERVICE_ID:-}
+      # Execution & guardrails
+      - EXEC_BACKEND=${EXEC_BACKEND:-local}
+      - APPROVAL_MODE=${APPROVAL_MODE:-dangerous}
+      - CODE_EXECUTION_ENABLED=${CODE_EXECUTION_ENABLED:-false}
+      - PROCESS_TOOL_ENABLED=${PROCESS_TOOL_ENABLED:-false}
+      - DOCKER_TOOL_ENABLED=${DOCKER_TOOL_ENABLED:-false}
+      - SANDBOX_BACKEND=${SANDBOX_BACKEND:-auto}
+      - SANDBOX_WORKSPACE=${SANDBOX_WORKSPACE:-/home/promethe/.promethe/workspace}
+      - SANDBOX_MODE=${SANDBOX_MODE:-WORKSPACE_WRITE}
+      - SANDBOX_APPROVAL_POLICY=${SANDBOX_APPROVAL_POLICY:-ON_REQUEST}
+      - SANDBOX_NETWORK_MODE=${SANDBOX_NETWORK_MODE:-OFF}
+      - SANDBOX_ALLOWED_DOMAINS=${SANDBOX_ALLOWED_DOMAINS:-}
+      # Gateway network boundary. Docker needs 0.0.0.0 internally while the
+      # published host port above remains loopback-only.
+      - GATEWAY_BIND_HOST=${GATEWAY_BIND_HOST:-0.0.0.0}
+      - REMOTE_ACCESS_ENABLED=${REMOTE_ACCESS_ENABLED:-false}
+      - PUBLIC_BASE_URL=${PUBLIC_BASE_URL:-}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-}
+      - REMOTE_SESSION_TTL_MINUTES=${REMOTE_SESSION_TTL_MINUTES:-60}
+      # Required (Base64-encoded 32 bytes) when remote access or OAuth is enabled.
+      - PROMETHE_MASTER_KEY=${PROMETHE_MASTER_KEY:-}
+      - PROMETHE_MASTER_KEY_ID=${PROMETHE_MASTER_KEY_ID:-primary}
+      - PROMETHE_PREVIOUS_MASTER_KEYS=${PROMETHE_PREVIOUS_MASTER_KEYS:-}
+      # OAuth uses a fixed callback below PUBLIC_BASE_URL.
+      - OAUTH_ENABLED=${OAUTH_ENABLED:-false}
+      - OAUTH_REDIRECT_URI=${OAUTH_REDIRECT_URI:-}
+      - OAUTH_GITHUB_CLIENT_ID=${OAUTH_GITHUB_CLIENT_ID:-}
+      - OAUTH_GITHUB_CLIENT_SECRET=${OAUTH_GITHUB_CLIENT_SECRET:-}
+      - OAUTH_GOOGLE_CLIENT_ID=${OAUTH_GOOGLE_CLIENT_ID:-}
+      - OAUTH_GOOGLE_CLIENT_SECRET=${OAUTH_GOOGLE_CLIENT_SECRET:-}
+      # Signed inbound webhook configuration.
+      - TELEGRAM_SECRET_TOKEN=${TELEGRAM_SECRET_TOKEN:-}
+      - DISCORD_PUBLIC_KEY=${DISCORD_PUBLIC_KEY:-}
+      - SLACK_SIGNING_SECRET=${SLACK_SIGNING_SECRET:-}
+      - WHATSAPP_APP_SECRET=${WHATSAPP_APP_SECRET:-}
+      - WHATSAPP_VERIFY_TOKEN=${WHATSAPP_VERIFY_TOKEN:-}
+      - SIGNAL_WEBHOOK_TOKEN=${SIGNAL_WEBHOOK_TOKEN:-}
+      - MATRIX_WEBHOOK_TOKEN=${MATRIX_WEBHOOK_TOKEN:-}
+      # Environment-managed MCP servers remain immutable in the UI.
+      - MCP_SERVERS=${MCP_SERVERS:-}
+    volumes:
+      - promethe-home:/home/promethe/.promethe
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  promethe-home:

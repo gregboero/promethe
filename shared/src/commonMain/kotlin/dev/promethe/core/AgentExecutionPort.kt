@@ -1,0 +1,9 @@
+package dev.promethe.core
+
+import kotlinx.coroutines.flow.Flow
+
+interface AgentExecutionPort {
+    fun execute(request: AgentExecutionRequest): Flow<AgentExecutionEvent>
+
+    suspend fun executeToCompletion(request: AgentExecutionRequest): String
+}

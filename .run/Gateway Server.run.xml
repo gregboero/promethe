@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="🌐 Gateway (Server)" type="JetRunConfigurationType" factoryName="Kotlin" folderName="Promethe">
+    <module name="promethe.gateway.main" />
+    <option name="MAIN_CLASS_NAME" value="dev.promethe.gateway.MainKt" />
+    <option name="VM_PARAMETERS" value="-Xmx1g" />
+    <option name="PROGRAM_PARAMETERS" value="" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <envs>
+      <env name="PORT" value="8080" />
+    </envs>
+    <shortenClasspath name="NONE" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

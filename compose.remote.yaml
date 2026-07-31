@@ -1,0 +1,27 @@
+services:
+  promethe-core:
+    environment:
+      - REMOTE_ACCESS_ENABLED=true
+      - PUBLIC_BASE_URL=${PUBLIC_BASE_URL:?Set PUBLIC_BASE_URL to the public https origin}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:?Set the explicit browser origin}
+      - PROMETHE_MASTER_KEY=${PROMETHE_MASTER_KEY:?Set a Base64-encoded 32-byte master key}
+
+  promethe-proxy:
+    image: caddy:2.10.0-alpine
+    depends_on:
+      promethe-core:
+        condition: service_healthy
+    environment:
+      - PROMETHE_DOMAIN=${PROMETHE_DOMAIN:?Set the public DNS name without a scheme}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    restart: unless-stopped
+
+volumes:
+  caddy-data:
+  caddy-config:

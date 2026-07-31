@@ -1,0 +1,41 @@
+# ── TencentDB Agent Memory Overlay ───────────────────────────
+# Usage: docker compose -f docker-compose.yml -f compose.tencent.yaml up
+#
+# Adds TencentDB Agent Memory (MIT, github.com/Tencent/TencentDB-Agent-Memory)
+# 4-tier memory pipeline, 100% local (SQLite + sqlite-vec), zero external APIs.
+# Memory API: http://localhost:8420/api/v1/memories
+#
+# NOTE: If no published Docker image exists on DockerHub/GHCR,
+# uncomment the `build:` block and clone the repo into ./vendor/.
+#   git clone https://github.com/Tencent/TencentDB-Agent-Memory vendor/TencentDB-Agent-Memory
+
+services:
+  tencent-memory:
+    # Option A: Published image (verify tag on upstream repo)
+    image: tencent/agent-memory:latest
+    # Option B: Build from source (uncomment if no published image)
+    # build:
+    #   context: ./vendor/TencentDB-Agent-Memory
+    ports:
+      - "8420:8420"
+    volumes:
+      - tencent-data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8420/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  promethe-core:
+    depends_on:
+      tencent-memory:
+        condition: service_healthy
+    environment:
+      - MEMORY_PROVIDER=tencent
+      - TENCENT_MEMORY_URL=http://tencent-memory:8420
+      - TENCENT_SERVICE_ID=${TENCENT_SERVICE_ID:-}
+      - TENCENT_MEMORY_API_KEY=${TENCENT_MEMORY_API_KEY:-}
+
+volumes:
+  tencent-data:

@@ -1,0 +1,265 @@
+name: CI — Promethe
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - '**'
+      - '.github/workflows/**'
+      - '.github/SECURITY.md'
+  pull_request:
+    branches: [main]
+    paths:
+      - '**'
+      - '.github/workflows/**'
+      - '.github/SECURITY.md'
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-review:
+    name: Dependency Review
+    if: github.event_name == 'pull_request' && github.event.repository.private == false
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - name: Review dependency changes
+        uses: actions/dependency-review-action@v5.0.0
+
+  codeql:
+    name: CodeQL
+    if: github.event.repository.private == false
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [java-kotlin]
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4.7.1
+        with:
+          distribution: corretto
+          java-version: '21'
+          cache: gradle
+
+      - name: Build Promethe for CodeQL
+        working-directory: .
+        run: |
+          chmod +x gradlew
+          ./gradlew shared:compileKotlinJvm gateway:compileKotlin api:compileKotlinJvm --no-daemon
+
+      - name: Analyze
+        uses: github/codeql-action/analyze@v4
+
+  source-trivy:
+    name: Trivy Source Scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - name: Scan source and dependencies
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln,secret,misconfig
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: '1'
+          format: table
+
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: .
+
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4.7.1
+        with:
+          distribution: corretto
+          java-version: '21'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build
+        run: ./gradlew shared:compileKotlinJvm gateway:compileKotlin api:compileKotlinJvm --no-daemon
+
+      - name: Compile Desktop and Wasm clients
+        run: ./gradlew composeApp:compileKotlinDesktop composeApp:compileKotlinWasmJs --no-daemon
+
+      - name: Unit and security tests
+        run: ./gradlew shared:jvmTest gateway:test api:jvmTest composeApp:desktopTest --no-daemon
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: test-reports
+          path: |
+            shared/build/reports/tests/
+            gateway/build/reports/tests/
+            api/build/reports/tests/
+            composeApp/build/reports/tests/
+          retention-days: 7
+
+  docs-consistency:
+    name: Docs Consistency
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: .
+
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      # verify-docs.ps1 checks stack versions, phantom routes, channel count,
+      # gradle modules and INDEX.md links against the actual code — it exits
+      # non-zero on any inconsistency (PowerShell Core is preinstalled).
+      - name: Docs vs code consistency (verify-docs.ps1)
+        run: pwsh docs/verify-docs.ps1
+
+  lint:
+    name: Lint (ktlint)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: .
+
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4.7.1
+        with:
+          distribution: corretto
+          java-version: '21'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: ktlint
+        run: ./gradlew ktlintCheck --no-daemon
+      # detekt removed: 1.23.x is binary-incompatible with Kotlin 2.4.0 and
+      # 2.0 is still alpha — re-add once stable (see build.gradle.kts TODO).
+
+  qodana:
+    name: Qodana Community
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      checks: write
+
+    steps:
+      - uses: actions/checkout@v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4.7.1
+        with:
+          distribution: corretto
+          java-version: '21'
+          cache: gradle
+
+      - name: Qodana Scan
+        uses: JetBrains/qodana-action@v2026.1
+        with:
+          args: --linter qodana-jvm-community --within-docker false --project-dir .
+          pr-mode: false
+
+  # ── Docker Image (main only) ─────────────────────────────────────────
+  docker:
+    name: Build Docker Image (validation only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [build-and-test, docs-consistency, lint, qodana, codeql, source-trivy]
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.10.0
+
+      - name: Build Docker image (validation only)
+        uses: docker/build-push-action@v6.18.0
+        with:
+          context: .
+          push: false
+          platforms: linux/amd64,linux/arm64
+          tags: ghcr.io/${{ github.repository_owner }}/promethe-gateway:sha-${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build sandbox runner image (validation only)
+        uses: docker/build-push-action@v6.18.0
+        with:
+          context: .
+          file: Dockerfile.runner
+          push: false
+          platforms: linux/amd64,linux/arm64
+          tags: ghcr.io/${{ github.repository_owner }}/promethe-runner:sha-${{ github.sha }}
+          cache-from: type=gha,scope=runner
+          cache-to: type=gha,mode=max,scope=runner
+
+  # ── Desktop Distribution (main only) ─────────────────────────────────
+  desktop-package:
+    name: Desktop (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    needs: [build-and-test, docs-consistency, lint, qodana, codeql, source-trivy]
+    if: github.ref == 'refs/heads/main'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    defaults:
+      run:
+        working-directory: .
+
+    steps:
+      - uses: actions/checkout@v4.2.2
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4.7.1
+        with:
+          distribution: corretto
+          java-version: '21'
+          cache: gradle
+
+      - name: Package Desktop app
+        run: ./gradlew composeApp:packageDistributionForCurrentOS --console=plain --no-daemon
+
+      - name: Upload Desktop artifact
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: desktop-${{ matrix.os }}
+          path: composeApp/build/compose/binaries/
+          retention-days: 14

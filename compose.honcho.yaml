@@ -1,0 +1,53 @@
+# ── Honcho Memory Overlay ────────────────────────────────────
+# Usage: docker compose -f docker-compose.yml -f compose.honcho.yaml up
+#
+# Adds Honcho (Plastic Labs) for AI memory management.
+# Honcho API: http://localhost:8001
+#
+# NOTE: Verify the official Honcho Docker image and default port at
+# https://github.com/plastic-labs/honcho before first deployment.
+# Adjust the image tag and port mapping if needed.
+
+services:
+  honcho-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: honcho
+      POSTGRES_USER: honcho
+      POSTGRES_PASSWORD: ${HONCHO_DB_PASSWORD:-honcho}
+    volumes:
+      - honcho-pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U honcho"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  honcho:
+    image: plasticlabs/honcho:latest
+    depends_on:
+      honcho-db:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://honcho:${HONCHO_DB_PASSWORD:-honcho}@honcho-db:5432/honcho
+    ports:
+      - "8001:8001"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  promethe-core:
+    depends_on:
+      honcho:
+        condition: service_healthy
+    environment:
+      - MEMORY_PROVIDER=honcho
+      - HONCHO_URL=http://honcho:8001
+      - HONCHO_API_KEY=${HONCHO_API_KEY:-}
+
+volumes:
+  honcho-pgdata:

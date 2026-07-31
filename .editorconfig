@@ -1,0 +1,15 @@
+root = true
+
+[*.{kt,kts}]
+# ktlint rules
+ktlint_standard_no-wildcard-imports = disabled
+ktlint_standard_filename = disabled
+ktlint_standard_no-consecutive-comments = disabled
+# Compose @Composable functions use PascalCase by convention
+ktlint_standard_function-naming = disabled
+# Gradle .kts auto-format loop issues
+ktlint_standard_chain-method-continuation = disabled
+ktlint_standard_multiline-expression-wrapping = disabled
+ktlint_standard_import-ordering = disabled
+ktlint_standard_max-line-length = disabled
+

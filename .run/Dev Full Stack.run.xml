@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="🚀 Dev Full Stack (Gateway + Browser)" type="CompoundRunConfigurationType" folderName="Promethe">
+    <toRun name="🌐 Gateway (Server)" type="JetRunConfigurationType" />
+    <toRun name="🌍 WasmJS (Browser)" type="GradleRunConfiguration" />
+    <method v="2" />
+  </configuration>
+</component>

@@ -1,0 +1,154 @@
+package dev.promethe.gateway
+
+import dev.promethe.core.AgentConfig
+import dev.promethe.core.ToolApprovalGate
+import dev.promethe.gateway.auth.OwnerAuthService
+import dev.promethe.db.DatabaseFactory
+import io.ktor.client.request.delete
+import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.request.put
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
+import io.ktor.serialization.kotlinx.json.json
+import io.ktor.server.application.install
+import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.routing.routing
+import io.ktor.server.testing.ApplicationTestBuilder
+import io.ktor.server.testing.testApplication
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withTimeout
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
+
+class ApprovalRoutesTest {
+    private val apiKey = "pk-prom-approval-local-key"
+    private val json = Json { ignoreUnknownKeys = true }
+
+    @Test
+    fun `persistent approval and revocation require local owner authentication`() =
+        testApplication {
+            coroutineScope {
+                val gate = configureRoutes()
+                val ownerToken = createOwnerAndLogin()
+
+                val remoteAttempt = async { gate.checkMandatory("shell", """{"executable":"git"}""", "session-a") }
+                val remoteRequestId = awaitPending(gate)
+                val forbidden =
+                    client.post("/approval/$remoteRequestId") {
+                        header(HttpHeaders.Authorization, "Bearer $ownerToken")
+                        contentType(ContentType.Application.Json)
+                        setBody("""{"approved":true,"scope":"PERSISTENT"}""")
+                    }
+                assertEquals(HttpStatusCode.Forbidden, forbidden.status)
+                assertEquals(1, gate.listPending().size)
+                gate.respond(remoteRequestId, approved = false)
+                assertFalse(remoteAttempt.await().allowed)
+
+                val localAttempt = async { gate.checkMandatory("shell", """{"executable":"git"}""", "session-b") }
+                val localRequestId = awaitPending(gate)
+                val approved =
+                    client.post("/approval/$localRequestId") {
+                        header(HttpHeaders.Authorization, "Bearer $apiKey")
+                        contentType(ContentType.Application.Json)
+                        setBody("""{"approved":true,"scope":"PERSISTENT","expiresInMs":1000,"localOwner":false}""")
+                    }
+                assertEquals(HttpStatusCode.OK, approved.status)
+                assertTrue(localAttempt.await().allowed)
+
+                val grant = gate.listGrants().single()
+                val revoked =
+                    client.delete("/approval/grants/${grant.id}") {
+                        header(HttpHeaders.Authorization, "Bearer $apiKey")
+                    }
+                assertEquals(HttpStatusCode.OK, revoked.status)
+                assertTrue(gate.listGrants().isEmpty())
+            }
+        }
+
+    @Test
+    fun `route validates scopes and never exposes raw sensitive arguments`() =
+        testApplication {
+            coroutineScope {
+                val gate = configureRoutes()
+                val pending = async { gate.checkMandatory("shell", """{"token":"top-secret","executable":"git"}""", "session-a") }
+                val requestId = awaitPending(gate)
+
+                val listing =
+                    client.post("/approval/$requestId") {
+                        header(HttpHeaders.Authorization, "Bearer $apiKey")
+                        contentType(ContentType.Application.Json)
+                        setBody("""{"approved":true,"scope":"FOREVER"}""")
+                    }
+                assertEquals(HttpStatusCode.BadRequest, listing.status)
+                assertEquals(1, gate.listPending().size)
+                assertFalse(gate.listPending().single().args.contains("top-secret"))
+
+                gate.respond(requestId, approved = false)
+                assertFalse(pending.await().allowed)
+            }
+        }
+
+    private fun ApplicationTestBuilder.configureRoutes(): ToolApprovalGate {
+        val gate =
+            ToolApprovalGate(
+                AgentConfig(
+                    approvalMode = "all",
+                    approvalTimeoutMs = 10_000,
+                ),
+            )
+        val auth = OwnerAuthService(DatabaseFactory.createInMemory(), sessionTtlMinutes = 15)
+        val security =
+            GatewaySecurityConfig(
+                bindHost = "127.0.0.1",
+                remoteAccessEnabled = true,
+                allowedOrigins = emptySet(),
+                remoteSessionTtlMinutes = 15,
+            )
+        application {
+            install(ContentNegotiation) { json(json) }
+            AuthMiddleware.install(this, apiKey, security, auth)
+            routing {
+                authRoutes(auth, security)
+                approvalRoutes(gate)
+            }
+        }
+        return gate
+    }
+
+    private suspend fun ApplicationTestBuilder.createOwnerAndLogin(): String {
+        assertEquals(
+            HttpStatusCode.OK,
+            client.put("/api/v1/security/remote-owner") {
+                header(HttpHeaders.Authorization, "Bearer $apiKey")
+                contentType(ContentType.Application.Json)
+                setBody("""{"user":"owner","password":"correct-horse-battery-staple"}""")
+            }.status,
+        )
+        val login =
+            client.post("/auth/login") {
+                contentType(ContentType.Application.Json)
+                setBody("""{"user":"owner","password":"correct-horse-battery-staple","clientKind":"NATIVE"}""")
+            }
+        assertEquals(HttpStatusCode.OK, login.status)
+        return json.parseToJsonElement(login.bodyAsText()).jsonObject["accessToken"].toString().trim('"')
+    }
+
+    private suspend fun awaitPending(gate: ToolApprovalGate): String =
+        withTimeout(2_000) {
+            while (gate.listPending().isEmpty()) {
+                delay(10)
+            }
+            gate.listPending().single().id
+        }
+}
