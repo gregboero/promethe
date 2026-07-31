@@ -24,10 +24,11 @@ iterative and retain the public migration baseline recorded by Copybara.
 missing.
 
 Copybara pushes verified changes to `copybara-sync`, never directly to
-`main`. A target-repository workflow opens a pull request from that branch.
-The repository owner reviews it after CI passes and merges it with rebase so
-the migration metadata remains available to the next export. A pending sync
-pull request blocks later exports until it is resolved.
+`main`. The branch runs public CI, then the repository owner opens a pull
+request from that branch, reviews it and merges it with rebase so the
+migration metadata remains available to the next export. GitHub Actions
+cannot create or approve this pull request. A pending sync branch blocks later
+exports until it is resolved.
 
 Public export commits deliberately use a neutral project author and sync
 message. Source-repository authors, commit messages and co-author trailers are
