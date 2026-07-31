@@ -45,9 +45,7 @@ try {
             Set-Content -LiteralPath $target -Value $content -Encoding UTF8 -NoNewline
         }
 
-        $qodanaContent = Get-Content (Join-Path $repositoryRoot "qodana.yaml") -Raw -Encoding UTF8
-        $qodanaContent = $qodanaContent.Replace("projectDir: promethe", "projectDir: .")
-        Set-Content -LiteralPath (Join-Path $destinationPath "qodana.yaml") -Value $qodanaContent -Encoding UTF8 -NoNewline
+        Copy-Item -LiteralPath (Join-Path $repositoryRoot "qodana.yaml") -Destination $destinationPath
     }
 
     & (Join-Path $destinationPath "scripts/verify-public-export.ps1") -Path $destinationPath

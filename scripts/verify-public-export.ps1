@@ -87,8 +87,8 @@ foreach ($workflow in @(".github/workflows/ci.yml", ".github/workflows/release.y
 
 $qodanaPath = Join-Path $root "qodana.yaml"
 if ((Test-Path -LiteralPath $qodanaPath) -and
-    -not (Select-String -LiteralPath $qodanaPath -SimpleMatch "projectDir: ." -Quiet)) {
-    $errors.Add("qodana.yaml is not configured for the standalone repository root.")
+    (Select-String -LiteralPath $qodanaPath -Pattern "^\s*projectDir\s*:" -Quiet)) {
+    $errors.Add("qodana.yaml must not declare the unsupported projectDir key.")
 }
 
 if ($errors.Count -gt 0) {
