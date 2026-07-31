@@ -1,0 +1,43 @@
+name: Open public synchronization pull request
+
+on:
+  push:
+    branches: [copybara-sync]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  open-sync-pr:
+    if: github.repository == 'gregboero/promethe'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Create synchronization pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          existing_pr="$(
+            gh pr list \
+              --repo "$GITHUB_REPOSITORY" \
+              --base main \
+              --head copybara-sync \
+              --state open \
+              --json number \
+              --jq '.[0].number // empty'
+          )"
+
+          if [[ -n "$existing_pr" ]]; then
+            echo "Synchronization pull request #$existing_pr is already open."
+            exit 0
+          fi
+
+          gh pr create \
+            --repo "$GITHUB_REPOSITORY" \
+            --base main \
+            --head copybara-sync \
+            --title "Sync Promethe from monorepo" \
+            --body "Automated, verified synchronization from the private source-of-truth repository. Review and merge with rebase after all required checks pass."

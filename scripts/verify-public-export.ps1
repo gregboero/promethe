@@ -23,6 +23,7 @@ $requiredFiles = @(
     ".github/CODEOWNERS",
     ".github/SECURITY.md",
     ".github/workflows/ci.yml",
+    ".github/workflows/public-sync-pr.yml",
     ".github/workflows/release.yml",
     "qodana.yaml"
 )

@@ -2,12 +2,13 @@ name: CI — Promethe
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, develop, copybara-sync]
     paths:
       - '**'
       - '.github/workflows/**'
       - '.github/SECURITY.md'
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     branches: [main]
     paths:
       - '**'
