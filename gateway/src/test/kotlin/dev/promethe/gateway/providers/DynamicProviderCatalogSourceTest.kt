@@ -13,6 +13,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -22,7 +23,7 @@ class DynamicProviderCatalogSourceTest {
     @Test
     fun `discovers provider-specific payloads without putting keys in URLs`() =
         runTest {
-            val requests = mutableListOf<String>()
+            val requests = CopyOnWriteArrayList<String>()
             val client = HttpClient(
                 MockEngine { request ->
                     requests += "${request.url.host}${request.url.encodedPath}"

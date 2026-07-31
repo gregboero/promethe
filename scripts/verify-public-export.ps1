@@ -20,6 +20,7 @@ $requiredFiles = @(
     "CONTRIBUTING.md",
     "docs/SECURITY.md",
     "docs/REPOSITORY_SYNC.md",
+    ".github/CODEOWNERS",
     ".github/SECURITY.md",
     ".github/workflows/ci.yml",
     ".github/workflows/release.yml",
@@ -61,6 +62,18 @@ $licensePath = Join-Path $root "LICENSE"
 if ((Test-Path -LiteralPath $licensePath) -and
     -not (Select-String -LiteralPath $licensePath -Pattern "Apache License" -Quiet)) {
     $errors.Add("LICENSE is not Apache License 2.0.")
+}
+
+$readmePath = Join-Path $root "README.md"
+if ((Test-Path -LiteralPath $readmePath) -and
+    -not (Select-String -LiteralPath $readmePath -SimpleMatch "[Apache License 2.0](LICENSE)" -Quiet)) {
+    $errors.Add("README.md does not advertise the Apache License 2.0.")
+}
+
+$codeownersPath = Join-Path $root ".github/CODEOWNERS"
+if ((Test-Path -LiteralPath $codeownersPath) -and
+    -not (Select-String -LiteralPath $codeownersPath -Pattern "^\*\s+@gregboero\s*$" -Quiet)) {
+    $errors.Add(".github/CODEOWNERS does not require @gregboero for all changes.")
 }
 
 $textFiles = $files | Where-Object {

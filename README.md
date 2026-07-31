@@ -403,4 +403,5 @@ Check that Ollama is running: `ollama list`. With Docker Compose, Ollama must be
 
 ## License
 
-MIT
+Promethe is licensed under the [Apache License 2.0](LICENSE). See
+[NOTICE](NOTICE) for third-party attribution.
