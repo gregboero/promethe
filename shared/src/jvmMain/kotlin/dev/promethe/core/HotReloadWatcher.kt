@@ -102,6 +102,9 @@ class HotReloadWatcher(
     }
 
     private suspend fun handleFileChange(filename: String) {
+        val callbacks = matchingCallbacks(filename)
+        if (callbacks.isEmpty()) return
+
         val file = File(workDir, filename)
         if (!file.exists() || !file.isFile) return
 
@@ -116,26 +119,29 @@ class HotReloadWatcher(
 
         logger.info { "Detected change: $filename" }
 
-        for ((pattern, callbacks) in listeners) {
-            val matches =
+        for (callback in callbacks) {
+            try {
+                callback(filename, content)
+            } catch (e: Exception) {
+                logger.error(e) { "Callback error for $filename" }
+            }
+        }
+    }
+
+    internal fun hasListenerFor(filename: String): Boolean = matchingCallbacks(filename).isNotEmpty()
+
+    private fun matchingCallbacks(filename: String): List<suspend (String, String) -> Unit> =
+        listeners.entries
+            .asSequence()
+            .filter { (pattern, _) ->
                 when {
                     pattern == filename -> true
                     pattern.startsWith("*.") && filename.endsWith(pattern.removePrefix("*")) -> true
                     pattern.endsWith("/*") && filename.startsWith(pattern.removeSuffix("/*")) -> true
                     else -> false
                 }
-
-            if (matches) {
-                for (callback in callbacks) {
-                    try {
-                        callback(filename, content)
-                    } catch (e: Exception) {
-                        logger.error(e) { "Callback error for $filename" }
-                    }
-                }
-            }
-        }
-    }
+            }.flatMap { (_, callbacks) -> callbacks.asSequence() }
+            .toList()
 
     fun stop() {
         watchJob?.cancel()
