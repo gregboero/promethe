@@ -68,11 +68,7 @@ class WorkspaceSecurityTest {
             val writer = SecureJvmWorkspaceFileWriter(root.toString())
             val reader = SecureJvmWorkspaceFileReader(root.toString())
 
-            val writeResult = runCatching { writer.write("nested/result.txt", "safe content") }
-            if (writeResult.exceptionOrNull()?.message?.contains("unavailable on this filesystem") == true) {
-                return@runTest
-            }
-            writeResult.getOrThrow()
+            writer.write("nested/result.txt", "safe content")
 
             assertEquals("safe content", Files.readString(root.resolve("nested/result.txt")))
             assertEquals("safe content", reader.read("nested/result.txt"))
@@ -81,6 +77,21 @@ class WorkspaceSecurityTest {
             }
             assertFailsWith<IllegalArgumentException> {
                 reader.read(".git/config")
+            }
+        }
+
+    @Test
+    fun `Windows fallback rejects alternate streams and reserved device names`() =
+        runTest {
+            if (!System.getProperty("os.name").contains("win", ignoreCase = true)) return@runTest
+            val root = createTempDirectory("promethe-workspace")
+            val writer = SecureJvmWorkspaceFileWriter(root.toString())
+
+            assertFailsWith<IllegalArgumentException> {
+                writer.write("report.txt:secret", "hidden")
+            }
+            assertFailsWith<IllegalArgumentException> {
+                writer.write("CON.txt", "device")
             }
         }
 

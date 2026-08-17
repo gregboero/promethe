@@ -96,6 +96,7 @@ fun gatewayModule(
             actionExecutor = get(),
             sandboxManager = get(),
             sandboxRuntimePolicy = get(),
+            localCodingAgentService = get(),
             oauthManager = oauthManager,
         )
     }

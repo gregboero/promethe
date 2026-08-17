@@ -131,18 +131,21 @@ gated on).
 ## Twilio (SMS / WhatsApp)
 
 **Tool**: `twilio` (`TwilioTool`)
-**Condition**: `TWILIO_ACCOUNT_SID` and `TWILIO_AUTH_TOKEN` are both non-blank
-(`TWILIO_PHONE_NUMBER` is read but not itself gated on).
+**Condition**: always registered; credentials are resolved for every invocation so values saved
+from Settings apply without restarting the gateway.
 
 | Env var | Required |
 |---|---|
 | `TWILIO_ACCOUNT_SID` | Yes |
 | `TWILIO_AUTH_TOKEN` | Yes |
-| `TWILIO_PHONE_NUMBER` | Read, used as the `From` number — not itself gated |
+| `TWILIO_PHONE_NUMBER` | Yes for sending; used as the `From` number |
 
 **Capabilities** (`action` argument): `send_sms`, `send_whatsapp`, `list_messages`, `get_message`.
 WhatsApp messages are sent by prefixing both `From`/`To` numbers with `whatsapp:`. Supports
 `mediaUrl` for MMS/WhatsApp image attachments.
+
+Incoming SMS messages use the signed `POST /webhook/sms` endpoint and are routed through the
+A2A agent loop. Configure the exact public HTTPS origin through `PUBLIC_BASE_URL`.
 
 ---
 

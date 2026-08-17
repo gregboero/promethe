@@ -4,6 +4,7 @@ import ai.koog.agents.core.tools.SimpleTool
 import ai.koog.agents.core.tools.annotations.LLMDescription
 import ai.koog.serialization.typeToken
 import dev.promethe.core.MemoryLayer
+import dev.promethe.core.currentToolInvocation
 import dev.promethe.core.memory.MemoryFact
 import dev.promethe.core.memory.MemoryTier
 import kotlinx.serialization.Serializable
@@ -35,8 +36,10 @@ class MemorySaveTool(
             """.trimMargin(),
     ) {
     override suspend fun execute(args: MemorySaveArgs): String {
+        val namespace = currentToolInvocation()?.memoryNamespace ?: "default"
         val fact =
             MemoryFact(
+                userId = namespace,
                 category = args.category,
                 content = args.content,
                 tier = MemoryTier.ATOMIC,
@@ -72,7 +75,8 @@ class MemorySearchTool(
             """.trimMargin(),
     ) {
     override suspend fun execute(args: MemorySearchArgs): String {
-        val facts = memoryLayer.recallFacts(args.query, args.limit)
+        val namespace = currentToolInvocation()?.memoryNamespace ?: "default"
+        val facts = memoryLayer.recallFacts(args.query, args.limit, namespace)
         if (facts.isEmpty()) {
             return "[Memory] No facts found matching '${args.query}'"
         }
@@ -108,12 +112,17 @@ class MemoryForgetTool(
     ) {
     override suspend fun execute(args: MemoryForgetArgs): String =
         if (args.factId == "all") {
-            val allFacts = memoryLayer.getAllFacts()
+            val namespace = currentToolInvocation()?.memoryNamespace ?: "default"
+            val allFacts = memoryLayer.getAllFacts(namespace)
             allFacts.forEach { memoryLayer.deleteFact(it.id) }
             "[Memory] Cleared all ${allFacts.size} facts from memory."
         } else {
-            memoryLayer.deleteFact(args.factId)
-            "[Memory] Deleted fact: ${args.factId}"
+            val namespace = currentToolInvocation()?.memoryNamespace ?: "default"
+            if (memoryLayer.deleteFactInNamespace(args.factId, namespace)) {
+                "[Memory] Deleted fact: ${args.factId}"
+            } else {
+                "[Memory] Fact not found in the active memory scope: ${args.factId}"
+            }
         }
 }
 
@@ -139,7 +148,8 @@ class MemoryListTool(
             """.trimMargin(),
     ) {
     override suspend fun execute(args: MemoryListArgs): String {
-        val allFacts = memoryLayer.getAllFacts()
+        val namespace = currentToolInvocation()?.memoryNamespace ?: "default"
+        val allFacts = memoryLayer.getAllFacts(namespace)
         val filtered =
             if (args.category.isNotBlank()) {
                 allFacts.filter { it.category == args.category }

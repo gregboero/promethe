@@ -143,8 +143,15 @@ val buildSandboxNative by tasks.registering(Exec::class) {
 
 val syncSandboxNative by tasks.registering(Copy::class) {
     dependsOn(buildSandboxNative)
-    from(sandboxNativeBinary)
-    into(generatedSandboxResources.map { it.dir("sandbox/$sandboxPlatform-$sandboxArchitecture") })
+    from(sandboxNativeBinary) {
+        into("sandbox/$sandboxPlatform-$sandboxArchitecture")
+    }
+    if (sandboxPlatform == "windows") {
+        from(sandboxNativeDirectory.file("windows/setup.ps1")) {
+            into("sandbox/windows")
+        }
+    }
+    into(generatedSandboxResources)
 }
 
 kotlin.sourceSets.named("jvmMain") {

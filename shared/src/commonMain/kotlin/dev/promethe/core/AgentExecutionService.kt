@@ -1,6 +1,8 @@
 package dev.promethe.core
 
+import dev.promethe.api.ACTIVE_PROJECT_SETTING_KEY
 import dev.promethe.db.PrometheDatabaseApi
+import dev.promethe.db.ProjectRow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
@@ -35,6 +37,8 @@ data class AgentExecutionRequest(
     val model: String? = null,
     val origin: AgentExecutionOrigin = AgentExecutionOrigin.INTERNAL,
     val channelHint: String = "internal",
+    val externalContext: String? = null,
+    val projectId: String? = null,
 )
 
 sealed interface AgentExecutionEvent {
@@ -81,6 +85,7 @@ class AgentExecutionService(
             }
 
             val resolved = resolveProfile(request)
+            val project = resolveProject(request)
             persistHistory(request)
 
             var finalResponse: String? = null
@@ -94,6 +99,11 @@ class AgentExecutionService(
                 toolCallOrigin = request.origin.toToolCallOrigin(),
                 overrideReasoningEffort = resolved.reasoningEffort,
                 llmRequestContext = LlmRequestContext(request.sessionId, request.origin),
+                externalContext = request.externalContext,
+                projectId = project?.id,
+                projectContext = project?.toPromptContext(),
+                memoryNamespace = project?.memoryNamespace ?: "default",
+                workspaceRelativePath = project?.workspacePath,
             ).collect { trajectory ->
                 stepCount++
                 emit(AgentExecutionEvent.Step(stepCount, trajectory))
@@ -123,7 +133,7 @@ class AgentExecutionService(
             logger.error(e) { "Agent execution failed for session ${request.sessionId}" }
             emit(
                 AgentExecutionEvent.Failed(
-                    code = "agent_execution_failed",
+                    code = (e as? AgentExecutionException)?.code ?: "agent_execution_failed",
                     message = e.message ?: "Agent execution failed",
                     steps = stepCount,
                 ),
@@ -162,6 +172,38 @@ class AgentExecutionService(
                     timestamp = now + index,
                 )
             }
+    }
+
+    private suspend fun resolveProject(request: AgentExecutionRequest): ProjectRow? {
+        val existingSession = database.getSession(request.sessionId)
+        val isNewSession = existingSession == null
+        if (isNewSession) {
+            database.insertSessionOrIgnore(
+                request.sessionId,
+                Clock.System.now().toEpochMilliseconds(),
+                "{}",
+            )
+        }
+
+        val projectId =
+            request.projectId
+                ?: existingSession?.projectId
+                ?: (if (isNewSession) database.getSetting(ACTIVE_PROJECT_SETTING_KEY) else null)
+                ?: return null
+        val project = database.getProject(projectId)
+        if (project == null || project.archived) {
+            if (request.projectId != null) {
+                throw AgentExecutionException("invalid_project", "Project '$projectId' does not exist or is archived")
+            }
+            if (database.getSetting(ACTIVE_PROJECT_SETTING_KEY) == projectId) {
+                database.deleteSetting(ACTIVE_PROJECT_SETTING_KEY)
+            }
+            return null
+        }
+        if (existingSession?.projectId != project.id) {
+            database.assignSessionToProject(request.sessionId, project.id)
+        }
+        return project
     }
 
     private suspend fun resolveProfile(request: AgentExecutionRequest): ResolvedExecution {
@@ -225,4 +267,17 @@ class AgentExecutionService(
         val skills: List<String>,
         val reasoningEffort: dev.promethe.api.ReasoningEffort?,
     )
+
+    private fun ProjectRow.toPromptContext(): String =
+        buildString {
+            appendLine("Active project: $name")
+            appendLine("Project id: $id")
+            appendLine("Workspace: $workspacePath")
+            if (description.isNotBlank()) appendLine("Description: $description")
+            if (instructions.isNotBlank()) {
+                appendLine("Project instructions:")
+                appendLine(instructions)
+            }
+            append("Relative file and process paths must use this project workspace.")
+        }
 }

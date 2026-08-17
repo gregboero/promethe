@@ -17,8 +17,10 @@
 | Document | Description | Source of truth |
 |---|---|---|
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Modules, bootstrap, request flow, DI, persistence | `AgentBootstrap.kt`, `OmnichannelGateway.kt`, `settings.gradle.kts` |
+| [AGENTIC_ROADMAP.md](AGENTIC_ROADMAP.md) | Faisabilité des propositions agentiques 2026 et roadmap d'implémentation | Code actuel, certification et décisions d'architecture |
 | [architecture.mmd](architecture.mmd) | Mermaid diagram of the full architecture | Same |
 | [MEMORY.md](MEMORY.md) | 4-tier memory (L0-L3), providers, API | `MemoryLayer.kt`, `memory/*.kt`, `MemoryRoutes.kt` |
+| [PROJECTS.md](PROJECTS.md) | Durable project context, workspace, scoped memory and session assignment | `ProjectRoutes.kt`, `AgentExecutionService.kt`, `ProjectsScreen.kt` |
 | [RAG.md](RAG.md) | Knowledge base: ingestion, hybrid search, re-ranking | `core/rag/*.kt`, `RagRoutes.kt` |
 | [GEPA.md](GEPA.md) | Self-evolution: genetic optimization of prompts and skills | `GepaEngine.kt`, `gepa/*.kt`, `GepaJobManager.kt` |
 | [RESILIENCE.md](RESILIENCE.md) | Context compression, retry, auto-healing, LLM fallback | `ContextCompressor.kt`, `ResilienceStrategy.kt`, `KoogLlmAdapter.kt` |

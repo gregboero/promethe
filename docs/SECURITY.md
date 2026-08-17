@@ -63,12 +63,38 @@ is denied. The MCP HTTP endpoint applies the same policy to its `Origin` header.
 The former raw HTTP command execution endpoint has been removed. The `shell` tool remains available only
 through a structured interface (`executable` plus literal `arguments`) and always requires human approval.
 It rejects shell interpreters, pipes, redirects, command substitution, and workspaces outside the configured
-project root. Its execution backend is a Docker sandbox with no network, reduced capabilities, a read-only
-root filesystem, resource limits, and a workspace-only mount.
+project root. Its execution backend is the native sandbox helper; unsupported or failed backends deny
+process execution instead of falling back to an unmanaged process. Linux uses Bubblewrap/seccomp. Windows
+uses dedicated identities, a restricted token, an AppContainer without network capabilities, workspace
+ACLs, Job Objects and firewall rules after a
+loopback-only UAC setup and behavioral self-test. Setup never broadens ACLs on the owner's Windows profile:
+the dedicated identity can read only locations already readable to it plus the registered workspace, can
+write only inside that workspace, and has network access disabled.
 
 Mandatory approval also covers destructive file operations, Docker, process termination, Git writes,
 external sending tools, browser evaluation, and configuration changes. `APPROVAL_MODE=auto` does not
 bypass this mandatory set.
+
+## Discord Access and Knowledge Capture
+
+Discord access can be restricted with `DISCORD_ALLOWED_USER_IDS`. An empty value preserves the
+backward-compatible behavior; a non-empty value fails closed and only valid listed user IDs may invoke
+the agent. The restriction applies to the persistent Gateway and signed slash-command interactions.
+
+Passive Discord capture is disabled by default. `DISCORD_KNOWLEDGE_CHANNEL_IDS` explicitly selects the
+channels whose new messages are stored as JSON-LD under `~/.promethe/knowledge/discord/`. Archived
+conversation is injected only for the same channel, is escaped and labelled as untrusted external data,
+and cannot grant permissions or bypass tool approvals. Anyone allowed to invoke Promethe in such a
+channel may receive answers derived from that channel's archive, so configure channel permissions and
+the user allow-list together. Remove the channel ID to stop future capture; existing archive files remain
+until the owner deletes them locally.
+
+The owner may also maintain a structured live policy through authenticated `/api/v1/channels/discord/policy`
+routes or the `discord_policy` agent tool. Runtime rules are stored in SQLite and can allow or deny a user,
+limit an allowed user to deterministic subject phrases, opt a channel into Open Knowledge capture and bind
+that channel to a Promethe project. Dynamic `DENY` rules override static access. Policy mutations are
+classified as `CONFIG_CHANGE`, require human approval when requested conversationally and are blocked for
+all channel, webhook, MCP, ACP, voice, scheduler and autonomous origins.
 
 ## Public Surface
 

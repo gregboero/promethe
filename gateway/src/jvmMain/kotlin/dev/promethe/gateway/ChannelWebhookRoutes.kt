@@ -26,9 +26,20 @@ private val logger = io.github.oshai.kotlinlogging.KotlinLogging.logger {}
  * 4. Execute agent loop, emitting events to [AgentEventBus]
  * 5. Return the last response
  */
-fun Route.channelWebhookRoutes(
+internal fun Route.channelWebhookRoutes(
     a2aClient: A2AInternalClient,
+    publicBaseUrl: String? = null,
+    discordKnowledgeArchive: DiscordKnowledgeArchive? = null,
+    discordPolicyService: DiscordPolicyService? = null,
 ) {
+    twilioWebhookRoute(
+        agentExecutor =
+            TwilioAgentExecutor { sessionId, text ->
+                a2aClient.execute(sessionId, text, channelHint = "sms", origin = ToolCallOrigin.CHANNEL)
+            },
+        publicBaseUrl = publicBaseUrl,
+    )
+
     // ── Shared execution helper ──────────────────────────────────────────────
 
     /**
@@ -110,15 +121,99 @@ fun Route.channelWebhookRoutes(
             call.respond(DiscordInteractionResponse(type = 1))
             return@post
         }
+        val userId = interaction.requestingUserId()
+        val allowedUsers = discordIdAllowlist(ConfigProvider.get().get("DISCORD_ALLOWED_USER_IDS", ""))
+        val text = interaction.data?.options?.firstOrNull()?.value
+            ?: interaction.data?.name ?: ""
+        val guildId = interaction.guild_id.ifBlank { "dm" }
+        val channelId = interaction.channel_id
+        val policyAllowsUser =
+            userId != null &&
+                (
+                    discordPolicyService?.allowsUser(allowedUsers, userId, guildId, channelId) { text }
+                        ?: allowedUsers.allows(userId)
+                )
+        if (!policyAllowsUser) {
+            call.respond(
+                DiscordInteractionResponse(
+                    type = 4,
+                    data = DiscordResponseData(content = "You are not allowed to use this bot.", flags = 64),
+                ),
+            )
+            return@post
+        }
         val eventId = interaction.id.ifBlank { WebhookReplayGuard.fingerprint(rawBody) }
         if (!call.acceptWebhookEvent("discord", eventId)) return@post
 
         // APPLICATION_COMMAND (type=2)
-        val text = interaction.data?.options?.firstOrNull()?.value
-            ?: interaction.data?.name ?: ""
-        val sessionId = "discord-${interaction.channel_id}"
+        val sessionId = "discord-$guildId-$channelId"
+        val staticKnowledgeChannelIds = discordIdSet(ConfigProvider.get().get("DISCORD_KNOWLEDGE_CHANNEL_IDS", ""))
+        val knowledgeEnabled =
+            discordPolicyService?.capturesKnowledge(staticKnowledgeChannelIds, guildId, channelId)
+                ?: (channelId in staticKnowledgeChannelIds)
+        val projectId = discordPolicyService?.projectIdForChannel(guildId, channelId)
+        val authorName = interaction.member?.nick
+            ?: interaction.member?.user?.global_name
+            ?: interaction.user?.global_name
+            ?: interaction.member?.user?.username
+            ?: interaction.user?.username
+            ?: userId
+        val archivedRequest =
+            if (knowledgeEnabled && discordKnowledgeArchive != null) {
+                val message =
+                    discordKnowledgeMessage(
+                        messageId = interaction.id,
+                        guildId = guildId,
+                        channelId = channelId,
+                        channelName = channelId,
+                        authorId = userId,
+                        authorName = authorName,
+                        authorIsPromethe = false,
+                        content = text,
+                        timestampMillis = System.currentTimeMillis(),
+                    )
+                discordKnowledgeArchive.appendBestEffort(message)
+                message
+            } else {
+                null
+            }
+        val externalContext =
+            if (knowledgeEnabled && discordKnowledgeArchive != null) {
+                discordKnowledgeArchive
+                    .recentContextBestEffort(
+                        guildId = guildId,
+                        channelId = channelId,
+                        excludeIdentifier = archivedRequest?.identifier,
+                    ).takeIf(String::isNotBlank)
+            } else {
+                null
+            }
 
-        val lastResponse = a2aClient.execute(sessionId, text, channelHint = "discord", origin = ToolCallOrigin.CHANNEL)
+        val lastResponse =
+            a2aClient.execute(
+                sessionId,
+                text,
+                channelHint = "discord",
+                origin = ToolCallOrigin.CHANNEL,
+                externalContext = externalContext,
+                projectId = projectId,
+            )
+        if (knowledgeEnabled && discordKnowledgeArchive != null) {
+            discordKnowledgeArchive.appendBestEffort(
+                discordKnowledgeMessage(
+                    messageId = "promethe-${interaction.id}",
+                    guildId = guildId,
+                    channelId = channelId,
+                    channelName = channelId,
+                    authorId = "promethe",
+                    authorName = "Promethe",
+                    authorIsPromethe = true,
+                    content = lastResponse,
+                    timestampMillis = System.currentTimeMillis(),
+                    replyToMessageId = interaction.id,
+                ),
+            )
+        }
 
         call.respond(
             DiscordInteractionResponse(
@@ -193,9 +288,13 @@ fun Route.channelWebhookRoutes(
     }
 }
 
+internal fun DiscordInteraction.requestingUserId(): String? =
+    member?.user?.id?.takeIf(String::isNotBlank)
+        ?: user?.id?.takeIf(String::isNotBlank)
+
 private const val MAX_WEBHOOK_BODY_BYTES = 1_048_576
 
-private suspend fun io.ktor.server.application.ApplicationCall.receiveBoundedWebhookBody(): String? {
+internal suspend fun io.ktor.server.application.ApplicationCall.receiveBoundedWebhookBody(): String? {
     val declaredLength = request.header(HttpHeaders.ContentLength)?.toLongOrNull()
     if (declaredLength != null && declaredLength > MAX_WEBHOOK_BODY_BYTES) {
         respond(HttpStatusCode.PayloadTooLarge, ErrorResponse("Webhook payload exceeds 1 MiB"))

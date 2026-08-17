@@ -140,11 +140,13 @@ unsandboxed fallback.
 
 | Variable | Type | Default | Description |
 |---|---|---|---|
-| `SANDBOX_BACKEND` | string | `auto` | Native backend selection. Linux uses Bubblewrap/seccomp. macOS and Windows execution are deliberately `UNAVAILABLE` until detached-process and read confinement are respectively certified. Docker and WSL2 are not automatic fallbacks yet. |
+| `SANDBOX_BACKEND` | string | `auto` | Native backend selection. Linux uses Bubblewrap/seccomp. Windows uses the elevated restricted-identity backend after its one-time UAC setup and self-test. macOS remains unavailable. Docker and WSL2 are not automatic fallbacks yet. |
 | `SANDBOX_WORKSPACE` | path | `~/.promethe/workspace` | Canonical root exposed to process and workspace file tools. Runtime data, credentials, plugins and the database remain outside this root. |
-| `SANDBOX_MODE` | string | `WORKSPACE_WRITE` | `READ_ONLY` or `WORKSPACE_WRITE`. `FULL_ACCESS` is rejected fail-closed. |
+| `SANDBOX_MODE` | string | `WORKSPACE_WRITE` | `READ_ONLY`, `WORKSPACE_WRITE`, or local-only `FULL_ACCESS` for file tools. Commands and code execution remain confined to `SANDBOX_WORKSPACE`. |
+| `SANDBOX_READABLE_ROOTS` | JSON array | `[]` | Additional absolute directories readable by file tools, for example `["C:\\Users\\me\\Documents"]`. The workspace root is managed automatically. |
+| `SANDBOX_WRITABLE_ROOTS` | JSON array | `[]` | Additional absolute directories writable by file tools, for example `["C:\\Users\\me\\Documents\\output"]`. Every writable root must also be readable. |
 | `SANDBOX_APPROVAL_POLICY` | string | `ON_REQUEST` | Approval policy for process effects. |
-| `SANDBOX_NETWORK_MODE` | string | `OFF` | Network is disabled. `ALLOWLIST` is rejected until an authenticated proxy is implemented. |
+| `SANDBOX_NETWORK_MODE` | string | `OFF` | Network remains disabled. `ALLOWLIST` is rejected until an authenticated proxy is implemented; selected roots and `FULL_ACCESS` do not change this. |
 | `SANDBOX_ALLOWED_DOMAINS` | comma-separated strings | empty | Reserved for the future authenticated proxy; it does not enable network access today. |
 | `PROMETHE_SANDBOX_HELPER` | path | packaged helper | Absolute path to the native helper executable. |
 | `PROMETHE_SANDBOX_HELPER_SHA256` | hex string | — | Required 64-character SHA-256 checksum when `PROMETHE_SANDBOX_HELPER` is configured. |
@@ -152,14 +154,68 @@ unsandboxed fallback.
 
 The native helper enforces bounded execution, workspace roots, protected
 metadata paths (`.git`, `.promethe`, `.codex`, `.agents`) and OS-specific
-process isolation. MCP stdio is unavailable until IPC v2 adds persistent
-bidirectional sessions.
+process isolation. The workspace may legitimately be empty; no starter files
+are created in it. Selected roots and local `FULL_ACCESS` apply only to file
+tools. `FULL_ACCESS` does not expand command, code-execution or MCP stdio
+roots, and approvals remain mandatory for every unconfined file operation.
+MCP stdio is unavailable until IPC v2 adds persistent bidirectional sessions.
 
-The Windows setup scripts remain available for experimental validation, but
-the helper currently returns `BACKEND_UNAVAILABLE` for every execution until
-read confinement is certified. Running setup does not enable the backend.
-Use `sandbox-native/windows/uninstall.ps1` for removal. See
+`SANDBOX_READABLE_ROOTS` and `SANDBOX_WRITABLE_ROOTS` must be valid JSON
+arrays, not comma-separated strings. For example:
+
+```dotenv
+SANDBOX_READABLE_ROOTS=["C:\\Users\\me\\Documents","D:\\datasets"]
+SANDBOX_WRITABLE_ROOTS=["C:\\Users\\me\\Documents\\output"]
+```
+
+These roots are intended for local configuration. Remote sessions cannot
+enable `FULL_ACCESS` or alter the local file-access boundary. File operations
+still pass through path canonicalization, protected-path checks and approval.
+
+On Windows, use **Settings > Sandbox > Install sandbox**. The loopback-only
+setup route launches the packaged setup script, requests UAC, installs a
+protected runner and executes a behavioral self-test. Setup cancellation or
+self-test failure keeps process tools unavailable. Windows setup leaves the
+owner profile ACL unchanged, grants process access only to the registered
+workspace, and disables network access. Selected roots are used by file tools
+only. Use `sandbox-native/windows/uninstall.ps1`
+from an elevated terminal for removal. See
 [`SANDBOX.md`](SANDBOX.md) and the [manual test matrix](release/SANDBOX_MANUAL_TESTS.md).
+
+---
+
+## 3B. Local development agents
+
+Promethe can expose authenticated local Codex and Claude Code installations as
+specialized tools inside the normal agent loop. They are not A2A agents and do
+not add separate REST lifecycle routes. Detection is visible through
+`GET /api/v1/capabilities` and can be refreshed with the existing settings
+reload action.
+
+| Variable | Type | Default | Description |
+|---|---|---|---|
+| `CODEX_CLI_PATH` | absolute path | PATH discovery | Optional path to a native `codex` executable. |
+| `CLAUDE_CODE_CLI_PATH` | absolute path | PATH discovery | Optional path to a native `claude` executable. |
+
+The CLI must already be authenticated by the current OS user. Promethe never
+copies or reads the provider credential files. It records only the executable
+path, version and SHA-256 identity in memory, and persists only the external
+thread/session id in Promethe session metadata.
+
+`codex_delegate` uses `codex app-server` over JSONL stdio and requires a Codex
+version with named permission profiles. Promethe installs a network-disabled
+permission profile on every thread and turn, disables discovered Codex MCP and
+plugin/app entries for that delegation, and never inherits a resumed thread's
+wider permissions. Existing user-level Codex hooks remain part of the trusted
+local CLI installation and are reported as a BETA limitation. `claude_code_delegate`
+uses Claude Code streaming JSON with user and project setting sources disabled.
+In write mode, its only MCP server is an
+ephemeral permission tool connected to Promethe's local approval gate; automatic
+memory is disabled for the delegated process.
+
+`READ_ONLY` and `WORKSPACE_WRITE` are the only access modes. Full-access,
+skipped-permission and automatic-approval flags are rejected. Cloud Codex and
+Claude Agent SDK execution are not included in this release.
 
 ---
 
@@ -246,10 +302,10 @@ Use `sandbox-native/windows/uninstall.ps1` for removal. See
 
 ## 9. Messaging channels
 
-| Channel | Variable 1 | Variable 2 |
+| Channel | Required | Optional / secondary |
 |---|---|---|
 | **Telegram** | `TELEGRAM_BOT_TOKEN` | `TELEGRAM_SECRET_TOKEN` |
-| **Discord** | `DISCORD_BOT_TOKEN` | `DISCORD_PUBLIC_KEY` |
+| **Discord** | `DISCORD_BOT_TOKEN` | `DISCORD_PUBLIC_KEY` (slash commands), `DISCORD_MESSAGE_CONTENT_ENABLED` (default `false`), `DISCORD_ALLOWED_USER_IDS`, `DISCORD_KNOWLEDGE_CHANNEL_IDS` |
 | **Slack** | `SLACK_BOT_TOKEN` | `SLACK_SIGNING_SECRET` |
 | **WhatsApp** | `WHATSAPP_PHONE_NUMBER_ID` | `WHATSAPP_ACCESS_TOKEN` |
 | **Signal** | `SIGNAL_CLI_REST_URL` | `SIGNAL_PHONE_NUMBER` |
@@ -268,6 +324,15 @@ Inbound webhook verification secrets read by the gateway are:
 | Matrix | `MATRIX_WEBHOOK_TOKEN` | Shared webhook token |
 
 See [CHANNELS.md](CHANNELS.md) for detailed setup guides.
+
+Discord ID lists accept values separated by commas, semicolons, spaces, or newlines. An empty
+`DISCORD_ALLOWED_USER_IDS` preserves unrestricted access for users who can reach the bot. Once the
+setting is non-empty, only valid numeric IDs in the list can invoke Promethe; a malformed non-empty
+list denies every user. `DISCORD_KNOWLEDGE_CHANNEL_IDS` is empty by default and therefore archives
+nothing. These variables remain the static bootstrap policy. Authenticated owner conversations and the
+`/api/v1/channels/discord/policy` API can add structured SQLite-backed overrides at runtime: scoped
+allow/deny rules, deterministic subject phrases, channel capture and project association. Dynamic
+`DENY` rules take precedence and policy changes do not require a process restart.
 
 ---
 

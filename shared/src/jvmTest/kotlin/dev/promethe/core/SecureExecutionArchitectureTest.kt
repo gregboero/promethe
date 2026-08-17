@@ -38,7 +38,12 @@ class SecureExecutionArchitectureTest {
     @Test
     fun `only the trusted sandbox helper launcher may create a process`() {
         val root = projectRoot()
-        val allowed = "shared/src/jvmMain/kotlin/dev/promethe/core/sandbox/SandboxHelperProcess.kt"
+        val allowed =
+            setOf(
+                "shared/src/jvmMain/kotlin/dev/promethe/core/sandbox/SandboxHelperProcess.kt",
+                "shared/src/jvmMain/kotlin/dev/promethe/core/sandbox/WindowsSandboxSetupLauncher.kt",
+                "shared/src/jvmMain/kotlin/dev/promethe/core/coding/TrustedLocalAgentProcess.kt",
+            )
         val forbidden =
             listOf(
                 "ProcessBuilder(",
@@ -49,7 +54,7 @@ class SecureExecutionArchitectureTest {
             )
         val violations =
             productionKotlinFiles(root)
-                .filter { path -> root.relativize(path).toString().replace('\\', '/') != allowed }
+                .filter { path -> root.relativize(path).toString().replace('\\', '/') !in allowed }
                 .flatMap { path ->
                     val source = path.readText()
                     forbidden
@@ -69,6 +74,34 @@ class SecureExecutionArchitectureTest {
                 .map { path -> root.relativize(path).toString() }
 
         assertEquals(emptyList(), violations, "Credential mutation can overwrite a concurrent update: $violations")
+    }
+
+    @Test
+    fun `local coding assistants remain tools and are never A2A peers`() {
+        val root = projectRoot()
+        val codingRoot = root.resolve("shared/src/jvmMain/kotlin/dev/promethe/core/coding")
+        val violations =
+            Files.walk(codingRoot).use { paths ->
+                paths
+                    .filter { path -> path.extension == "kt" && path.readText().contains("AgentA2ARegistry") }
+                    .map { path -> root.relativize(path).toString() }
+                    .toList()
+            }
+        assertEquals(emptyList(), violations, "Local coding assistants were registered as A2A peers: $violations")
+    }
+
+    @Test
+    fun `gateway exposes no external agent lifecycle routes`() {
+        val root = projectRoot()
+        val gatewayRoot = root.resolve("gateway/src/jvmMain")
+        val violations =
+            Files.walk(gatewayRoot).use { paths ->
+                paths
+                    .filter { path -> path.extension == "kt" && path.readText().contains("/external-agents") }
+                    .map { path -> root.relativize(path).toString() }
+                    .toList()
+            }
+        assertEquals(emptyList(), violations, "Redundant external-agent REST routes were added: $violations")
     }
 
     private fun productionKotlinFiles(root: Path): List<Path> =

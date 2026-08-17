@@ -90,6 +90,7 @@ private class FakeTestProvider : MemoryProvider {
     override suspend fun recallFacts(
         query: String,
         limit: Int,
+        userId: String,
     ) = facts.take(limit)
 
     override suspend fun getAllFacts(userId: String) = facts.toList()

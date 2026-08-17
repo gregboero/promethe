@@ -278,15 +278,15 @@ class ToolApprovalGate(
      */
     fun listPending(): List<ApprovalRequest> =
         synchronized(pendingApprovals) {
-            pendingApprovals.values
-                .filter { it.status == ApprovalStatus.PENDING }
-                .sortedByDescending { it.createdAt }
+            newestFirst(
+                pendingApprovals.values.filter { it.status == ApprovalStatus.PENDING },
+            ) { it.createdAt }
         }
 
     fun listGrants(): List<ApprovalGrant> =
         synchronized(approvalGrants) {
             pruneExpiredGrants()
-            approvalGrants.values.sortedByDescending { it.createdAt }
+            newestFirst(approvalGrants.values) { it.createdAt }
         }
 
     fun revoke(
@@ -496,9 +496,9 @@ class ToolApprovalGate(
      */
     fun listPendingProviders(): List<ProviderChoiceRequest> =
         synchronized(pendingProviderChoices) {
-            pendingProviderChoices.values
-                .filter { it.status == ApprovalStatus.PENDING }
-                .sortedByDescending { it.createdAt }
+            newestFirst(
+                pendingProviderChoices.values.filter { it.status == ApprovalStatus.PENDING },
+            ) { it.createdAt }
         }
 
     private fun cleanupProvider(requestId: String) {
@@ -510,6 +510,23 @@ class ToolApprovalGate(
     private fun secureRequestId(prefix: String): String {
         val random = ByteArray(18).also { SecureRandom().nextBytes(it) }
         return "$prefix-${Base64.getUrlEncoder().withoutPadding().encodeToString(random)}"
+    }
+
+    /** Avoids a lazily loaded comparator class while the Desktop app is running from Gradle class directories. */
+    private inline fun <T> newestFirst(
+        values: Collection<T>,
+        createdAt: (T) -> Long,
+    ): List<T> {
+        val result = ArrayList<T>(values.size)
+        for (value in values) {
+            val timestamp = createdAt(value)
+            var insertionIndex = 0
+            while (insertionIndex < result.size && createdAt(result[insertionIndex]) >= timestamp) {
+                insertionIndex++
+            }
+            result.add(insertionIndex, value)
+        }
+        return result
     }
 
     private fun sha256(value: String): String =

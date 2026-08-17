@@ -21,6 +21,17 @@ mod unsupported;
 #[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))]
 use unsupported as current;
 
+pub fn run_special_mode() -> Option<i32> {
+    #[cfg(target_os = "windows")]
+    {
+        current::run_special_mode()
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+        None
+    }
+}
+
 pub fn execute(request: IpcRequest) -> IpcResponse {
     let execution_id = request
         .execution

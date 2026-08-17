@@ -84,13 +84,14 @@ class CapabilityRoutesTest {
             val body = json.decodeFromString<CapabilityListResponse>(response.bodyAsText())
             val channels = body.capabilities.filter { it.category == "channel" }
             val tools = ToolRegistry.listTools()
+            val betaChannels = setOf("telegram", "discord", "slack", "whatsapp", "signal", "matrix", "sms")
 
             assertTrue(
-                channels.filter { it.id.removePrefix("channel.") in setOf("telegram", "discord", "slack", "whatsapp", "signal", "matrix") }
+                channels.filter { it.id.removePrefix("channel.") in betaChannels }
                     .all { it.maturity.name == "BETA" },
             )
             assertTrue(
-                channels.filter { it.id.removePrefix("channel.") !in setOf("telegram", "discord", "slack", "whatsapp", "signal", "matrix") }
+                channels.filter { it.id.removePrefix("channel.") !in betaChannels }
                     .all { it.maturity.name == "LAB" },
             )
             assertTrue(

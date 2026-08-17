@@ -20,6 +20,14 @@ enum class CapabilityAvailability {
 }
 
 @Serializable
+enum class CapabilityAuthentication {
+    AUTHENTICATED,
+    SIGNED_OUT,
+    UNKNOWN,
+    NOT_APPLICABLE,
+}
+
+@Serializable
 data class CapabilityDescriptor(
     val id: String,
     val name: String,
@@ -30,6 +38,8 @@ data class CapabilityDescriptor(
     val risk: String = "READ",
     val requiredConfiguration: List<String> = emptyList(),
     val limitations: List<String> = emptyList(),
+    val runtimeVersion: String? = null,
+    val authentication: CapabilityAuthentication = CapabilityAuthentication.NOT_APPLICABLE,
 )
 
 @Serializable
@@ -69,4 +79,7 @@ data class ToolInvocation(
     val arguments: JsonObject,
     val sessionId: String = "unknown",
     val origin: ToolCallOrigin = ToolCallOrigin.AGENT,
+    val projectId: String? = null,
+    val memoryNamespace: String = "default",
+    val workspaceRelativePath: String? = null,
 )

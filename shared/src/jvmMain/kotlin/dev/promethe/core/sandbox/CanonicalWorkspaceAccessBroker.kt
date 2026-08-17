@@ -42,7 +42,7 @@ class CanonicalWorkspaceAccessBroker : WorkspaceAccessBroker {
             val roots = listOf(workspace) + validated.writableRoots.map(::canonicalExistingDirectory)
             requireInside(candidate, roots, "write")
         }
-        rejectProtectedPath(workspace, candidate, validated.protectedPaths)
+        rejectProtectedPath(candidate, validated.protectedPaths)
         return candidate.toString()
     }
 
@@ -93,17 +93,14 @@ class CanonicalWorkspaceAccessBroker : WorkspaceAccessBroker {
     }
 
     private fun rejectProtectedPath(
-        workspace: Path,
         candidate: Path,
         protectedPaths: List<String>,
     ) {
-        if (!candidate.startsWith(workspace)) return
-        val relative = workspace.relativize(candidate)
-        val denied =
-            protectedPaths.any { protected ->
-                val protectedPath = Path.of(protected).normalize()
-                protectedPath.nameCount > 0 && relative.startsWith(protectedPath)
-            }
+        val protectedNames =
+            protectedPaths
+                .mapNotNull { protected -> Path.of(protected).normalize().fileName?.toString()?.lowercase() }
+                .toSet()
+        val denied = candidate.any { segment -> segment.toString().lowercase() in protectedNames }
         if (denied) throw WorkspaceAccessDeniedException("path is protected by the sandbox profile")
     }
 }

@@ -43,7 +43,7 @@ class SandboxedCommandRunner(
         sensitiveEnvironmentKeys: Set<String> = emptySet(),
         interactive: Boolean = false,
     ): SandboxedExecutionResult {
-        val profile = runtimePolicy.withTimeout(timeoutMillis)
+        val profile = runtimePolicy.processProfile(timeoutMillis)
         val resolvedWorkingDirectory =
             accessBroker.resolveReadablePath(
                 workspaceRoot = workspaceRoot,
@@ -95,6 +95,8 @@ class SandboxedCommandRunner(
         )
 
     fun permissionProfile(): SandboxPermissionProfile = runtimePolicy.get()
+
+    override fun hasUnconfinedFileAccess(): Boolean = runtimePolicy.get().mode == dev.promethe.api.SandboxMode.FULL_ACCESS
 
     private fun sanitizeIdentifier(value: String): String {
         val sanitized =

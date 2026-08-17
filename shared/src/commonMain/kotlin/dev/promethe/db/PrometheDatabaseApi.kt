@@ -7,6 +7,17 @@ import dev.promethe.api.ReasoningEffort
  * The actual implementation (Exposed) lives in jvmMain.
  */
 interface PrometheDatabaseApi {
+    // ── Projects ──
+    suspend fun insertProject(project: ProjectRow) = Unit
+
+    suspend fun updateProject(project: ProjectRow) = Unit
+
+    suspend fun getProject(id: String): ProjectRow? = null
+
+    suspend fun getAllProjects(): List<ProjectRow> = emptyList()
+
+    suspend fun getProjectSessionCounts(): Map<String, Int> = emptyMap()
+
     // ── Sessions ──
     suspend fun insertSession(
         id: String,
@@ -21,6 +32,13 @@ interface PrometheDatabaseApi {
     )
 
     suspend fun getAllSessions(): List<SessionRow>
+
+    suspend fun getSession(id: String): SessionRow? = getAllSessions().find { it.id == id }
+
+    suspend fun assignSessionToProject(
+        sessionId: String,
+        projectId: String?,
+    ) = Unit
 
     suspend fun deleteSession(id: String)
 
@@ -217,6 +235,19 @@ data class SessionRow(
     val createdAt: Long,
     val metadata: String?,
     val title: String? = null,
+    val projectId: String? = null,
+)
+
+data class ProjectRow(
+    val id: String,
+    val name: String,
+    val description: String = "",
+    val instructions: String = "",
+    val workspacePath: String,
+    val memoryNamespace: String,
+    val archived: Boolean = false,
+    val createdAt: Long,
+    val updatedAt: Long,
 )
 
 data class MessageRow(

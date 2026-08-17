@@ -47,6 +47,7 @@ object KoinBootstrap {
             single<dev.promethe.core.sandbox.SandboxManager> { stack.sandboxManager }
             single<dev.promethe.core.sandbox.SandboxRuntimePolicy> { stack.sandboxRuntimePolicy }
             single<dev.promethe.core.sandbox.SandboxedCommandRunner> { stack.sandboxCommandRunner }
+            single<dev.promethe.core.coding.LocalCodingAgentService> { stack.localCodingAgentService }
 
             // ── Optional services ──
             stack.pluginLoader?.let { pl ->

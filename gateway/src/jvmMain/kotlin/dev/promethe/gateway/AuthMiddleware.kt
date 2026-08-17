@@ -174,6 +174,7 @@ object AuthMiddleware {
             "/webhook/slack",
             "/webhook/signal",
             "/webhook/matrix",
+            "/webhook/sms",
         )
 
     private val RETIRED_ROUTES = setOf("/execute", "/api/chat", "/ws/chat", "/api/setup/remote")

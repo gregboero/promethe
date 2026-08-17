@@ -18,6 +18,10 @@ enum InputFrame {
 }
 
 fn main() {
+    if let Some(exit_code) = platform::run_special_mode() {
+        std::process::exit(exit_code);
+    }
+
     let stdin = io::stdin();
     let stdout = Arc::new(Mutex::new(io::stdout()));
     let mut workers: Vec<thread::JoinHandle<()>> = Vec::new();

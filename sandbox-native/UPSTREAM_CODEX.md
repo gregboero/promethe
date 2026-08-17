@@ -7,7 +7,7 @@ versioned JSONL IPC protocol; no Codex source file is vendored verbatim.
 - Upstream repository: https://github.com/openai/codex
 - Reference commit: `07490c75234ed3c63291a8eb7629f04f647038fa`
 - Upstream license: Apache License 2.0
-- Reference date: 2026-07-28
+- Reference date: 2026-07-29
 
 Reference modules:
 

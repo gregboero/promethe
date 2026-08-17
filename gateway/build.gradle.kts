@@ -28,6 +28,12 @@ dependencies {
     // BouncyCastle (Ed25519 for Discord webhook verification)
     implementation(libs.bouncycastle)
 
+    // Discord Gateway lifecycle, reconnects, heartbeats, and REST rate limits.
+    implementation(libs.jda)
+
+    // Twilio request validation and outbound SMS replies.
+    implementation(libs.twilio)
+
     // Koog stable core and prompt-executor clients.
     implementation(libs.bundles.koog.stable)
 

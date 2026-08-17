@@ -13,6 +13,11 @@ interface SandboxManager {
     suspend fun status(): SandboxStatus
 
     suspend fun selfTest(): SandboxStatus
+
+    suspend fun setup(workspaceRoot: String): SandboxStatus =
+        status().copy(
+            message = "Sandbox setup is not supported by this backend.",
+        )
 }
 
 fun interface SandboxProcessLauncher {
@@ -29,6 +34,8 @@ interface SandboxCommandExecutor {
     ): SandboxedExecutionResult
 
     fun approvalContext(): String
+
+    fun hasUnconfinedFileAccess(): Boolean = false
 }
 
 interface WorkspaceAccessBroker {

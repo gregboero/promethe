@@ -23,6 +23,7 @@ class PrometheDatabase(
         transaction(db) {
             @Suppress("DEPRECATION")
             SchemaUtils.createMissingTablesAndColumns(
+                Projects,
                 Sessions,
                 Messages,
                 Feedbacks,
@@ -127,6 +128,55 @@ class PrometheDatabase(
         }
     }
 
+    // ===== PROJECTS =====
+
+    override suspend fun insertProject(project: ProjectRow) {
+        dbQuery {
+            Projects.insert {
+                it[id] = project.id
+                it[name] = project.name
+                it[description] = project.description
+                it[instructions] = project.instructions
+                it[workspacePath] = project.workspacePath
+                it[memoryNamespace] = project.memoryNamespace
+                it[archived] = project.archived
+                it[createdAt] = project.createdAt
+                it[updatedAt] = project.updatedAt
+            }
+        }
+    }
+
+    override suspend fun updateProject(project: ProjectRow) {
+        dbQuery {
+            Projects.update({ Projects.id eq project.id }) {
+                it[name] = project.name
+                it[description] = project.description
+                it[instructions] = project.instructions
+                it[archived] = project.archived
+                it[updatedAt] = project.updatedAt
+            }
+        }
+    }
+
+    override suspend fun getProject(id: String): ProjectRow? =
+        dbQuery {
+            Projects.selectAll().where { Projects.id eq id }.singleOrNull()?.toProjectRow()
+        }
+
+    override suspend fun getAllProjects(): List<ProjectRow> =
+        dbQuery {
+            Projects.selectAll().orderBy(Projects.updatedAt, SortOrder.DESC).map { it.toProjectRow() }
+        }
+
+    override suspend fun getProjectSessionCounts(): Map<String, Int> =
+        dbQuery {
+            Sessions
+                .selectAll()
+                .mapNotNull { row -> row[Sessions.projectId] }
+                .groupingBy { it }
+                .eachCount()
+        }
+
     // ===== SESSIONS =====
 
     override suspend fun insertSession(
@@ -164,6 +214,22 @@ class PrometheDatabase(
                 .orderBy(Sessions.createdAt, SortOrder.DESC)
                 .map { it.toSessionRow() }
         }
+
+    override suspend fun getSession(id: String): SessionRow? =
+        dbQuery {
+            Sessions.selectAll().where { Sessions.id eq id }.singleOrNull()?.toSessionRow()
+        }
+
+    override suspend fun assignSessionToProject(
+        sessionId: String,
+        projectId: String?,
+    ) {
+        dbQuery {
+            Sessions.update({ Sessions.id eq sessionId }) {
+                it[Sessions.projectId] = projectId
+            }
+        }
+    }
 
     override suspend fun deleteSession(id: String) {
         dbQuery {
@@ -981,6 +1047,20 @@ private fun ResultRow.toSessionRow() =
         createdAt = this[Sessions.createdAt],
         metadata = this[Sessions.metadata],
         title = this[Sessions.title],
+        projectId = this[Sessions.projectId],
+    )
+
+private fun ResultRow.toProjectRow() =
+    ProjectRow(
+        id = this[Projects.id],
+        name = this[Projects.name],
+        description = this[Projects.description],
+        instructions = this[Projects.instructions],
+        workspacePath = this[Projects.workspacePath],
+        memoryNamespace = this[Projects.memoryNamespace],
+        archived = this[Projects.archived],
+        createdAt = this[Projects.createdAt],
+        updatedAt = this[Projects.updatedAt],
     )
 
 private fun ResultRow.toMessageRow() =

@@ -149,19 +149,20 @@ curl http://localhost:8080/api/v1/sessions
     "id": "sess-001",
     "createdAt": 1718000000000,
     "metadata": "{}",
-    "messageCount": 12
+    "messageCount": 12,
+    "projectId": "project-2c2b62ba"
   }
 ]
 ```
 
 ### POST /api/v1/sessions
 
-Create a new session.
+Create a new session. `projectId` is optional; when omitted, a new session inherits the server's active project.
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/sessions \
   -H "Content-Type: application/json" \
-  -d '{"metadata": "{\"name\": \"Projet X\"}"}'
+  -d '{"id":"sess-001","projectId":"project-2c2b62ba"}'
 ```
 
 ### DELETE /api/v1/sessions/{id}
@@ -190,6 +191,16 @@ curl -X PATCH http://localhost:8080/api/v1/sessions/sess-001/metadata \
   -d '{"name": "Projet X"}'
 ```
 
+### PATCH /api/v1/sessions/{id}/project
+
+Assign an existing conversation to a project, or send `null` to detach it.
+
+```bash
+curl -X PATCH http://localhost:8080/api/v1/sessions/sess-001/project \
+  -H "Content-Type: application/json" \
+  -d '{"projectId":"project-2c2b62ba"}'
+```
+
 ### GET /api/v1/sessions/{id}/export/json
 
 Export a complete session as JSON (sets `Content-Disposition: attachment`).
@@ -207,6 +218,35 @@ curl http://localhost:8080/api/v1/sessions/sess-001/export/markdown
 ```
 
 > Note: there is no combined `GET /api/v1/sessions/{id}/export` — export is split into the two typed routes above. See also [Session Checkpoints](#session-checkpoints) for `GET/POST/DELETE /api/v1/sessions/{id}/checkpoint(s)`.
+
+---
+
+## Projects
+
+Projects group conversations, trusted instructions, a workspace and isolated long-term memory. All routes
+require owner authentication. Archiving is non-destructive and never deletes project files or memories.
+
+| Method | Route | Purpose |
+|---|---|---|
+| `GET` | `/api/v1/projects` | List projects and the active project id |
+| `POST` | `/api/v1/projects` | Create a project and its workspace |
+| `GET` | `/api/v1/projects/{id}` | Read one project |
+| `PUT` | `/api/v1/projects/{id}` | Update or restore a project |
+| `DELETE` | `/api/v1/projects/{id}` | Archive a project |
+| `PUT` | `/api/v1/projects/{id}/active` | Make a project active |
+| `DELETE` | `/api/v1/projects/active` | Clear the active project |
+
+```bash
+curl -X POST http://localhost:8080/api/v1/projects \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name":"Promethe public release",
+    "description":"Release preparation",
+    "instructions":"Prioritize security regressions and keep the release checklist current."
+  }'
+```
+
+See [PROJECTS.md](PROJECTS.md) for workspace and memory semantics.
 
 ---
 
@@ -347,6 +387,37 @@ Convenience endpoint for the currently running job, if any. Returns `204 No Cont
 ```bash
 curl http://localhost:8080/api/v1/gepa/current
 ```
+
+---
+
+## Sandbox and file permissions
+
+### GET /api/v1/security/sandbox/status
+
+Returns the native process-sandbox state plus `workspaceRoot` and
+`localConfigurationAllowed`. The latter is true only for a loopback request
+authenticated with the local API key.
+
+### GET /api/v1/security/permission-profile
+
+Returns the active file/process permission profile, including canonical
+readable and writable roots.
+
+### PUT /api/v1/security/permission-profile
+
+Updates and persists the profile. This route requires loopback authentication
+with the local API key. `FULL_ACCESS` applies only to approved file tools;
+process tools remain confined to the main workspace. It is rejected whenever
+remote access is enabled.
+
+### POST /api/v1/security/sandbox/self-test
+
+Runs the native backend self-test.
+
+### POST /api/v1/security/sandbox/setup
+
+Runs the one-time native setup where supported. This route also requires the
+local loopback API key.
 
 ---
 
@@ -539,7 +610,39 @@ curl -X POST http://localhost:8080/api/v1/channels/telegram/test
 # → {"status": "ok", "channel": "telegram", "message": "Configuration valid"}
 ```
 
-Supported channel names: `telegram`, `discord`, `slack`, `whatsapp`, `signal`, `matrix`. See [Channel Webhooks](#channel-webhooks-inbound) for the actual inbound receiver endpoints.
+Supported channel names: `telegram`, `discord`, `slack`, `whatsapp`, `signal`, `matrix`, `sms`. See [Channel Webhooks](#channel-webhooks-inbound) for the actual inbound receiver endpoints.
+
+### Discord live policy
+
+All endpoints below require owner authentication. Discord IDs may be numeric IDs or Discord mention
+syntax. Policies are persisted in SQLite and used immediately by the persistent Gateway and signed
+Discord interactions.
+
+| Method | Route | Purpose |
+|---|---|---|
+| `GET` | `/api/v1/channels/discord/policy` | List dynamic user and channel rules |
+| `PUT` | `/api/v1/channels/discord/policy/users/{userId}` | Allow/deny a user and optionally restrict subjects/server/channel |
+| `DELETE` | `/api/v1/channels/discord/policy/users/{userId}` | Remove the exact dynamic rule; optional `guildId` and `channelId` query parameters select its scope |
+| `PUT` | `/api/v1/channels/discord/policy/channels/{channelId}` | Start/stop Open Knowledge capture and optionally associate a project |
+| `DELETE` | `/api/v1/channels/discord/policy/channels/{channelId}` | Remove the dynamic channel override |
+
+Contract signatures: `GET /api/v1/channels/discord/policy`,
+`PUT /api/v1/channels/discord/policy/users/{userId}`,
+`DELETE /api/v1/channels/discord/policy/users/{userId}`,
+`PUT /api/v1/channels/discord/policy/channels/{channelId}` and
+`DELETE /api/v1/channels/discord/policy/channels/{channelId}`.
+
+```bash
+curl -X PUT http://localhost:8080/api/v1/channels/discord/policy/users/123456789012345678 \
+  -H "Authorization: Bearer $PROMETHE_SESSION" \
+  -H "Content-Type: application/json" \
+  -d '{"effect":"ALLOW","allowedTopics":["weather","public release"]}'
+
+curl -X PUT http://localhost:8080/api/v1/channels/discord/policy/channels/345678901234567890 \
+  -H "Authorization: Bearer $PROMETHE_SESSION" \
+  -H "Content-Type: application/json" \
+  -d '{"captureKnowledge":true,"projectId":"project-release"}'
+```
 
 ---
 
@@ -1359,6 +1462,7 @@ the message through the shared A2A pipeline.
 | POST | `/webhook/slack` | Slack Events API (HMAC signing secret; handles `url_verification` challenge) |
 | POST | `/webhook/signal` | Signal (via signal-cli REST API) |
 | POST | `/webhook/matrix` | Matrix Appservice |
+| POST | `/webhook/sms` | Twilio SMS (`X-Twilio-Signature`; empty TwiML acknowledgement, asynchronous A2A reply) |
 
 ```bash
 curl -X POST http://localhost:8080/webhook/telegram \
@@ -1646,6 +1750,8 @@ supports the capability (missing provider = tool call fails at invocation, not a
 **AI (3)**: `embedding`, `speech_to_text`, `vector_search`
 
 **Agent-level (11)**: `clarify`, `cronjob`, `send_message`, `session_search`, `mixture_of_agents`, `config_get`, `config_set`, `plugin_list`, `checkpoint_save`, `checkpoint_list`, `render_ui`
+
+**Gateway administration (1)**: `discord_policy` — owner A2A conversations only; mutations require approval.
 
 **Autonomous (1)**: `autonomous_goal`
 

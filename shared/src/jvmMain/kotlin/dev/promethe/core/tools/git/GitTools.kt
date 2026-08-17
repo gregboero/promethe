@@ -4,6 +4,7 @@ import ai.koog.agents.core.tools.SimpleTool
 import ai.koog.agents.core.tools.annotations.LLMDescription
 import ai.koog.serialization.typeToken
 import dev.promethe.core.WorkspacePathPolicy
+import dev.promethe.core.projectScopedPath
 import dev.promethe.core.sandbox.SandboxedCommandRunner
 import dev.promethe.core.sandbox.renderCommandOutput
 import kotlinx.serialization.Serializable
@@ -64,10 +65,10 @@ private suspend fun runGit(
     vararg args: String,
 ): String = sandboxRunner.execute(executable = "git", arguments = args.toList(), workingDirectory = workDir).renderCommandOutput()
 
-private fun resolveGitDirectory(
+private suspend fun resolveGitDirectory(
     workspace: String,
     requested: String,
-): String? = WorkspacePathPolicy.resolve(workspace, requested)?.takeIf { it.isDirectory }?.path
+): String? = WorkspacePathPolicy.resolve(workspace, projectScopedPath(requested))?.takeIf { it.isDirectory }?.path
 
 private fun isSafePath(value: String): Boolean =
     value.isBlank() ||

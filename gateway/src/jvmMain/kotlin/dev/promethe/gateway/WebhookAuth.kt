@@ -1,5 +1,6 @@
 package dev.promethe.gateway
 
+import com.twilio.security.RequestValidator
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.header
@@ -13,6 +14,26 @@ import kotlin.math.abs
 // Webhook signature verification for external messaging platforms.
 // Each platform uses its own signature scheme to authenticate incoming webhooks.
 object WebhookAuth {
+    suspend fun verifyTwilio(
+        call: ApplicationCall,
+        authToken: String,
+        requestUrl: String,
+        parameters: Map<String, String>,
+    ): Boolean {
+        if (!requireConfigured(call, authToken, "Twilio")) return false
+        val signature = call.request.header("X-Twilio-Signature").orEmpty()
+        val valid =
+            signature.isNotBlank() &&
+                runCatching {
+                    RequestValidator(authToken).validate(requestUrl, parameters, signature)
+                }.getOrDefault(false)
+        if (!valid) {
+            call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Invalid Twilio signature"))
+            return false
+        }
+        return true
+    }
+
     // Verify Telegram webhook using secret token header
     suspend fun verifyTelegram(
         call: ApplicationCall,

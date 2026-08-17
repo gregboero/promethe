@@ -109,6 +109,21 @@ data class DiscordInteraction(
     val channel_id: String = "",
     val guild_id: String = "",
     val token: String = "",
+    val member: DiscordInteractionMember? = null,
+    val user: DiscordInteractionUser? = null,
+)
+
+@Serializable
+data class DiscordInteractionMember(
+    val user: DiscordInteractionUser? = null,
+    val nick: String? = null,
+)
+
+@Serializable
+data class DiscordInteractionUser(
+    val id: String = "",
+    val username: String = "",
+    val global_name: String? = null,
 )
 
 @Serializable
@@ -132,6 +147,7 @@ data class DiscordInteractionResponse(
 @Serializable
 data class DiscordResponseData(
     val content: String,
+    val flags: Int? = null,
 )
 
 // ── Slack Events API ────────────────────────────────────────

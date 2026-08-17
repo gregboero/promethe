@@ -9,6 +9,7 @@ import dev.promethe.db.*
 class FakeDatabase : PrometheDatabaseApi {
     // ── Storage ──
     private val sessions = mutableListOf<SessionRow>()
+    private val projects = mutableListOf<ProjectRow>()
     private val messages = mutableListOf<MessageRow>()
     private val feedbacks = mutableListOf<FeedbackRow>()
     private val agentProfiles = mutableListOf<AgentProfileRow>()
@@ -18,6 +19,22 @@ class FakeDatabase : PrometheDatabaseApi {
     private val webhookChannels = mutableListOf<WebhookChannelRow>()
     private var messageIdCounter = 1
     private var factIdCounter = 1
+
+    // ── Projects ──
+    override suspend fun insertProject(project: ProjectRow) {
+        projects += project
+    }
+
+    override suspend fun updateProject(project: ProjectRow) {
+        val index = projects.indexOfFirst { it.id == project.id }
+        if (index >= 0) projects[index] = project
+    }
+
+    override suspend fun getProject(id: String): ProjectRow? = projects.find { it.id == id }
+
+    override suspend fun getAllProjects(): List<ProjectRow> = projects.toList()
+
+    override suspend fun getProjectSessionCounts(): Map<String, Int> = sessions.mapNotNull(SessionRow::projectId).groupingBy { it }.eachCount()
 
     // ── Sessions ──
     override suspend fun insertSession(
@@ -37,6 +54,16 @@ class FakeDatabase : PrometheDatabaseApi {
     }
 
     override suspend fun getAllSessions(): List<SessionRow> = sessions.toList()
+
+    override suspend fun getSession(id: String): SessionRow? = sessions.find { it.id == id }
+
+    override suspend fun assignSessionToProject(
+        sessionId: String,
+        projectId: String?,
+    ) {
+        val index = sessions.indexOfFirst { it.id == sessionId }
+        if (index >= 0) sessions[index] = sessions[index].copy(projectId = projectId)
+    }
 
     override suspend fun deleteSession(id: String) {
         sessions.removeAll { it.id == id }

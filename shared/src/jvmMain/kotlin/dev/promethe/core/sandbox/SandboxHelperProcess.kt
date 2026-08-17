@@ -6,6 +6,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 import java.security.MessageDigest
+import java.util.concurrent.TimeUnit
 
 internal interface SandboxHelperProcess {
     val input: OutputStream
@@ -16,6 +17,8 @@ internal interface SandboxHelperProcess {
     fun destroy()
 
     fun destroyForcibly()
+
+    fun waitFor(timeoutMillis: Long): Boolean = !isAlive
 }
 
 internal fun interface SandboxHelperProcessFactory {
@@ -26,11 +29,8 @@ internal object JvmSandboxHelperProcessFactory : SandboxHelperProcessFactory {
     override fun start(helper: Path): SandboxHelperProcess {
         val launchHelper = verifiedSandboxHelperLaunchCopy(helper)
         val builder = ProcessBuilder(launchHelper.toAbsolutePath().normalize().toString())
-        val inheritedEnvironment = System.getenv()
         builder.environment().clear()
-        SAFE_HELPER_ENVIRONMENT.forEach { name ->
-            inheritedEnvironment[name]?.let { value -> builder.environment()[name] = value }
-        }
+        builder.environment().putAll(sandboxHelperEnvironment(System.getenv()))
         helper.parent?.toFile()?.let(builder::directory)
         return try {
             JvmSandboxHelperProcess(builder.start(), launchHelper.takeIf { it != helper })
@@ -41,21 +41,28 @@ internal object JvmSandboxHelperProcessFactory : SandboxHelperProcessFactory {
             throw error
         }
     }
-
-    private val SAFE_HELPER_ENVIRONMENT =
-        setOf(
-            "HOME",
-            "LANG",
-            "LC_ALL",
-            "PATH",
-            "SystemRoot",
-            "TEMP",
-            "TMP",
-            "TMPDIR",
-            "USERPROFILE",
-            "WINDIR",
-        )
 }
+
+internal fun sandboxHelperEnvironment(inherited: Map<String, String>): Map<String, String> =
+    SAFE_HELPER_ENVIRONMENT.mapNotNull { name ->
+        inherited[name]?.let { value -> name to value }
+    }.toMap()
+
+private val SAFE_HELPER_ENVIRONMENT =
+    setOf(
+        "HOME",
+        "LANG",
+        "LC_ALL",
+        "PATH",
+        "ProgramData",
+        "SystemDrive",
+        "SystemRoot",
+        "TEMP",
+        "TMP",
+        "TMPDIR",
+        "USERPROFILE",
+        "WINDIR",
+    )
 
 internal fun verifiedSandboxHelperLaunchCopy(
     helper: Path,
@@ -120,4 +127,6 @@ private class JvmSandboxHelperProcess(
     override fun destroyForcibly() {
         delegate.destroyForcibly()
     }
+
+    override fun waitFor(timeoutMillis: Long): Boolean = delegate.waitFor(timeoutMillis, TimeUnit.MILLISECONDS)
 }

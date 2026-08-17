@@ -5,9 +5,11 @@ import androidx.lifecycle.viewModelScope
 import dev.promethe.api.ProviderRegistry
 import dev.promethe.api.SandboxMode
 import dev.promethe.api.SandboxPermissionProfile
+import dev.promethe.api.SandboxStatus
 import dev.promethe.app.config.AppCredentials
 import dev.promethe.app.config.CredentialManager
 import dev.promethe.app.network.PrometheClient
+import dev.promethe.app.platform.pickSandboxDirectory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -113,6 +115,9 @@ private fun integrationRemoteConfigValues(state: SettingsState): Map<String, Str
         "TELEGRAM_SECRET_TOKEN" to state.intTelegramSecretToken,
         "DISCORD_BOT_TOKEN" to state.intDiscordBotToken,
         "DISCORD_PUBLIC_KEY" to state.intDiscordPublicKey,
+        "DISCORD_MESSAGE_CONTENT_ENABLED" to state.intDiscordMessageContentEnabled.toString(),
+        "DISCORD_ALLOWED_USER_IDS" to state.intDiscordAllowedUserIds,
+        "DISCORD_KNOWLEDGE_CHANNEL_IDS" to state.intDiscordKnowledgeChannelIds,
         "SLACK_BOT_TOKEN" to state.intSlackBotToken,
         "SLACK_SIGNING_SECRET" to state.intSlackSigningSecret,
         "WHATSAPP_PHONE_NUMBER_ID" to state.intWhatsappPhoneId,
@@ -196,6 +201,7 @@ class SettingsViewModel(
         loadVoiceProviders()
         loadExtendedConfig()
         loadSandbox()
+        loadLocalCodingAgents()
     }
 
     // ── State Mutation ──────────────────────────────────────────────────────
@@ -219,6 +225,35 @@ class SettingsViewModel(
         }
     }
 
+    fun loadLocalCodingAgents(redetect: Boolean = false) {
+        viewModelScope.launch {
+            _state.update { it.copy(localCodingAgentsLoading = true, localCodingAgentsError = null) }
+            try {
+                if (redetect) client?.reloadSettings()
+                val capabilities =
+                    client
+                        ?.getCapabilities()
+                        ?.capabilities
+                        ?.filter { it.category == "integration.coding-agent" }
+                        .orEmpty()
+                _state.update {
+                    it.copy(
+                        localCodingAgents = capabilities,
+                        localCodingAgentsLoading = false,
+                    )
+                }
+            } catch (e: Exception) {
+                logger.debug(e) { "Failed to load local coding agents" }
+                _state.update {
+                    it.copy(
+                        localCodingAgentsLoading = false,
+                        localCodingAgentsError = e.message ?: "Local coding-agent detection failed",
+                    )
+                }
+            }
+        }
+    }
+
     fun runSandboxSelfTest() {
         viewModelScope.launch {
             _state.update { it.copy(sandboxSelfTestRunning = true, sandboxError = null) }
@@ -232,19 +267,105 @@ class SettingsViewModel(
         }
     }
 
-    fun updateSandboxMode(mode: SandboxMode) {
-        val current = _state.value.sandboxProfile ?: return
+    fun setupSandbox() {
         viewModelScope.launch {
-            _state.update { it.copy(sandboxProfile = current.copy(mode = mode), sandboxError = null) }
+            _state.update { it.copy(sandboxSetupRunning = true, sandboxError = null) }
             try {
-                val saved = client?.updateSandboxPermissionProfile(current.copy(mode = mode))
-                if (saved != null) _state.update { it.copy(sandboxProfile = saved) }
+                val status = client?.setupSandbox()
+                _state.update {
+                    it.copy(
+                        sandboxStatus = status,
+                        sandboxSetupRunning = false,
+                    )
+                }
             } catch (e: Exception) {
-                logger.debug(e) { "Failed to update sandbox permission profile" }
-                _state.update { it.copy(sandboxProfile = current, sandboxError = e.message ?: "Sandbox profile update failed") }
+                logger.debug(e) { "Sandbox setup failed" }
+                _state.update {
+                    it.copy(
+                        sandboxSetupRunning = false,
+                        sandboxError = e.message ?: "Sandbox setup failed",
+                    )
+                }
             }
         }
     }
+
+    fun updateSandboxMode(mode: SandboxMode) {
+        val current = _state.value.sandboxProfile ?: return
+        if (!_state.value.sandboxStatus.isLocalSandboxConfigurationAllowed()) return
+        persistSandboxProfile(current.copy(mode = mode), current)
+    }
+
+    fun addSandboxRoot() {
+        if (!_state.value.sandboxStatus.isLocalSandboxConfigurationAllowed()) return
+        viewModelScope.launch {
+            val selected = pickSandboxDirectory()?.trim()?.takeIf(String::isNotBlank) ?: return@launch
+            val current = _state.value.sandboxProfile ?: return@launch
+            val workspace = _state.value.sandboxStatus?.workspaceRoot
+            if (workspace != null && sameSandboxPath(selected, workspace)) return@launch
+            if (current.readableRoots.any { sameSandboxPath(it, selected) }) return@launch
+
+            val nextReadable = current.readableRoots + selected
+            val nextWritable =
+                if (current.mode == SandboxMode.READ_ONLY) {
+                    current.writableRoots
+                } else {
+                    current.writableRoots + selected
+                }
+            persistSandboxProfile(current.copy(readableRoots = nextReadable, writableRoots = nextWritable), current)
+        }
+    }
+
+    fun removeSandboxRoot(root: String) {
+        val current = _state.value.sandboxProfile ?: return
+        if (!_state.value.sandboxStatus.isLocalSandboxConfigurationAllowed()) return
+        persistSandboxProfile(
+            current.copy(
+                readableRoots = current.readableRoots.filterNot { sameSandboxPath(it, root) },
+                writableRoots = current.writableRoots.filterNot { sameSandboxPath(it, root) },
+            ),
+            current,
+        )
+    }
+
+    fun setSandboxRootWritable(
+        root: String,
+        writable: Boolean,
+    ) {
+        val current = _state.value.sandboxProfile ?: return
+        if (!_state.value.sandboxStatus.isLocalSandboxConfigurationAllowed()) return
+        val writableRoots =
+            if (writable) {
+                if (current.writableRoots.any { sameSandboxPath(it, root) }) current.writableRoots else current.writableRoots + root
+            } else {
+                current.writableRoots.filterNot { sameSandboxPath(it, root) }
+            }
+        persistSandboxProfile(current.copy(writableRoots = writableRoots), current)
+    }
+
+    private fun persistSandboxProfile(
+        next: SandboxPermissionProfile,
+        previous: SandboxPermissionProfile,
+    ) {
+        val gateway = client ?: return
+        viewModelScope.launch {
+            _state.update { it.copy(sandboxProfile = next, sandboxError = null) }
+            try {
+                val saved = gateway.updateSandboxPermissionProfile(next)
+                _state.update { it.copy(sandboxProfile = saved) }
+            } catch (e: Exception) {
+                logger.debug(e) { "Failed to update sandbox permission profile" }
+                _state.update { it.copy(sandboxProfile = previous, sandboxError = e.message ?: "Sandbox profile update failed") }
+            }
+        }
+    }
+
+    private fun sameSandboxPath(
+        left: String,
+        right: String,
+    ): Boolean = left.trimEnd('/', '\\').equals(right.trimEnd('/', '\\'), ignoreCase = true)
+
+    private fun SandboxStatus?.isLocalSandboxConfigurationAllowed(): Boolean = this?.localConfigurationAllowed == true
 
     // ── Load ─────────────────────────────────────────────────────────────────
 
@@ -398,6 +519,10 @@ class SettingsViewModel(
                         intTelegramSecretToken = env["TELEGRAM_SECRET_TOKEN"]?.jsonPrimitive?.content ?: "",
                         intDiscordBotToken = env["DISCORD_BOT_TOKEN"]?.jsonPrimitive?.content ?: "",
                         intDiscordPublicKey = env["DISCORD_PUBLIC_KEY"]?.jsonPrimitive?.content ?: "",
+                        intDiscordMessageContentEnabled =
+                            env["DISCORD_MESSAGE_CONTENT_ENABLED"]?.jsonPrimitive?.content?.toBooleanStrictOrNull() ?: false,
+                        intDiscordAllowedUserIds = env["DISCORD_ALLOWED_USER_IDS"]?.jsonPrimitive?.content ?: "",
+                        intDiscordKnowledgeChannelIds = env["DISCORD_KNOWLEDGE_CHANNEL_IDS"]?.jsonPrimitive?.content ?: "",
                         intSlackBotToken = env["SLACK_BOT_TOKEN"]?.jsonPrimitive?.content ?: "",
                         intSlackSigningSecret = env["SLACK_SIGNING_SECRET"]?.jsonPrimitive?.content ?: "",
                         intWhatsappPhoneId = env["WHATSAPP_PHONE_NUMBER_ID"]?.jsonPrimitive?.content ?: "",
@@ -519,15 +644,39 @@ class SettingsViewModel(
             } else {
                 s.llmApiKey
             }
+        val selectedProvider = PROVIDERS.getOrElse(s.selectedProvider) { "openai" }
+        val selectedModel =
+            s.llmModels[selectedProvider]
+                ?.trim()
+                ?.takeIf { it.isNotEmpty() }
+                ?: s.llmModel.trim().takeIf { it.isNotEmpty() }
+                ?: persisted
+                    ?.takeIf { it.llmProvider == selectedProvider }
+                    ?.llmModels
+                    ?.get(selectedProvider)
+                    ?.trim()
+                    ?.takeIf { it.isNotEmpty() }
+                ?: persisted
+                    ?.takeIf { it.llmProvider == selectedProvider }
+                    ?.llmModel
+                    ?.trim()
+                    ?.takeIf { it.isNotEmpty() }
+                ?: ProviderRegistry.get(selectedProvider)?.defaultModel.orEmpty()
+        val selectedModels =
+            if (selectedModel.isBlank()) {
+                s.llmModels
+            } else {
+                s.llmModels + (selectedProvider to selectedModel)
+            }
         _state.update { it.copy(isSaving = true, saveError = null) }
 
         val creds = AppCredentials(
             apiKey = persisted?.apiKey.orEmpty(),
-            llmProvider = PROVIDERS[s.selectedProvider],
+            llmProvider = selectedProvider,
             llmApiKey = localApiKey,
-            llmModel = s.llmModel,
+            llmModel = selectedModel,
             llmApiKeys = localApiKeys,
-            llmModels = s.llmModels,
+            llmModels = selectedModels,
             gatewayUrl = s.gatewayUrl,
             lastRemoteGatewayUrl = persisted?.lastRemoteGatewayUrl.orEmpty(),
             ollamaUrl = s.ollamaUrl,
@@ -684,7 +833,16 @@ class SettingsViewModel(
             val stt = client?.getJsonList("/api/v1/voice/providers?cap=STT") ?: emptyList()
             val translate = client?.getJsonList("/api/v1/voice/providers?cap=TRANSLATE") ?: emptyList()
             logger.info { "Voice providers fetched — S2S: $s2s, TTS: $tts, STT: $stt, TRANSLATE: $translate" }
-            _state.update { it.copy(availableS2sProviders = s2s, availableTtsProviders = tts, availableSttProviders = stt, availableTranslateProviders = translate) }
+            _state.update { state ->
+                state.copy(
+                    availableS2sProviders = s2s,
+                    availableTtsProviders = tts,
+                    availableSttProviders = stt,
+                    availableTranslateProviders = translate,
+                    voiceSttProvider = state.voiceSttProvider.takeIf { it in stt }
+                        ?: stt.firstOrNull().orEmpty(),
+                )
+            }
         } catch (e: Exception) {
             logger.warn(e) { "Failed to fetch voice provider lists" }
         }
@@ -703,10 +861,34 @@ class SettingsViewModel(
                 val voiceInfos = client?.getVoiceInfoList("/api/v1/voice/voices?provider=$provider") ?: emptyList()
                 _state.update { s ->
                     when (cap.uppercase()) {
-                        "S2S" -> s.copy(voiceS2sModels = models, voiceS2sVoices = voices, voiceS2sVoiceInfos = voiceInfos)
-                        "TTS" -> s.copy(voiceTtsModels = models, voiceTtsVoices = voices, voiceTtsVoiceInfos = voiceInfos)
-                        "STT" -> s.copy(voiceSttModels = models)
+                        "S2S" -> s.copy(
+                            voiceS2sModels = models,
+                            voiceS2sVoices = voices,
+                            voiceS2sVoiceInfos = voiceInfos,
+                            voiceS2sModel = s.voiceS2sModel.takeIf { it in models }
+                                ?: models.firstOrNull().orEmpty(),
+                            voiceS2sVoice = s.voiceS2sVoice.takeIf { it in voices }
+                                ?: voices.firstOrNull().orEmpty(),
+                        )
+
+                        "TTS" -> s.copy(
+                            voiceTtsModels = models,
+                            voiceTtsVoices = voices,
+                            voiceTtsVoiceInfos = voiceInfos,
+                            voiceTtsModel = s.voiceTtsModel.takeIf { it in models }
+                                ?: models.firstOrNull().orEmpty(),
+                            voiceTtsVoice = s.voiceTtsVoice.takeIf { it in voices }
+                                ?: voices.firstOrNull().orEmpty(),
+                        )
+
+                        "STT" -> s.copy(
+                            voiceSttModels = models,
+                            voiceSttModel = s.voiceSttModel.takeIf { it in models }
+                                ?: models.firstOrNull().orEmpty(),
+                        )
+
                         "TRANSLATE" -> s.copy(voiceTranslateModels = models)
+
                         else -> s
                     }
                 }

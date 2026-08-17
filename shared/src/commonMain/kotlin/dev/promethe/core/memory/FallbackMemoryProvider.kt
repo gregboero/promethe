@@ -30,17 +30,18 @@ class FallbackMemoryProvider(
     override suspend fun recallFacts(
         query: String,
         limit: Int,
+        userId: String,
     ): List<MemoryFact> {
         return try {
             if (primary.isAvailable()) {
-                val results = primary.recallFacts(query, limit)
+                val results = primary.recallFacts(query, limit, userId)
                 if (results.isNotEmpty()) return results
             }
             // Primary unavailable or returned nothing — use fallback
-            fallback.recallFacts(query, limit)
+            fallback.recallFacts(query, limit, userId)
         } catch (e: Exception) {
             logger.warn(e) { "Primary memory recall failed, using fallback" }
-            fallback.recallFacts(query, limit)
+            fallback.recallFacts(query, limit, userId)
         }
     }
 
