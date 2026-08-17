@@ -146,8 +146,18 @@ fun SettingsScreen(
                 state = state,
                 onToggle = { viewModel.update { copy(sandboxExpanded = !sandboxExpanded) } },
                 onSelectMode = viewModel::updateSandboxMode,
+                onAddRoot = viewModel::addSandboxRoot,
+                onRemoveRoot = viewModel::removeSandboxRoot,
+                onSetRootWritable = viewModel::setSandboxRootWritable,
+                onSetup = viewModel::setupSandbox,
                 onSelfTest = viewModel::runSandboxSelfTest,
                 onRefresh = viewModel::loadSandbox,
+            )
+
+            LocalCodingAgentsSection(
+                state = state,
+                onToggle = { viewModel.update { copy(localCodingAgentsExpanded = !localCodingAgentsExpanded) } },
+                onRefresh = { viewModel.loadLocalCodingAgents(redetect = true) },
             )
 
             // ── GEPA ──

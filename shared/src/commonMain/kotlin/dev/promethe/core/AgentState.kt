@@ -25,6 +25,8 @@ data class AgentConfig(
     val sandboxApprovalPolicy: SandboxApprovalPolicy = SandboxApprovalPolicy.ON_REQUEST,
     val sandboxNetworkMode: SandboxNetworkMode = SandboxNetworkMode.OFF,
     val sandboxAllowedDomains: List<String> = emptyList(),
+    val sandboxReadableRoots: List<String> = emptyList(),
+    val sandboxWritableRoots: List<String> = emptyList(),
     val customBaseUrl: String = "", // For LiteLLM proxy or any OpenAI-compatible endpoint
     val honchoBaseUrl: String = "",
     val honchoApiKey: String = "",

@@ -100,4 +100,15 @@ class EmbeddedMemoryProviderTest {
     fun testProviderName() {
         assertEquals("embedded-sqlite", provider.name)
     }
+
+    @Test
+    fun `recall isolates project memory namespaces`() =
+        runTest {
+            provider.storeFact(MemoryFact(userId = "project:one", category = "project", content = "Uses PostgreSQL"))
+            provider.storeFact(MemoryFact(userId = "project:two", category = "project", content = "Uses SQLite"))
+
+            val firstProject = provider.recallFacts("Uses", userId = "project:one")
+            assertEquals(listOf("Uses PostgreSQL"), firstProject.map(MemoryFact::content))
+            assertTrue(provider.recallFacts("Uses", userId = "default").isEmpty())
+        }
 }

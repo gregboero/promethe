@@ -48,9 +48,6 @@ class SttAgentTtsRelay(
     private var relayJob: Job? = null
     private var httpClient: HttpClient? = null
 
-    // Provider API keys (resolved at connect time)
-    private var ttsApiKey: String? = null
-
     // TTS/STT provider settings (resolved from DB at connect time)
     private var ttsProviderId: String = "gemini_tts"
     private var ttsVoiceId: String = "Puck"
@@ -68,8 +65,12 @@ class SttAgentTtsRelay(
         toolSchemas: List<ToolSchema>,
         scope: CoroutineScope,
     ) {
+        val dictationOnly = config.mode.equals("stt", ignoreCase = true)
+
         // ── Resolve providers from user settings (DB) ──
-        sttProviderId = database.getSetting("voice_stt_provider")?.takeIf { it.isNotBlank() } ?: "deepgram"
+        sttProviderId = config.provider.takeIf { it.isNotBlank() }
+            ?: database.getSetting("voice_stt_provider")?.takeIf { it.isNotBlank() }
+            ?: "deepgram"
         ttsProviderId = database.getSetting("voice_tts_provider")?.takeIf { it.isNotBlank() } ?: "gemini_tts"
         ttsModelId = database.getSetting("voice_tts_model")?.takeIf { it.isNotBlank() } ?: ""
         ttsVoiceId = database.getSetting("voice_tts_voice")?.takeIf { it.isNotBlank() } ?: config.voice
@@ -91,18 +92,34 @@ class SttAgentTtsRelay(
             return
         }
 
-        val ttsRegistryProvider = registry.getProvider(ttsProviderId)
-        if (ttsRegistryProvider == null) {
-            _events.emit(VoiceEvent.Error("Unknown TTS provider: $ttsProviderId"))
-            return
-        }
-        ttsApiKey = resolveApiKey(ttsRegistryProvider.requiredSettingKey)
-        if (ttsApiKey.isNullOrBlank()) {
-            _events.emit(VoiceEvent.Error("No API key for TTS provider '$ttsProviderId' (setting: ${ttsRegistryProvider.requiredSettingKey})"))
-            return
+        if (!dictationOnly) {
+            val ttsRegistryProvider = registry.getProvider(ttsProviderId)
+            if (ttsRegistryProvider == null) {
+                _events.emit(VoiceEvent.Error("Unknown TTS provider: $ttsProviderId"))
+                return
+            }
+            if (resolveApiKey(ttsRegistryProvider.requiredSettingKey).isNullOrBlank()) {
+                _events.emit(VoiceEvent.Error("No API key for TTS provider '$ttsProviderId' (setting: ${ttsRegistryProvider.requiredSettingKey})"))
+                return
+            }
         }
 
-        logger.info { "Pipeline relay: STT=$sttProviderId, TTS=$ttsProviderId, voice=$ttsVoiceId" }
+        logger.info {
+            if (dictationOnly) {
+                "Dictation relay: STT=$sttProviderId"
+            } else {
+                "Pipeline relay: STT=$sttProviderId, TTS=$ttsProviderId, voice=$ttsVoiceId"
+            }
+        }
+
+        // ── Create STT provider ──
+        val sttModel = config.model.takeIf { it.isNotBlank() }
+            ?: database.getSetting("voice_stt_model")?.takeIf { it.isNotBlank() }
+            ?: sttRegistryProvider.defaultModels(VoiceCapability.STT).firstOrNull()
+        if (sttModel == null) {
+            _events.emit(VoiceEvent.Error("STT model non configuré. Allez dans Paramètres > Voix > STT pour choisir un modèle."))
+            return
+        }
 
         // ── Create HTTP client ──
         val client = HttpClient {
@@ -110,12 +127,6 @@ class SttAgentTtsRelay(
         }
         httpClient = client
 
-        // ── Create STT provider ──
-        val sttModel = config.model.takeIf { it.isNotBlank() }
-        if (sttModel == null) {
-            _events.emit(VoiceEvent.Error("STT model non configuré. Allez dans Paramètres > Voix > STT pour choisir un modèle."))
-            return
-        }
         val provider = createSttProvider(sttProviderId, client, sttApiKey, sttModel)
         if (provider == null) {
             _events.emit(VoiceEvent.Error("Unsupported STT provider: $sttProviderId"))
@@ -140,8 +151,10 @@ class SttAgentTtsRelay(
                         )
                     },
                     onFinalTranscript = { transcript ->
-                        // Trigger agent + TTS pipeline
-                        processAgentAndTts(transcript)
+                        if (!dictationOnly) {
+                            // Trigger agent + TTS pipeline only for conversational sessions.
+                            processAgentAndTts(transcript)
+                        }
                     },
                 )
                 // Keep the job alive — BatchSttProvider.start() returns immediately

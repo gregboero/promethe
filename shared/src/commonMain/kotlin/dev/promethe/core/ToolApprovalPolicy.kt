@@ -21,6 +21,7 @@ object ToolApprovalPolicy {
             "directory_tree",
             "file_search",
             "code_grep",
+            "workspace_roots",
             "git_status",
             "git_diff",
             "git_log",
@@ -95,6 +96,8 @@ object ToolApprovalPolicy {
             "browser_type" to ToolRisk.EXTERNAL_EFFECT,
             "browser_press" to ToolRisk.EXTERNAL_EFFECT,
             "browser_dialog" to ToolRisk.EXTERNAL_EFFECT,
+            "codex_delegate" to ToolRisk.EXECUTE,
+            "claude_code_delegate" to ToolRisk.EXECUTE,
         )
 
     private val riskyOperations =
@@ -109,6 +112,16 @@ object ToolApprovalPolicy {
                     "add_comment" to ToolRisk.EXTERNAL_EFFECT,
                 ),
             "cronjob" to mapOf("create" to ToolRisk.CONFIG_CHANGE, "delete" to ToolRisk.DESTRUCTIVE),
+            "discord_policy" to
+                mapOf(
+                    "list" to ToolRisk.READ,
+                    "allow_user" to ToolRisk.CONFIG_CHANGE,
+                    "deny_user" to ToolRisk.CONFIG_CHANGE,
+                    "remove_user_rule" to ToolRisk.CONFIG_CHANGE,
+                    "listen_channel" to ToolRisk.CONFIG_CHANGE,
+                    "stop_listening_channel" to ToolRisk.CONFIG_CHANGE,
+                    "remove_channel_rule" to ToolRisk.CONFIG_CHANGE,
+                ),
         )
 
     fun evaluate(

@@ -36,9 +36,11 @@ class A2AInternalClient(
         text: String,
         channelHint: String = "internal",
         origin: ToolCallOrigin = ToolCallOrigin.AGENT,
+        externalContext: String? = null,
+        projectId: String? = null,
     ): String {
         if (text.isBlank()) return "No response"
-        logger.debug { "A2AInternal [$channelHint] → session=$sessionId, text=${text.take(100)}" }
+        logger.debug { "A2AInternal [$channelHint] → session=$sessionId, textLength=${text.length}" }
 
         return try {
             executionService.executeToCompletion(
@@ -47,6 +49,8 @@ class A2AInternalClient(
                     text = text,
                     origin = origin.toExecutionOrigin(),
                     channelHint = channelHint,
+                    externalContext = externalContext,
+                    projectId = projectId,
                 ),
             )
         } catch (e: Exception) {

@@ -134,20 +134,27 @@ class CodeExecutionTool(
         val writer =
             workspaceFileWriter
                 ?: return "[ERROR] Secure code staging is unavailable; refusing to execute code."
+        val scopedWorkDir = projectScopedPath(".")
+        val executionWorkDir = File(workDir, scopedWorkDir).canonicalFile
+        val workspace = File(workDir).canonicalFile
+        if (!executionWorkDir.toPath().startsWith(workspace.toPath()) || !executionWorkDir.isDirectory) {
+            return "[ERROR] Active project workspace is unavailable"
+        }
         val tempName = ".promethe-exec-${UUID.randomUUID()}$extension"
-        val tempFile = File(workDir, tempName)
+        val tempFile = File(executionWorkDir, tempName)
 
         return try {
-            writer.write(tempName, args.code)
+            val stagedPath = if (scopedWorkDir == ".") tempName else "$scopedWorkDir/$tempName"
+            writer.write(stagedPath, args.code)
             val extraArgs = if (args.args.isNotBlank()) args.args.split(" ") else emptyList()
 
             when (backend) {
                 "local" -> {
-                    executeLocal(runner, interpreter + listOf(tempFile.absolutePath) + extraArgs, timeoutSecs)
+                    executeLocal(runner, interpreter + listOf(tempFile.absolutePath) + extraArgs, executionWorkDir.path, timeoutSecs)
                 }
 
                 "docker" -> {
-                    executeDocker(runner, args.language, interpreter, tempFile, extraArgs, timeoutSecs)
+                    executeDocker(runner, args.language, interpreter, tempFile, extraArgs, executionWorkDir.path, timeoutSecs)
                 }
 
                 "singularity", "modal", "daytona" -> {
@@ -172,6 +179,7 @@ class CodeExecutionTool(
     private suspend fun executeLocal(
         runner: SandboxedCommandRunner,
         fullCommand: List<String>,
+        executionWorkDir: String,
         timeoutSecs: Long,
     ): String {
         // Parity with runLocalProcess: the interpreter invocation goes through the blocklist too
@@ -183,7 +191,7 @@ class CodeExecutionTool(
             runner.execute(
                 executable = fullCommand.first(),
                 arguments = fullCommand.drop(1),
-                workingDirectory = workDir,
+                workingDirectory = executionWorkDir,
                 timeoutMillis = timeoutSecs * 1_000,
             )
         return truncateOutput(result.renderCommandOutput(), maxOutputBytes)
@@ -195,6 +203,7 @@ class CodeExecutionTool(
         interpreter: List<String>,
         tempFile: File,
         extraArgs: List<String>,
+        executionWorkDir: String,
         timeoutSecs: Long,
     ): String {
         val image = dockerImageFor(language)
@@ -216,7 +225,7 @@ class CodeExecutionTool(
             runner.execute(
                 executable = cmd.first(),
                 arguments = cmd.drop(1),
-                workingDirectory = workDir,
+                workingDirectory = executionWorkDir,
                 timeoutMillis = (timeoutSecs + DOCKER_STARTUP_GRACE_SECS) * 1_000,
             )
 
@@ -225,7 +234,7 @@ class CodeExecutionTool(
                 runner.execute(
                     executable = "docker",
                     arguments = listOf("kill", containerName),
-                    workingDirectory = workDir,
+                    workingDirectory = executionWorkDir,
                     timeoutMillis = 5_000,
                 )
             if (cleanup.exitCode != 0) {

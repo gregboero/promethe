@@ -52,9 +52,11 @@ class EmbeddedMemoryProvider(
     override suspend fun recallFacts(
         query: String,
         limit: Int,
+        userId: String,
     ): List<MemoryFact> {
         val results = database.searchUserFacts(query)
         return results
+            .filter { it.userId == userId }
             .sortedByDescending { it.confidence }
             .take(limit)
             .map { it.toMemoryFact() }

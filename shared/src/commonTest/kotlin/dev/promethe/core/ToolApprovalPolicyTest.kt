@@ -86,6 +86,17 @@ class ToolApprovalPolicyTest {
     }
 
     @Test
+    fun `Discord policy reads are safe but mutations require approval`() {
+        val read = ToolApprovalPolicy.evaluate("discord_policy", buildJsonObject { put("action", "list") })
+        val mutation = ToolApprovalPolicy.evaluate("discord_policy", buildJsonObject { put("action", "allow_user") })
+
+        assertEquals(ToolRisk.READ, read.risk)
+        assertFalse(read.mandatoryApproval)
+        assertEquals(ToolRisk.CONFIG_CHANGE, mutation.risk)
+        assertTrue(mutation.mandatoryApproval)
+    }
+
+    @Test
     fun `only an explicit qualified MCP certification grants read risk`() {
         val toolName = "mcp_test_certified_lookup"
         val arguments = buildJsonObject {}

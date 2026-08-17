@@ -5,6 +5,7 @@ import ai.koog.agents.core.tools.annotations.LLMDescription
 import ai.koog.serialization.typeToken
 import dev.promethe.core.sandbox.SandboxedCommandRunner
 import dev.promethe.core.sandbox.renderCommandOutput
+import dev.promethe.core.projectScopedPath
 import kotlinx.serialization.Serializable
 import java.io.File
 
@@ -67,7 +68,7 @@ class ShellTool(
         if (!workspace.isDirectory) return "[ERROR] Workspace does not exist: ${workspace.path}"
         val requestedDirectory =
             try {
-                File(workspace, args.cwd).canonicalFile
+                File(workspace, projectScopedPath(args.cwd)).canonicalFile
             } catch (error: Exception) {
                 return "[ERROR] Invalid working directory: ${error.message}"
             }
@@ -203,8 +204,9 @@ class DockerTool(
         if (action !in DOCKER_ACTIONS) return "[ERROR] Unsupported Docker action '${args.action}'."
         if (args.arguments.any(::containsShellSyntax)) return "[BLOCKED] Pipes, redirections, and shell syntax are not allowed"
         val commandArguments = if (action == "compose") listOf("compose") + args.arguments else listOf(action) + args.arguments
+        val scopedWorkDir = File(workDir, projectScopedPath(".")).canonicalPath
         return sandboxRunner
-            .execute(executable = "docker", arguments = commandArguments, workingDirectory = workDir, timeoutMillis = 60_000)
+            .execute(executable = "docker", arguments = commandArguments, workingDirectory = scopedWorkDir, timeoutMillis = 60_000)
             .renderCommandOutput()
     }
 

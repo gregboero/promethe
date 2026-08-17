@@ -60,11 +60,14 @@ class SecurityTest {
             "browser_type",
             "browser_press",
             "browser_dialog",
+            "codex_delegate",
+            "claude_code_delegate",
             "github",
             "calendar",
             "notion",
             "jira",
             "cronjob",
+            "discord_policy",
         )
 
         val dangerousTools = ToolApprovalGate.DANGEROUS_TOOLS

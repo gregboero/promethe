@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.AutoFixHigh
 import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.Forum
+import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Monitor
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Psychology
@@ -76,6 +77,7 @@ private data class NavItem(
 private val navItems =
     listOf(
         NavItem("sessions", Icons.Default.Forum, Res.string.nav_chat, PrometheRoute.Sessions),
+        NavItem("projects", Icons.Default.Folder, Res.string.nav_projects, PrometheRoute.Projects),
         NavItem("agents", Icons.Default.SmartToy, Res.string.nav_agents, PrometheRoute.Agents),
         NavItem("channels", Icons.Filled.Chat, Res.string.nav_channels, PrometheRoute.Channels),
         NavItem("monitor", Icons.Default.Monitor, Res.string.nav_monitor, PrometheRoute.Monitor),
@@ -429,10 +431,15 @@ private fun AppContent(
                     is PrometheRoute.Sessions -> NavEntry(route) {
                         SessionsScreen(
                             client = client,
+                            onManageProjects = { navigateToTab(PrometheRoute.Projects) },
                             onSessionSelected = { sessionId ->
                                 backStack.add(PrometheRoute.Chat(sessionId))
                             },
                         )
+                    }
+
+                    is PrometheRoute.Projects -> NavEntry(route) {
+                        ProjectsScreen(client)
                     }
 
                     is PrometheRoute.Chat -> NavEntry(route) {

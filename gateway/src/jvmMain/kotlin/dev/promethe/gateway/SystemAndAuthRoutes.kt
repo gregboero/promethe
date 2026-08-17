@@ -98,6 +98,23 @@ fun Route.approvalRoutes(approvalGate: ToolApprovalGate?) {
         }
         val expiresInMs = body["expiresInMs"]?.jsonPrimitive?.longOrNull
         val localOwner = AuthMiddleware.isLocalApiKeyAuthentication(call)
+        val localOnlyApproval =
+            gate.listPending()
+                .firstOrNull { request -> request.id == requestId }
+                ?.toolName
+                ?.let { toolName ->
+                    toolName == "codex_delegate" ||
+                        toolName == "claude_code_delegate" ||
+                        toolName.startsWith("codex_local_action") ||
+                        toolName.startsWith("claude_code_action:")
+                } == true
+        if (approved && localOnlyApproval && !localOwner) {
+            call.respond(
+                HttpStatusCode.Forbidden,
+                ApprovalActionResponse(false, error = "Local coding-agent approval requires the local desktop owner"),
+            )
+            return@post
+        }
         when (gate.respond(requestId, approved, scope, expiresInMs, localOwner)) {
             ToolApprovalGate.ResponseResult.ACCEPTED -> {
                 call.respond(ApprovalActionResponse(true, if (approved) "approved" else "rejected", scope.name))

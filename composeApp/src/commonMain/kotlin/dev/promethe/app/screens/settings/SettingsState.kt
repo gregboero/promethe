@@ -1,5 +1,6 @@
 package dev.promethe.app.screens.settings
 
+import dev.promethe.api.CapabilityDescriptor
 import dev.promethe.api.SandboxPermissionProfile
 import dev.promethe.api.SandboxStatus
 
@@ -100,6 +101,9 @@ data class SettingsState(
     val intTelegramSecretToken: String = "",
     val intDiscordBotToken: String = "",
     val intDiscordPublicKey: String = "",
+    val intDiscordMessageContentEnabled: Boolean = false,
+    val intDiscordAllowedUserIds: String = "",
+    val intDiscordKnowledgeChannelIds: String = "",
     val intSlackBotToken: String = "",
     val intSlackSigningSecret: String = "",
     val intWhatsappPhoneId: String = "",
@@ -208,6 +212,7 @@ data class SettingsState(
     val browserExpanded: Boolean = false,
     val haExpanded: Boolean = false,
     val sandboxExpanded: Boolean = false,
+    val localCodingAgentsExpanded: Boolean = false,
     // ── Save status ──
     val isSaving: Boolean = false,
     val saveError: String? = null,
@@ -216,5 +221,10 @@ data class SettingsState(
     val sandboxProfile: SandboxPermissionProfile? = null,
     val sandboxLoading: Boolean = false,
     val sandboxSelfTestRunning: Boolean = false,
+    val sandboxSetupRunning: Boolean = false,
     val sandboxError: String? = null,
+    // ── Local coding agents ──
+    val localCodingAgents: List<CapabilityDescriptor> = emptyList(),
+    val localCodingAgentsLoading: Boolean = false,
+    val localCodingAgentsError: String? = null,
 )

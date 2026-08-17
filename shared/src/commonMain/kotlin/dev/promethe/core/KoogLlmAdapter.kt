@@ -234,10 +234,40 @@ open class KoogLlmAdapter(
         provider: String,
         model: String,
     ) {
-        currentProvider = provider
-        currentModel = model
+        val canonicalProvider = dev.promethe.api.ProviderRegistry.canonicalKey(provider)
+        val resolvedModel = resolveModel(canonicalProvider, model)
+        currentProvider = canonicalProvider
+        currentModel = resolvedModel
         // Note: the router executor will be resolved on the next LLM call via completeWithProfile().
         // No need to pre-warm here — the router.getExecutor() is suspend and would require a coroutine.
+    }
+
+    internal fun resolveModel(
+        provider: String,
+        requestedModel: String?,
+    ): String {
+        val canonicalProvider = dev.promethe.api.ProviderRegistry.canonicalKey(provider)
+        val providerInfo =
+            requireNotNull(dev.promethe.api.ProviderRegistry.get(canonicalProvider)) {
+                "Unsupported provider: $provider"
+            }
+        return requestedModel
+            ?.trim()
+            ?.takeIf { it.isNotEmpty() }
+            ?: currentModel
+                .trim()
+                .takeIf {
+                    it.isNotEmpty() &&
+                        dev.promethe.api.ProviderRegistry.canonicalKey(currentProvider) == canonicalProvider
+                }
+            ?: config.modelName
+                .trim()
+                .takeIf {
+                    it.isNotEmpty() &&
+                        dev.promethe.api.ProviderRegistry.canonicalKey(config.provider) == canonicalProvider
+                }
+            ?: providerInfo.defaultModel.trim().takeIf { it.isNotEmpty() }
+            ?: throw IllegalArgumentException("A model is required for provider '$canonicalProvider'")
     }
 
     /**
@@ -269,6 +299,7 @@ open class KoogLlmAdapter(
         reasoningEffort: ReasoningEffort = config.reasoningEffort,
     ): LlmResponse {
         val canonicalProvider = dev.promethe.api.ProviderRegistry.canonicalKey(provider)
+        val resolvedModel = resolveModel(canonicalProvider, model)
         val exec =
             if (router != null) {
                 router!!.getExecutor(canonicalProvider)
@@ -278,7 +309,7 @@ open class KoogLlmAdapter(
         return executeCompletion(
             exec = exec,
             provider = canonicalProvider,
-            model = model,
+            model = resolvedModel,
             temperature = temperature,
             systemPrompt = systemPrompt,
             messages = messages,

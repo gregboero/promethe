@@ -12,6 +12,33 @@ import kotlin.test.assertTrue
 
 class SandboxHelperDiscoveryTest {
     @Test
+    fun `Windows setup script is packaged with the helper`() {
+        if (!System.getProperty("os.name").contains("win", ignoreCase = true)) return
+        val resource =
+            requireNotNull(javaClass.classLoader.getResourceAsStream("sandbox/windows/setup.ps1")) {
+                "sandbox/windows/setup.ps1 must be present in JVM resources"
+            }
+        resource.use { input ->
+            val script = input.bufferedReader().readText()
+            assertTrue(script.contains("PrometheSbxOffline"))
+            assertTrue(script.contains("PrometheSbxOnline"))
+            assertTrue(script.contains("PrometheSbxWriters"))
+            assertTrue(!script.contains("PrometheSandboxOffline"))
+            assertTrue(script.contains("Remove-LocalGroup -Name \$legacyWriterGroup"))
+            assertTrue(script.contains("Add-Type -AssemblyName System.Security"))
+            assertTrue(script.contains("PrometheSandboxAppContainer"))
+            assertTrue(script.contains("appContainerSid = \$appContainerSid"))
+            assertTrue(script.contains("\$setupVersion = 6"))
+            assertTrue(script.contains("\$runnerVersion = 4"))
+            assertTrue(script.contains("-WindowStyle Hidden"))
+            assertTrue(!script.contains("ProfileImagePath"))
+            assertTrue(script.contains("RandomNumberGenerator]::Create()"))
+            assertTrue(script.contains("GetBytes(\$bytes)"))
+            assertTrue(!script.contains("RandomNumberGenerator]::Fill"))
+        }
+    }
+
+    @Test
     fun `configured helper is accepted when checksum matches`() {
         val helper = Files.createTempFile("promethe-helper-test", executableSuffix())
         try {
@@ -114,6 +141,27 @@ class SandboxHelperDiscoveryTest {
             launchCopy?.deleteIfExists()
             helper.deleteIfExists()
         }
+    }
+
+    @Test
+    fun `helper environment retains required Windows sandbox roots without secrets`() {
+        val environment =
+            sandboxHelperEnvironment(
+                mapOf(
+                    "PATH" to "C:\\Windows\\System32",
+                    "ProgramData" to "C:\\ProgramData",
+                    "SystemDrive" to "C:",
+                    "SystemRoot" to "C:\\Windows",
+                    "PROMETHE_MASTER_KEY" to "secret",
+                    "XAI_API_KEY" to "secret",
+                ),
+            )
+
+        assertEquals("C:\\ProgramData", environment["ProgramData"])
+        assertEquals("C:", environment["SystemDrive"])
+        assertEquals("C:\\Windows", environment["SystemRoot"])
+        assertTrue("PROMETHE_MASTER_KEY" !in environment)
+        assertTrue("XAI_API_KEY" !in environment)
     }
 
     private fun configuredEnvironment(helper: java.nio.file.Path): Map<String, String> =

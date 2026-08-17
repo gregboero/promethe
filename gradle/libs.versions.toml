@@ -20,6 +20,8 @@ kover = "0.9.8"
 koin-bom = "4.2.1"
 compose-multiplatform = "1.11.1"
 navigation3 = "1.0.0-alpha05"
+jda = "6.4.1"
+twilio = "12.1.1"
 
 [libraries]
 # ── Koog Agent Framework (KMP) ──
@@ -80,6 +82,8 @@ exposed-kotlin-datetime = { module = "org.jetbrains.exposed:exposed-kotlin-datet
 sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite-jdbc" }
 flyway-core = { module = "org.flywaydb:flyway-core", version.ref = "flyway" }
 bouncycastle = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncycastle" }
+jda = { module = "net.dv8tion:JDA", version.ref = "jda" }
+twilio = { module = "com.twilio.sdk:twilio", version.ref = "twilio" }
 
 # ── Tracy Observability ──
 tracy-core = { module = "org.jetbrains.ai.tracy:tracy-core", version.ref = "tracy" }

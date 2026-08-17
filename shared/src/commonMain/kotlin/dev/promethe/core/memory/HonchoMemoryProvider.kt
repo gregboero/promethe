@@ -25,21 +25,26 @@ class HonchoMemoryProvider(
     override suspend fun storeFact(fact: MemoryFact) {
         pendingFacts.add(fact)
         // Batch sync to Honcho: send accumulated facts as profile context
-        val profileContext = pendingFacts.joinToString("\n") { "[${it.category}] ${it.content}" }
-        honchoClient.syncProfile(sessionId, "", profileContext)
+        val profileContext =
+            pendingFacts
+                .filter { it.userId == fact.userId }
+                .joinToString("\n") { "[${it.category}] ${it.content}" }
+        honchoClient.syncProfile(scopedSessionId(fact.userId), "", profileContext)
     }
 
     override suspend fun recallFacts(
         query: String,
         limit: Int,
+        userId: String,
     ): List<MemoryFact> {
-        val context = honchoClient.fetchContext(sessionId, query)
+        val context = honchoClient.fetchContext(scopedSessionId(userId), query)
         if (context.isBlank()) return emptyList()
 
         // Honcho returns a text context block — wrap as a single SCENARIO-level fact
         return listOf(
             MemoryFact(
                 id = "honcho-context",
+                userId = userId,
                 category = "context",
                 content = context,
                 tier = MemoryTier.SCENARIO,
@@ -49,7 +54,7 @@ class HonchoMemoryProvider(
 
     override suspend fun getAllFacts(userId: String): List<MemoryFact> {
         // Honcho doesn't expose a "list all facts" API — return pending local facts
-        return pendingFacts.toList()
+        return pendingFacts.filter { it.userId == userId }
     }
 
     override suspend fun deleteFact(id: String) {
@@ -57,4 +62,6 @@ class HonchoMemoryProvider(
     }
 
     override suspend fun isAvailable(): Boolean = honchoClient.isAvailable()
+
+    private fun scopedSessionId(userId: String): String = if (userId == "default") sessionId else "$sessionId:$userId"
 }

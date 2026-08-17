@@ -47,6 +47,10 @@ fun interface WorkspaceFileReader {
     suspend fun read(relativePath: String): String
 }
 
+fun interface WorkspaceDirectoryResolver {
+    fun resolve(requestedPath: String): String
+}
+
 // ── Tool implementations ───────────────────────────────────────────
 
 class FileReadTool(
@@ -60,7 +64,7 @@ class FileReadTool(
         description = "Reads the content of a file in the workspace. Argument 'path' must be relative to the workspace.",
     ) {
     override suspend fun execute(args: FileReadArgs): String {
-        val pathString = args.path
+        val pathString = projectScopedPath(args.path)
 
         secureReader?.let { reader ->
             return try {
@@ -100,7 +104,7 @@ class FileWriteTool(
     private val logger = Log.create("FileWriteTool")
 
     override suspend fun execute(args: FileWriteArgs): String {
-        val pathString = args.path
+        val pathString = projectScopedPath(args.path)
         val content = args.content
 
         secureWriter?.let { writer ->

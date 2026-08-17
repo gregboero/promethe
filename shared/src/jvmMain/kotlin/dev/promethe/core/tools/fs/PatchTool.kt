@@ -5,7 +5,9 @@ import ai.koog.agents.core.tools.annotations.LLMDescription
 import ai.koog.serialization.typeToken
 import dev.promethe.core.WorkspaceFileReader
 import dev.promethe.core.WorkspaceFileWriter
+import dev.promethe.core.WorkspaceDirectoryResolver
 import dev.promethe.core.WorkspacePathPolicy
+import dev.promethe.core.projectScopedPath
 import kotlinx.serialization.Serializable
 import java.nio.file.NoSuchFileException
 import java.nio.file.Path
@@ -29,18 +31,30 @@ class PatchTool(
     private val defaultWorkDir: String,
     private val secureReader: WorkspaceFileReader?,
     private val secureWriter: WorkspaceFileWriter?,
+    private val directoryResolver: WorkspaceDirectoryResolver? = null,
 ) : SimpleTool<PatchArgs>(
         argsType = typeToken<PatchArgs>(),
         name = "patch",
         description = "Apply a unified diff (patch) to files. Accepts standard git diff format. Returns a summary of applied changes.",
     ) {
     override suspend fun execute(args: PatchArgs): String {
-        val wd = WorkspacePathPolicy.resolve(defaultWorkDir, args.workDir.ifBlank { "." })
-            ?: return "[ERROR] Access denied: working directory must be inside the workspace"
         val reader = secureReader ?: return "[ERROR] Secure workspace reads are unavailable"
         val writer = secureWriter ?: return "[ERROR] Secure workspace writes are unavailable"
-        val root = Path.of(defaultWorkDir).toRealPath()
-        val relativeWorkingDirectory = root.relativize(wd.toPath()).toString()
+        val scopedWorkDir = projectScopedPath(args.workDir.ifBlank { "." })
+        val workingDirectory =
+            try {
+                directoryResolver?.resolve(scopedWorkDir)
+                    ?: WorkspacePathPolicy.resolve(defaultWorkDir, scopedWorkDir)?.toString()
+                    ?: return "[ERROR] Access denied: working directory must be inside the workspace"
+            } catch (error: Exception) {
+                return "[ERROR] Access denied: ${error.message}"
+            }
+        val relativeWorkingDirectory =
+            if (directoryResolver == null) {
+                Path.of(defaultWorkDir).toRealPath().relativize(Path.of(workingDirectory).toRealPath()).toString()
+            } else {
+                null
+            }
         return try {
             val hunks = parsePatch(args.patch)
             if (hunks.isEmpty()) return "[ERROR] No valid hunks found in patch."
@@ -49,7 +63,7 @@ class PatchTool(
             for (hunk in hunks) {
                 val targetPath =
                     Path
-                        .of(relativeWorkingDirectory)
+                        .of(relativeWorkingDirectory ?: workingDirectory)
                         .resolve(hunk.filePath)
                         .normalize()
                         .toString()

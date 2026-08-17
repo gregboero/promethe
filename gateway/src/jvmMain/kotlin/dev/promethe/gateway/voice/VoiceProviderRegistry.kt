@@ -176,6 +176,23 @@ data class VoiceInfo(
     val description: String,
 )
 
+internal val OPENAI_TTS_VOICES =
+    listOf(
+        VoiceInfo("alloy", "Neutral, balanced"),
+        VoiceInfo("echo", "Clear, resonant"),
+        VoiceInfo("fable", "Expressive, narrative"),
+        VoiceInfo("onyx", "Deep, authoritative"),
+        VoiceInfo("nova", "Bright, conversational"),
+        VoiceInfo("shimmer", "Warm, polished"),
+        VoiceInfo("coral", "Warm, expressive"),
+        VoiceInfo("verse", "Natural, versatile"),
+        VoiceInfo("ballad", "Smooth, melodic"),
+        VoiceInfo("ash", "Clear, grounded"),
+        VoiceInfo("sage", "Calm, measured"),
+        VoiceInfo("marin", "Natural, articulate"),
+        VoiceInfo("cedar", "Warm, confident"),
+    )
+
 // ═══════════════════════════════════════════════════════════════════
 //  PROVIDERS — S2S
 // ═══════════════════════════════════════════════════════════════════
@@ -338,15 +355,7 @@ class OpenAITTSProvider : VoiceProvider {
     override fun defaultModels(capability: VoiceCapability) = listOf("tts-1", "tts-1-hd")
     // NOTE: gpt-4o-mini-tts is deprecated by OpenAI as of 2026
 
-    override fun defaultVoices() =
-        listOf(
-            VoiceInfo("alloy", "Neutral, balanced"),
-            VoiceInfo("echo", "Clear, resonant"),
-            VoiceInfo("fable", "Expressive, narrative"),
-            VoiceInfo("onyx", "Deep, authoritative"),
-            VoiceInfo("nova", "Bright, conversational"),
-            VoiceInfo("shimmer", "Warm, polished"),
-        )
+    override fun defaultVoices() = OPENAI_TTS_VOICES
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -431,13 +440,12 @@ class OpenAISTTProvider : VoiceProvider {
     override val displayName = "OpenAI STT"
     override val capabilities = setOf(VoiceCapability.STT)
     override val requiredSettingKey = "OPENAI_API_KEY"
-    override val implemented = false
 
-    // Multimodal models + dedicated STT
+    // Batch transcription models supported by OpenAiSttBackend.
     override fun defaultModels(capability: VoiceCapability) =
         listOf(
-            "gpt-realtime-whisper",
             "gpt-4o-transcribe",
+            "gpt-4o-mini-transcribe",
             "whisper-1",
         )
 }

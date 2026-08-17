@@ -6,6 +6,13 @@ Prométhé is an autonomous AI agent built with **Kotlin Multiplatform** (KMP).
 The project is split into four Gradle modules: a shared core (`:shared`), an HTTP/WebSocket server (`:gateway`), API models (`:api`), and a Compose Multiplatform interface (`:composeApp`).
 The agent supports several launch modes (GUI, CLI, daemon), communicates with LLMs via a multi-model router with fallback, and exposes a bus of 19 messaging channels.
 
+Local coding assistants are tools, not peers in the A2A registry. Requests from
+UI, channels, webhooks, ACP and the OpenAI-compatible adapter enter
+`AgentExecutionService`, continue through `AIAgent.executeLoop()` and reach
+`codex_delegate` or `claude_code_delegate` only through `SecureToolExecutor`.
+The local adapters reuse the current OS user's CLI login while Promethe retains
+approval, workspace and audit control.
+
 ---
 
 ## 2. Gradle Modules
@@ -105,6 +112,7 @@ flowchart LR
 | Table | Role |
 |---|---|
 | Sessions | Conversation sessions |
+| Projects | Durable project instructions, workspace and memory namespace |
 | Messages | Messages (FTS5 indexing) |
 | Feedbacks | User feedback |
 | AgentProfiles | Agent profiles |
@@ -165,6 +173,7 @@ registry. See **RAG.md** for embedding providers, vector stores, and the ingesti
 | `/agents/` | POST | A2A JSON-RPC (`message/send`, `message/stream`, `tasks/get`) |
 | `/mcp` | — | MCP server routes |
 | `/api/v1/sessions` | REST | Session CRUD |
+| `/api/v1/projects` | REST | Project lifecycle, active workspace and session grouping |
 | `/api/v1/agents` | REST | Agent profile CRUD |
 | `/api/v1/memory/...` | REST | Memory facts |
 | `/api/v1/feedback/...` | REST | Feedback |

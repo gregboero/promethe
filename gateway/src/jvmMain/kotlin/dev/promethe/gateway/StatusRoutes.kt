@@ -36,6 +36,7 @@ fun Route.statusRoutes(
     config: AgentConfig? = null,
     database: PrometheDatabaseApi? = null,
     providerCatalogSource: ProviderCatalogSource? = null,
+    onSettingsReloaded: suspend () -> Unit = {},
 ) {
     val startTime = System.currentTimeMillis()
 
@@ -242,12 +243,22 @@ fun Route.statusRoutes(
                 val apiKeys = CredentialsStore.resolveApiKeys(credentials)
                 llmAdapter.updateApiKeys(apiKeys)
                 dev.promethe.core.LiveProviderKeys.replace(apiKeys)
-                // Update active provider/model so new requests use the selected provider
-                if (credentials.llmProvider.isNotBlank()) {
-                    llmAdapter.updateActiveModel(credentials.llmProvider, credentials.llmModel)
-                    logger.info { "Live provider/model updated: ${credentials.llmProvider}/${credentials.llmModel}" }
+                // Update only from a coherent provider/model pair. Provider defaults
+                // are resolved here so an empty persisted model never reaches an API.
+                val selection = LlmSelectionResolver.resolve(credentials)
+                val selectedProvider = selection.provider?.takeIf { it.isNotBlank() }
+                val selectedModel = selection.model?.takeIf { it.isNotBlank() }
+                if (selectedProvider != null && selectedModel != null) {
+                    llmAdapter.updateActiveModel(selectedProvider, selectedModel)
+                    logger.info { "Live provider/model updated: ${llmAdapter.currentProvider}/${llmAdapter.currentModel}" }
+                } else {
+                    logger.warn {
+                        "Live provider/model unchanged: incomplete selection " +
+                            "${selection.provider.orEmpty()}/${selection.model.orEmpty()}"
+                    }
                 }
                 val providerCount = providerCatalogSource?.reload()?.providers()?.size
+                onSettingsReloaded()
                 logger.info { "Live provider keys and capability router reloaded successfully" }
                 call.respond(SettingsReloadResponse(providerCount = providerCount))
             } else {

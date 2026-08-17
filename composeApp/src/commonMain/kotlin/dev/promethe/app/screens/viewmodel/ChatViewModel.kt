@@ -129,7 +129,11 @@ class ChatViewModel(
             try {
                 val history = client.getMessages(sessionId)
                 val displayItems = history.map { ev ->
-                    DisplayItem(event = ev, isUser = ev.type == "user")
+                    DisplayItem(
+                        event = ev,
+                        isUser = ev.type == "user",
+                        timestamp = ev.timestamp ?: Clock.System.now().toEpochMilliseconds(),
+                    )
                 }
                 _state.update { it.copy(items = displayItems) }
             } catch (e: Exception) {

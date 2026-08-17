@@ -91,9 +91,10 @@ object TtsSynthesizer {
         voice: String,
         text: String,
     ): TtsResult? {
+        val selectedVoice = normalizeVoice("openai_tts", voice)
         val body = buildJsonObject {
             put("model", "gpt-4o-mini-tts")
-            put("voice", voice.ifBlank { "alloy" })
+            put("voice", selectedVoice)
             put("input", text)
             put("response_format", "pcm")
         }
@@ -116,6 +117,18 @@ object TtsSynthesizer {
             sampleRate = 24000,
         )
     }
+
+    internal fun normalizeVoice(
+        providerId: String,
+        voice: String,
+    ): String =
+        when (providerId) {
+            "openai_tts" -> voice.lowercase().takeIf { candidate ->
+                OPENAI_TTS_VOICES.any { it.id == candidate }
+            } ?: "alloy"
+
+            else -> voice
+        }
 
     private suspend fun synthesizeElevenLabs(
         client: HttpClient,

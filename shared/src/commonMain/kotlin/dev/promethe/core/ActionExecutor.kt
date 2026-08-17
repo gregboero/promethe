@@ -11,6 +11,7 @@ import dev.promethe.core.hooks.HookResult
 import dev.promethe.core.sandbox.SandboxCommandExecutor
 import dev.promethe.core.sandbox.renderCommandOutput
 import io.ktor.client.*
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.*
 
 /**
@@ -103,6 +104,7 @@ class ActionExecutor(
         "get_current_datetime",
         "get_config",
         "list_profiles",
+        "workspace_roots",
     )
 
     @OptIn(InternalAgentToolsApi::class)
@@ -128,6 +130,10 @@ class ActionExecutor(
             setAttribute("tool.origin", request.origin.name)
             setAttribute("tool.args_keys", args.keys.joinToString(","))
 
+            if (toolName == "discord_policy" && request.origin !in ownerPolicyOrigins) {
+                return@span "[BLOCKED] Discord policy administration is restricted to owner conversations"
+            }
+
             // ── DEDUP CHECK — return cached result for identical read-only calls ──
             if (toolName in dedupSafeTools) {
                 val cacheKey = "$toolName|$args"
@@ -152,7 +158,12 @@ class ActionExecutor(
 
             // ── APPROVAL GATE — human-in-the-loop for dangerous tools ──
             val policy = ToolApprovalPolicy.evaluate(toolName, args)
-            val requiresMandatoryApproval = policy.mandatoryApproval
+            val unconfinedFileAccess =
+                toolName in fileAccessTools && sandboxCommandExecutor?.hasUnconfinedFileAccess() == true
+            if (unconfinedFileAccess && request.origin !in localInteractiveOrigins) {
+                return@span "[BLOCKED] Full local file access is unavailable from ${request.origin.name.lowercase()}"
+            }
+            val requiresMandatoryApproval = policy.mandatoryApproval || unconfinedFileAccess
             setAttribute("tool.risk", policy.risk.name)
             if (requiresMandatoryApproval && approvalGate == null) {
                 return@span "[BLOCKED] A human approval service is required for '$toolName'"
@@ -160,8 +171,9 @@ class ActionExecutor(
             if (approvalGate != null) {
                 val canonicalArguments =
                     canonicalJson(args) +
-                        if (toolName in processBackedTools) {
-                            "\n[sandbox-policy=${sandboxCommandExecutor?.approvalContext() ?: "unavailable"}]"
+                        if (toolName in processBackedTools || toolName in fileAccessTools) {
+                            "\n[workspace=${request.workspaceRelativePath ?: "."}]" +
+                                "\n[sandbox-policy=${sandboxCommandExecutor?.approvalContext() ?: "unavailable"}]"
                         } else {
                             ""
                         }
@@ -187,7 +199,10 @@ class ActionExecutor(
                             val typedArgs = tool.decodeArgs(koogArgs, koogSerializer)
 
                             // 3. Execute with type-erased dispatch
-                            val execResult = tool.executeUnsafe(typedArgs)
+                            val execResult =
+                                withContext(ToolInvocationContext(request)) {
+                                    tool.executeUnsafe(typedArgs)
+                                }
 
                             // 4. Coerce result to String, truncate
                             val raw = execResult?.toString() ?: ""
@@ -206,7 +221,12 @@ class ActionExecutor(
 
                         // Generic command execution never falls back to the host.
                         // The external sandbox receives an executable plus arguments.
-                        return@run runSandboxCommand(executable, arguments, request.sessionId)
+                        return@run runSandboxCommand(
+                            executable,
+                            arguments,
+                            request.sessionId,
+                            request.workspaceRelativePath ?: ".",
+                        )
                     }
 
                     "Error: Tool '$toolName' is not registered"
@@ -257,10 +277,28 @@ class ActionExecutor(
             "web_screenshot",
         )
 
+    private val fileAccessTools =
+        setOf(
+            "read_file",
+            "write_file",
+            "file_delete",
+            "file_move",
+            "directory_tree",
+            "file_search",
+            "code_grep",
+            "patch",
+            "csv",
+            "workspace_roots",
+        )
+
+    private val localInteractiveOrigins = setOf(ToolCallOrigin.AGENT, ToolCallOrigin.A2A)
+    private val ownerPolicyOrigins = setOf(ToolCallOrigin.A2A)
+
     private suspend fun runSandboxCommand(
         command: String,
         args: List<String>,
         sessionId: String,
+        workingDirectory: String,
     ): String {
         val executor =
             sandboxCommandExecutor
@@ -269,7 +307,7 @@ class ActionExecutor(
             .executeCommand(
                 executable = command,
                 arguments = args,
-                workingDirectory = ".",
+                workingDirectory = workingDirectory,
                 sessionId = sessionId,
                 timeoutMillis = config.executionTimeoutMs,
             ).renderCommandOutput()

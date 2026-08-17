@@ -36,7 +36,7 @@ class SerializationRoundTripTest {
     fun chatRequest() = assertRoundTrip(ChatRequest(message = "Bonjour", sessionId = "s-1"))
 
     @Test
-    fun chatEvent() = assertRoundTrip(ChatEvent(type = "response", content = "Réponse"))
+    fun chatEvent() = assertRoundTrip(ChatEvent(type = "response", content = "Réponse", timestamp = 1718000000000))
 
     @Test
     fun sessionInfo() = assertRoundTrip(SessionInfo(id = "s-1", createdAt = 1718000000000, messageCount = 5, title = "Test"))
@@ -49,6 +49,55 @@ class SerializationRoundTripTest {
 
     @Test
     fun createSessionRequest() = assertRoundTrip(CreateSessionRequest(id = "s-new"))
+
+    @Test
+    fun projectModels() {
+        val project =
+            ProjectInfo(
+                id = "project-1",
+                name = "Promethe public release",
+                workspacePath = "projects/project-1",
+                memoryNamespace = "project:project-1",
+                active = true,
+                sessionCount = 3,
+                memoryCount = 5,
+                createdAt = 1,
+                updatedAt = 2,
+            )
+        assertRoundTrip(project)
+        assertRoundTrip(ProjectListResponse(listOf(project), project.id))
+        assertRoundTrip(CreateProjectRequest("Promethe public release", instructions = "Keep security tests green"))
+        assertRoundTrip(UpdateProjectRequest(description = "Public release work"))
+        assertRoundTrip(AssignSessionProjectRequest(project.id))
+    }
+
+    @Test
+    fun discordPolicyModels() {
+        val policy =
+            DiscordAccessPolicy(
+                userRules =
+                    listOf(
+                        DiscordUserAccessRule(
+                            userId = "111",
+                            guildId = "222",
+                            effect = DiscordUserRuleEffect.ALLOW,
+                            allowedTopics = listOf("weather"),
+                        ),
+                    ),
+                channelRules =
+                    listOf(
+                        DiscordChannelListenRule(
+                            channelId = "333",
+                            captureKnowledge = true,
+                            projectId = "project-1",
+                        ),
+                    ),
+                updatedAt = 1,
+            )
+        assertRoundTrip(policy)
+        assertRoundTrip(UpsertDiscordUserRuleRequest(allowedTopics = listOf("weather")))
+        assertRoundTrip(UpsertDiscordChannelRuleRequest(projectId = "project-1"))
+    }
 
     // ═══════════════════════════════════════════════════════════════════════════
     // Export Models
@@ -320,7 +369,23 @@ class SerializationRoundTripTest {
     @Test
     fun discordInteractionResponse() =
         assertRoundTrip(
-            DiscordInteractionResponse(type = 4, data = DiscordResponseData(content = "Response")),
+            DiscordInteractionResponse(type = 4, data = DiscordResponseData(content = "Response", flags = 64)),
+        )
+
+    @Test
+    fun discordInteractionUser() =
+        assertRoundTrip(
+            DiscordInteraction(
+                id = "interaction-1",
+                type = 2,
+                channel_id = "channel-1",
+                guild_id = "guild-1",
+                member =
+                    DiscordInteractionMember(
+                        user = DiscordInteractionUser(id = "user-1", username = "alice", global_name = "Alice"),
+                        nick = "Ali",
+                    ),
+            ),
         )
 
     @Test

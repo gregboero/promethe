@@ -190,6 +190,27 @@ class SessionRoutesTest {
             assertTrue(events.isEmpty(), "Messages for a non-existent session should be empty")
         }
 
+    @Test
+    fun `GET messages restores only conversation roles with original timestamps`() =
+        testApplication {
+            val db = FakeDatabase()
+            db.insertSessionOrIgnore("weather-session", 900L, null)
+            db.insertMessage("weather-session", "user", "Weather tomorrow?", 1_000L)
+            db.insertMessage("weather-session", "system", "Observation: raw search result", 1_100L)
+            db.insertMessage("weather-session", "assistant", "Tomorrow will be 21 C.", 1_200L)
+            configureApp(db)
+
+            val response = client.get("/api/v1/sessions/weather-session/messages")
+            assertEquals(HttpStatusCode.OK, response.status)
+
+            val responseBody = response.bodyAsText()
+            val events = json.decodeFromString<List<ChatEvent>>(responseBody)
+            assertEquals(listOf("user", "response"), events.map { it.type })
+            assertEquals(listOf("Weather tomorrow?", "Tomorrow will be 21 C."), events.map { it.content })
+            assertEquals(listOf(1_000L, 1_200L), events.map { it.timestamp })
+            assertFalse(responseBody.contains("Observation:"))
+        }
+
     // ── 8. DELETE non-existent session returns 200 ───────────────
 
     @Test

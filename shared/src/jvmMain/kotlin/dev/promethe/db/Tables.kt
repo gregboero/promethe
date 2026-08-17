@@ -2,14 +2,39 @@ package dev.promethe.db
 
 import org.jetbrains.exposed.v1.core.Table
 
+/** projects — durable work contexts grouping sessions, memory and a workspace. */
+object Projects : Table("projects") {
+    val id = varchar("id", 64)
+    val name = varchar("name", 120)
+    val description = text("description").default("")
+    val instructions = text("instructions").default("")
+    val workspacePath = varchar("workspace_path", 500)
+    val memoryNamespace = varchar("memory_namespace", 255)
+    val archived = bool("archived").default(false)
+    val createdAt = long("created_at")
+    val updatedAt = long("updated_at")
+
+    override val primaryKey = PrimaryKey(id)
+
+    init {
+        uniqueIndex(workspacePath)
+        uniqueIndex(memoryNamespace)
+    }
+}
+
 /** sessions — agent conversation sessions */
 object Sessions : Table("sessions") {
     val id = varchar("id", 255)
     val createdAt = long("created_at")
     val metadata = text("metadata").nullable()
     val title = varchar("title", 500).nullable()
+    val projectId = varchar("project_id", 64).references(Projects.id).nullable()
 
     override val primaryKey = PrimaryKey(id)
+
+    init {
+        index(isUnique = false, projectId)
+    }
 }
 
 /** messages — individual messages within a session */

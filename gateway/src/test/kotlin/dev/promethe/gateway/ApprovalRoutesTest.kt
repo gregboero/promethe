@@ -5,6 +5,7 @@ import dev.promethe.core.ToolApprovalGate
 import dev.promethe.gateway.auth.OwnerAuthService
 import dev.promethe.db.DatabaseFactory
 import io.ktor.client.request.delete
+import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.put
@@ -25,6 +26,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -34,6 +36,20 @@ import kotlin.test.assertTrue
 class ApprovalRoutesTest {
     private val apiKey = "pk-prom-approval-local-key"
     private val json = Json { ignoreUnknownKeys = true }
+
+    @Test
+    fun `pending provider choices endpoint is loadable when the queue is empty`() =
+        testApplication {
+            configureRoutes()
+
+            val response =
+                client.get("/approval/providers/pending") {
+                    header(HttpHeaders.Authorization, "Bearer $apiKey")
+                }
+
+            assertEquals(HttpStatusCode.OK, response.status)
+            assertEquals(0, json.parseToJsonElement(response.bodyAsText()).jsonObject.getValue("pending").jsonArray.size)
+        }
 
     @Test
     fun `persistent approval and revocation require local owner authentication`() =
@@ -94,6 +110,29 @@ class ApprovalRoutesTest {
                 assertEquals(1, gate.listPending().size)
                 assertFalse(gate.listPending().single().args.contains("top-secret"))
 
+                gate.respond(requestId, approved = false)
+                assertFalse(pending.await().allowed)
+            }
+        }
+
+    @Test
+    fun `remote owner cannot approve local coding agent actions`() =
+        testApplication {
+            coroutineScope {
+                val gate = configureRoutes()
+                val ownerToken = createOwnerAndLogin()
+                val pending = async { gate.checkMandatory("codex_delegate", "{}", "remote-session") }
+                val requestId = awaitPending(gate)
+
+                val response =
+                    client.post("/approval/$requestId") {
+                        header(HttpHeaders.Authorization, "Bearer $ownerToken")
+                        contentType(ContentType.Application.Json)
+                        setBody("""{"approved":true,"scope":"ONCE"}""")
+                    }
+
+                assertEquals(HttpStatusCode.Forbidden, response.status)
+                assertEquals(1, gate.listPending().size)
                 gate.respond(requestId, approved = false)
                 assertFalse(pending.await().allowed)
             }

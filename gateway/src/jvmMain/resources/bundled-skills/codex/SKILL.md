@@ -1,53 +1,27 @@
 ---
 name: codex
-description: "Delegate coding tasks to OpenAI Codex CLI — features, PRs, refactoring."
+description: "Delegate repository work to the authenticated local Codex CLI."
 source: BUNDLED
 requires_cli: codex
 platforms: jvm
 ---
 
-# Codex CLI — Promethe Orchestration Guide
+# Codex local delegation
 
-Delegate coding tasks to [Codex](https://github.com/openai/codex) (OpenAI's autonomous coding agent CLI) via Promethe's `execute_command` tool.
+Use `codex_delegate` for focused coding, review, debugging, and repository tasks.
+The tool is present only when Promethe detects a runnable, authenticated Codex CLI.
 
-## Prerequisites
+## Arguments
 
-- **Install:** `npm install -g @openai/codex`
-- **Auth:** either `OPENAI_API_KEY` or Codex OAuth credentials from `codex login`
-- **Must run inside a git repository** — Codex refuses to run outside one
+- `task`: the complete task and acceptance criteria.
+- `accessMode`: `READ_ONLY` for analysis and review; `WORKSPACE_WRITE` only when edits are required.
+- `externalSessionId`: optional Codex thread id returned by an earlier delegation.
 
-## One-Shot Tasks (PREFERRED)
+Promethe sends the task over stdin to `codex app-server`; never call Codex through
+`execute_command`, `shell`, or a shell wrapper. Promethe owns approval relay,
+workspace confinement, cancellation, and session mapping. Dangerous Codex modes
+such as `--yolo` and `danger-full-access` are forbidden.
 
-```
-execute_command(command="codex", args=["exec", "Add dark mode toggle to settings"])
-```
-
-For scratch work (Codex needs a git repo):
-```
-execute_command(command="bash", args=["-c", "cd $(mktemp -d) && git init && codex exec 'Build a snake game in Python'"])
-```
-
-## Full Auto Mode
-
-For autonomous operation with file write approval:
-```
-execute_command(command="codex", args=["exec", "--full-auto", "Refactor the auth module"])
-```
-
-## Key Flags
-
-| Flag | Effect |
-|------|--------|
-| `exec "prompt"` | One-shot execution, exits when done |
-| `--full-auto` | Sandboxed but auto-approves file changes in workspace |
-| `--yolo` | No sandbox, no approvals (fastest, most dangerous) |
-| `--sandbox danger-full-access` | Full filesystem access |
-| `--model <name>` | Select model (default: latest GPT) |
-
-## Integration with Promethe
-
-When delegating to Codex:
-1. Ensure the working directory is a git repository
-2. Use `execute_command` with appropriate timeout (coding tasks can take minutes)
-3. Capture the output and relay results to the user
-4. For long tasks, consider using `delegate_task` to run asynchronously
+After the tool returns, inspect its summary and synthesize the final answer inside
+the current Promethe agent loop. Use `delegate_task` only for Promethe subagents,
+not for Codex.

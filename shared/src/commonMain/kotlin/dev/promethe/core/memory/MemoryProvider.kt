@@ -46,6 +46,7 @@ interface MemoryProvider {
     suspend fun recallFacts(
         query: String,
         limit: Int = 10,
+        userId: String = "default",
     ): List<MemoryFact>
 
     /** Get all stored facts for a user. */

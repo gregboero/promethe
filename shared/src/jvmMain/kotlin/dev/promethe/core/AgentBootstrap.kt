@@ -4,12 +4,14 @@ import dev.promethe.api.SandboxApprovalPolicy
 import dev.promethe.api.SandboxMode
 import dev.promethe.api.SandboxNetworkMode
 import dev.promethe.core.config.ConfigProvider
+import dev.promethe.core.coding.LocalCodingAgentService
 import dev.promethe.core.hooks.*
 import dev.promethe.core.memory.*
 import dev.promethe.core.sandbox.NativeSandboxManager
 import dev.promethe.core.sandbox.NativeSandboxProcessLauncher
 import dev.promethe.core.sandbox.SandboxRuntimePolicy
 import dev.promethe.core.sandbox.SandboxManager
+import dev.promethe.core.sandbox.SandboxPolicyFileAccess
 import dev.promethe.core.sandbox.SandboxedCommandRunner
 import dev.promethe.core.tools.builtin.*
 import dev.promethe.db.DatabaseFactory
@@ -47,6 +49,7 @@ data class AgentStack(
     val sandboxManager: SandboxManager,
     val sandboxRuntimePolicy: SandboxRuntimePolicy,
     val sandboxCommandRunner: SandboxedCommandRunner,
+    val localCodingAgentService: LocalCodingAgentService,
 )
 
 object AgentBootstrap {
@@ -104,6 +107,8 @@ object AgentBootstrap {
                         .split(',')
                         .map(String::trim)
                         .filter(String::isNotEmpty),
+                sandboxReadableRoots = parseSandboxRoots(ConfigProvider.get().get("SANDBOX_READABLE_ROOTS", "")),
+                sandboxWritableRoots = parseSandboxRoots(ConfigProvider.get().get("SANDBOX_WRITABLE_ROOTS", "")),
                 honchoBaseUrl = ConfigProvider.get().get("HONCHO_URL", ""),
                 honchoApiKey = ConfigProvider.get().get("HONCHO_API_KEY", ""),
                 tracingBackend = ConfigProvider.get().get("TRACING_BACKEND", "console"),
@@ -140,6 +145,12 @@ object AgentBootstrap {
             config.copy(profileDirectory = PrometheHome.absolutePath)
         } else {
             config
+        }
+        require(
+            resolvedConfig.sandboxMode != SandboxMode.FULL_ACCESS ||
+                !ConfigProvider.get().getBoolean("REMOTE_ACCESS_ENABLED", false),
+        ) {
+            "SANDBOX_MODE=FULL_ACCESS cannot be used while REMOTE_ACCESS_ENABLED=true"
         }
 
         // One-shot migration from old relative paths to ~/.promethe
@@ -180,6 +191,7 @@ object AgentBootstrap {
         val workDir = workspaceDirectory.absolutePath.toPath()
         val sandboxManager = NativeSandboxManager.discover()
         val sandboxRuntimePolicy = SandboxRuntimePolicy(workDir.toString(), resolvedConfig)
+        val sandboxFileAccess = SandboxPolicyFileAccess(sandboxRuntimePolicy)
         val sandboxCommandRunner =
             SandboxedCommandRunner(
                 launcher = NativeSandboxProcessLauncher(sandboxManager),
@@ -198,7 +210,7 @@ object AgentBootstrap {
                 fs = fs,
                 basePath = workDir,
                 pathResolver = CanonicalWorkspacePathResolver,
-                secureReader = SecureJvmWorkspaceFileReader(workDir.toString()),
+                secureReader = sandboxFileAccess,
             ),
         )
         ToolRegistry.register(
@@ -206,7 +218,7 @@ object AgentBootstrap {
                 fs = fs,
                 basePath = workDir,
                 pathResolver = CanonicalWorkspacePathResolver,
-                secureWriter = SecureJvmWorkspaceFileWriter(workDir.toString()),
+                secureWriter = sandboxFileAccess,
             ),
         )
         val outboundPolicy = JvmOutboundUrlPolicy()
@@ -261,6 +273,21 @@ object AgentBootstrap {
                 approvalGate = approvalGate,
                 sandboxCommandExecutor = sandboxCommandRunner,
             )
+
+        val localCodingAgentService =
+            LocalCodingAgentService(
+                workspace = workspaceDirectory.toPath(),
+                database = database,
+                approvalGate = approvalGate,
+            ).also { service ->
+                val detected = service.refresh()
+                logger.info {
+                    "Local coding agents detected: " +
+                        detected.joinToString { status ->
+                            "${status.kind.id}=${status.available}/${status.authentication}"
+                        }
+                }
+            }
 
         // ── Memory Provider ────────────────────────────────────
         val embeddedProvider = EmbeddedMemoryProvider(database)
@@ -482,6 +509,7 @@ object AgentBootstrap {
             workDir,
             LiveProviderKeys,
             sandboxCommandRunner,
+            sandboxFileAccess,
         )
 
         // ── Auto-Healing Executor ──────────────────────────────
@@ -558,8 +586,17 @@ object AgentBootstrap {
             sandboxManager = sandboxManager,
             sandboxRuntimePolicy = sandboxRuntimePolicy,
             sandboxCommandRunner = sandboxCommandRunner,
+            localCodingAgentService = localCodingAgentService,
         )
     }
+
+    private fun parseSandboxRoots(value: String): List<String> =
+        if (value.isBlank()) {
+            emptyList()
+        } else {
+            runCatching { PrometheJson.decodeFromString<List<String>>(value) }
+                .getOrElse { error("Invalid sandbox roots configuration") }
+        }
 
     /**
      * One-shot migration from old relative paths to ~/.promethe.

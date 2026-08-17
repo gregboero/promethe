@@ -52,6 +52,7 @@ class NativeSandboxManager internal constructor(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val startupMutex = Mutex()
     private val writerMutex = Mutex()
+    private val setupMutex = Mutex()
     private val processLock = Any()
     private val controlLock = Any()
     private val pendingExecutions = ConcurrentHashMap<String, CompletableDeferred<SandboxIpcResponse>>()
@@ -72,8 +73,11 @@ class NativeSandboxManager internal constructor(
     @Volatile
     private var closed = false
 
+    @Volatile
+    private var setupInProgress = false
+
     override suspend fun execute(request: SandboxedExecutionRequest): SandboxedExecutionResult {
-        if (closed) {
+        if (closed || setupInProgress) {
             return unavailableResult(request.executionId)
         }
         if (request.protocolVersion != SANDBOX_PROTOCOL_VERSION) {
@@ -133,6 +137,25 @@ class NativeSandboxManager internal constructor(
             pendingExecutions.remove(request.executionId, pending)
         }
     }
+
+    override suspend fun setup(workspaceRoot: String): SandboxStatus =
+        setupMutex.withLock {
+            if (!System.getProperty("os.name").contains("win", ignoreCase = true)) {
+                return@withLock status().copy(
+                    message = "Interactive sandbox setup is available only on Windows.",
+                )
+            }
+            setupInProgress = true
+            try {
+                startupMutex.withLock {
+                    stopCurrentProcess()
+                }
+                WindowsSandboxSetupLauncher.run(helper, workspaceRoot)
+            } finally {
+                setupInProgress = false
+            }
+            selfTest()
+        }
 
     override suspend fun cancel(executionId: String): Boolean {
         if (executionId.isBlank() || closed) {
@@ -204,7 +227,16 @@ class NativeSandboxManager internal constructor(
             }
             try {
                 sendRequest(request)
-                withTimeout(CONTROL_TIMEOUT_MILLIS) {
+                val timeoutMillis =
+                    if (
+                        operation == SandboxIpcOperation.STATUS ||
+                        operation == SandboxIpcOperation.SELF_TEST
+                    ) {
+                        SELF_TEST_CONTROL_TIMEOUT_MILLIS
+                    } else {
+                        CONTROL_TIMEOUT_MILLIS
+                    }
+                withTimeout(timeoutMillis) {
                     pending.await()
                 }
             } catch (error: Exception) {
@@ -238,10 +270,12 @@ class NativeSandboxManager internal constructor(
     }
 
     private suspend fun ensureProcess(): ProcessState {
+        check(!setupInProgress) { "sandbox setup is in progress" }
         processState?.takeIf { it.process.isAlive }?.let { return it }
         return startupMutex.withLock {
             processState?.takeIf { it.process.isAlive }?.let { return@withLock it }
             check(!closed) { "sandbox manager is closed" }
+            check(!setupInProgress) { "sandbox setup is in progress" }
             val process =
                 withContext(Dispatchers.IO) {
                     processFactory.start(helper)
@@ -376,8 +410,9 @@ class NativeSandboxManager internal constructor(
         if (state.process.isAlive) {
             runCatching { state.process.destroy() }
         }
-        if (state.process.isAlive) {
+        if (state.process.isAlive && !runCatching { state.process.waitFor(HELPER_STOP_GRACE_MILLIS) }.getOrDefault(false)) {
             runCatching { state.process.destroyForcibly() }
+            runCatching { state.process.waitFor(HELPER_KILL_GRACE_MILLIS) }
         }
     }
 
@@ -472,6 +507,9 @@ class NativeSandboxManager internal constructor(
         private const val MAX_EXECUTION_TIMEOUT_MILLIS = 24L * 60L * 60L * 1_000L
         private const val TRANSPORT_GRACE_MILLIS = 2_000L
         private const val CONTROL_TIMEOUT_MILLIS = 5_000L
+        private const val SELF_TEST_CONTROL_TIMEOUT_MILLIS = 30_000L
+        private const val HELPER_STOP_GRACE_MILLIS = 500L
+        private const val HELPER_KILL_GRACE_MILLIS = 2_000L
         private const val CANCEL_GRACE_MILLIS = 1_000L
         private const val TRANSPORT_ERROR_MESSAGE = "Sandbox helper is unavailable; execution was denied."
     }

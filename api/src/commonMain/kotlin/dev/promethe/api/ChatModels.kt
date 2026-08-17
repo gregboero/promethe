@@ -23,6 +23,7 @@ data class ChatEvent(
     val args: JsonObject? = null,
     val binaryData: String? = null, // base64 audio chunks or protobuf-encoded UI
     val metadata: JsonObject? = null, // structured metadata (voice config, UI state, etc.)
+    val timestamp: Long? = null, // persisted message time; absent on transient streaming events
 )
 
 /**

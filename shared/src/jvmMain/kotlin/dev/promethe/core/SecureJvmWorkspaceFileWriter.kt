@@ -31,9 +31,13 @@ class SecureJvmWorkspaceFileWriter(
         openedStreams += rootStream
         try {
             @Suppress("UNCHECKED_CAST")
-            var current =
-                rootStream as? SecureDirectoryStream<Path>
-                    ?: error("secure workspace writes are unavailable on this filesystem")
+            val secureRoot = rootStream as? SecureDirectoryStream<Path>
+            if (secureRoot == null) {
+                openedStreams.asReversed().forEach { stream -> runCatching { stream.close() } }
+                CanonicalNioWorkspaceAccess.write(workspaceRoot, relativePath, content)
+                return@withContext
+            }
+            var current: SecureDirectoryStream<Path> = requireNotNull(secureRoot)
 
             for (index in 0 until relative.nameCount - 1) {
                 val next = current.newDirectoryStream(relative.getName(index), LinkOption.NOFOLLOW_LINKS)
@@ -91,9 +95,12 @@ class SecureJvmWorkspaceFileReader(
             openedStreams += rootStream
             try {
                 @Suppress("UNCHECKED_CAST")
-                var current =
-                    rootStream as? SecureDirectoryStream<Path>
-                        ?: error("secure workspace reads are unavailable on this filesystem")
+                val secureRoot = rootStream as? SecureDirectoryStream<Path>
+                if (secureRoot == null) {
+                    openedStreams.asReversed().forEach { stream -> runCatching { stream.close() } }
+                    return@withContext CanonicalNioWorkspaceAccess.read(workspaceRoot, relativePath)
+                }
+                var current: SecureDirectoryStream<Path> = requireNotNull(secureRoot)
 
                 for (index in 0 until relative.nameCount - 1) {
                     val next = current.newDirectoryStream(relative.getName(index), LinkOption.NOFOLLOW_LINKS)
@@ -117,17 +124,32 @@ enum class SecureDeletedEntry {
     RECURSIVE_DIRECTORY,
 }
 
+interface WorkspaceFileMutator {
+    suspend fun delete(
+        relativePath: String,
+        recursive: Boolean,
+    ): SecureDeletedEntry
+
+    suspend fun move(
+        sourcePath: String,
+        destinationPath: String,
+    )
+}
+
 class SecureJvmWorkspaceFileMutator(
     workspaceRoot: String,
-) {
+) : WorkspaceFileMutator {
     private val workspaceRoot = Path.of(workspaceRoot).toRealPath()
 
-    suspend fun delete(
+    override suspend fun delete(
         relativePath: String,
         recursive: Boolean,
     ): SecureDeletedEntry =
         withContext(Dispatchers.IO) {
             val relative = validateSecureRelativePath(relativePath)
+            if (!supportsSecureDirectoryStreams(workspaceRoot)) {
+                return@withContext CanonicalNioWorkspaceAccess.delete(workspaceRoot, relativePath, recursive)
+            }
             openSecureParent(workspaceRoot, relative).use { parent ->
                 val name = relative.fileName
                 val attributes = parent.attributes(name)
@@ -148,12 +170,16 @@ class SecureJvmWorkspaceFileMutator(
             }
         }
 
-    suspend fun move(
+    override suspend fun move(
         sourcePath: String,
         destinationPath: String,
     ) = withContext(Dispatchers.IO) {
         val source = validateSecureRelativePath(sourcePath)
         val destination = validateSecureRelativePath(destinationPath)
+        if (!supportsSecureDirectoryStreams(workspaceRoot)) {
+            CanonicalNioWorkspaceAccess.move(workspaceRoot, sourcePath, destinationPath)
+            return@withContext
+        }
         openSecureParent(workspaceRoot, source).use { sourceParent ->
             openSecureParent(workspaceRoot, destination).use { destinationParent ->
                 sourceParent.attributes(source.fileName)
@@ -181,6 +207,10 @@ class SecureJvmWorkspaceFileMutator(
         }
     }
 }
+
+private fun supportsSecureDirectoryStreams(
+    workspaceRoot: Path,
+): Boolean = Files.newDirectoryStream(workspaceRoot).use { stream -> stream is SecureDirectoryStream<Path> }
 
 private class OpenSecureParent(
     val stream: SecureDirectoryStream<Path>,

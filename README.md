@@ -157,6 +157,7 @@ The Desktop/Web app offers the following screens via the navigation bar:
 | Screen | Description |
 |---|---|
 | **Chat** | Conversations with the agent (sessions, real-time streaming) |
+| **Projects** | Active workspaces, project instructions, scoped memory and conversation grouping |
 | **Agents** | Agent profile management |
 | **Monitor** | Agent Monitor — real-time observability + tool approval panel |
 | **Stats** | Usage statistics |
@@ -280,7 +281,8 @@ The gateway exposes the following endpoints:
 | Group | Endpoints | Description |
 |---|---|---|
 | **Chat (A2A)** | `POST /agents/a2a` (JSON-RPC `message/send`) | Conversation via the A2A protocol |
-| **Sessions** | `GET/POST /api/sessions` | Session management |
+| **Sessions** | `GET/POST /api/v1/sessions` | Session management and project assignment |
+| **Projects** | `CRUD /api/v1/projects` | Durable work contexts and active workspace |
 | **Agents** | `CRUD /api/agents` | Agent profiles |
 | **Stats** | `GET /api/stats` | Usage statistics |
 | **Memory** | `GET/DELETE /api/memory/facts` | Memory management |
@@ -301,7 +303,7 @@ Prométhé supports **19 messaging channels**, configurable via the **Setup Scre
 | Channel | Environment variables |
 |---|---|
 | **Telegram** | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_SECRET_TOKEN` |
-| **Discord** | `DISCORD_BOT_TOKEN`, `DISCORD_PUBLIC_KEY` |
+| **Discord** | `DISCORD_BOT_TOKEN` (`DISCORD_PUBLIC_KEY` is optional for slash commands) |
 | **Slack** | `SLACK_BOT_TOKEN`, `SLACK_SIGNING_SECRET` |
 | **WhatsApp** | `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_ACCESS_TOKEN` |
 | **Signal** | `SIGNAL_CLI_REST_URL`, `SIGNAL_PHONE_NUMBER` |
@@ -347,6 +349,7 @@ Prométhé applies a **secure-by-default** approach:
 |---|---|---|
 | **Approval Mode** | Human-in-the-loop for dangerous tools | `dangerous` — destructive operations always require approval, including when `APPROVAL_MODE=auto` |
 | **Execution Backend** | Sandboxing of commands and code | `local` — the native helper applies the selected OS sandbox with network disabled and workspace-bounded access |
+| **Development agents** | Local Codex and Claude Code delegation inside the Promethe agent loop | Detected from authenticated native CLIs; every delegation and provider action remains approval-gated |
 | **Guardrail Presets** | Blocked command patterns | `dev-safe` — blocks fork bombs, `rm -rf /`, pipe-to-shell, etc. |
 
 `EXEC_BACKEND=local` is not a permissive mode. Process execution remains subject

@@ -12,32 +12,38 @@ import kotlin.test.assertTrue
 
 class SandboxRuntimePolicyTest {
     @Test
-    fun `caller cannot replace workspace roots or protected metadata`() {
+    fun `local owner can add canonical roots while protected metadata remains enforced`() {
         val workspace = Files.createTempDirectory("promethe-runtime-policy").toRealPath()
+        val selected = Files.createTempDirectory("promethe-selected-root").toRealPath()
         val policy = SandboxRuntimePolicy(workspace.toString(), AgentConfig())
 
         val updated =
             policy.update(
                 SandboxPermissionProfile(
-                    readableRoots = listOf("C:/outside"),
-                    writableRoots = listOf("C:/outside"),
+                    readableRoots = listOf(selected.toString()),
+                    writableRoots = listOf(selected.toString()),
                     protectedPaths = emptyList(),
                 ),
                 localOwner = true,
             )
 
-        assertEquals(listOf(workspace.toString()), updated.readableRoots)
-        assertEquals(listOf(workspace.toString()), updated.writableRoots)
+        assertEquals(listOf(workspace.toString(), selected.toString()), updated.readableRoots)
+        assertEquals(listOf(workspace.toString(), selected.toString()), updated.writableRoots)
         assertTrue(updated.protectedPaths.containsAll(listOf(".git", ".promethe", ".codex", ".agents")))
     }
 
     @Test
-    fun `unsupported full access and network profiles fail closed`() {
+    fun `full file access stays local while process roots stay confined`() {
         val workspace = Files.createTempDirectory("promethe-runtime-policy")
         val policy = SandboxRuntimePolicy(workspace.toString(), AgentConfig())
 
-        assertFailsWith<SandboxPolicyException> {
-            policy.update(SandboxPermissionProfile(mode = SandboxMode.FULL_ACCESS), localOwner = true)
+        val updated = policy.update(SandboxPermissionProfile(mode = SandboxMode.FULL_ACCESS), localOwner = true)
+        assertEquals(SandboxMode.FULL_ACCESS, updated.mode)
+        assertEquals(SandboxMode.WORKSPACE_WRITE, policy.processProfile().mode)
+        assertEquals(listOf(workspace.toRealPath().toString()), policy.processProfile().readableRoots)
+
+        assertFailsWith<IllegalStateException> {
+            policy.update(SandboxPermissionProfile(mode = SandboxMode.FULL_ACCESS), localOwner = false)
         }
         assertFailsWith<SandboxPolicyException> {
             policy.update(
@@ -51,15 +57,9 @@ class SandboxRuntimePolicyTest {
     }
 
     @Test
-    fun `unsupported profiles fail closed during startup`() {
+    fun `unsupported network profile fails closed during startup`() {
         val workspace = Files.createTempDirectory("promethe-runtime-policy")
 
-        assertFailsWith<SandboxPolicyException> {
-            SandboxRuntimePolicy(
-                workspace.toString(),
-                AgentConfig(sandboxMode = SandboxMode.FULL_ACCESS),
-            )
-        }
         assertFailsWith<SandboxPolicyException> {
             SandboxRuntimePolicy(
                 workspace.toString(),

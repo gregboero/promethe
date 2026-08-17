@@ -10,6 +10,7 @@ class LlmInferenceService(
     suspend fun complete(
         systemInstruction: String,
         messages: List<Pair<String, String>>,
+        provider: String? = null,
         model: String? = null,
         temperature: Double? = null,
     ): LlmResponse {
@@ -21,10 +22,13 @@ class LlmInferenceService(
             "LLM inference requires at least one non-system message with content"
         }
 
-        return llmAdapter.complete(
+        val resolvedProvider = provider?.trim()?.takeIf { it.isNotEmpty() } ?: llmAdapter.currentProvider
+        val resolvedModel = llmAdapter.resolveModel(resolvedProvider, model)
+        return llmAdapter.completeWithProfile(
             systemPrompt = systemInstruction,
             messages = messages,
-            model = model ?: llmAdapter.currentModel,
+            provider = resolvedProvider,
+            model = resolvedModel,
             temperature = temperature ?: 0.2,
         )
     }

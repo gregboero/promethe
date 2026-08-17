@@ -92,6 +92,7 @@ class FakeMemoryProvider(
     override suspend fun recallFacts(
         query: String,
         limit: Int,
+        userId: String,
     ) = recallResults.ifEmpty { storedFacts.filter { it.content.contains(query, ignoreCase = true) } }.take(limit)
 
     override suspend fun getAllFacts(userId: String) = storedFacts.toList()

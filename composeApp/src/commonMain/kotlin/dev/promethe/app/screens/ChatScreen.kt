@@ -184,6 +184,7 @@ fun ChatScreen(
                     DisplayItem(
                         event = ev,
                         isUser = ev.type == "user",
+                        timestamp = ev.timestamp ?: Clock.System.now().toEpochMilliseconds(),
                     )
                 }
         } catch (e: Exception) {
@@ -577,8 +578,8 @@ fun ChatScreen(
                                         } else {
                                             voiceVM.startDictation(
                                                 VoiceSessionConfig(
-                                                    provider = voiceSttProvider.takeIf { it.isNotBlank() } ?: "google_stt",
-                                                    model = voiceSttModel.takeIf { it.isNotBlank() } ?: "gemini-3.5-flash",
+                                                    provider = voiceSttProvider.takeIf { it.isNotBlank() } ?: "openai_stt",
+                                                    model = voiceSttModel,
                                                     mode = "stt",
                                                 ),
                                             )
