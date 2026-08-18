@@ -8,6 +8,7 @@ Promethe treats evaluation suites as versioned code. A suite describes inputs an
 |---|---|
 | Serializable contracts | `api/src/commonMain/kotlin/dev/promethe/api/EvalModels.kt` |
 | Runner and assertions | `evals/src/main/kotlin/dev/promethe/evals/EvalRunner.kt` |
+| Agent runtime adapter | `evals/src/main/kotlin/dev/promethe/evals/AgentExecutionEvalSubject.kt` |
 | Adversarial metrics | `evals/src/main/kotlin/dev/promethe/evals/AdversarialEvalLab.kt` |
 | Golden suites | `evals/src/test/resources/golden/*.json` |
 | CI regression tests | `evals/src/test/kotlin/dev/promethe/evals/` |
@@ -24,6 +25,8 @@ The command runs the four Phase 0 baselines:
 - tool security and approvals;
 - provider error handling;
 - prompt-injection resistance.
+
+The runtime baseline uses the real `AgentExecutionService`, SQLite in memory, the real tool approval policy, and a deterministic simulated provider. It produces machine-readable reports under `evals/build/reports/evals/`; CI archives this directory with the test reports. The provider is simulated so the baseline is reproducible and never consumes provider credits.
 
 An evaluation run fails when any assertion fails or when the subject raises an exception. Results retain the actual observed value but golden fixtures must never contain credentials, user data, raw prompts from production, or provider responses copied from private sessions.
 
@@ -46,7 +49,7 @@ Assertions can inspect `output`, `errorCode`, `exitCode`, or a `metadata.<key>` 
 
 A prompt, model, skill, policy, tool contract, or autonomous behavior must not be promoted when a related golden suite regresses. New security defects require a negative regression case before the fix is considered complete.
 
-Live-provider certification remains opt-in and separate from `evals:test`. It requires dedicated accounts, explicit credentials, a cost budget, and sanitized evidence as defined by the release certification documents.
+Live-provider certification remains opt-in and separate from `evals:test`. It requires dedicated accounts, explicit credentials, a cost budget, and sanitized evidence as defined by the release certification documents. A passing simulated runtime baseline does not certify a provider model.
 
 ## Adversarial metric
 
