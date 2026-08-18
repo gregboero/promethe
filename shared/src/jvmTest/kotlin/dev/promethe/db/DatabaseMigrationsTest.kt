@@ -25,6 +25,9 @@ class DatabaseMigrationsTest {
                     statement.executeQuery("SELECT version FROM flyway_schema_history WHERE version = '5'").use { rows ->
                         assertTrue(rows.next(), "V5 projects migration should be recorded")
                     }
+                    statement.executeQuery("SELECT version FROM flyway_schema_history WHERE version = '6'").use { rows ->
+                        assertTrue(rows.next(), "V6 agent run ledger migration should be recorded")
+                    }
                     statement.executeQuery("SELECT reasoning_effort FROM agent_profiles WHERE id = 'main'").use { rows ->
                         assertTrue(rows.next())
                         assertEquals("AUTO", rows.getString(1))
@@ -84,6 +87,12 @@ class DatabaseMigrationsTest {
                         val columns = mutableSetOf<String>()
                         while (rows.next()) columns += rows.getString("name")
                         assertTrue("project_id" in columns, "V5 must add the project association")
+                    }
+                    statement.executeQuery("PRAGMA table_info(agent_runs)").use { rows ->
+                        val columns = mutableSetOf<String>()
+                        while (rows.next()) columns += rows.getString("name")
+                        assertTrue("run_id" in columns, "V6 must add the durable run ledger")
+                        assertTrue("status" in columns, "V6 must persist the run status")
                     }
                 }
             }
