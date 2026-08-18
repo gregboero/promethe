@@ -49,7 +49,7 @@ These are configurable via the Setup Screen / Settings → **Observability** sec
 
 Backend changes require an application restart because the SDK is initialized once. Endpoint URLs must use HTTP or HTTPS and cannot contain embedded credentials.
 
-Trace attributes are allowlisted metadata, not request payloads. Keys containing prompt, content, message, token, secret, password, credentials, cookies, or tool arguments are dropped. String values are length- and character-bounded, and exception messages are not attached to spans. `promethe.run.id` and `promethe.step.id` correlate agent, LLM, and tool activity without exporting conversation text.
+Trace attributes are allowlisted metadata, not request payloads. Keys containing prompt, content, message, token, secret, password, credentials, cookies, or tool arguments are dropped unless they are an exact non-sensitive structural counter such as `gen_ai.usage.prompt_tokens`, `gen_ai.usage.completion_tokens`, or `gen_ai.request.message_count`. String values are length- and character-bounded, and exception messages are not attached to spans. `promethe.run.id` and `promethe.step.id` correlate agent, LLM, and tool activity without exporting conversation text.
 
 ---
 

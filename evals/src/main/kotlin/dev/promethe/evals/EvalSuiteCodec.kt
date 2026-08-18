@@ -1,6 +1,7 @@
 package dev.promethe.evals
 
 import dev.promethe.api.EvalSuite
+import dev.promethe.api.EvalRun
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -16,4 +17,6 @@ object EvalSuiteCodec {
     fun decode(content: String): EvalSuite = json.decodeFromString(content)
 
     fun encode(suite: EvalSuite): String = json.encodeToString(suite)
+
+    fun encode(run: EvalRun): String = json.encodeToString(run)
 }

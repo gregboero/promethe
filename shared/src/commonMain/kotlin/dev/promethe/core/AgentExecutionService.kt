@@ -5,8 +5,8 @@ import dev.promethe.db.PrometheDatabaseApi
 import dev.promethe.db.ProjectRow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonPrimitive
 import kotlin.time.Clock
@@ -89,11 +89,11 @@ class AgentExecutionService(
         var stepCount = 0
         val generatedRunId = executionIdGenerator.nextId("run")
         val effectiveRunId = request.runId ?: generatedRunId
-        return flow {
+        return channelFlow {
             if (!isValidExecutionId(effectiveRunId) ||
                 (request.parentRunId != null && !isValidExecutionId(request.parentRunId))
             ) {
-                emit(
+                send(
                     AgentExecutionEvent.Failed(
                         code = "invalid_run_identity",
                         message = "Run identifiers must contain only letters, digits, '.', '_', ':', or '-'",
@@ -101,13 +101,13 @@ class AgentExecutionService(
                         runId = generatedRunId,
                     ),
                 )
-                return@flow
+                return@channelFlow
             }
             val runIdentity = AgentRunIdentity(effectiveRunId, request.parentRunId)
             val input = request.text.trim()
             if (input.isBlank()) {
-                emit(AgentExecutionEvent.Failed("empty_input", "Agent input must contain text", 0, runIdentity.runId))
-                return@flow
+                send(AgentExecutionEvent.Failed("empty_input", "Agent input must contain text", 0, runIdentity.runId))
+                return@channelFlow
             }
 
             val resolved = resolveProfile(request)
@@ -148,7 +148,7 @@ class AgentExecutionService(
                 ).collect { trajectory ->
                     stepCount++
                     val step = runIdentity.step(stepCount)
-                    emit(AgentExecutionEvent.Step(step.index, trajectory, step.runId, step.stepId))
+                    send(AgentExecutionEvent.Step(step.index, trajectory, step.runId, step.stepId))
                     trajectory.outputs["response"]
                         ?.trim()
                         ?.takeIf { it.isNotBlank() }
@@ -162,7 +162,7 @@ class AgentExecutionService(
                     "Agent execution ended without a final response: " +
                         "session=${request.sessionId}, origin=${request.origin}, steps=$stepCount"
                 }
-                emit(
+                send(
                     AgentExecutionEvent.Failed(
                         code = "missing_final_response",
                         message = "The agent completed without producing a final response",
@@ -172,7 +172,7 @@ class AgentExecutionService(
                     ),
                 )
             } else {
-                emit(AgentExecutionEvent.Completed(response, stepCount, runIdentity.runId))
+                send(AgentExecutionEvent.Completed(response, stepCount, runIdentity.runId))
             }
         }.catch { e ->
             logger.error(e) { "Agent execution failed for session ${request.sessionId}" }

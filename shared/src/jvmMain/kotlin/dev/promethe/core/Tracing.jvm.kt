@@ -251,7 +251,7 @@ actual object Tracing {
     private fun safeAttributeKey(key: String): String? {
         val normalized = key.lowercase(Locale.ROOT)
         if (key.length > MAX_ATTRIBUTE_KEY_LENGTH || !key.matches(Regex("[A-Za-z0-9_.-]+"))) return null
-        if (key == "tool.args_keys") return key
+        if (key in nonSensitiveAttributeKeys) return key
         return key.takeUnless { sensitiveAttributeTerms.any(normalized::contains) }
     }
 
@@ -280,6 +280,15 @@ actual object Tracing {
             "secret",
             "text",
             "token",
+        )
+
+    private val nonSensitiveAttributeKeys =
+        setOf(
+            "agent.message_count",
+            "gen_ai.request.message_count",
+            "gen_ai.usage.completion_tokens",
+            "gen_ai.usage.prompt_tokens",
+            "tool.args_keys",
         )
 }
 

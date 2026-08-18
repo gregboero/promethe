@@ -122,6 +122,7 @@ jobs:
             gateway/build/reports/tests/
             api/build/reports/tests/
             evals/build/reports/tests/
+            evals/build/reports/evals/
             composeApp/build/reports/tests/
           retention-days: 7
 
