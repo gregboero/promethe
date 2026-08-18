@@ -22,6 +22,7 @@ compose-multiplatform = "1.11.1"
 navigation3 = "1.0.0-alpha05"
 jda = "6.4.1"
 twilio = "12.1.1"
+opentelemetry = "1.64.0"
 
 [libraries]
 # ── Koog Agent Framework (KMP) ──
@@ -88,6 +89,14 @@ twilio = { module = "com.twilio.sdk:twilio", version.ref = "twilio" }
 # ── Tracy Observability ──
 tracy-core = { module = "org.jetbrains.ai.tracy:tracy-core", version.ref = "tracy" }
 tracy-ktor = { module = "org.jetbrains.ai.tracy:tracy-ktor", version.ref = "tracy" }
+
+# ── OpenTelemetry Observability ──
+opentelemetry-api = { module = "io.opentelemetry:opentelemetry-api", version.ref = "opentelemetry" }
+opentelemetry-extension-kotlin = { module = "io.opentelemetry:opentelemetry-extension-kotlin", version.ref = "opentelemetry" }
+opentelemetry-sdk-autoconfigure = { module = "io.opentelemetry:opentelemetry-sdk-extension-autoconfigure", version.ref = "opentelemetry" }
+opentelemetry-exporter-otlp = { module = "io.opentelemetry:opentelemetry-exporter-otlp", version.ref = "opentelemetry" }
+opentelemetry-exporter-logging = { module = "io.opentelemetry:opentelemetry-exporter-logging", version.ref = "opentelemetry" }
+opentelemetry-sdk-testing = { module = "io.opentelemetry:opentelemetry-sdk-testing", version.ref = "opentelemetry" }
 
 # ── CLI ──
 mordant = { module = "com.github.ajalt.mordant:mordant", version.ref = "mordant" }

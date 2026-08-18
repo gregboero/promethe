@@ -11,7 +11,7 @@ import kotlinx.serialization.Serializable
 // ══════════════════════════════════════════════════════════════
 // Agent-level tools — Hermes parity, wave 2:
 //   - SessionSearchTool    → search past sessions (FTS)
-//   - MixtureOfAgentsTool  → multi-model consensus
+//   - MixtureOfAgentsTool  → multi-model synthesis
 // ══════════════════════════════════════════════════════════════
 
 // ── SessionSearchTool ───────────────────────────────────────
@@ -67,7 +67,7 @@ data class MixtureOfAgentsArgs(
     val prompt: String,
     @property:LLMDescription("Comma-separated model names. Default uses 3 diverse models.")
     val models: String = "",
-    @property:LLMDescription("Synthesis strategy: 'best_of', 'merge', or 'vote'. Default: 'best_of'.")
+    @property:LLMDescription("Synthesis strategy: 'best_of' or 'merge'. Default: 'best_of'.")
     val strategy: String = "best_of",
 )
 
@@ -80,6 +80,9 @@ class MixtureOfAgentsTool(
         description = "Get a high-quality answer by consulting multiple AI models and synthesizing their best responses.",
     ) {
     companion object {
+        const val VOTE_UNAVAILABLE_MESSAGE =
+            "[UNAVAILABLE] The 'vote' strategy is disabled because it has no evidence-based judge. Use 'best_of' or 'merge'."
+
         val DEFAULT_MODELS = listOf(
             "nousresearch/hermes-3-llama-3.1-405b",
             "anthropic/claude-3.5-sonnet",
@@ -88,6 +91,10 @@ class MixtureOfAgentsTool(
     }
 
     override suspend fun execute(args: MixtureOfAgentsArgs): String {
+        if (args.strategy.trim().lowercase() == "vote") {
+            return VOTE_UNAVAILABLE_MESSAGE
+        }
+
         val models = if (args.models.isNotBlank()) {
             args.models.split(",").map { it.trim() }
         } else {
@@ -113,7 +120,6 @@ class MixtureOfAgentsTool(
 
             // Phase 2: Synthesize
             val synthesis = when (args.strategy) {
-                "vote" -> synthesizeVote(responses)
                 "merge" -> synthesizeMerge(args.prompt, responses)
                 else -> synthesizeBestOf(args.prompt, responses)
             }
@@ -163,9 +169,4 @@ class MixtureOfAgentsTool(
         }
         return llmAdapter.complete("Merge expert.", listOf("user" to mergePrompt), config.modelName, 0.2).content
     }
-
-    private fun synthesizeVote(responses: List<Pair<String, String>>): String =
-        responses.filter { !it.second.startsWith("[ERROR") }
-            .maxByOrNull { it.second.length }
-            ?.second ?: "No valid responses."
 }

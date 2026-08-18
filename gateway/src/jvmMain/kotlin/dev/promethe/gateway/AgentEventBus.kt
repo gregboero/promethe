@@ -30,7 +30,11 @@ object AgentEventBus {
      * - thought only                → "step_start"  (agent is thinking)
      * - no action, has output       → "step_complete"
      */
-    fun ConversationTrajectory.toAgentEvent(agentId: String = "main"): AgentExecutionEvent {
+    fun ConversationTrajectory.toAgentEvent(
+        agentId: String = "main",
+        runId: String? = null,
+        stepId: String? = null,
+    ): AgentExecutionEvent {
         val now = System.currentTimeMillis()
         val act = this.action
         val obs = this.observation
@@ -45,6 +49,8 @@ object AgentEventBus {
                     tool = act.toolName,
                     content = obs.take(200),
                     timestamp = now,
+                    runId = runId,
+                    stepId = stepId,
                 )
             }
 
@@ -56,6 +62,8 @@ object AgentEventBus {
                     tool = act.toolName,
                     content = act.args.toString().take(200),
                     timestamp = now,
+                    runId = runId,
+                    stepId = stepId,
                 )
             }
 
@@ -66,6 +74,8 @@ object AgentEventBus {
                     type = "step_start",
                     content = thght.take(200),
                     timestamp = now,
+                    runId = runId,
+                    stepId = stepId,
                 )
             }
 
@@ -77,6 +87,8 @@ object AgentEventBus {
                     type = if (answer != null) "step_complete" else "step_start",
                     content = answer?.take(200) ?: "Processing…",
                     timestamp = now,
+                    runId = runId,
+                    stepId = stepId,
                 )
             }
         }

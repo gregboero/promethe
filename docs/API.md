@@ -1086,7 +1086,7 @@ curl -X DELETE http://localhost:8080/api/v1/skills/data_analysis
 
 ### POST /api/v1/skills/curate
 
-Launch automatic curation (deduplication, quality scoring).
+Run a non-destructive quality pass. The response contains quality issues and typed `QUARANTINED` proposals for low-quality or near-duplicate skills. No skill is deleted, merged, or rewritten; legacy `merged` and `deleted` counters remain zero.
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/skills/curate
@@ -1727,9 +1727,10 @@ supports the capability (missing provider = tool call fails at invocation, not a
 | `twilio` | `TWILIO_ACCOUNT_SID` **and** `TWILIO_AUTH_TOKEN` are set — ⚠️ approval-gated |
 | `web_scrape` | always (no key required) |
 | `execute_code` | `CODE_EXECUTION_ENABLED=true` — ⚠️ approval-gated, sandboxed via `EXEC_BACKEND` (default `local`); Python, JavaScript and Kotlin only |
-| `browser_navigate`, `browser_click`, `browser_type`, `browser_extract`, `browser_screenshot`, `browser_eval`, `browser_scroll`, `browser_back`, `browser_press`, `browser_get_images`, `browser_vision`, `browser_dialog` (12 tools, `BrowserTools.create`) | `BROWSER_CDP_PORT` is set (local CDP backend), **or** `BROWSER_BACKEND=browserbase` with `BROWSERBASE_API_KEY` + `BROWSERBASE_PROJECT_ID` set (cloud backend) |
+| `browser_navigate`, `browser_click`, `browser_type`, `browser_extract`, `browser_screenshot`, `browser_eval`, `browser_scroll`, `browser_back`, `browser_press`, `browser_get_images`, `browser_dialog` (11 tools, `BrowserTools.create`) | `BROWSER_CDP_PORT` is set (local CDP backend), **or** `BROWSER_BACKEND=browserbase` with `BROWSERBASE_API_KEY` + `BROWSERBASE_PROJECT_ID` set (cloud backend) |
 
 `browser_eval` is in `DANGEROUS_TOOLS` and requires approval.
+`browser_vision` is intentionally unavailable and is not registered until a VLM integration performs real screenshot analysis.
 
 ### Extended tools — always registered (`IntegrationRegistrar.registerExtendedTools`)
 

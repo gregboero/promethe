@@ -94,8 +94,8 @@ jobs:
           java-version: '21'
           cache: gradle
       - run: chmod +x gradlew
-      - run: ./gradlew shared:compileKotlinJvm gateway:compileKotlin api:compileKotlinJvm composeApp:compileKotlinDesktop composeApp:compileKotlinWasmJs --no-daemon
-      - run: ./gradlew shared:jvmTest gateway:test api:jvmTest composeApp:desktopTest --no-daemon
+      - run: ./gradlew shared:compileKotlinJvm gateway:compileKotlin api:compileKotlinJvm evals:compileKotlin composeApp:compileKotlinDesktop composeApp:compileKotlinWasmJs --no-daemon
+      - run: ./gradlew shared:jvmTest gateway:test api:jvmTest evals:test composeApp:desktopTest --no-daemon
 
   docs-consistency:
     name: Docs Consistency

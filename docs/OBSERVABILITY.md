@@ -6,7 +6,7 @@
 
 Prométhé exposes three complementary layers of observability:
 
-1. **Tracing** — span-based instrumentation around LLM calls, initialized by `TracySetup` (currently a no-op — see below).
+1. **Tracing** — OpenTelemetry spans around agent, LLM, tool, and GEPA execution, initialized by `TracySetup`.
 2. **LLM usage stats** — per-request token counts and cost, persisted to SQLite and aggregated by `KoogLlmAdapter`.
 3. **Lifecycle hooks** — `LoggingHook` and `MetricsHook`, which observe tool calls, errors, and sessions as they happen.
 
@@ -14,7 +14,7 @@ These are surfaced through gateway HTTP endpoints (`/status`, `/status/providers
 
 ---
 
-## Tracing (TracySetup)
+## OpenTelemetry tracing
 
 `TracySetup.initialize(config: AgentConfig)` (`shared/src/commonMain/kotlin/dev/promethe/core/TracySetup.kt`) is the single entry point called once during gateway/agent startup, from `AgentBootstrap.kt`:
 
@@ -24,34 +24,32 @@ TracySetup.initialize(resolvedConfig)
 llmAdapter.initializeWithRouter(apiKeys, database)
 ```
 
-It forwards `config.tracingBackend` to the `Tracing` expect/actual object (`shared/src/commonMain/kotlin/dev/promethe/core/Tracing.kt`), which defines:
+It forwards the selected backend, endpoint, and Langfuse credentials to the `Tracing` expect/actual object (`shared/src/commonMain/kotlin/dev/promethe/core/Tracing.kt`), which defines:
 
-- `initialize(backend: String)` — selects the backend once at startup.
-- `span(name, attributes) { ... }` — runs a block inside a named span, with a `SpanScope` receiver for `setAttribute(key, value)`.
+- `initialize(...)` — configures the OpenTelemetry Java SDK once at startup.
+- `span(name, attributes) { ... }` — runs a suspendable block inside a named span and propagates the OTel context across coroutine thread changes.
 - `flush()` — flush pending traces before shutdown.
 
 ### Config
 
 | Variable | Default | Values |
 |---|---|---|
-| `TRACING_BACKEND` (`AgentConfig.tracingBackend`) | `console` | `console`, `langfuse`, `otlp` |
+| `TRACING_BACKEND` (`AgentConfig.tracingBackend`) | `console` | `none`, `console`, `langfuse`, `otlp` |
 | `LANGFUSE_PUBLIC_KEY` / `LANGFUSE_SECRET_KEY` / `LANGFUSE_HOST` | — | Used when backend is `langfuse` |
 | `OTLP_ENDPOINT` | — | Used when backend is `otlp` (e.g. `http://localhost:4317`) |
 
 These are configurable via the Setup Screen / Settings → **Observability** section (`ObservabilitySection.kt`), which lets the user pick the backend and fill in Langfuse/OTLP fields, persisted through `CredentialManager` / `AgentConfig`.
 
-### Current implementation status
+### Exporters and data policy
 
-The JVM `actual object Tracing` (`shared/src/jvmMain/kotlin/dev/promethe/core/Tracing.jvm.kt`) is presently a **no-op stub**. Per the code comment:
+- `none` disables tracing.
+- `console` uses the local console exporter and performs no network request.
+- `otlp` uses the configured `OTLP_ENDPOINT`; when it is blank, standard `OTEL_*` environment variables can configure the exporter.
+- `langfuse` sends OTLP/HTTP spans to `<LANGFUSE_HOST>/api/public/otel` with Basic authentication and the Langfuse v4 ingestion header.
 
-> Tracy compiler plugin temporarily disabled (incompatible with Kotlin 2.4.0). Using no-op stubs until Tracy releases a Kotlin 2.4.0-compatible version.
+Backend changes require an application restart because the SDK is initialized once. Endpoint URLs must use HTTP or HTTPS and cannot contain embedded credentials.
 
-Concretely:
-- `initialize()` only logs a warning (`"Tracy tracing temporarily disabled..."`) and marks itself initialized; it does not connect to Langfuse or an OTLP collector.
-- `span { block() }` executes `block` directly against an empty `SpanScope`, with no span actually recorded.
-- `SpanScope.setAttribute(...)` is a no-op for all overloads (`String`, `Int`, `Long`, `Double`, `Boolean`).
-
-So today, selecting `langfuse` or `otlp` as the tracing backend has no runtime effect beyond storing the choice — no spans are exported. `KoogLlmAdapter` still calls `setAttribute(...)` for `gen_ai.usage.*` fields on every completion (see below), but those calls currently go nowhere.
+Trace attributes are allowlisted metadata, not request payloads. Keys containing prompt, content, message, token, secret, password, credentials, cookies, or tool arguments are dropped. String values are length- and character-bounded, and exception messages are not attached to spans. `promethe.run.id` and `promethe.step.id` correlate agent, LLM, and tool activity without exporting conversation text.
 
 ---
 
@@ -191,7 +189,7 @@ A green/red dot in the top bar reflects whether `/status` responded (`healthOk =
 
 ## Limitations
 
-- **Tracing is not currently wired end-to-end.** The `Tracing` JVM implementation is a no-op stub pending a Tracy release compatible with Kotlin 2.4.0; selecting `langfuse` or `otlp` in Settings only stores the choice, no spans are exported today.
+- **Tracing is metadata-only by design.** Prompt and response bodies are excluded, so detailed content inspection requires a separate explicitly consented diagnostic workflow.
 - **`MetricsHook` is registered but not exposed.** Its `getMetrics()` (tool call counts, error count, session count) has no HTTP route or UI panel reading it, and it does not persist across restarts.
 - **`LoggingHook` output goes to process logs only** — no structured/query-able audit trail beyond whatever log aggregation is set up outside Prométhé.
 - **Pricing for providers without a pricing API is static.** OpenAI/Anthropic/Google/DeepSeek costs use a hardcoded `KNOWN_PRICING` table in `ModelPricingService.kt` that must be updated manually as vendors change prices; unlisted models silently fall back to a `$1/$1` per-million default, which can under- or over-estimate cost.

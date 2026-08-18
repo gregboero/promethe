@@ -349,7 +349,13 @@ object PrometheA2A {
                                 stepCount = event.index
 
                                 // ── Broadcast to Monitor WebSocket ──
-                                AgentEventBus.emit(trajectory.toAgentEvent(agentId = "main"))
+                                AgentEventBus.emit(
+                                    trajectory.toAgentEvent(
+                                        agentId = "main",
+                                        runId = event.runId,
+                                        stepId = event.stepId,
+                                    ),
+                                )
 
                                 val thought = trajectory.thought
                                 val actionDesc = trajectory.action?.let { "🔧 ${it.toolName}(${it.args})" }

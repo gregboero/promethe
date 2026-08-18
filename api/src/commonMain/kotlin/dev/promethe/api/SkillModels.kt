@@ -44,6 +44,24 @@ data class SkillCurationReport(
     val issues: List<String> = emptyList(),
     val merged: Int = 0,
     val deleted: Int = 0,
+    val proposals: List<SkillCurationProposalDto> = emptyList(),
+)
+
+@Serializable
+enum class SkillCurationActionDto {
+    REVIEW_LOW_QUALITY,
+    REVIEW_DUPLICATE,
+}
+
+@Serializable
+data class SkillCurationProposalDto(
+    val action: SkillCurationActionDto,
+    val skill: String,
+    val relatedSkills: List<String> = emptyList(),
+    val score: Int? = null,
+    val similarity: Double? = null,
+    val rationale: String,
+    val status: String = "QUARANTINED",
 )
 
 @Serializable

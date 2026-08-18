@@ -291,6 +291,7 @@ class WebToolsTest {
     @Test
     fun testBrowserToolsMetadataAndExecution() =
         runTest {
+            var screenshotCalled = false
             val fakeBackend = object : BrowserBackend {
                 override suspend fun navigate(url: String): BrowserResult = BrowserResult(true, "Navigated to $url")
 
@@ -305,7 +306,10 @@ class WebToolsTest {
 
                 override suspend fun extractPage(): BrowserResult = BrowserResult(true, "Extracted page")
 
-                override suspend fun screenshot(): BrowserResult = BrowserResult(true, "c2NyZWVuc2hvdA==")
+                override suspend fun screenshot(): BrowserResult {
+                    screenshotCalled = true
+                    return BrowserResult(true, "c2NyZWVuc2hvdA==")
+                }
 
                 override suspend fun evaluate(expression: String): BrowserResult = BrowserResult(true, "Result of $expression")
 
@@ -315,7 +319,8 @@ class WebToolsTest {
             }
 
             val tools = BrowserTools.create(fakeBackend)
-            assertEquals(12, tools.size, "Should create 12 tools")
+            assertEquals(11, tools.size, "Should register only implemented tools")
+            assertFalse(tools.any { it.name == "browser_vision" })
 
             // Test navigate tool
             val navigateTool = tools.first { it.name == "browser_navigate" } as BrowserNavigateTool
@@ -336,6 +341,11 @@ class WebToolsTest {
             val extractTool = tools.first { it.name == "browser_extract" } as BrowserExtractTool
             val extractResult = extractTool.execute(BrowserExtractArgs("#content"))
             assertEquals("Extracted #content", extractResult)
+
+            val visionTool = BrowserVisionTool(fakeBackend)
+            val visionResult = visionTool.execute(BrowserVisionArgs())
+            assertTrue(visionResult.startsWith("[UNAVAILABLE]"), "Got: $visionResult")
+            assertFalse(screenshotCalled, "Unavailable browser vision must not capture a screenshot")
         }
 
     @Test

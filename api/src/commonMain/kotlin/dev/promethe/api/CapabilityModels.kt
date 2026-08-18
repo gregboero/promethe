@@ -82,4 +82,6 @@ data class ToolInvocation(
     val projectId: String? = null,
     val memoryNamespace: String = "default",
     val workspaceRelativePath: String? = null,
+    val runId: String? = null,
+    val stepId: String? = null,
 )

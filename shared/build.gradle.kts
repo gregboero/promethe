@@ -50,6 +50,7 @@ kotlin {
         jvmTest.dependencies {
             implementation(libs.kotlinx.datetime)
             implementation(libs.sqlite.jdbc)
+            implementation(libs.opentelemetry.sdk.testing)
         }
 
         configurations.all {
@@ -81,6 +82,11 @@ kotlin {
 // Must be added via the JVM-specific Gradle configuration directly.
 dependencies {
     add("jvmMainImplementation", libs.ktor.client.cio)
+    add("jvmMainImplementation", libs.opentelemetry.api)
+    add("jvmMainImplementation", libs.opentelemetry.extension.kotlin)
+    add("jvmMainImplementation", libs.opentelemetry.sdk.autoconfigure)
+    add("jvmMainImplementation", libs.opentelemetry.exporter.logging)
+    add("jvmMainImplementation", libs.opentelemetry.exporter.otlp)
     // Argon2id password hashing and AES-GCM support for gateway security features.
     add("jvmMainImplementation", libs.bouncycastle)
     add("jvmMainImplementation", libs.exposed.core)

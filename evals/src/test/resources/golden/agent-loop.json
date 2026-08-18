@@ -1,0 +1,18 @@
+{
+  "id": "agent-loop",
+  "version": 1,
+  "description": "Deterministic baseline for a complete agent response",
+  "cases": [
+    {
+      "id": "agent-final-response",
+      "capability": "agent-loop",
+      "description": "The loop emits a final response and at least one step",
+      "input": "hello",
+      "assertions": [
+        { "id": "final", "field": "output", "kind": "CONTAINS", "expected": "final:" },
+        { "id": "steps", "field": "metadata.steps", "kind": "EXISTS" }
+      ],
+      "tags": ["golden", "agent"]
+    }
+  ]
+}

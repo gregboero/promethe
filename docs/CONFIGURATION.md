@@ -255,7 +255,7 @@ Claude Agent SDK execution are not included in this release.
 
 | Variable | Type | Default | Description |
 |---|---|---|---|
-| `TRACING_BACKEND` | string | `console` | Backend: `console`, `langfuse`, `otlp` |
+| `TRACING_BACKEND` | string | `console` | Backend: `none`, `console`, `langfuse`, `otlp` |
 
 ### Langfuse (if TRACING_BACKEND=langfuse)
 

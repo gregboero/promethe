@@ -368,8 +368,8 @@ Promethe is developed in a private monorepo and exported to the public repositor
 # Compile everything
 ./gradlew build
 
-# Unit tests (360+ tests)
-./gradlew shared:jvmTest
+# Unit, contract, security, and golden evaluation tests
+./gradlew api:jvmTest evals:test shared:jvmTest gateway:test composeApp:desktopTest
 
 # Fat JAR (standalone gateway)
 ./gradlew gateway:shadowJar
