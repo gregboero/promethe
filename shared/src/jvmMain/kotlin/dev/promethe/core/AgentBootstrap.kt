@@ -272,6 +272,7 @@ object AgentBootstrap {
                 hookManager = hookManager,
                 approvalGate = approvalGate,
                 sandboxCommandExecutor = sandboxCommandRunner,
+                toolIntentLedger = PersistentToolIntentLedger(database),
             )
 
         val localCodingAgentService =

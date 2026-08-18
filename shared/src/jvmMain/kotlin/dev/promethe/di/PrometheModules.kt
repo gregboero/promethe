@@ -41,7 +41,14 @@ val coreModule = module {
 // ═══════════════════════════════════════════════════════════════
 val agentModule = module {
     // ActionExecutor — needs HttpClient + config + hookManager
-    single { ActionExecutor(get(), get(), hookManager = get()) }
+    single {
+        ActionExecutor(
+            config = get(),
+            httpClient = get(),
+            hookManager = get(),
+            toolIntentLedger = PersistentToolIntentLedger(get()),
+        )
+    }
 
     // Skills
     single { SkillLoader(getFileSystem(), get(named("skillsDir"))) }

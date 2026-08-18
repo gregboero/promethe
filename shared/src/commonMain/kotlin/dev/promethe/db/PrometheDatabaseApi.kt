@@ -3,6 +3,8 @@ package dev.promethe.db
 import dev.promethe.api.ReasoningEffort
 import dev.promethe.api.AgentRunRecord
 import dev.promethe.api.AgentRunStatus
+import dev.promethe.api.ToolIntentRecord
+import dev.promethe.api.ToolIntentStatus
 
 /**
  * Platform-agnostic database interface consumed by core classes in commonMain.
@@ -34,6 +36,30 @@ interface PrometheDatabaseApi {
     suspend fun getAgentRun(runId: String): AgentRunRecord? = null
 
     suspend fun getAgentRunsByStatus(statuses: Set<AgentRunStatus>): List<AgentRunRecord> = emptyList()
+
+    // ── Tool intents ──
+    suspend fun insertToolIntent(intent: ToolIntentRecord): Boolean = true
+
+    suspend fun transitionToolIntent(
+        intentId: String,
+        expectedStatuses: Set<ToolIntentStatus>,
+        status: ToolIntentStatus,
+        resultHash: String?,
+        errorCode: String?,
+        startedAt: Long?,
+        finishedAt: Long?,
+        updatedAt: Long,
+    ): Boolean = true
+
+    suspend fun resetToolIntentForRetry(
+        intentId: String,
+        expectedStatuses: Set<ToolIntentStatus>,
+        updatedAt: Long,
+    ): Boolean = true
+
+    suspend fun getToolIntentByIdempotencyKeyHash(idempotencyKeyHash: String): ToolIntentRecord? = null
+
+    suspend fun getToolIntentsByStatus(statuses: Set<ToolIntentStatus>): List<ToolIntentRecord> = emptyList()
 
     // ── Projects ──
     suspend fun insertProject(project: ProjectRow) = Unit

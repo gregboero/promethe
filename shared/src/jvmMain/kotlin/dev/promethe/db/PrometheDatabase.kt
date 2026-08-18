@@ -2,6 +2,8 @@ package dev.promethe.db
 
 import dev.promethe.api.AgentRunRecord
 import dev.promethe.api.AgentRunStatus
+import dev.promethe.api.ToolIntentRecord
+import dev.promethe.api.ToolIntentStatus
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.jdbc.*
@@ -26,6 +28,7 @@ class PrometheDatabase(
             @Suppress("DEPRECATION")
             SchemaUtils.createMissingTablesAndColumns(
                 AgentRuns,
+                ToolIntents,
                 Projects,
                 Sessions,
                 Messages,
@@ -218,6 +221,98 @@ class PrometheDatabase(
                 .where { AgentRuns.status inList statuses.map(AgentRunStatus::name) }
                 .orderBy(AgentRuns.updatedAt, SortOrder.ASC)
                 .map { it.toAgentRunRecord() }
+        }
+
+    // ===== TOOL INTENTS =====
+
+    override suspend fun insertToolIntent(intent: ToolIntentRecord): Boolean =
+        dbQuery {
+            ToolIntents
+                .insertIgnore {
+                    it[intentId] = intent.intentId
+                    it[idempotencyKeyHash] = intent.idempotencyKeyHash
+                    it[invocationHash] = intent.invocationHash
+                    it[runId] = intent.runId
+                    it[stepId] = intent.stepId
+                    it[sessionId] = intent.sessionId
+                    it[toolName] = intent.toolName
+                    it[risk] = intent.risk.name
+                    it[status] = intent.status.name
+                    it[resultHash] = intent.resultHash
+                    it[errorCode] = intent.errorCode
+                    it[createdAt] = intent.createdAt
+                    it[startedAt] = intent.startedAt
+                    it[finishedAt] = intent.finishedAt
+                    it[updatedAt] = intent.updatedAt
+                }.insertedCount > 0
+        }
+
+    override suspend fun transitionToolIntent(
+        intentId: String,
+        expectedStatuses: Set<ToolIntentStatus>,
+        status: ToolIntentStatus,
+        resultHash: String?,
+        errorCode: String?,
+        startedAt: Long?,
+        finishedAt: Long?,
+        updatedAt: Long,
+    ): Boolean =
+        dbQuery {
+            if (expectedStatuses.isEmpty()) return@dbQuery false
+            ToolIntents.update(
+                where = {
+                    (ToolIntents.intentId eq intentId) and
+                        (ToolIntents.status inList expectedStatuses.map(ToolIntentStatus::name))
+                },
+            ) {
+                it[ToolIntents.status] = status.name
+                it[ToolIntents.resultHash] = resultHash
+                it[ToolIntents.errorCode] = errorCode
+                if (startedAt != null) it[ToolIntents.startedAt] = startedAt
+                it[ToolIntents.finishedAt] = finishedAt
+                it[ToolIntents.updatedAt] = updatedAt
+            } > 0
+        }
+
+    override suspend fun getToolIntentByIdempotencyKeyHash(idempotencyKeyHash: String): ToolIntentRecord? =
+        dbQuery {
+            ToolIntents
+                .selectAll()
+                .where { ToolIntents.idempotencyKeyHash eq idempotencyKeyHash }
+                .singleOrNull()
+                ?.toToolIntentRecord()
+        }
+
+    override suspend fun resetToolIntentForRetry(
+        intentId: String,
+        expectedStatuses: Set<ToolIntentStatus>,
+        updatedAt: Long,
+    ): Boolean =
+        dbQuery {
+            if (expectedStatuses.isEmpty()) return@dbQuery false
+            ToolIntents.update(
+                where = {
+                    (ToolIntents.intentId eq intentId) and
+                        (ToolIntents.status inList expectedStatuses.map(ToolIntentStatus::name))
+                },
+            ) {
+                it[status] = ToolIntentStatus.PREPARED.name
+                it[resultHash] = null
+                it[errorCode] = null
+                it[startedAt] = null
+                it[finishedAt] = null
+                it[ToolIntents.updatedAt] = updatedAt
+            } > 0
+        }
+
+    override suspend fun getToolIntentsByStatus(statuses: Set<ToolIntentStatus>): List<ToolIntentRecord> =
+        dbQuery {
+            if (statuses.isEmpty()) return@dbQuery emptyList()
+            ToolIntents
+                .selectAll()
+                .where { ToolIntents.status inList statuses.map(ToolIntentStatus::name) }
+                .orderBy(ToolIntents.updatedAt, SortOrder.ASC)
+                .map { it.toToolIntentRecord() }
         }
 
     // ===== PROJECTS =====
@@ -1157,6 +1252,25 @@ private fun ResultRow.toAgentRunRecord() =
         startedAt = this[AgentRuns.startedAt],
         finishedAt = this[AgentRuns.finishedAt],
         updatedAt = this[AgentRuns.updatedAt],
+    )
+
+private fun ResultRow.toToolIntentRecord() =
+    ToolIntentRecord(
+        intentId = this[ToolIntents.intentId],
+        idempotencyKeyHash = this[ToolIntents.idempotencyKeyHash],
+        invocationHash = this[ToolIntents.invocationHash],
+        runId = this[ToolIntents.runId],
+        stepId = this[ToolIntents.stepId],
+        sessionId = this[ToolIntents.sessionId],
+        toolName = this[ToolIntents.toolName],
+        risk = dev.promethe.api.ToolRisk.valueOf(this[ToolIntents.risk]),
+        status = ToolIntentStatus.valueOf(this[ToolIntents.status]),
+        resultHash = this[ToolIntents.resultHash],
+        errorCode = this[ToolIntents.errorCode],
+        createdAt = this[ToolIntents.createdAt],
+        startedAt = this[ToolIntents.startedAt],
+        finishedAt = this[ToolIntents.finishedAt],
+        updatedAt = this[ToolIntents.updatedAt],
     )
 
 private fun ResultRow.toProjectRow() =
