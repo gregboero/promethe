@@ -27,6 +27,33 @@ object AgentRuns : Table("agent_runs") {
     }
 }
 
+/** tool_intents — durable idempotency boundary around tool side effects. */
+object ToolIntents : Table("tool_intents") {
+    val intentId = varchar("intent_id", 160)
+    val idempotencyKeyHash = varchar("idempotency_key_hash", 64)
+    val invocationHash = varchar("invocation_hash", 64)
+    val runId = varchar("run_id", 160).nullable()
+    val stepId = varchar("step_id", 200).nullable()
+    val sessionId = varchar("session_id", 255)
+    val toolName = varchar("tool_name", 255)
+    val risk = varchar("risk", 32)
+    val status = varchar("status", 32)
+    val resultHash = varchar("result_hash", 64).nullable()
+    val errorCode = varchar("error_code", 128).nullable()
+    val createdAt = long("created_at")
+    val startedAt = long("started_at").nullable()
+    val finishedAt = long("finished_at").nullable()
+    val updatedAt = long("updated_at")
+
+    override val primaryKey = PrimaryKey(intentId)
+
+    init {
+        uniqueIndex(idempotencyKeyHash)
+        index(isUnique = false, runId)
+        index(isUnique = false, status)
+    }
+}
+
 /** projects — durable work contexts grouping sessions, memory and a workspace. */
 object Projects : Table("projects") {
     val id = varchar("id", 64)

@@ -255,6 +255,25 @@ class SerializationRoundTripTest {
         )
 
     @Test
+    fun toolIntentRecord() =
+        assertRoundTrip(
+            ToolIntentRecord(
+                intentId = "tool-12345678",
+                idempotencyKeyHash = "a".repeat(64),
+                invocationHash = "b".repeat(64),
+                runId = "run-12345678",
+                stepId = "run-12345678-step-0001",
+                sessionId = "session-1",
+                toolName = "send_message",
+                risk = ToolRisk.EXTERNAL_EFFECT,
+                status = ToolIntentStatus.EXECUTING,
+                createdAt = 100,
+                startedAt = 101,
+                updatedAt = 101,
+            ),
+        )
+
+    @Test
     fun gepaOptimizeRequest() = assertRoundTrip(GepaOptimizeRequest(maxGenerations = 5, populationSize = 8))
 
     @Test

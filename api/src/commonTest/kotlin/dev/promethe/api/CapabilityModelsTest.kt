@@ -33,6 +33,7 @@ class CapabilityModelsTest {
                 sessionId = "session-1",
                 runId = "run-12345678",
                 stepId = "run-12345678-step-0001",
+                idempotencyKey = "search-promethe-1",
             )
 
         val encoded = Json.encodeToString(ToolInvocation.serializer(), invocation)

@@ -84,4 +84,5 @@ data class ToolInvocation(
     val workspaceRelativePath: String? = null,
     val runId: String? = null,
     val stepId: String? = null,
+    val idempotencyKey: String? = null,
 )

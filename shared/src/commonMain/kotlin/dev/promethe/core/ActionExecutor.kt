@@ -11,8 +11,10 @@ import dev.promethe.core.hooks.HookResult
 import dev.promethe.core.sandbox.SandboxCommandExecutor
 import dev.promethe.core.sandbox.renderCommandOutput
 import io.ktor.client.*
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.*
+import kotlin.time.Clock
 
 /**
  * Dangerous commands that should never be executed locally.
@@ -76,7 +78,10 @@ class ActionExecutor(
     private val hookManager: HookManager? = null,
     private val approvalGate: ApprovalGate? = null,
     private val sandboxCommandExecutor: SandboxCommandExecutor? = null,
+    private val toolIntentLedger: ToolIntentLedger = NoOpToolIntentLedger,
 ) : SecureToolExecutor {
+    private val logger = Log.create("ActionExecutor")
+
     /** Shared Koog-compatible serializer backed by kotlinx-serialization. */
     private val koogSerializer = KotlinxSerializer()
 
@@ -132,9 +137,8 @@ class ActionExecutor(
             request.runId?.let { setAttribute("promethe.run.id", it) }
             request.stepId?.let { setAttribute("promethe.step.id", it) }
 
-            if (toolName == "discord_policy" && request.origin !in ownerPolicyOrigins) {
-                return@span "[BLOCKED] Discord policy administration is restricted to owner conversations"
-            }
+            val policy = ToolApprovalPolicy.evaluate(toolName, args)
+            setAttribute("tool.risk", policy.risk.name)
 
             // ── DEDUP CHECK — return cached result for identical read-only calls ──
             if (toolName in dedupSafeTools) {
@@ -142,6 +146,33 @@ class ActionExecutor(
                 dedupCache[cacheKey]?.let { cached ->
                     return@span "$cached\n\n[NOTE: Cached result — you already called this tool with identical arguments. Use the information above to formulate your response.]"
                 }
+            }
+
+            val intentId =
+                try {
+                    when (
+                        val admission =
+                            toolIntentLedger.prepare(
+                                request = request,
+                                risk = policy.risk,
+                                now = Clock.System.now().toEpochMilliseconds(),
+                            )
+                    ) {
+                        is ToolIntentAdmission.Proceed -> admission.intentId
+                        is ToolIntentAdmission.Replay -> return@span admission.message
+                        is ToolIntentAdmission.Denied -> return@span "[BLOCKED] ${admission.message}"
+                    }
+                } catch (error: Exception) {
+                    logger.error(error) { "Tool intent ledger unavailable for '$toolName'" }
+                    if (policy.risk != ToolRisk.READ) {
+                        return@span "[BLOCKED] The durable tool intent ledger is unavailable"
+                    }
+                    null
+                }
+
+            if (toolName == "discord_policy" && request.origin !in ownerPolicyOrigins) {
+                recordBlocked(intentId, "owner_policy_required")
+                return@span "[BLOCKED] Discord policy administration is restricted to owner conversations"
             }
 
             // ── BEFORE_TOOL_CALL hook ──
@@ -152,22 +183,29 @@ class ActionExecutor(
                         toolName = toolName,
                         toolArgs = args,
                     )
-                val hookResult = hookManager.fire(beforeCtx)
+                val hookResult =
+                    try {
+                        hookManager.fire(beforeCtx)
+                    } catch (error: Exception) {
+                        withContext(NonCancellable) { recordBlocked(intentId, "hook_failed") }
+                        throw error
+                    }
                 if (hookResult is HookResult.Abort) {
+                    recordBlocked(intentId, "hook_aborted")
                     return@span "[BLOCKED] ${hookResult.reason}"
                 }
             }
 
             // ── APPROVAL GATE — human-in-the-loop for dangerous tools ──
-            val policy = ToolApprovalPolicy.evaluate(toolName, args)
             val unconfinedFileAccess =
                 toolName in fileAccessTools && sandboxCommandExecutor?.hasUnconfinedFileAccess() == true
             if (unconfinedFileAccess && request.origin !in localInteractiveOrigins) {
+                recordBlocked(intentId, "remote_full_file_access")
                 return@span "[BLOCKED] Full local file access is unavailable from ${request.origin.name.lowercase()}"
             }
             val requiresMandatoryApproval = policy.mandatoryApproval || unconfinedFileAccess
-            setAttribute("tool.risk", policy.risk.name)
             if (requiresMandatoryApproval && approvalGate == null) {
+                recordBlocked(intentId, "approval_service_required")
                 return@span "[BLOCKED] A human approval service is required for '$toolName'"
             }
             if (approvalGate != null) {
@@ -180,12 +218,33 @@ class ActionExecutor(
                             ""
                         }
                 val approvalResult =
-                    if (requiresMandatoryApproval) {
-                        approvalGate.checkMandatory(toolName, canonicalArguments, request.sessionId)
-                    } else {
-                        approvalGate.check(toolName, canonicalArguments, request.sessionId)
+                    try {
+                        if (requiresMandatoryApproval) {
+                            approvalGate.checkMandatory(toolName, canonicalArguments, request.sessionId)
+                        } else {
+                            approvalGate.check(toolName, canonicalArguments, request.sessionId)
+                        }
+                    } catch (error: Exception) {
+                        withContext(NonCancellable) { recordBlocked(intentId, "approval_interrupted") }
+                        throw error
                     }
-                if (!approvalResult.allowed) return@span "[BLOCKED] Approval denied: ${approvalResult.reason}"
+                if (!approvalResult.allowed) {
+                    recordBlocked(intentId, "approval_denied")
+                    return@span "[BLOCKED] Approval denied: ${approvalResult.reason}"
+                }
+            }
+
+            if (intentId != null) {
+                val executionClaimed =
+                    runCatching {
+                        toolIntentLedger.markExecuting(intentId, Clock.System.now().toEpochMilliseconds())
+                    }.getOrElse { error ->
+                        logger.error(error) { "Failed to claim tool intent '$intentId'" }
+                        false
+                    }
+                if (!executionClaimed) {
+                    return@span "[BLOCKED] This tool intent is no longer eligible for execution"
+                }
             }
 
             val result =
@@ -254,6 +313,7 @@ class ActionExecutor(
 
             setAttribute("tool.result.length", finalResult.length)
             setAttribute("tool.success", !finalResult.startsWith("[ERROR]") && !finalResult.startsWith("[BLOCKED]"))
+            recordOutcome(intentId, finalResult)
 
             // ── STORE in dedup cache for safe tools ──
             if (toolName in dedupSafeTools && !finalResult.startsWith("[ERROR]") && !finalResult.startsWith("[BLOCKED]")) {
@@ -262,6 +322,42 @@ class ActionExecutor(
 
             finalResult
         }
+    }
+
+    private suspend fun recordBlocked(
+        intentId: String?,
+        errorCode: String,
+    ) {
+        if (intentId == null) return
+        runCatching {
+            toolIntentLedger.markBlocked(intentId, errorCode, Clock.System.now().toEpochMilliseconds())
+        }.onFailure { error ->
+            logger.error(error) { "Failed to mark tool intent '$intentId' as blocked" }
+        }
+    }
+
+    private suspend fun recordOutcome(
+        intentId: String?,
+        result: String,
+    ) {
+        if (intentId == null) return
+        val now = Clock.System.now().toEpochMilliseconds()
+        val recorded =
+            runCatching {
+                when {
+                    result.startsWith("[BLOCKED]") -> toolIntentLedger.markBlocked(intentId, "tool_blocked", now)
+
+                    result.startsWith("[ERROR]") ||
+                        result.startsWith("Error:") ||
+                        result.startsWith("[SANDBOX") -> toolIntentLedger.markFailed(intentId, "tool_failed", now)
+
+                    else -> toolIntentLedger.markSucceeded(intentId, result, now)
+                }
+            }.getOrElse { error ->
+                logger.error(error) { "Failed to finish tool intent '$intentId'" }
+                false
+            }
+        if (!recorded) logger.warn { "Tool intent '$intentId' did not accept its terminal transition" }
     }
 
     private val processBackedTools =
