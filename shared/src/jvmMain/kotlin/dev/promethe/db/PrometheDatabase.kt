@@ -1,10 +1,15 @@
 package dev.promethe.db
 
+import dev.promethe.api.AgentApprovalScope
+import dev.promethe.api.AgentRunEventRecord
+import dev.promethe.api.AgentRunEventType
 import dev.promethe.api.AgentRunRecord
 import dev.promethe.api.AgentRunStatus
 import dev.promethe.api.ToolIntentRecord
 import dev.promethe.api.ToolIntentStatus
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.jdbc.*
 import org.jetbrains.exposed.v1.jdbc.transactions.experimental.newSuspendedTransaction
@@ -19,6 +24,8 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 class PrometheDatabase(
     private val db: Database,
 ) : PrometheDatabaseApi {
+    private val eventWriteMutex = Mutex()
+
     /**
      * Initialize schema: create tables + FTS5 index + sync triggers.
      * Called once at startup by [DatabaseFactory].
@@ -29,6 +36,7 @@ class PrometheDatabase(
             SchemaUtils.createMissingTablesAndColumns(
                 AgentRuns,
                 ToolIntents,
+                AgentRunEvents,
                 Projects,
                 Sessions,
                 Messages,
@@ -136,9 +144,12 @@ class PrometheDatabase(
 
     // ===== AGENT RUNS =====
 
-    override suspend fun insertAgentRun(run: AgentRunRecord): Boolean =
-        dbQuery {
-            AgentRuns
+    override suspend fun insertAgentRun(
+        run: AgentRunRecord,
+        event: AgentRunEventRecord?,
+    ): Boolean =
+        eventDbQuery {
+            val inserted = AgentRuns
                 .insertIgnore {
                     it[runId] = run.runId
                     it[parentRunId] = run.parentRunId
@@ -154,6 +165,10 @@ class PrometheDatabase(
                     it[finishedAt] = run.finishedAt
                     it[updatedAt] = run.updatedAt
                 }.insertedCount > 0
+            if (inserted && event != null) {
+                check(appendAgentRunEventInTransaction(event)) { "Failed to append agent run start event" }
+            }
+            inserted
         }
 
     override suspend fun transitionAgentRun(
@@ -166,10 +181,11 @@ class PrometheDatabase(
         startedAt: Long?,
         finishedAt: Long?,
         updatedAt: Long,
+        event: AgentRunEventRecord?,
     ): Boolean =
-        dbQuery {
-            if (expectedStatuses.isEmpty()) return@dbQuery false
-            AgentRuns.update(
+        eventDbQuery {
+            if (expectedStatuses.isEmpty()) return@eventDbQuery false
+            val updated = AgentRuns.update(
                 where = {
                     (AgentRuns.runId eq runId) and
                         (AgentRuns.status inList expectedStatuses.map(AgentRunStatus::name))
@@ -183,6 +199,10 @@ class PrometheDatabase(
                 it[AgentRuns.finishedAt] = finishedAt
                 it[AgentRuns.updatedAt] = updatedAt
             } > 0
+            if (updated && event != null) {
+                check(appendAgentRunEventInTransaction(event)) { "Failed to append agent run transition event" }
+            }
+            updated
         }
 
     override suspend fun updateAgentRunProgress(
@@ -190,9 +210,10 @@ class PrometheDatabase(
         stepCount: Int,
         lastStepId: String,
         updatedAt: Long,
+        event: AgentRunEventRecord?,
     ): Boolean =
-        dbQuery {
-            AgentRuns.update(
+        eventDbQuery {
+            val updated = AgentRuns.update(
                 where = {
                     (AgentRuns.runId eq runId) and
                         (AgentRuns.status eq AgentRunStatus.RUNNING.name)
@@ -202,6 +223,10 @@ class PrometheDatabase(
                 it[AgentRuns.lastStepId] = lastStepId
                 it[AgentRuns.updatedAt] = updatedAt
             } > 0
+            if (updated && event != null) {
+                check(appendAgentRunEventInTransaction(event)) { "Failed to append agent run step event" }
+            }
+            updated
         }
 
     override suspend fun getAgentRun(runId: String): AgentRunRecord? =
@@ -223,11 +248,25 @@ class PrometheDatabase(
                 .map { it.toAgentRunRecord() }
         }
 
+    override suspend fun appendAgentRunEvent(event: AgentRunEventRecord): Boolean = eventDbQuery { appendAgentRunEventInTransaction(event) }
+
+    override suspend fun getAgentRunEvents(runId: String): List<AgentRunEventRecord> =
+        dbQuery {
+            AgentRunEvents
+                .selectAll()
+                .where { AgentRunEvents.runId eq runId }
+                .orderBy(AgentRunEvents.sequence, SortOrder.ASC)
+                .map { it.toAgentRunEventRecord() }
+        }
+
     // ===== TOOL INTENTS =====
 
-    override suspend fun insertToolIntent(intent: ToolIntentRecord): Boolean =
-        dbQuery {
-            ToolIntents
+    override suspend fun insertToolIntent(
+        intent: ToolIntentRecord,
+        event: AgentRunEventRecord?,
+    ): Boolean =
+        eventDbQuery {
+            val inserted = ToolIntents
                 .insertIgnore {
                     it[intentId] = intent.intentId
                     it[idempotencyKeyHash] = intent.idempotencyKeyHash
@@ -245,6 +284,10 @@ class PrometheDatabase(
                     it[finishedAt] = intent.finishedAt
                     it[updatedAt] = intent.updatedAt
                 }.insertedCount > 0
+            if (inserted && event != null) {
+                check(appendAgentRunEventInTransaction(event)) { "Failed to append tool intent event" }
+            }
+            inserted
         }
 
     override suspend fun transitionToolIntent(
@@ -256,10 +299,11 @@ class PrometheDatabase(
         startedAt: Long?,
         finishedAt: Long?,
         updatedAt: Long,
+        event: AgentRunEventRecord?,
     ): Boolean =
-        dbQuery {
-            if (expectedStatuses.isEmpty()) return@dbQuery false
-            ToolIntents.update(
+        eventDbQuery {
+            if (expectedStatuses.isEmpty()) return@eventDbQuery false
+            val updated = ToolIntents.update(
                 where = {
                     (ToolIntents.intentId eq intentId) and
                         (ToolIntents.status inList expectedStatuses.map(ToolIntentStatus::name))
@@ -272,6 +316,10 @@ class PrometheDatabase(
                 it[ToolIntents.finishedAt] = finishedAt
                 it[ToolIntents.updatedAt] = updatedAt
             } > 0
+            if (updated && event != null) {
+                check(appendAgentRunEventInTransaction(event)) { "Failed to append tool intent transition event" }
+            }
+            updated
         }
 
     override suspend fun getToolIntentByIdempotencyKeyHash(idempotencyKeyHash: String): ToolIntentRecord? =
@@ -283,14 +331,24 @@ class PrometheDatabase(
                 ?.toToolIntentRecord()
         }
 
+    override suspend fun getToolIntent(intentId: String): ToolIntentRecord? =
+        dbQuery {
+            ToolIntents
+                .selectAll()
+                .where { ToolIntents.intentId eq intentId }
+                .singleOrNull()
+                ?.toToolIntentRecord()
+        }
+
     override suspend fun resetToolIntentForRetry(
         intentId: String,
         expectedStatuses: Set<ToolIntentStatus>,
         updatedAt: Long,
+        event: AgentRunEventRecord?,
     ): Boolean =
-        dbQuery {
-            if (expectedStatuses.isEmpty()) return@dbQuery false
-            ToolIntents.update(
+        eventDbQuery {
+            if (expectedStatuses.isEmpty()) return@eventDbQuery false
+            val updated = ToolIntents.update(
                 where = {
                     (ToolIntents.intentId eq intentId) and
                         (ToolIntents.status inList expectedStatuses.map(ToolIntentStatus::name))
@@ -303,6 +361,10 @@ class PrometheDatabase(
                 it[finishedAt] = null
                 it[ToolIntents.updatedAt] = updatedAt
             } > 0
+            if (updated && event != null) {
+                check(appendAgentRunEventInTransaction(event)) { "Failed to append tool intent retry event" }
+            }
+            updated
         }
 
     override suspend fun getToolIntentsByStatus(statuses: Set<ToolIntentStatus>): List<ToolIntentRecord> =
@@ -1220,10 +1282,54 @@ class PrometheDatabase(
                 }
         }
 
+    private fun appendAgentRunEventInTransaction(event: AgentRunEventRecord): Boolean {
+        require(event.eventId.isNotBlank()) { "Agent run event ID must not be blank" }
+        require(event.runId.isNotBlank()) { "Agent run event run ID must not be blank" }
+        require(event.sequence == 0L) { "Agent run event sequence is assigned by the database" }
+
+        val maxSequence = AgentRunEvents.sequence.max()
+        val currentSequence =
+            AgentRunEvents
+                .select(maxSequence)
+                .where { AgentRunEvents.runId eq event.runId }
+                .singleOrNull()
+                ?.get(maxSequence) ?: 0L
+        val nextSequence = currentSequence + 1L
+        return AgentRunEvents
+            .insertIgnore {
+                it[eventId] = event.eventId
+                it[runId] = event.runId
+                it[sequence] = nextSequence
+                it[eventType] = event.type.name
+                it[parentRunId] = event.parentRunId
+                it[sessionId] = event.sessionId
+                it[origin] = event.origin
+                it[projectId] = event.projectId
+                it[stepId] = event.stepId
+                it[stepCount] = event.stepCount
+                it[intentId] = event.intentId
+                it[idempotencyKeyHash] = event.idempotencyKeyHash
+                it[invocationHash] = event.invocationHash
+                it[toolName] = event.toolName
+                it[risk] = event.risk?.name
+                it[runStatus] = event.runStatus?.name
+                it[intentStatus] = event.intentStatus?.name
+                it[resultHash] = event.resultHash
+                it[errorCode] = event.errorCode
+                it[approvalId] = event.approvalId
+                it[approvalAllowed] = event.approvalAllowed
+                it[approvalScope] = event.approvalScope?.name
+                it[createdAt] = event.createdAt
+                it[eventVersion] = event.eventVersion
+            }.insertedCount > 0
+    }
+
     // ===== HELPERS =====
 
     @Suppress("DEPRECATION")
     private suspend fun <T> dbQuery(block: Transaction.() -> T): T = newSuspendedTransaction(Dispatchers.IO, db) { block() }
+
+    private suspend fun <T> eventDbQuery(block: Transaction.() -> T): T = eventWriteMutex.withLock { dbQuery(block) }
 }
 
 // ===== EXTENSION MAPPERS =====
@@ -1271,6 +1377,34 @@ private fun ResultRow.toToolIntentRecord() =
         startedAt = this[ToolIntents.startedAt],
         finishedAt = this[ToolIntents.finishedAt],
         updatedAt = this[ToolIntents.updatedAt],
+    )
+
+private fun ResultRow.toAgentRunEventRecord() =
+    AgentRunEventRecord(
+        eventId = this[AgentRunEvents.eventId],
+        runId = this[AgentRunEvents.runId],
+        sequence = this[AgentRunEvents.sequence],
+        type = AgentRunEventType.valueOf(this[AgentRunEvents.eventType]),
+        parentRunId = this[AgentRunEvents.parentRunId],
+        sessionId = this[AgentRunEvents.sessionId],
+        origin = this[AgentRunEvents.origin],
+        projectId = this[AgentRunEvents.projectId],
+        stepId = this[AgentRunEvents.stepId],
+        stepCount = this[AgentRunEvents.stepCount],
+        intentId = this[AgentRunEvents.intentId],
+        idempotencyKeyHash = this[AgentRunEvents.idempotencyKeyHash],
+        invocationHash = this[AgentRunEvents.invocationHash],
+        toolName = this[AgentRunEvents.toolName],
+        risk = this[AgentRunEvents.risk]?.let(dev.promethe.api.ToolRisk::valueOf),
+        runStatus = this[AgentRunEvents.runStatus]?.let(AgentRunStatus::valueOf),
+        intentStatus = this[AgentRunEvents.intentStatus]?.let(ToolIntentStatus::valueOf),
+        resultHash = this[AgentRunEvents.resultHash],
+        errorCode = this[AgentRunEvents.errorCode],
+        approvalId = this[AgentRunEvents.approvalId],
+        approvalAllowed = this[AgentRunEvents.approvalAllowed],
+        approvalScope = this[AgentRunEvents.approvalScope]?.let(AgentApprovalScope::valueOf),
+        createdAt = this[AgentRunEvents.createdAt],
+        eventVersion = this[AgentRunEvents.eventVersion],
     )
 
 private fun ResultRow.toProjectRow() =

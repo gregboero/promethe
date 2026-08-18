@@ -1,6 +1,7 @@
 package dev.promethe.core
 
 import dev.promethe.api.SandboxedExecutionResult
+import dev.promethe.api.AgentRunEventType
 import dev.promethe.api.ToolIntentStatus
 import dev.promethe.core.sandbox.SandboxCommandExecutor
 import dev.promethe.db.DatabaseFactory
@@ -104,6 +105,20 @@ class ToolIntentLedgerTest {
             assertTrue(executor.execute(request).startsWith("[IDEMPOTENT]"))
             assertEquals(1, commandExecutor.count)
             assertEquals(1, database.getToolIntentsByStatus(setOf(ToolIntentStatus.SUCCEEDED)).size)
+            val runId = requireNotNull(request.runId)
+            assertEquals(
+                listOf(
+                    AgentRunEventType.INTENT_PROPOSED,
+                    AgentRunEventType.APPROVAL_RESOLVED,
+                    AgentRunEventType.TOOL_STARTED,
+                    AgentRunEventType.TOOL_COMPLETED,
+                ),
+                database.getAgentRunEvents(runId).map { it.type },
+            )
+            assertEquals(
+                database.getToolIntentsByStatus(setOf(ToolIntentStatus.SUCCEEDED)).single(),
+                PersistentRunEventLedger(database).reconstructToolIntents(runId).single(),
+            )
         }
 
     private fun request(

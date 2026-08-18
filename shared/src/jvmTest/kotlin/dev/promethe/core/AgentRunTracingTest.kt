@@ -82,6 +82,7 @@ class AgentRunTracingTest {
                 assertEquals(AgentRunStatus.SUCCEEDED, persistedRun.status)
                 assertEquals(3, persistedRun.stepCount)
                 assertEquals("trace-run-0001-step-0003", persistedRun.lastStepId)
+                assertEquals(persistedRun, PersistentRunEventLedger(database).reconstructRun("trace-run-0001"))
 
                 val failedEvents =
                     service.execute(
@@ -95,6 +96,7 @@ class AgentRunTracingTest {
                 val failedRun = assertNotNull(database.getAgentRun("trace-failed-0001"))
                 assertEquals(AgentRunStatus.FAILED, failedRun.status)
                 assertEquals("empty_input", failedRun.errorCode)
+                assertEquals(failedRun, PersistentRunEventLedger(database).reconstructRun("trace-failed-0001"))
 
                 val spans = exporter.finishedSpanItems
                 val runSpan = spans.single { it.name == "agent.run" }
@@ -140,6 +142,7 @@ class AgentRunTracingTest {
                 collection.cancelAndJoin()
                 val cancelledRun = assertNotNull(database.getAgentRun("trace-cancelled-0001"))
                 assertEquals(AgentRunStatus.CANCELLED, cancelledRun.status)
+                assertEquals(cancelledRun, PersistentRunEventLedger(database).reconstructRun("trace-cancelled-0001"))
             } finally {
                 Tracing.telemetry = previousTelemetry
                 httpClient.close()

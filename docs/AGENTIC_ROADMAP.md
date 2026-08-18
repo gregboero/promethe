@@ -75,7 +75,7 @@ Une technologie n'est promue que si elle possède un propriétaire, des métriqu
 | Domaine | État vérifié | Diagnostic |
 |---|---|---|
 | Boucle agentique | `EXISTANT` | [`AIAgent.executeLoop`](../shared/src/commonMain/kotlin/dev/promethe/core/AIAgent.kt#L51) reste une boucle impérative limitée à dix itérations. Une migration progressive vers un graphe est possible ; une réécriture totale immédiate serait risquée. |
-| Run ledger et checkpoints | `PARTIEL` | `AgentExecutionService` persiste l'identité, l'origine, la progression et l'état terminal dans `agent_runs`. `ActionExecutor` persiste désormais chaque intention, son empreinte, sa clé d'idempotence et ses transitions terminales dans `tool_intents`, en refusant de rejouer une exécution à l'issue incertaine. Un checkpoint est aussi enregistré après les outils, mais seulement avec l'itération, l'entrée courante et `isComplete`. Il manque encore le journal d'événements append-only, les décisions d'approbation durables et l'`ArtifactStore`. |
+| Run ledger et checkpoints | `PARTIEL` | `AgentExecutionService` persiste l'identité, l'origine, la progression et l'état terminal dans `agent_runs`. `ActionExecutor` persiste chaque intention, son empreinte, sa clé d'idempotence et ses transitions terminales dans `tool_intents`, en refusant de rejouer une exécution à l'issue incertaine. `agent_run_events` conserve maintenant un journal append-only ordonné des runs, étapes, intentions, décisions d'approbation et outils sans contenu sensible ; les snapshots peuvent être reconstruits depuis ces événements. Un checkpoint est aussi enregistré après les outils, mais seulement avec l'itération, l'entrée courante et `isComplete`. Il manque encore la reprise par événement et l'`ArtifactStore`. |
 | Approbation et politique | `EXISTANT` | [`ActionExecutor`](../shared/src/commonMain/kotlin/dev/promethe/core/ActionExecutor.kt#L155) classe le risque et impose l'approbation obligatoire. [`ToolApprovalGate`](../shared/src/jvmMain/kotlin/dev/promethe/core/ToolApprovalGate.kt#L136) ne permet pas au mode `auto` de contourner `checkMandatory`. |
 | Sandbox | `EXISTANT` | Sandbox native Rust, politique réseau et racines canoniques. WASI ou microVM seraient des backends supplémentaires, pas des remplacements immédiats. Voir [SANDBOX.md](SANDBOX.md). |
 | Contexte | `PARTIEL` | [`ContextCompressor`](../shared/src/commonMain/kotlin/dev/promethe/core/ContextCompressor.kt#L42) compresse l'historique et [`ToolOutputPruner`](../shared/src/commonMain/kotlin/dev/promethe/core/ToolOutputPruner.kt#L34) réduit les sorties. Les données brutes ne sont pas reliées à un magasin d'artefacts durable. |
@@ -90,7 +90,7 @@ Une technologie n'est promue que si elle possède un propriétaire, des métriqu
 | Voix temps réel | `EXISTANT` | OpenAI Realtime et Gemini Live implémentent WebSocket, audio bidirectionnel, outils et interruption : [`OpenAIRealtimeRelay`](../gateway/src/jvmMain/kotlin/dev/promethe/gateway/voice/OpenAIRealtimeRelay.kt#L16), [`GeminiLiveRelay`](../gateway/src/jvmMain/kotlin/dev/promethe/gateway/voice/GeminiLiveRelay.kt#L20). Le besoin est la certification, pas une réécriture. |
 | A2UI | `EXISTANT` | Registre de composants et état dynamique sont présents dans [`A2UIRegistry`](../composeApp/src/commonMain/kotlin/dev/promethe/app/a2ui/A2UIRegistry.kt#L12). Les composants générés doivent rester déclaratifs et whitelistés. |
 | Computer use visuel | `PARTIEL` | Le navigateur sait utiliser des sélecteurs et prendre une capture. `browser_vision` n'est plus enregistré comme outil tant qu'aucune inférence visuelle n'est réellement exécutée. |
-| Bus d'événements | `PARTIEL` | [`AgentEventBus`](../gateway/src/jvmMain/kotlin/dev/promethe/gateway/AgentEventBus.kt#L16) diffuse en mémoire vers les WebSockets. Ce n'est ni un journal durable ni un runtime actor/event-sourced. |
+| Bus d'événements | `PARTIEL` | [`AgentEventBus`](../gateway/src/jvmMain/kotlin/dev/promethe/gateway/AgentEventBus.kt#L16) diffuse en mémoire vers les WebSockets, tandis que `agent_run_events` fournit l'historique durable des exécutions. Il manque encore la projection temps réel depuis ce journal et un runtime actor supervisé. |
 
 ## 5. Architecture cible
 
@@ -379,8 +379,8 @@ Backends optionnels :
 
 **Durée indicative : 6 à 8 semaines. Priorité P0-P1.**
 
-1. Étendre le premier `RunLedger` persistant avec les IDs d'intention et un journal append-only des transitions d'outil.
-2. Ajouter les clés d'idempotence et états d'outil persistants.
+1. **FAIT** — Étendre le premier `RunLedger` persistant avec les IDs d'intention et un journal append-only des transitions d'outil.
+2. **FAIT** — Ajouter les clés d'idempotence et états d'outil persistants.
 3. Envelopper `executeLoop` dans le premier `ExecutionGraph` sans big bang.
 4. Créer `ResourceGovernor` global et propagation des budgets aux sous-agents.
 5. Introduire `ArtifactStore` et observations référencées par hash.
