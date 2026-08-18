@@ -237,6 +237,24 @@ class SerializationRoundTripTest {
         )
 
     @Test
+    fun agentRunRecord() =
+        assertRoundTrip(
+            AgentRunRecord(
+                runId = "run-12345678",
+                parentRunId = "run-parent-12345678",
+                sessionId = "session-1",
+                origin = "A2A",
+                projectId = "project-1",
+                status = AgentRunStatus.RUNNING,
+                stepCount = 2,
+                lastStepId = "run-12345678-step-0002",
+                createdAt = 100,
+                startedAt = 101,
+                updatedAt = 110,
+            ),
+        )
+
+    @Test
     fun gepaOptimizeRequest() = assertRoundTrip(GepaOptimizeRequest(maxGenerations = 5, populationSize = 8))
 
     @Test

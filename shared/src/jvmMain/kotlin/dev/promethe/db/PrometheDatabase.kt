@@ -1,5 +1,7 @@
 package dev.promethe.db
 
+import dev.promethe.api.AgentRunRecord
+import dev.promethe.api.AgentRunStatus
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.jdbc.*
@@ -23,6 +25,7 @@ class PrometheDatabase(
         transaction(db) {
             @Suppress("DEPRECATION")
             SchemaUtils.createMissingTablesAndColumns(
+                AgentRuns,
                 Projects,
                 Sessions,
                 Messages,
@@ -127,6 +130,95 @@ class PrometheDatabase(
             }
         }
     }
+
+    // ===== AGENT RUNS =====
+
+    override suspend fun insertAgentRun(run: AgentRunRecord): Boolean =
+        dbQuery {
+            AgentRuns
+                .insertIgnore {
+                    it[runId] = run.runId
+                    it[parentRunId] = run.parentRunId
+                    it[sessionId] = run.sessionId
+                    it[origin] = run.origin
+                    it[projectId] = run.projectId
+                    it[status] = run.status.name
+                    it[stepCount] = run.stepCount
+                    it[lastStepId] = run.lastStepId
+                    it[errorCode] = run.errorCode
+                    it[createdAt] = run.createdAt
+                    it[startedAt] = run.startedAt
+                    it[finishedAt] = run.finishedAt
+                    it[updatedAt] = run.updatedAt
+                }.insertedCount > 0
+        }
+
+    override suspend fun transitionAgentRun(
+        runId: String,
+        expectedStatuses: Set<AgentRunStatus>,
+        status: AgentRunStatus,
+        stepCount: Int,
+        lastStepId: String?,
+        errorCode: String?,
+        startedAt: Long?,
+        finishedAt: Long?,
+        updatedAt: Long,
+    ): Boolean =
+        dbQuery {
+            if (expectedStatuses.isEmpty()) return@dbQuery false
+            AgentRuns.update(
+                where = {
+                    (AgentRuns.runId eq runId) and
+                        (AgentRuns.status inList expectedStatuses.map(AgentRunStatus::name))
+                },
+            ) {
+                it[AgentRuns.status] = status.name
+                it[AgentRuns.stepCount] = stepCount
+                it[AgentRuns.lastStepId] = lastStepId
+                it[AgentRuns.errorCode] = errorCode
+                if (startedAt != null) it[AgentRuns.startedAt] = startedAt
+                it[AgentRuns.finishedAt] = finishedAt
+                it[AgentRuns.updatedAt] = updatedAt
+            } > 0
+        }
+
+    override suspend fun updateAgentRunProgress(
+        runId: String,
+        stepCount: Int,
+        lastStepId: String,
+        updatedAt: Long,
+    ): Boolean =
+        dbQuery {
+            AgentRuns.update(
+                where = {
+                    (AgentRuns.runId eq runId) and
+                        (AgentRuns.status eq AgentRunStatus.RUNNING.name)
+                },
+            ) {
+                it[AgentRuns.stepCount] = stepCount
+                it[AgentRuns.lastStepId] = lastStepId
+                it[AgentRuns.updatedAt] = updatedAt
+            } > 0
+        }
+
+    override suspend fun getAgentRun(runId: String): AgentRunRecord? =
+        dbQuery {
+            AgentRuns
+                .selectAll()
+                .where { AgentRuns.runId eq runId }
+                .singleOrNull()
+                ?.toAgentRunRecord()
+        }
+
+    override suspend fun getAgentRunsByStatus(statuses: Set<AgentRunStatus>): List<AgentRunRecord> =
+        dbQuery {
+            if (statuses.isEmpty()) return@dbQuery emptyList()
+            AgentRuns
+                .selectAll()
+                .where { AgentRuns.status inList statuses.map(AgentRunStatus::name) }
+                .orderBy(AgentRuns.updatedAt, SortOrder.ASC)
+                .map { it.toAgentRunRecord() }
+        }
 
     // ===== PROJECTS =====
 
@@ -1048,6 +1140,23 @@ private fun ResultRow.toSessionRow() =
         metadata = this[Sessions.metadata],
         title = this[Sessions.title],
         projectId = this[Sessions.projectId],
+    )
+
+private fun ResultRow.toAgentRunRecord() =
+    AgentRunRecord(
+        runId = this[AgentRuns.runId],
+        parentRunId = this[AgentRuns.parentRunId],
+        sessionId = this[AgentRuns.sessionId],
+        origin = this[AgentRuns.origin],
+        projectId = this[AgentRuns.projectId],
+        status = AgentRunStatus.valueOf(this[AgentRuns.status]),
+        stepCount = this[AgentRuns.stepCount],
+        lastStepId = this[AgentRuns.lastStepId],
+        errorCode = this[AgentRuns.errorCode],
+        createdAt = this[AgentRuns.createdAt],
+        startedAt = this[AgentRuns.startedAt],
+        finishedAt = this[AgentRuns.finishedAt],
+        updatedAt = this[AgentRuns.updatedAt],
     )
 
 private fun ResultRow.toProjectRow() =

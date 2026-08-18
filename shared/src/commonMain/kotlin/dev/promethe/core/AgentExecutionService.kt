@@ -1,12 +1,18 @@
 package dev.promethe.core
 
 import dev.promethe.api.ACTIVE_PROJECT_SETTING_KEY
+import dev.promethe.api.AgentRunRecord
+import dev.promethe.api.AgentRunStatus
 import dev.promethe.db.PrometheDatabaseApi
 import dev.promethe.db.ProjectRow
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonPrimitive
 import kotlin.time.Clock
@@ -82,23 +88,68 @@ class AgentExecutionService(
     private val agent: AIAgent,
     private val database: PrometheDatabaseApi,
     private val executionIdGenerator: ExecutionIdGenerator = DefaultExecutionIdGenerator,
+    private val runLedger: RunLedger = PersistentRunLedger(database),
 ) : AgentExecutionPort {
     private val logger = Log.create("AgentExecutionService")
 
     override fun execute(request: AgentExecutionRequest): Flow<AgentExecutionEvent> {
         var stepCount = 0
+        var lastStepId: String? = null
+        var ledgerStarted = false
+        var terminalRecorded = false
         val generatedRunId = executionIdGenerator.nextId("run")
         val effectiveRunId = request.runId ?: generatedRunId
         return channelFlow {
-            if (!isValidExecutionId(effectiveRunId) ||
-                (request.parentRunId != null && !isValidExecutionId(request.parentRunId))
-            ) {
+            val identityIsValid =
+                isValidExecutionId(effectiveRunId) &&
+                    (request.parentRunId == null || isValidExecutionId(request.parentRunId))
+            val ledgerRunId = effectiveRunId.takeIf(::isValidExecutionId) ?: generatedRunId
+            val createdAt = Clock.System.now().toEpochMilliseconds()
+            try {
+                ledgerStarted =
+                    runLedger.begin(
+                        AgentRunRecord(
+                            runId = ledgerRunId,
+                            parentRunId = request.parentRunId?.takeIf(::isValidExecutionId),
+                            sessionId = request.sessionId,
+                            origin = request.origin.name,
+                            projectId = request.projectId,
+                            status = AgentRunStatus.PENDING,
+                            createdAt = createdAt,
+                            updatedAt = createdAt,
+                        ),
+                    )
+            } catch (error: Exception) {
+                logger.error(error) { "Run ledger initialization failed for $ledgerRunId" }
+                send(
+                    AgentExecutionEvent.Failed(
+                        code = "run_ledger_unavailable",
+                        message = "The durable run ledger is unavailable",
+                        steps = 0,
+                        runId = ledgerRunId,
+                    ),
+                )
+                return@channelFlow
+            }
+            if (!ledgerStarted) {
+                send(
+                    AgentExecutionEvent.Failed(
+                        code = "duplicate_run_id",
+                        message = "The run identifier already exists",
+                        steps = 0,
+                        runId = ledgerRunId,
+                    ),
+                )
+                return@channelFlow
+            }
+            if (!identityIsValid) {
+                terminalRecorded = runLedger.fail(ledgerRunId, 0, null, "invalid_run_identity", createdAt)
                 send(
                     AgentExecutionEvent.Failed(
                         code = "invalid_run_identity",
                         message = "Run identifiers must contain only letters, digits, '.', '_', ':', or '-'",
                         steps = 0,
-                        runId = generatedRunId,
+                        runId = ledgerRunId,
                     ),
                 )
                 return@channelFlow
@@ -106,6 +157,7 @@ class AgentExecutionService(
             val runIdentity = AgentRunIdentity(effectiveRunId, request.parentRunId)
             val input = request.text.trim()
             if (input.isBlank()) {
+                terminalRecorded = runLedger.fail(runIdentity.runId, 0, null, "empty_input", createdAt)
                 send(AgentExecutionEvent.Failed("empty_input", "Agent input must contain text", 0, runIdentity.runId))
                 return@channelFlow
             }
@@ -148,6 +200,10 @@ class AgentExecutionService(
                 ).collect { trajectory ->
                     stepCount++
                     val step = runIdentity.step(stepCount)
+                    lastStepId = step.stepId
+                    if (!runLedger.recordStep(step.runId, step.stepId, step.index, Clock.System.now().toEpochMilliseconds())) {
+                        throw AgentExecutionException("run_ledger_write_failed", "Failed to persist agent step")
+                    }
                     send(AgentExecutionEvent.Step(step.index, trajectory, step.runId, step.stepId))
                     trajectory.outputs["response"]
                         ?.trim()
@@ -162,6 +218,14 @@ class AgentExecutionService(
                     "Agent execution ended without a final response: " +
                         "session=${request.sessionId}, origin=${request.origin}, steps=$stepCount"
                 }
+                terminalRecorded =
+                    runLedger.fail(
+                        runIdentity.runId,
+                        stepCount,
+                        lastStepId,
+                        "missing_final_response",
+                        Clock.System.now().toEpochMilliseconds(),
+                    )
                 send(
                     AgentExecutionEvent.Failed(
                         code = "missing_final_response",
@@ -172,10 +236,35 @@ class AgentExecutionService(
                     ),
                 )
             } else {
+                terminalRecorded =
+                    runLedger.complete(
+                        runIdentity.runId,
+                        stepCount,
+                        lastStepId,
+                        Clock.System.now().toEpochMilliseconds(),
+                    )
+                if (!terminalRecorded) {
+                    throw AgentExecutionException("run_ledger_write_failed", "Failed to complete agent run")
+                }
                 send(AgentExecutionEvent.Completed(response, stepCount, runIdentity.runId))
             }
         }.catch { e ->
             logger.error(e) { "Agent execution failed for session ${request.sessionId}" }
+            if (ledgerStarted && !terminalRecorded) {
+                terminalRecorded =
+                    try {
+                        runLedger.fail(
+                            effectiveRunId.takeIf(::isValidExecutionId) ?: generatedRunId,
+                            stepCount,
+                            lastStepId,
+                            (e as? AgentExecutionException)?.code ?: "agent_execution_failed",
+                            Clock.System.now().toEpochMilliseconds(),
+                        )
+                    } catch (ledgerError: Exception) {
+                        logger.error(ledgerError) { "Failed to persist terminal run failure" }
+                        false
+                    }
+            }
             emit(
                 AgentExecutionEvent.Failed(
                     code = (e as? AgentExecutionException)?.code ?: "agent_execution_failed",
@@ -183,10 +272,21 @@ class AgentExecutionService(
                     steps = stepCount,
                     runId = effectiveRunId.takeIf(::isValidExecutionId) ?: generatedRunId,
                     stepId =
-                        stepCount.takeIf { it > 0 }
-                            ?.let { index -> "$effectiveRunId-step-${index.toString().padStart(4, '0')}" },
+                    lastStepId,
                 ),
             )
+        }.onCompletion { cause ->
+            if (cause is CancellationException && ledgerStarted && !terminalRecorded) {
+                withContext(NonCancellable) {
+                    terminalRecorded =
+                        runLedger.cancel(
+                            effectiveRunId.takeIf(::isValidExecutionId) ?: generatedRunId,
+                            stepCount,
+                            lastStepId,
+                            Clock.System.now().toEpochMilliseconds(),
+                        )
+                }
+            }
         }
     }
 

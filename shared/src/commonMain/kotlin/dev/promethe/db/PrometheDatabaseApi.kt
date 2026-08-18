@@ -1,12 +1,40 @@
 package dev.promethe.db
 
 import dev.promethe.api.ReasoningEffort
+import dev.promethe.api.AgentRunRecord
+import dev.promethe.api.AgentRunStatus
 
 /**
  * Platform-agnostic database interface consumed by core classes in commonMain.
  * The actual implementation (Exposed) lives in jvmMain.
  */
 interface PrometheDatabaseApi {
+    // ── Agent runs ──
+    suspend fun insertAgentRun(run: AgentRunRecord): Boolean = true
+
+    suspend fun transitionAgentRun(
+        runId: String,
+        expectedStatuses: Set<AgentRunStatus>,
+        status: AgentRunStatus,
+        stepCount: Int,
+        lastStepId: String?,
+        errorCode: String?,
+        startedAt: Long?,
+        finishedAt: Long?,
+        updatedAt: Long,
+    ): Boolean = true
+
+    suspend fun updateAgentRunProgress(
+        runId: String,
+        stepCount: Int,
+        lastStepId: String,
+        updatedAt: Long,
+    ): Boolean = true
+
+    suspend fun getAgentRun(runId: String): AgentRunRecord? = null
+
+    suspend fun getAgentRunsByStatus(statuses: Set<AgentRunStatus>): List<AgentRunRecord> = emptyList()
+
     // ── Projects ──
     suspend fun insertProject(project: ProjectRow) = Unit
 

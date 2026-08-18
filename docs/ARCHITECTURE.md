@@ -111,6 +111,7 @@ flowchart LR
 
 | Table | Role |
 |---|---|
+| AgentRuns | Durable run lifecycle, parent identity, progress and terminal state |
 | Sessions | Conversation sessions |
 | Projects | Durable project instructions, workspace and memory namespace |
 | Messages | Messages (FTS5 indexing) |

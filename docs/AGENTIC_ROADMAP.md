@@ -21,6 +21,7 @@ Promethe possède déjà des bases solides : boucle agentique, outils typés, ap
 
 La priorité n'est toutefois pas d'ajouter du quantique, des essaims ou de l'auto-modification. La Phase 0 a posé les premières fondations du **harness de preuve** : evals-as-code, golden sets, identifiants de run/step et traces OpenTelemetry. Les déficits restants sont notamment :
 
+- `agent_runs` persiste désormais le cycle `PENDING` → `RUNNING` → terminal, mais les intentions et effets d'outils ne sont pas encore journalisés en append-only ;
 - les checkpoints ne journalisent pas assez d'état pour garantir une reprise sans double effet ;
 - les sorties d'outils sont tronquées sans `ArtifactStore` durable ;
 - les propositions de curation de skills ne disposent pas encore d'un workflow persistant de revue/promotion ;
@@ -74,7 +75,7 @@ Une technologie n'est promue que si elle possède un propriétaire, des métriqu
 | Domaine | État vérifié | Diagnostic |
 |---|---|---|
 | Boucle agentique | `EXISTANT` | [`AIAgent.executeLoop`](../shared/src/commonMain/kotlin/dev/promethe/core/AIAgent.kt#L51) reste une boucle impérative limitée à dix itérations. Une migration progressive vers un graphe est possible ; une réécriture totale immédiate serait risquée. |
-| Checkpoints | `PARTIEL` | Un checkpoint est enregistré après les outils, mais seulement avec l'itération, l'entrée courante et `isComplete` ([sauvegarde](../shared/src/commonMain/kotlin/dev/promethe/core/AIAgent.kt#L356)). Il manque l'intention d'outil, son statut, la clé d'idempotence, les artefacts et les décisions d'approbation. |
+| Run ledger et checkpoints | `PARTIEL` | `AgentExecutionService` persiste l'identité, l'origine, la progression et l'état terminal dans `agent_runs`. Un checkpoint est aussi enregistré après les outils, mais seulement avec l'itération, l'entrée courante et `isComplete`. Il manque encore le journal append-only des intentions, statuts d'outil, clés d'idempotence, artefacts et décisions d'approbation. |
 | Approbation et politique | `EXISTANT` | [`ActionExecutor`](../shared/src/commonMain/kotlin/dev/promethe/core/ActionExecutor.kt#L155) classe le risque et impose l'approbation obligatoire. [`ToolApprovalGate`](../shared/src/jvmMain/kotlin/dev/promethe/core/ToolApprovalGate.kt#L136) ne permet pas au mode `auto` de contourner `checkMandatory`. |
 | Sandbox | `EXISTANT` | Sandbox native Rust, politique réseau et racines canoniques. WASI ou microVM seraient des backends supplémentaires, pas des remplacements immédiats. Voir [SANDBOX.md](SANDBOX.md). |
 | Contexte | `PARTIEL` | [`ContextCompressor`](../shared/src/commonMain/kotlin/dev/promethe/core/ContextCompressor.kt#L42) compresse l'historique et [`ToolOutputPruner`](../shared/src/commonMain/kotlin/dev/promethe/core/ToolOutputPruner.kt#L34) réduit les sorties. Les données brutes ne sont pas reliées à un magasin d'artefacts durable. |
@@ -378,7 +379,7 @@ Backends optionnels :
 
 **Durée indicative : 6 à 8 semaines. Priorité P0-P1.**
 
-1. Introduire `RunLedger` et les IDs de run/step/intent.
+1. Étendre le premier `RunLedger` persistant avec les IDs d'intention et un journal append-only des transitions d'outil.
 2. Ajouter les clés d'idempotence et états d'outil persistants.
 3. Envelopper `executeLoop` dans le premier `ExecutionGraph` sans big bang.
 4. Créer `ResourceGovernor` global et propagation des budgets aux sous-agents.

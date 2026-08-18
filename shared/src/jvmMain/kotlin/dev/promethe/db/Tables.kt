@@ -2,6 +2,31 @@ package dev.promethe.db
 
 import org.jetbrains.exposed.v1.core.Table
 
+/** agent_runs — durable lifecycle state for each entry into the agent loop. */
+object AgentRuns : Table("agent_runs") {
+    val runId = varchar("run_id", 160)
+    val parentRunId = varchar("parent_run_id", 160).nullable()
+    val sessionId = varchar("session_id", 255)
+    val origin = varchar("origin", 64)
+    val projectId = varchar("project_id", 64).nullable()
+    val status = varchar("status", 32)
+    val stepCount = integer("step_count").default(0)
+    val lastStepId = varchar("last_step_id", 200).nullable()
+    val errorCode = varchar("error_code", 128).nullable()
+    val createdAt = long("created_at")
+    val startedAt = long("started_at").nullable()
+    val finishedAt = long("finished_at").nullable()
+    val updatedAt = long("updated_at")
+
+    override val primaryKey = PrimaryKey(runId)
+
+    init {
+        index(isUnique = false, sessionId)
+        index(isUnique = false, status)
+        index(isUnique = false, parentRunId)
+    }
+}
+
 /** projects — durable work contexts grouping sessions, memory and a workspace. */
 object Projects : Table("projects") {
     val id = varchar("id", 64)

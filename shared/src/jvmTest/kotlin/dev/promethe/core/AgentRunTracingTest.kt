@@ -2,6 +2,7 @@ package dev.promethe.core
 
 import dev.promethe.api.ReasoningEffort
 import ai.koog.agents.core.tools.ToolDescriptor
+import dev.promethe.api.AgentRunStatus
 import dev.promethe.db.DatabaseFactory
 import io.ktor.client.HttpClient
 import io.opentelemetry.api.common.AttributeKey
@@ -14,7 +15,12 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 
 class AgentRunTracingTest {
@@ -72,6 +78,24 @@ class AgentRunTracingTest {
                     ).toList()
 
                 assertTrue(events.last() is AgentExecutionEvent.Completed, events.joinToString())
+                val persistedRun = assertNotNull(database.getAgentRun("trace-run-0001"))
+                assertEquals(AgentRunStatus.SUCCEEDED, persistedRun.status)
+                assertEquals(3, persistedRun.stepCount)
+                assertEquals("trace-run-0001-step-0003", persistedRun.lastStepId)
+
+                val failedEvents =
+                    service.execute(
+                        AgentExecutionRequest(
+                            sessionId = "trace-session",
+                            text = " ",
+                            runId = "trace-failed-0001",
+                        ),
+                    ).toList()
+                assertTrue(failedEvents.last() is AgentExecutionEvent.Failed)
+                val failedRun = assertNotNull(database.getAgentRun("trace-failed-0001"))
+                assertEquals(AgentRunStatus.FAILED, failedRun.status)
+                assertEquals("empty_input", failedRun.errorCode)
+
                 val spans = exporter.finishedSpanItems
                 val runSpan = spans.single { it.name == "agent.run" }
                 val llmSpans = spans.filter { it.name == "gen_ai.chat" }
@@ -88,6 +112,34 @@ class AgentRunTracingTest {
                     assertNotNull(span.attributes.long("gen_ai.usage.completion_tokens"))
                     assertNotNull(span.attributes.double("gen_ai.usage.cost"))
                 }
+
+                val cancellingAdapter = CancellingAdapter(config)
+                val cancellingAgent =
+                    AIAgent(
+                        config = config,
+                        database = database,
+                        llmAdapter = cancellingAdapter,
+                        profileManager = ProfileManager(null),
+                        actionExecutor = actionExecutor,
+                        skillLoader = SkillLoader(getFileSystem(), skillsDirectory),
+                        trajectoryEvaluator = TrajectoryEvaluator(cancellingAdapter, config),
+                        skillWriter = SkillWriter(getFileSystem(), skillsDirectory),
+                    )
+                val cancellingService = AgentExecutionService(cancellingAgent, database)
+                val collection =
+                    launch {
+                        cancellingService.execute(
+                            AgentExecutionRequest(
+                                sessionId = "trace-session",
+                                text = "Wait for cancellation.",
+                                runId = "trace-cancelled-0001",
+                            ),
+                        ).collect()
+                    }
+                cancellingAdapter.started.await()
+                collection.cancelAndJoin()
+                val cancelledRun = assertNotNull(database.getAgentRun("trace-cancelled-0001"))
+                assertEquals(AgentRunStatus.CANCELLED, cancelledRun.status)
             } finally {
                 Tracing.telemetry = previousTelemetry
                 httpClient.close()
@@ -95,6 +147,27 @@ class AgentRunTracingTest {
                 profileDirectory.toFile().deleteRecursively()
             }
         }
+}
+
+private class CancellingAdapter(
+    config: AgentConfig,
+) : KoogLlmAdapter(config) {
+    val started = CompletableDeferred<Unit>()
+
+    override suspend fun completeWithProfile(
+        systemPrompt: String,
+        messages: List<Pair<String, String>>,
+        provider: String,
+        model: String,
+        temperature: Double,
+        tools: List<ToolDescriptor>,
+        context: LlmRequestContext?,
+        pendingToolTurn: PendingToolTurn?,
+        reasoningEffort: ReasoningEffort,
+    ): LlmResponse {
+        started.complete(Unit)
+        awaitCancellation()
+    }
 }
 
 private class TracedScriptedAdapter(
