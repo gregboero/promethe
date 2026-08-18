@@ -970,7 +970,6 @@ class SettingsViewModel(
 
         val MEMORY_PROVIDERS = listOf("embedded", "honcho", "tencent")
         val EXECUTION_BACKENDS = listOf("local", "docker", "ssh", "daytona")
-        val TRACING_BACKENDS = listOf("console", "langfuse", "otlp")
         val APPROVAL_MODES = listOf("auto", "dangerous", "all")
         val THEMES = listOf("system", "dark", "light")
     }

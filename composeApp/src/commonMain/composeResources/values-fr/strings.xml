@@ -278,7 +278,6 @@
     <string name="settings_observability_title">Observabilité</string>
     <string name="settings_observability_description">Traçage et monitoring</string>
     <string name="settings_observability_tracing_label">Backend de traçage</string>
-    <string name="settings_observability_tracy_warning">⚠️ L\'export de traces est actuellement désactivé (le plugin Tracy est incompatible avec Kotlin 2.4.0). Les spans sont enregistrés mais non exportés. La configuration prendra effet lorsque le support Tracy sera rétabli.</string>
     <string name="settings_observability_langfuse_public_label">Langfuse Public Key</string>
     <string name="settings_observability_langfuse_secret_label">Langfuse Secret Key</string>
     <string name="settings_observability_langfuse_host_label">Langfuse Host</string>

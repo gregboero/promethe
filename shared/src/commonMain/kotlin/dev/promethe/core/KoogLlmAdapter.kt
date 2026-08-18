@@ -337,6 +337,9 @@ open class KoogLlmAdapter(
             setAttribute("gen_ai.request.model", model)
             setAttribute("gen_ai.request.temperature", temperature)
             setAttribute("gen_ai.request.message_count", messages.size)
+            context?.runId?.let { setAttribute("promethe.run.id", it) }
+            context?.parentRunId?.let { setAttribute("promethe.run.parent_id", it) }
+            context?.stepId?.let { setAttribute("promethe.step.id", it) }
 
             // Build prompt (with system prompt caching)
             val prompt = buildCachedPrompt(systemPrompt, messages, pendingToolTurn)

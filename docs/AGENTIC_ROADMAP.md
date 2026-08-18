@@ -19,14 +19,13 @@ Les estimations de durée supposent une petite équipe de deux développeurs, av
 
 Promethe possède déjà des bases solides : boucle agentique, outils typés, approbation humaine obligatoire pour les effets externes, sandbox native, mémoire multi-fournisseur, profils et skills, orchestration multi-agent, checkpoints, A2UI, MCP, voix temps réel et tests de sécurité.
 
-La priorité n'est toutefois pas d'ajouter du quantique, des essaims ou de l'auto-modification. Le principal déficit est le **harness de preuve** autour de ces capacités :
+La priorité n'est toutefois pas d'ajouter du quantique, des essaims ou de l'auto-modification. La Phase 0 a posé les premières fondations du **harness de preuve** : evals-as-code, golden sets, identifiants de run/step et traces OpenTelemetry. Les déficits restants sont notamment :
 
-- l'observabilité est actuellement un no-op sur JVM ;
 - les checkpoints ne journalisent pas assez d'état pour garantir une reprise sans double effet ;
 - les sorties d'outils sont tronquées sans `ArtifactStore` durable ;
-- les skills peuvent être supprimés sur la seule note d'un LLM ;
-- le « vote » multi-agent choisit la réponse la plus longue ;
-- `BrowserVisionTool` ne transmet pas réellement la capture à un modèle visuel ;
+- les propositions de curation de skills ne disposent pas encore d'un workflow persistant de revue/promotion ;
+- la synthèse multi-agent n'a pas encore de juge fondé sur des preuves ;
+- `browser_vision` reste indisponible tant qu'aucun VLM n'analyse réellement la capture ;
 - MCP doit suivre la spécification 2026 plutôt que développer `sampling` et `roots`, désormais dépréciés.
 
 La stratégie recommandée est donc :
@@ -81,15 +80,15 @@ Une technologie n'est promue que si elle possède un propriétaire, des métriqu
 | Contexte | `PARTIEL` | [`ContextCompressor`](../shared/src/commonMain/kotlin/dev/promethe/core/ContextCompressor.kt#L42) compresse l'historique et [`ToolOutputPruner`](../shared/src/commonMain/kotlin/dev/promethe/core/ToolOutputPruner.kt#L34) réduit les sorties. Les données brutes ne sont pas reliées à un magasin d'artefacts durable. |
 | Routage LLM | `PARTIEL` | [`MultiModelRouter`](../shared/src/commonMain/kotlin/dev/promethe/core/MultiModelRouter.kt#L26) route par profil/fournisseur et construit des fallbacks, mais ne choisit pas encore selon risque, coût, latence ou difficulté. |
 | Budget autonome | `PARTIEL` | `AutonomousExecutor` contrôle tokens, coût, itérations et durée. Le budget n'est pas encore un gouverneur global commun à chaque appel LLM, outil et sous-agent. |
-| Skills et GEPA | `PARTIEL` | Loader, writer, synthèse et évolution existent. [`SkillCurator`](../shared/src/commonMain/kotlin/dev/promethe/core/SkillCurator.kt#L43) peut toutefois fusionner ou supprimer un skill sur similarité Jaccard et note LLM, sans contrat ni benchmark. |
+| Skills et GEPA | `PARTIEL` | Loader, writer, synthèse et évolution existent. [`SkillCurator`](../shared/src/commonMain/kotlin/dev/promethe/core/SkillCurator.kt) ne modifie plus les skills : il retourne des propositions en quarantaine. Il manque encore le workflow persistant de revue, les contrats et benchmarks de promotion. |
 | Évaluation de trajectoire | `PARTIEL` | [`TrajectoryEvaluator`](../shared/src/commonMain/kotlin/dev/promethe/core/TrajectoryEvaluator.kt#L25) juge surtout le nombre d'outils, l'absence de chaîne `[ERROR]` et l'existence d'une réponse. Ce n'est pas une validation comportementale. |
-| Multi-agent | `PARTIEL` | [`AgentOrchestrator`](../shared/src/jvmMain/kotlin/dev/promethe/core/AgentOrchestrator.kt#L19) gère délégation et concurrence. Le mode `vote` de [`MixtureOfAgentsTool`](../shared/src/jvmMain/kotlin/dev/promethe/core/tools/builtin/AgentTools2.kt#L167) retourne simplement la réponse la plus longue. |
+| Multi-agent | `PARTIEL` | [`AgentOrchestrator`](../shared/src/jvmMain/kotlin/dev/promethe/core/AgentOrchestrator.kt#L19) gère délégation et concurrence. Le pseudo-mode `vote` a été retiré ; `best_of` et `merge` restent disponibles sans prétendre fournir un consensus vérifié. |
 | Mémoire | `PARTIEL` | Mémoire L0-L3, namespaces, confiance et backends multiples. Pas de temps de validité, temps de transaction, supersession ou provenance complète. Voir [MEMORY.md](MEMORY.md). |
-| Observabilité | `PARTIEL` | L'API de spans existe, mais [`Tracing.jvm.kt`](../shared/src/jvmMain/kotlin/dev/promethe/core/Tracing.jvm.kt#L5) est un no-op depuis le passage à Kotlin 2.4. Les dépendances Tracy sont commentées. |
+| Observabilité | `PARTIEL` | [`Tracing.jvm.kt`](../shared/src/jvmMain/kotlin/dev/promethe/core/Tracing.jvm.kt) utilise désormais OpenTelemetry avec export console, OTLP ou Langfuse, propagation coroutine et filtrage des contenus sensibles. Les métriques durables et SLO restent à compléter. |
 | MCP | `PARTIEL` | Stdio, SSE et Streamable HTTP, découverte et proxy d'outils sont présents dans [`McpBridge`](../shared/src/commonMain/kotlin/dev/promethe/core/McpBridge.kt#L23). Il manque l'alignement complet sur MCP 2026-07-28. |
 | Voix temps réel | `EXISTANT` | OpenAI Realtime et Gemini Live implémentent WebSocket, audio bidirectionnel, outils et interruption : [`OpenAIRealtimeRelay`](../gateway/src/jvmMain/kotlin/dev/promethe/gateway/voice/OpenAIRealtimeRelay.kt#L16), [`GeminiLiveRelay`](../gateway/src/jvmMain/kotlin/dev/promethe/gateway/voice/GeminiLiveRelay.kt#L20). Le besoin est la certification, pas une réécriture. |
 | A2UI | `EXISTANT` | Registre de composants et état dynamique sont présents dans [`A2UIRegistry`](../composeApp/src/commonMain/kotlin/dev/promethe/app/a2ui/A2UIRegistry.kt#L12). Les composants générés doivent rester déclaratifs et whitelistés. |
-| Computer use visuel | `PARTIEL` | Le navigateur sait utiliser des sélecteurs et prendre une capture. [`BrowserVisionTool`](../shared/src/jvmMain/kotlin/dev/promethe/core/tools/builtin/BrowserTools.kt#L223) ne fait cependant qu'indiquer la taille de la capture ; aucune inférence visuelle n'est exécutée. |
+| Computer use visuel | `PARTIEL` | Le navigateur sait utiliser des sélecteurs et prendre une capture. `browser_vision` n'est plus enregistré comme outil tant qu'aucune inférence visuelle n'est réellement exécutée. |
 | Bus d'événements | `PARTIEL` | [`AgentEventBus`](../gateway/src/jvmMain/kotlin/dev/promethe/gateway/AgentEventBus.kt#L16) diffuse en mémoire vers les WebSockets. Ce n'est ni un journal durable ni un runtime actor/event-sourced. |
 
 ## 5. Architecture cible

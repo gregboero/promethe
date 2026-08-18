@@ -18,6 +18,7 @@
 |---|---|---|
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Modules, bootstrap, request flow, DI, persistence | `AgentBootstrap.kt`, `OmnichannelGateway.kt`, `settings.gradle.kts` |
 | [AGENTIC_ROADMAP.md](AGENTIC_ROADMAP.md) | Faisabilité des propositions agentiques 2026 et roadmap d'implémentation | Code actuel, certification et décisions d'architecture |
+| [EVALS.md](EVALS.md) | Evals-as-code, golden sets, adversarial baseline and promotion gates | `api/.../EvalModels.kt`, `evals/` |
 | [architecture.mmd](architecture.mmd) | Mermaid diagram of the full architecture | Same |
 | [MEMORY.md](MEMORY.md) | 4-tier memory (L0-L3), providers, API | `MemoryLayer.kt`, `memory/*.kt`, `MemoryRoutes.kt` |
 | [PROJECTS.md](PROJECTS.md) | Durable project context, workspace, scoped memory and session assignment | `ProjectRoutes.kt`, `AgentExecutionService.kt`, `ProjectsScreen.kt` |
@@ -80,7 +81,7 @@
 | Ktor | 3.5.0 (CIO) | `libs.versions.toml` |
 | Exposed | 1.3.0 | `libs.versions.toml` |
 | Flyway | 12.8.1 | `libs.versions.toml` |
-| Koog SDK | 1.0.0-beta | `libs.versions.toml` |
+| Koog SDK | 1.1.1 stable core / 1.1.1-beta integrations | `libs.versions.toml` |
 | Compose Multiplatform | 1.11.1 | `libs.versions.toml` |
 | SQLite (JDBC) | 3.53.2.0 | `libs.versions.toml` |
 
@@ -90,6 +91,7 @@
 promethe/
 ├── :shared       ← KMP commonMain + jvmMain (core, tools, memory, DB, LLM)
 ├── :api           ← Shared data models and interfaces
+├── :evals         ← Deterministic eval runner, golden sets and adversarial metrics
 ├── :gateway       ← Ktor server (OmnichannelGateway, routes, A2A)
 └── :composeApp    ← Compose Multiplatform UI + unified entry point (Main.kt)
 ```

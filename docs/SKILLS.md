@@ -12,7 +12,7 @@ Skills are reusable blocks of knowledge that Promethe accumulates over the cours
 |---|---|
 | `SkillLoader.kt` | Loads skills, builds a keyword index, manages the cache |
 | `SkillWriter.kt` | Synthesizes new skills from successful trajectories |
-| `SkillCurator.kt` | Scores and prunes skills periodically |
+| `SkillCurator.kt` | Scores skills and emits non-destructive review proposals |
 
 ---
 
@@ -65,11 +65,14 @@ Use `supervisorScope` to isolate child failures…
 
 ## Curation
 
-`SkillCurator` runs periodically to maintain the quality of the corpus:
+`SkillCurator` performs a proposal-only quality pass:
 
-- **Scoring** — Each skill receives a score based on its usage frequency and feedback.
-- **Pruning** — Skills below a score threshold are archived or deleted.
-- **Merging** — Redundant skills can be consolidated.
+- **Scoring** — An LLM grades utility, clarity, specificity, and freshness from 1 to 5.
+- **Low quality** — A score at or below the threshold creates a `REVIEW_LOW_QUALITY` proposal.
+- **Duplicates** — High keyword overlap creates a `REVIEW_DUPLICATE` proposal.
+- **Quarantine** — Proposals are returned with `QUARANTINED` status for explicit review.
+
+The curator never deletes, merges, rewrites, or invalidates a skill. The `merged` and `deleted` API counters remain at zero for backward compatibility.
 
 ---
 
@@ -85,6 +88,7 @@ Base: `/api/v1/skills`
 | `PUT` | `/api/v1/skills/:name` | Updates an existing skill |
 | `DELETE` | `/api/v1/skills/:name` | Deletes a skill |
 | `GET` | `/api/v1/skills/search?q=…` | Searches by keywords |
+| `POST` | `/api/v1/skills/curate` | Scores skills and returns quarantined review proposals |
 
 ---
 

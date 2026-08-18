@@ -29,6 +29,7 @@ promethe/
 │   ├── wasmJsMain/  #   Web entry point
 │   └── iosMain/     #   Swift/Kotlin bridge
 ├── api/             # Shared API models (JVM + wasmJs)
+├── evals/           # Deterministic eval runner, golden sets, adversarial metrics
 └── docs/            # Documentation
 ```
 
@@ -38,8 +39,8 @@ promethe/
 # Compile the whole project
 ./gradlew build
 
-# Unit tests (shared)
-./gradlew shared:jvmTest
+# Unit, contract, security, and golden evaluation tests
+./gradlew api:jvmTest evals:test shared:jvmTest gateway:test
 
 # Run the gateway
 ./gradlew gateway:run
@@ -92,14 +93,7 @@ ktlint_standard_import-ordering = disabled
 
 ## CI Pipeline
 
-The `.github/workflows/ci.yml` file defines 4 jobs:
-
-| Job | Trigger | Description |
-|---|---|---|
-| **test** | push/PR | `shared:jvmTest` |
-| **build** | after test | 5 targets: Desktop, Android, WasmJS, Gateway, iOS |
-| **docker** | main only | Build + push `ghcr.io/.../promethe-gateway:latest` |
-| **desktop-package** | main only | Linux/macOS/Windows installers |
+The `.github/workflows/ci.yml` pipeline compiles the gateway, API, shared core, evals, Desktop and Wasm clients. It runs unit, contract, security, golden eval, Desktop, documentation and lint checks, plus dependency, CodeQL, Trivy and Qodana analysis. Main additionally validates Docker images and desktop packages without publishing them.
 
 ## Practical guides
 
@@ -141,12 +135,14 @@ The `.github/workflows/ci.yml` file defines 4 jobs:
 
 ## Running tests
 
-The suite is split across three modules (~404 tests total):
+The suite is split across four backend modules plus the Desktop client:
 
 ```bash
 ./gradlew shared:jvmTest    # Agent engine, memory providers, tools, tracing (shared/src/jvmTest, shared/src/commonTest)
 ./gradlew gateway:test      # Route/integration tests — routes, rate limiter, MCP, scheduler (gateway/src/test)
 ./gradlew api:jvmTest       # kotlinx-serialization round-trip tests (api/src/commonTest)
+./gradlew evals:test         # Golden sets, eval runner and adversarial baseline (evals/src/test)
+./gradlew composeApp:desktopTest
 
 # E2E tests (requires the gateway to be running)
 ./test-e2e.ps1

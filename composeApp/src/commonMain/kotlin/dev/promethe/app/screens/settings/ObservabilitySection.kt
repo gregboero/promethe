@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -15,11 +14,12 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import promethe.composeapp.generated.resources.*
 
-internal val TRACING_BACKENDS = listOf("console", "langfuse", "otlp")
+internal val TRACING_BACKENDS = listOf("console", "langfuse", "otlp", "none")
 internal val TRACING_BACKEND_LABELS = mapOf(
     "console" to "Console",
     "langfuse" to "Langfuse",
     "otlp" to "OTLP",
+    "none" to "Off",
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,20 +50,6 @@ fun ObservabilitySection(
 
             val currentTracing = TRACING_BACKENDS[state.selectedTracingBackend]
 
-            // Warning: Tracy compiler plugin disabled in v0.1.0
-            AnimatedVisibility(currentTracing != "console") {
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = colors.errorContainer),
-                    modifier = Modifier.fillMaxWidth().testTag("settings_tracy_warning"),
-                ) {
-                    Text(
-                        stringResource(Res.string.settings_observability_tracy_warning),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = colors.onErrorContainer,
-                        modifier = Modifier.padding(12.dp),
-                    )
-                }
-            }
             AnimatedVisibility(currentTracing == "langfuse") {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     OutlinedTextField(

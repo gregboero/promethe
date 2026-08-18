@@ -218,13 +218,15 @@ against the Home Assistant Conversation/REST API.
 
 ## Browser automation
 
-**Tools**: 12 `browser_*` tools, created by `BrowserTools.create(backend)` in
+**Tools**: 11 registered `browser_*` tools, created by `BrowserTools.create(backend)` in
 `promethe/shared/src/jvmMain/kotlin/dev/promethe/core/tools/builtin/BrowserTools.kt`:
 
 Core 6 — `browser_navigate`, `browser_click`, `browser_type`, `browser_extract`,
 `browser_screenshot`, `browser_eval`.
-Extended 6 — `browser_scroll`, `browser_back`, `browser_press`, `browser_get_images`,
-`browser_vision`, `browser_dialog`.
+Extended 5 — `browser_scroll`, `browser_back`, `browser_press`, `browser_get_images`,
+`browser_dialog`.
+
+`browser_vision` is unavailable and intentionally absent from the tool registry until a configured VLM actually analyzes the screenshot.
 
 **Condition**: a `BrowserBackend` must be constructed successfully. `IntegrationRegistrar` picks
 one of two backends based on `BROWSER_BACKEND`:
@@ -260,7 +262,7 @@ browserBackend?.let { backend -> BrowserTools.create(backend).forEach { ToolRegi
 
 If `BROWSER_BACKEND` is anything other than `"browserbase"` (including unset), the registrar falls
 through to the CDP path and requires `BROWSER_CDP_PORT`. If neither path yields a usable backend,
-none of the 12 tools are registered.
+none of the 11 tools are registered.
 
 For driving the Promethe Compose/WASM app itself with a browser agent (Playwright/CDP,
 accessibility tree test tags, JS bridge functions like `prometheLogin`/`prometheNavigate`), see

@@ -129,6 +129,8 @@ class ActionExecutor(
             setAttribute("tool.name", toolName)
             setAttribute("tool.origin", request.origin.name)
             setAttribute("tool.args_keys", args.keys.joinToString(","))
+            request.runId?.let { setAttribute("promethe.run.id", it) }
+            request.stepId?.let { setAttribute("promethe.step.id", it) }
 
             if (toolName == "discord_policy" && request.origin !in ownerPolicyOrigins) {
                 return@span "[BLOCKED] Discord policy administration is restricted to owner conversations"

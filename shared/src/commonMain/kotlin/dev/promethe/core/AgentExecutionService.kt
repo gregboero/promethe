@@ -39,23 +39,32 @@ data class AgentExecutionRequest(
     val channelHint: String = "internal",
     val externalContext: String? = null,
     val projectId: String? = null,
+    val runId: String? = null,
+    val parentRunId: String? = null,
 )
 
 sealed interface AgentExecutionEvent {
+    val runId: String
+
     data class Step(
         val index: Int,
         val trajectory: ConversationTrajectory,
+        override val runId: String,
+        val stepId: String,
     ) : AgentExecutionEvent
 
     data class Completed(
         val response: String,
         val steps: Int,
+        override val runId: String,
     ) : AgentExecutionEvent
 
     data class Failed(
         val code: String,
         val message: String,
         val steps: Int,
+        override val runId: String,
+        val stepId: String? = null,
     ) : AgentExecutionEvent
 }
 
@@ -72,15 +81,32 @@ class AgentExecutionException(
 class AgentExecutionService(
     private val agent: AIAgent,
     private val database: PrometheDatabaseApi,
+    private val executionIdGenerator: ExecutionIdGenerator = DefaultExecutionIdGenerator,
 ) : AgentExecutionPort {
     private val logger = Log.create("AgentExecutionService")
 
     override fun execute(request: AgentExecutionRequest): Flow<AgentExecutionEvent> {
         var stepCount = 0
+        val generatedRunId = executionIdGenerator.nextId("run")
+        val effectiveRunId = request.runId ?: generatedRunId
         return flow {
+            if (!isValidExecutionId(effectiveRunId) ||
+                (request.parentRunId != null && !isValidExecutionId(request.parentRunId))
+            ) {
+                emit(
+                    AgentExecutionEvent.Failed(
+                        code = "invalid_run_identity",
+                        message = "Run identifiers must contain only letters, digits, '.', '_', ':', or '-'",
+                        steps = 0,
+                        runId = generatedRunId,
+                    ),
+                )
+                return@flow
+            }
+            val runIdentity = AgentRunIdentity(effectiveRunId, request.parentRunId)
             val input = request.text.trim()
             if (input.isBlank()) {
-                emit(AgentExecutionEvent.Failed("empty_input", "Agent input must contain text", 0))
+                emit(AgentExecutionEvent.Failed("empty_input", "Agent input must contain text", 0, runIdentity.runId))
                 return@flow
             }
 
@@ -89,28 +115,45 @@ class AgentExecutionService(
             persistHistory(request)
 
             var finalResponse: String? = null
-            agent.executeLoop(
-                sessionId = request.sessionId,
-                userInput = input,
-                overrideProvider = resolved.provider,
-                overrideModel = resolved.model,
-                personaOverlay = resolved.persona,
-                personaSkillNames = resolved.skills,
-                toolCallOrigin = request.origin.toToolCallOrigin(),
-                overrideReasoningEffort = resolved.reasoningEffort,
-                llmRequestContext = LlmRequestContext(request.sessionId, request.origin),
-                externalContext = request.externalContext,
-                projectId = project?.id,
-                projectContext = project?.toPromptContext(),
-                memoryNamespace = project?.memoryNamespace ?: "default",
-                workspaceRelativePath = project?.workspacePath,
-            ).collect { trajectory ->
-                stepCount++
-                emit(AgentExecutionEvent.Step(stepCount, trajectory))
-                trajectory.outputs["response"]
-                    ?.trim()
-                    ?.takeIf { it.isNotBlank() }
-                    ?.let { finalResponse = it }
+            Tracing.span(
+                name = "agent.run",
+                attributes =
+                    buildMap {
+                        put("promethe.run.id", runIdentity.runId)
+                        put("agent.origin", request.origin.name)
+                        runIdentity.parentRunId?.let { put("promethe.run.parent_id", it) }
+                    },
+            ) {
+                agent.executeLoop(
+                    sessionId = request.sessionId,
+                    userInput = input,
+                    overrideProvider = resolved.provider,
+                    overrideModel = resolved.model,
+                    personaOverlay = resolved.persona,
+                    personaSkillNames = resolved.skills,
+                    toolCallOrigin = request.origin.toToolCallOrigin(),
+                    overrideReasoningEffort = resolved.reasoningEffort,
+                    llmRequestContext =
+                        LlmRequestContext(
+                            sessionId = request.sessionId,
+                            origin = request.origin,
+                            runId = runIdentity.runId,
+                            parentRunId = runIdentity.parentRunId,
+                        ),
+                    externalContext = request.externalContext,
+                    projectId = project?.id,
+                    projectContext = project?.toPromptContext(),
+                    memoryNamespace = project?.memoryNamespace ?: "default",
+                    workspaceRelativePath = project?.workspacePath,
+                ).collect { trajectory ->
+                    stepCount++
+                    val step = runIdentity.step(stepCount)
+                    emit(AgentExecutionEvent.Step(step.index, trajectory, step.runId, step.stepId))
+                    trajectory.outputs["response"]
+                        ?.trim()
+                        ?.takeIf { it.isNotBlank() }
+                        ?.let { finalResponse = it }
+                }
             }
 
             val response = finalResponse
@@ -124,10 +167,12 @@ class AgentExecutionService(
                         code = "missing_final_response",
                         message = "The agent completed without producing a final response",
                         steps = stepCount,
+                        runId = runIdentity.runId,
+                        stepId = stepCount.takeIf { it > 0 }?.let(runIdentity::step)?.stepId,
                     ),
                 )
             } else {
-                emit(AgentExecutionEvent.Completed(response, stepCount))
+                emit(AgentExecutionEvent.Completed(response, stepCount, runIdentity.runId))
             }
         }.catch { e ->
             logger.error(e) { "Agent execution failed for session ${request.sessionId}" }
@@ -136,6 +181,10 @@ class AgentExecutionService(
                     code = (e as? AgentExecutionException)?.code ?: "agent_execution_failed",
                     message = e.message ?: "Agent execution failed",
                     steps = stepCount,
+                    runId = effectiveRunId.takeIf(::isValidExecutionId) ?: generatedRunId,
+                    stepId =
+                        stepCount.takeIf { it > 0 }
+                            ?.let { index -> "$effectiveRunId-step-${index.toString().padStart(4, '0')}" },
                 ),
             )
         }

@@ -1,6 +1,7 @@
 package dev.promethe.gateway
 
 import dev.promethe.api.*
+import dev.promethe.core.CurationAction
 import dev.promethe.core.SkillEntry
 import dev.promethe.core.SkillLoader
 import dev.promethe.core.SkillWriter
@@ -198,6 +199,21 @@ fun Route.skillRoutes(
                         .map { "${it.first}: score=${it.second}" },
                     merged = report.merged.size,
                     deleted = report.pruned.size,
+                    proposals =
+                        report.proposals.map { proposal ->
+                            SkillCurationProposalDto(
+                                action =
+                                    when (proposal.action) {
+                                        CurationAction.REVIEW_LOW_QUALITY -> SkillCurationActionDto.REVIEW_LOW_QUALITY
+                                        CurationAction.REVIEW_DUPLICATE -> SkillCurationActionDto.REVIEW_DUPLICATE
+                                    },
+                                skill = proposal.skill,
+                                relatedSkills = proposal.relatedSkills,
+                                score = proposal.score,
+                                similarity = proposal.similarity,
+                                rationale = proposal.rationale,
+                            )
+                        },
                 ),
             )
         } catch (e: Exception) {

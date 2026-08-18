@@ -136,6 +136,11 @@ class AIAgent(
 
             while (!isComplete && iteration < maxIterations) {
                 iteration++
+                val iterationStepId =
+                    llmRequestContext?.runId?.let { runId ->
+                        "$runId-step-${iteration.toString().padStart(4, '0')}"
+                    }
+                val iterationLlmContext = llmRequestContext?.copy(stepId = iterationStepId)
 
                 // Récupérer tout l'historique de la session
                 val history = database.getMessagesForSession(sessionId)
@@ -182,7 +187,7 @@ class AIAgent(
                             overrideProvider = overrideProvider,
                             overrideModel = overrideModel,
                             reasoningEffort = effectiveReasoningEffort,
-                            context = llmRequestContext,
+                            context = iterationLlmContext,
                             pendingToolTurn = pendingToolTurn,
                         )
                     } catch (e: Exception) {
@@ -274,6 +279,8 @@ class AIAgent(
                                     projectId = projectId,
                                     memoryNamespace = memoryNamespace,
                                     workspaceRelativePath = workspaceRelativePath,
+                                    runId = iterationLlmContext?.runId,
+                                    stepId = iterationLlmContext?.stepId,
                                 ),
                             )
                         } catch (e: Exception) {
@@ -416,6 +423,8 @@ class AIAgent(
                                             projectId = projectId,
                                             memoryNamespace = memoryNamespace,
                                             workspaceRelativePath = workspaceRelativePath,
+                                            runId = iterationLlmContext?.runId,
+                                            stepId = iterationLlmContext?.stepId,
                                         ),
                                     )
                                 } catch (e: Exception) {

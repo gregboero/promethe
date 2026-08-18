@@ -99,6 +99,61 @@ class SerializationRoundTripTest {
         assertRoundTrip(UpsertDiscordChannelRuleRequest(projectId = "project-1"))
     }
 
+    @Test
+    fun evalModels() {
+        val assertion =
+            EvalAssertion(
+                id = "contains-answer",
+                kind = EvalAssertionKind.CONTAINS,
+                expected = "42",
+            )
+        val case =
+            EvalCase(
+                id = "answer",
+                capability = "agent",
+                description = "Produces the expected answer",
+                input = "What is six times seven?",
+                assertions = listOf(assertion),
+                tags = setOf("golden"),
+            )
+        val suite = EvalSuite("phase0", 1, "Phase 0 golden set", listOf(case))
+        val assertionResult = EvalAssertionResult(assertion.id, passed = true, actual = "42")
+        val caseResult = EvalCaseResult(case.id, EvalCaseStatus.PASSED, 12, listOf(assertionResult))
+
+        assertRoundTrip(suite)
+        assertRoundTrip(EvalObservation(output = "42", metadata = mapOf("provider" to "fixture")))
+        assertRoundTrip(
+            EvalRun(
+                id = "eval-1",
+                suiteId = suite.id,
+                suiteVersion = suite.version,
+                startedAt = 1,
+                finishedAt = 13,
+                status = EvalRunStatus.PASSED,
+                results = listOf(caseResult),
+            ),
+        )
+    }
+
+    @Test
+    fun skillCurationProposals() {
+        assertRoundTrip(
+            SkillCurationReport(
+                analyzed = 2,
+                issues = listOf("old-skill: score=1"),
+                proposals =
+                    listOf(
+                        SkillCurationProposalDto(
+                            action = SkillCurationActionDto.REVIEW_LOW_QUALITY,
+                            skill = "old-skill",
+                            score = 1,
+                            rationale = "Manual review required",
+                        ),
+                    ),
+            ),
+        )
+    }
+
     // ═══════════════════════════════════════════════════════════════════════════
     // Export Models
     // ═══════════════════════════════════════════════════════════════════════════
@@ -171,7 +226,14 @@ class SerializationRoundTripTest {
     @Test
     fun agentExecutionEvent() =
         assertRoundTrip(
-            AgentExecutionEvent(agentId = "a-1", type = "step", content = "Processing", timestamp = 1718000000000),
+            AgentExecutionEvent(
+                agentId = "a-1",
+                type = "step",
+                content = "Processing",
+                timestamp = 1718000000000,
+                runId = "run-12345678",
+                stepId = "run-12345678-step-0001",
+            ),
         )
 
     @Test

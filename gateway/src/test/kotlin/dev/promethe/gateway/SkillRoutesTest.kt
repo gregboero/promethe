@@ -58,8 +58,7 @@ class SkillRoutesTest {
 
     /**
      * Configures the Ktor test application with ContentNegotiation and
-     * skill routes mounted at /api. SkillCurator is NOT wired (no LLM
-     * in tests) — the curate endpoint is not under test here.
+     * skill routes mounted at /api. Curation uses a deterministic no-op LLM.
      */
     private fun ApplicationTestBuilder.configureApp(
         skillLoader: SkillLoader,
@@ -93,7 +92,6 @@ class SkillRoutesTest {
 
     /**
      * Builds a real [SkillCurator] with a no-op LLM adapter.
-     * Its [curate] method is never called in these tests.
      */
     private fun stubSkillCurator(
         loader: SkillLoader,
@@ -281,5 +279,35 @@ class SkillRoutesTest {
             // Sanitization: lowercase, non-alnum → underscore, collapse, trim
             assertEquals("my_cool_skill", created.name, "Name should be sanitized to lowercase underscored")
             assertEquals("test desc", created.description)
+        }
+
+    @Test
+    fun `POST curate returns quarantined proposals without mutating skills`() =
+        testApplication {
+            val duplicateContent =
+                """
+                ---
+                name: Kotlin Build Guide
+                description: Kotlin compiler and project build instructions
+                ---
+                # Kotlin Build Guide
+                Kotlin compiler project setup and Kotlin build instructions.
+                """.trimIndent()
+            writeSkillDir("kotlin-guide-a", duplicateContent)
+            writeSkillDir("kotlin-guide-b", duplicateContent)
+
+            val loader = SkillLoader(fs, skillsDir)
+            val writer = SkillWriter(fs, skillsDir)
+            configureApp(loader, writer)
+
+            val response = client.post("/api/v1/skills/curate")
+            assertEquals(HttpStatusCode.OK, response.status)
+
+            val report = json.decodeFromString<SkillCurationReport>(response.bodyAsText())
+            assertEquals(0, report.merged)
+            assertEquals(0, report.deleted)
+            assertTrue(report.proposals.any { it.action == SkillCurationActionDto.REVIEW_DUPLICATE })
+            assertTrue(report.proposals.all { it.status == "QUARANTINED" })
+            assertEquals(2, loader.listSkills().size)
         }
 }
