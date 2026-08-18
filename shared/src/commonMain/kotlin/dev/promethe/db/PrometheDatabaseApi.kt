@@ -1,8 +1,9 @@
 package dev.promethe.db
 
-import dev.promethe.api.ReasoningEffort
+import dev.promethe.api.AgentRunEventRecord
 import dev.promethe.api.AgentRunRecord
 import dev.promethe.api.AgentRunStatus
+import dev.promethe.api.ReasoningEffort
 import dev.promethe.api.ToolIntentRecord
 import dev.promethe.api.ToolIntentStatus
 
@@ -12,7 +13,10 @@ import dev.promethe.api.ToolIntentStatus
  */
 interface PrometheDatabaseApi {
     // ── Agent runs ──
-    suspend fun insertAgentRun(run: AgentRunRecord): Boolean = true
+    suspend fun insertAgentRun(
+        run: AgentRunRecord,
+        event: AgentRunEventRecord? = null,
+    ): Boolean = true
 
     suspend fun transitionAgentRun(
         runId: String,
@@ -24,6 +28,7 @@ interface PrometheDatabaseApi {
         startedAt: Long?,
         finishedAt: Long?,
         updatedAt: Long,
+        event: AgentRunEventRecord? = null,
     ): Boolean = true
 
     suspend fun updateAgentRunProgress(
@@ -31,14 +36,22 @@ interface PrometheDatabaseApi {
         stepCount: Int,
         lastStepId: String,
         updatedAt: Long,
+        event: AgentRunEventRecord? = null,
     ): Boolean = true
 
     suspend fun getAgentRun(runId: String): AgentRunRecord? = null
 
     suspend fun getAgentRunsByStatus(statuses: Set<AgentRunStatus>): List<AgentRunRecord> = emptyList()
 
+    suspend fun appendAgentRunEvent(event: AgentRunEventRecord): Boolean = true
+
+    suspend fun getAgentRunEvents(runId: String): List<AgentRunEventRecord> = emptyList()
+
     // ── Tool intents ──
-    suspend fun insertToolIntent(intent: ToolIntentRecord): Boolean = true
+    suspend fun insertToolIntent(
+        intent: ToolIntentRecord,
+        event: AgentRunEventRecord? = null,
+    ): Boolean = true
 
     suspend fun transitionToolIntent(
         intentId: String,
@@ -49,15 +62,19 @@ interface PrometheDatabaseApi {
         startedAt: Long?,
         finishedAt: Long?,
         updatedAt: Long,
+        event: AgentRunEventRecord? = null,
     ): Boolean = true
 
     suspend fun resetToolIntentForRetry(
         intentId: String,
         expectedStatuses: Set<ToolIntentStatus>,
         updatedAt: Long,
+        event: AgentRunEventRecord? = null,
     ): Boolean = true
 
     suspend fun getToolIntentByIdempotencyKeyHash(idempotencyKeyHash: String): ToolIntentRecord? = null
+
+    suspend fun getToolIntent(intentId: String): ToolIntentRecord? = null
 
     suspend fun getToolIntentsByStatus(statuses: Set<ToolIntentStatus>): List<ToolIntentRecord> = emptyList()
 

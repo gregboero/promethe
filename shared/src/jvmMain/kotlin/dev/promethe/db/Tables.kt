@@ -54,6 +54,42 @@ object ToolIntents : Table("tool_intents") {
     }
 }
 
+/** agent_run_events - append-only execution history without prompts, arguments, or raw results. */
+object AgentRunEvents : Table("agent_run_events") {
+    val eventId = varchar("event_id", 200)
+    val runId = varchar("run_id", 160)
+    val sequence = long("sequence")
+    val eventType = varchar("event_type", 40)
+    val parentRunId = varchar("parent_run_id", 160).nullable()
+    val sessionId = varchar("session_id", 255).nullable()
+    val origin = varchar("origin", 64).nullable()
+    val projectId = varchar("project_id", 64).nullable()
+    val stepId = varchar("step_id", 200).nullable()
+    val stepCount = integer("step_count").nullable()
+    val intentId = varchar("intent_id", 160).nullable()
+    val idempotencyKeyHash = varchar("idempotency_key_hash", 64).nullable()
+    val invocationHash = varchar("invocation_hash", 64).nullable()
+    val toolName = varchar("tool_name", 255).nullable()
+    val risk = varchar("risk", 32).nullable()
+    val runStatus = varchar("run_status", 32).nullable()
+    val intentStatus = varchar("intent_status", 32).nullable()
+    val resultHash = varchar("result_hash", 64).nullable()
+    val errorCode = varchar("error_code", 128).nullable()
+    val approvalId = varchar("approval_id", 200).nullable()
+    val approvalAllowed = bool("approval_allowed").nullable()
+    val approvalScope = varchar("approval_scope", 32).nullable()
+    val createdAt = long("created_at")
+    val eventVersion = integer("event_version").default(1)
+
+    override val primaryKey = PrimaryKey(eventId)
+
+    init {
+        uniqueIndex(runId, sequence)
+        index(isUnique = false, intentId)
+        index(isUnique = false, eventType)
+    }
+}
+
 /** projects — durable work contexts grouping sessions, memory and a workspace. */
 object Projects : Table("projects") {
     val id = varchar("id", 64)

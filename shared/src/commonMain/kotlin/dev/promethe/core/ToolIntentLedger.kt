@@ -1,5 +1,8 @@
 package dev.promethe.core
 
+import dev.promethe.api.AgentApprovalScope
+import dev.promethe.api.AgentRunEventRecord
+import dev.promethe.api.AgentRunEventType
 import dev.promethe.api.ToolIntentRecord
 import dev.promethe.api.ToolIntentStatus
 import dev.promethe.db.PrometheDatabaseApi
@@ -27,6 +30,13 @@ interface ToolIntentLedger {
         risk: ToolRisk,
         now: Long,
     ): ToolIntentAdmission
+
+    suspend fun recordApproval(
+        intentId: String?,
+        request: ToolExecutionRequest,
+        result: ApprovalGate.ApprovalResult,
+        now: Long,
+    ): Boolean
 
     suspend fun markExecuting(
         intentId: String,
@@ -58,6 +68,13 @@ object NoOpToolIntentLedger : ToolIntentLedger {
         risk: ToolRisk,
         now: Long,
     ): ToolIntentAdmission = ToolIntentAdmission.Proceed(null)
+
+    override suspend fun recordApproval(
+        intentId: String?,
+        request: ToolExecutionRequest,
+        result: ApprovalGate.ApprovalResult,
+        now: Long,
+    ): Boolean = true
 
     override suspend fun markExecuting(
         intentId: String,
@@ -116,7 +133,9 @@ class PersistentToolIntentLedger(
                 createdAt = now,
                 updatedAt = now,
             )
-        if (database.insertToolIntent(record)) return ToolIntentAdmission.Proceed(intentId)
+        if (database.insertToolIntent(record, record.proposedEvent("initial"))) {
+            return ToolIntentAdmission.Proceed(intentId)
+        }
 
         val existing = database.getToolIntentByIdempotencyKeyHash(idempotencyKeyHash)
             ?: return ToolIntentAdmission.Denied(null, "Durable tool intent conflict")
@@ -129,6 +148,7 @@ class PersistentToolIntentLedger(
                     intentId = existing.intentId,
                     expectedStatuses = setOf(existing.status),
                     updatedAt = now,
+                    event = existing.proposedEvent("retry:$now", createdAt = now),
                 )
             if (reset) return ToolIntentAdmission.Proceed(existing.intentId)
             return ToolIntentAdmission.Denied(existing.intentId, "An identical tool call was claimed concurrently")
@@ -166,11 +186,37 @@ class PersistentToolIntentLedger(
         }
     }
 
+    override suspend fun recordApproval(
+        intentId: String?,
+        request: ToolExecutionRequest,
+        result: ApprovalGate.ApprovalResult,
+        now: Long,
+    ): Boolean {
+        val runId = request.runId ?: return true
+        val effectiveIntentId = intentId ?: return true
+        return database.appendAgentRunEvent(
+            AgentRunEventRecord(
+                eventId = agentRunEventId(runId, AgentRunEventType.APPROVAL_RESOLVED, "$effectiveIntentId:$now"),
+                runId = runId,
+                type = AgentRunEventType.APPROVAL_RESOLVED,
+                sessionId = request.sessionId,
+                stepId = request.stepId,
+                intentId = effectiveIntentId,
+                toolName = request.toolName,
+                approvalId = result.approvalId?.take(MAX_EVENT_IDENTIFIER_LENGTH),
+                approvalAllowed = result.allowed,
+                approvalScope = result.scope?.let { AgentApprovalScope.valueOf(it.name) },
+                createdAt = now,
+            ),
+        )
+    }
+
     override suspend fun markExecuting(
         intentId: String,
         now: Long,
-    ): Boolean =
-        database.transitionToolIntent(
+    ): Boolean {
+        val intent = database.getToolIntent(intentId) ?: return false
+        return database.transitionToolIntent(
             intentId = intentId,
             expectedStatuses = setOf(ToolIntentStatus.PREPARED),
             status = ToolIntentStatus.EXECUTING,
@@ -179,7 +225,9 @@ class PersistentToolIntentLedger(
             startedAt = now,
             finishedAt = null,
             updatedAt = now,
+            event = intent.transitionEvent(AgentRunEventType.TOOL_STARTED, ToolIntentStatus.EXECUTING, now),
         )
+    }
 
     override suspend fun markSucceeded(
         intentId: String,
@@ -197,8 +245,9 @@ class PersistentToolIntentLedger(
         intentId: String,
         errorCode: String,
         now: Long,
-    ): Boolean =
-        database.transitionToolIntent(
+    ): Boolean {
+        val intent = database.getToolIntent(intentId) ?: return false
+        return database.transitionToolIntent(
             intentId = intentId,
             expectedStatuses = setOf(ToolIntentStatus.PREPARED, ToolIntentStatus.EXECUTING),
             status = ToolIntentStatus.BLOCKED,
@@ -207,7 +256,15 @@ class PersistentToolIntentLedger(
             startedAt = null,
             finishedAt = now,
             updatedAt = now,
+            event =
+                intent.transitionEvent(
+                    type = AgentRunEventType.TOOL_COMPLETED,
+                    status = ToolIntentStatus.BLOCKED,
+                    now = now,
+                    errorCode = errorCode,
+                ),
         )
+    }
 
     private suspend fun finish(
         intentId: String,
@@ -216,16 +273,26 @@ class PersistentToolIntentLedger(
         errorCode: String?,
         now: Long,
     ): Boolean =
-        database.transitionToolIntent(
-            intentId = intentId,
-            expectedStatuses = setOf(ToolIntentStatus.EXECUTING),
-            status = status,
-            resultHash = resultHash,
-            errorCode = errorCode,
-            startedAt = null,
-            finishedAt = now,
-            updatedAt = now,
-        )
+        database.getToolIntent(intentId)?.let { intent ->
+            database.transitionToolIntent(
+                intentId = intentId,
+                expectedStatuses = setOf(ToolIntentStatus.EXECUTING),
+                status = status,
+                resultHash = resultHash,
+                errorCode = errorCode,
+                startedAt = null,
+                finishedAt = now,
+                updatedAt = now,
+                event =
+                    intent.transitionEvent(
+                        type = AgentRunEventType.TOOL_COMPLETED,
+                        status = status,
+                        now = now,
+                        resultHash = resultHash,
+                        errorCode = errorCode,
+                    ),
+            )
+        } ?: false
 
     private fun ToolIntentRecord.canRetrySafely(
         requestedRisk: ToolRisk,
@@ -241,8 +308,54 @@ class PersistentToolIntentLedger(
 
     private companion object {
         const val SAFE_RETRY_AFTER_MILLIS = 5 * 60 * 1_000L
+        const val MAX_EVENT_IDENTIFIER_LENGTH = 200
     }
 }
+
+private fun ToolIntentRecord.proposedEvent(
+    subject: String,
+    createdAt: Long = this.createdAt,
+): AgentRunEventRecord? =
+    runId?.let { effectiveRunId ->
+        AgentRunEventRecord(
+            eventId = agentRunEventId(effectiveRunId, AgentRunEventType.INTENT_PROPOSED, "$intentId:$subject"),
+            runId = effectiveRunId,
+            type = AgentRunEventType.INTENT_PROPOSED,
+            sessionId = sessionId,
+            stepId = stepId,
+            intentId = intentId,
+            idempotencyKeyHash = idempotencyKeyHash,
+            invocationHash = invocationHash,
+            toolName = toolName,
+            risk = risk,
+            intentStatus = ToolIntentStatus.PREPARED,
+            createdAt = createdAt,
+        )
+    }
+
+private fun ToolIntentRecord.transitionEvent(
+    type: AgentRunEventType,
+    status: ToolIntentStatus,
+    now: Long,
+    resultHash: String? = null,
+    errorCode: String? = null,
+): AgentRunEventRecord? =
+    runId?.let { effectiveRunId ->
+        AgentRunEventRecord(
+            eventId = agentRunEventId(effectiveRunId, type, "$intentId:${status.name}:$now"),
+            runId = effectiveRunId,
+            type = type,
+            sessionId = sessionId,
+            stepId = stepId,
+            intentId = intentId,
+            toolName = toolName,
+            risk = risk,
+            intentStatus = status,
+            resultHash = resultHash,
+            errorCode = errorCode,
+            createdAt = now,
+        )
+    }
 
 internal fun toolInvocationHash(request: ToolExecutionRequest): String =
     toolIntentDigest(

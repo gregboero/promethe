@@ -228,6 +228,22 @@ class ActionExecutor(
                         withContext(NonCancellable) { recordBlocked(intentId, "approval_interrupted") }
                         throw error
                     }
+                val approvalRecorded =
+                    runCatching {
+                        toolIntentLedger.recordApproval(
+                            intentId = intentId,
+                            request = request,
+                            result = approvalResult,
+                            now = Clock.System.now().toEpochMilliseconds(),
+                        )
+                    }.getOrElse { error ->
+                        logger.error(error) { "Failed to record approval decision for '$toolName'" }
+                        false
+                    }
+                if (!approvalRecorded && policy.risk != ToolRisk.READ) {
+                    recordBlocked(intentId, "approval_audit_failed")
+                    return@span "[BLOCKED] The approval decision could not be recorded durably"
+                }
                 if (!approvalResult.allowed) {
                     recordBlocked(intentId, "approval_denied")
                     return@span "[BLOCKED] Approval denied: ${approvalResult.reason}"

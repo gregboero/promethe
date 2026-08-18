@@ -31,6 +31,9 @@ class DatabaseMigrationsTest {
                     statement.executeQuery("SELECT version FROM flyway_schema_history WHERE version = '7'").use { rows ->
                         assertTrue(rows.next(), "V7 tool intent ledger migration should be recorded")
                     }
+                    statement.executeQuery("SELECT version FROM flyway_schema_history WHERE version = '8'").use { rows ->
+                        assertTrue(rows.next(), "V8 agent run events migration should be recorded")
+                    }
                     statement.executeQuery("SELECT reasoning_effort FROM agent_profiles WHERE id = 'main'").use { rows ->
                         assertTrue(rows.next())
                         assertEquals("AUTO", rows.getString(1))
@@ -102,6 +105,13 @@ class DatabaseMigrationsTest {
                         while (rows.next()) columns += rows.getString("name")
                         assertTrue("idempotency_key_hash" in columns, "V7 must add durable tool idempotency")
                         assertTrue("invocation_hash" in columns, "V7 must bind idempotency to the full invocation")
+                    }
+                    statement.executeQuery("PRAGMA table_info(agent_run_events)").use { rows ->
+                        val columns = mutableSetOf<String>()
+                        while (rows.next()) columns += rows.getString("name")
+                        assertTrue("event_id" in columns, "V8 must add idempotent event identifiers")
+                        assertTrue("sequence" in columns, "V8 must order events within a run")
+                        assertTrue("invocation_hash" in columns, "V8 must persist only the tool invocation fingerprint")
                     }
                 }
             }

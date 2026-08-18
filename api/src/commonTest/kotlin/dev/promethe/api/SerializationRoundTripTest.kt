@@ -255,6 +255,25 @@ class SerializationRoundTripTest {
         )
 
     @Test
+    fun agentRunEventRecord() =
+        assertRoundTrip(
+            AgentRunEventRecord(
+                eventId = "event-12345678",
+                runId = "run-12345678",
+                sequence = 3,
+                type = AgentRunEventType.APPROVAL_RESOLVED,
+                sessionId = "session-1",
+                stepId = "run-12345678-step-0001",
+                intentId = "tool-12345678",
+                toolName = "send_message",
+                approvalId = "approval-12345678",
+                approvalAllowed = true,
+                approvalScope = AgentApprovalScope.ONCE,
+                createdAt = 102,
+            ),
+        )
+
+    @Test
     fun toolIntentRecord() =
         assertRoundTrip(
             ToolIntentRecord(

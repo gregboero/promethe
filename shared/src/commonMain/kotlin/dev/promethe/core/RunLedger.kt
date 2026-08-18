@@ -1,5 +1,7 @@
 package dev.promethe.core
 
+import dev.promethe.api.AgentRunEventRecord
+import dev.promethe.api.AgentRunEventType
 import dev.promethe.api.AgentRunRecord
 import dev.promethe.api.AgentRunStatus
 import dev.promethe.db.PrometheDatabaseApi
@@ -46,21 +48,21 @@ class PersistentRunLedger(
 ) : RunLedger {
     override suspend fun begin(run: AgentRunRecord): Boolean {
         require(run.status == AgentRunStatus.PENDING) { "A new run must start as PENDING" }
-        if (!database.insertAgentRun(run)) return false
-        check(
-            database.transitionAgentRun(
+        val running = run.copy(status = AgentRunStatus.RUNNING, startedAt = run.createdAt)
+        return database.insertAgentRun(
+            running,
+            AgentRunEventRecord(
+                eventId = agentRunEventId(run.runId, AgentRunEventType.RUN_STARTED, "start"),
                 runId = run.runId,
-                expectedStatuses = setOf(AgentRunStatus.PENDING),
-                status = AgentRunStatus.RUNNING,
-                stepCount = 0,
-                lastStepId = null,
-                errorCode = null,
-                startedAt = run.createdAt,
-                finishedAt = null,
-                updatedAt = run.createdAt,
+                type = AgentRunEventType.RUN_STARTED,
+                parentRunId = run.parentRunId,
+                sessionId = run.sessionId,
+                origin = run.origin,
+                projectId = run.projectId,
+                runStatus = AgentRunStatus.RUNNING,
+                createdAt = run.createdAt,
             ),
-        ) { "Failed to transition new run to RUNNING" }
-        return true
+        )
     }
 
     override suspend fun recordStep(
@@ -71,7 +73,22 @@ class PersistentRunLedger(
     ): Boolean {
         require(stepCount > 0) { "Run step count must be positive" }
         require(isValidExecutionId(stepId)) { "Invalid step ID" }
-        return database.updateAgentRunProgress(runId, stepCount, stepId, updatedAt)
+        return database.updateAgentRunProgress(
+            runId = runId,
+            stepCount = stepCount,
+            lastStepId = stepId,
+            updatedAt = updatedAt,
+            event =
+                AgentRunEventRecord(
+                    eventId = agentRunEventId(runId, AgentRunEventType.RUN_STEP_RECORDED, stepId),
+                    runId = runId,
+                    type = AgentRunEventType.RUN_STEP_RECORDED,
+                    stepId = stepId,
+                    stepCount = stepCount,
+                    runStatus = AgentRunStatus.RUNNING,
+                    createdAt = updatedAt,
+                ),
+        )
     }
 
     override suspend fun complete(
@@ -79,7 +96,16 @@ class PersistentRunLedger(
         stepCount: Int,
         lastStepId: String?,
         finishedAt: Long,
-    ): Boolean = transitionTerminal(runId, AgentRunStatus.SUCCEEDED, stepCount, lastStepId, null, finishedAt)
+    ): Boolean =
+        transitionTerminal(
+            runId,
+            AgentRunStatus.SUCCEEDED,
+            AgentRunEventType.RUN_FINISHED,
+            stepCount,
+            lastStepId,
+            null,
+            finishedAt,
+        )
 
     override suspend fun fail(
         runId: String,
@@ -89,7 +115,15 @@ class PersistentRunLedger(
         finishedAt: Long,
     ): Boolean {
         require(errorCode.isNotBlank()) { "A failed run requires an error code" }
-        return transitionTerminal(runId, AgentRunStatus.FAILED, stepCount, lastStepId, errorCode, finishedAt)
+        return transitionTerminal(
+            runId,
+            AgentRunStatus.FAILED,
+            AgentRunEventType.RUN_FAILED,
+            stepCount,
+            lastStepId,
+            errorCode,
+            finishedAt,
+        )
     }
 
     override suspend fun cancel(
@@ -97,7 +131,16 @@ class PersistentRunLedger(
         stepCount: Int,
         lastStepId: String?,
         finishedAt: Long,
-    ): Boolean = transitionTerminal(runId, AgentRunStatus.CANCELLED, stepCount, lastStepId, "cancelled", finishedAt)
+    ): Boolean =
+        transitionTerminal(
+            runId,
+            AgentRunStatus.CANCELLED,
+            AgentRunEventType.RUN_CANCELLED,
+            stepCount,
+            lastStepId,
+            "cancelled",
+            finishedAt,
+        )
 
     override suspend fun get(runId: String): AgentRunRecord? = database.getAgentRun(runId)
 
@@ -106,6 +149,7 @@ class PersistentRunLedger(
     private suspend fun transitionTerminal(
         runId: String,
         status: AgentRunStatus,
+        eventType: AgentRunEventType,
         stepCount: Int,
         lastStepId: String?,
         errorCode: String?,
@@ -121,5 +165,16 @@ class PersistentRunLedger(
             startedAt = null,
             finishedAt = finishedAt,
             updatedAt = finishedAt,
+            event =
+                AgentRunEventRecord(
+                    eventId = agentRunEventId(runId, eventType, status.name),
+                    runId = runId,
+                    type = eventType,
+                    stepId = lastStepId,
+                    stepCount = stepCount,
+                    runStatus = status,
+                    errorCode = errorCode,
+                    createdAt = finishedAt,
+                ),
         )
 }
