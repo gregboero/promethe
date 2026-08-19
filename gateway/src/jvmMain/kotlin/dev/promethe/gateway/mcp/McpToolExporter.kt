@@ -9,6 +9,7 @@ import dev.promethe.core.SecureToolExecutor
 import dev.promethe.core.ToolApprovalPolicy
 import dev.promethe.core.ToolCallOrigin
 import dev.promethe.core.ToolExecutionRequest
+import dev.promethe.core.ToolJsonSchemaGenerator
 import dev.promethe.core.ToolRegistry
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
@@ -195,28 +196,7 @@ class McpToolExporter(
             val desc = tool.descriptor
             put("name", desc.name)
             put("description", desc.description)
-            putJsonObject("inputSchema") {
-                put("\$schema", "https://json-schema.org/draft/2020-12/schema")
-                put("type", "object")
-                val allParams = desc.requiredParameters + desc.optionalParameters
-                putJsonObject("properties") {
-                    allParams.forEach { param ->
-                        putJsonObject(param.name) {
-                            put("type", param.type.toString().lowercase())
-                            put("description", param.description)
-                        }
-                    }
-                }
-                if (desc.requiredParameters.isNotEmpty()) {
-                    put(
-                        "required",
-                        buildJsonArray {
-                            desc.requiredParameters.forEach { add(kotlinx.serialization.json.JsonPrimitive(it.name)) }
-                        },
-                    )
-                }
-                put("additionalProperties", false)
-            }
+            put("inputSchema", ToolJsonSchemaGenerator.inputSchema(desc))
         }
 
     private fun isToolExposed(
