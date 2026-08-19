@@ -121,6 +121,52 @@ class ToolIntentLedgerTest {
             )
         }
 
+    @Test
+    fun `tool budget blocks a second distinct execution before process start`() =
+        runTest {
+            val database = DatabaseFactory.createInMemory()
+            val commandExecutor = CountingCommandExecutor()
+            val governors = InMemoryResourceGovernorRegistry()
+            val runId = "run-tool-budget-0001"
+            assertIs<ResourceGovernorAcquisition.Acquired>(
+                governors.acquire(
+                    runId = runId,
+                    sessionId = "session-tool-intent",
+                    budget = ResourceBudget(maxToolStarts = 1),
+                ),
+            )
+            val executor =
+                ActionExecutor(
+                    config = AgentConfig(),
+                    httpClient = HttpClient(),
+                    approvalGate = AllowApprovalGate,
+                    sandboxCommandExecutor = commandExecutor,
+                    toolIntentLedger = PersistentToolIntentLedger(database, SequentialIds()),
+                    resourceGovernors = governors,
+                )
+
+            fun command(value: String) =
+                request(toolName = "execute_command", value = value).copy(
+                    runId = runId,
+                    arguments =
+                        buildJsonObject {
+                            put("executable", "echo")
+                            put("arguments", kotlinx.serialization.json.buildJsonArray { add(JsonPrimitive(value)) })
+                        },
+                )
+
+            assertEquals("done", executor.execute(command("one")))
+            val denied = executor.execute(command("two"))
+
+            assertTrue(denied.startsWith("[BLOCKED] Resource budget exceeded: tool_starts"))
+            assertEquals(1, commandExecutor.count)
+            assertEquals(1, requireNotNull(governors.governorForRun(runId)).snapshot().toolsStarted)
+            assertEquals(
+                1,
+                database.getToolIntentsByStatus(setOf(ToolIntentStatus.BLOCKED)).size,
+            )
+        }
+
     private fun request(
         toolName: String,
         idempotencyKey: String? = null,

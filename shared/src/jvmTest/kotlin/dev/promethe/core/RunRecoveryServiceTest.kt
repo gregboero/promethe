@@ -242,6 +242,55 @@ class RunRecoveryServiceTest {
             }
         }
 
+    @Test
+    fun `resource conflict leaves a recoverable run unclaimed`() =
+        runTest {
+            val database = DatabaseFactory.createInMemory()
+            val runId = "recovery-resource-conflict-0001"
+            val request =
+                AgentExecutionRequest(
+                    sessionId = "recovery-session",
+                    text = "continue safely",
+                    origin = AgentExecutionOrigin.A2A,
+                    runId = runId,
+                )
+            val ledger = PersistentRunLedger(database)
+            assertTrue(ledger.begin(pendingRun(runId, agentExecutionRequestFingerprint(request))))
+            val governors = InMemoryResourceGovernorRegistry()
+            assertIs<ResourceGovernorAcquisition.Acquired>(
+                governors.acquire("active-run-0001", request.sessionId, ResourceBudget.DEFAULT),
+            )
+            val resources = TestAgentResources(database)
+            try {
+                val service =
+                    AgentExecutionService(
+                        agent = resources.agent,
+                        database = database,
+                        runLedger = ledger,
+                        executionGraph = object : ExecutionGraph {
+                            override fun execute(request: ExecutionGraphRequest) = flowOf<ExecutionGraphTransition>()
+                        },
+                        recoveryService =
+                            RunRecoveryService(
+                                ledger,
+                                PersistentRunEventLedger(database),
+                                now = { 200 },
+                            ),
+                        resourceGovernors = governors,
+                    )
+
+                val failed = assertIs<AgentExecutionEvent.Failed>(service.resume(request).toList().single())
+
+                assertEquals("run_resume_conflict", failed.code)
+                assertEquals(AgentRunStatus.RECOVERABLE, ledger.get(runId)?.status)
+                assertTrue(
+                    database.getAgentRunEvents(runId).none { it.type == AgentRunEventType.RUN_RESUME_CLAIMED },
+                )
+            } finally {
+                resources.close()
+            }
+        }
+
     private fun pendingRun(
         runId: String,
         requestFingerprint: String = "test-request-fingerprint",
