@@ -85,6 +85,14 @@ raw arguments and secrets are not stored. MCP and legacy voice schema exports om
 policy. Destination-level HTTP allow-lists and explicit owner identity propagation remain required before
 the egress and owner policy work can be considered complete.
 
+Remote tool observations are passed through `UntrustedReader` before they return to the model. External
+markup is escaped, provenance is retained and `PrivilegedController` taints the remainder of that run.
+After a web, MCP, ACP, integration, plugin or local-agent observation, the same run may continue using
+trusted local read-only tools, but it cannot write, execute, control a device or perform further egress.
+A contaminated run is also excluded from automatic skill synthesis and memory fact extraction. A new
+explicit owner turn starts a new trust decision. This containment reduces indirect prompt-injection risk;
+it does not claim that arbitrary model output has been proven safe.
+
 ## Discord Access and Knowledge Capture
 
 Discord access can be restricted with `DISCORD_ALLOWED_USER_IDS`. An empty value preserves the

@@ -5,6 +5,7 @@ import dev.promethe.api.AgentRunEventRecord
 import dev.promethe.api.AgentRunEventType
 import dev.promethe.api.AgentRunRecord
 import dev.promethe.api.AgentRunStatus
+import dev.promethe.api.PolicyDataTrust
 import dev.promethe.api.ToolIntentRecord
 import dev.promethe.api.ToolIntentStatus
 import kotlinx.coroutines.Dispatchers
@@ -558,6 +559,8 @@ class PrometheDatabase(
         role: String,
         content: String,
         timestamp: Long,
+        dataTrust: PolicyDataTrust,
+        sourceRunId: String?,
     ): Int =
         dbQuery {
             Messages.insert {
@@ -565,6 +568,8 @@ class PrometheDatabase(
                 it[Messages.role] = role
                 it[Messages.content] = content
                 it[Messages.timestamp] = timestamp
+                it[Messages.dataTrust] = dataTrust.name
+                it[Messages.sourceRunId] = sourceRunId
             } get Messages.id
         }
 
@@ -1487,6 +1492,8 @@ private fun ResultRow.toMessageRow() =
         role = this[Messages.role],
         content = this[Messages.content],
         timestamp = this[Messages.timestamp],
+        dataTrust = PolicyDataTrust.valueOf(this[Messages.dataTrust]),
+        sourceRunId = this[Messages.sourceRunId],
     )
 
 private fun ResultRow.toFeedbackRow() =

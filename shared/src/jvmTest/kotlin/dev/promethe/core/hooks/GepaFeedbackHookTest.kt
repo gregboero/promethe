@@ -283,6 +283,8 @@ private class StubDatabase : PrometheDatabaseApi {
         role: String,
         content: String,
         timestamp: Long,
+        dataTrust: dev.promethe.api.PolicyDataTrust,
+        sourceRunId: String?,
     ): Int = 0
 
     override suspend fun getMessagesForSession(sessionId: String): List<MessageRow> = emptyList()

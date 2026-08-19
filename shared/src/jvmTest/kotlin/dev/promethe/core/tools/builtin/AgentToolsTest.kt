@@ -221,9 +221,11 @@ class FakePrometheDatabase : PrometheDatabaseApi {
         role: String,
         content: String,
         timestamp: Long,
+        dataTrust: dev.promethe.api.PolicyDataTrust,
+        sourceRunId: String?,
     ): Int {
         val nextId = messages.size + 1
-        messages.add(MessageRow(nextId, sessionId, role, content, timestamp))
+        messages.add(MessageRow(nextId, sessionId, role, content, timestamp, dataTrust, sourceRunId))
         return nextId
     }
 

@@ -43,6 +43,9 @@ class DatabaseMigrationsTest {
                     statement.executeQuery("SELECT version FROM flyway_schema_history WHERE version = '11'").use { rows ->
                         assertTrue(rows.next(), "V11 security audit hash-chain migration should be recorded")
                     }
+                    statement.executeQuery("SELECT version FROM flyway_schema_history WHERE version = '12'").use { rows ->
+                        assertTrue(rows.next(), "V12 message trust provenance migration should be recorded")
+                    }
                     statement.executeQuery("SELECT reasoning_effort FROM agent_profiles WHERE id = 'main'").use { rows ->
                         assertTrue(rows.next())
                         assertEquals("AUTO", rows.getString(1))
@@ -131,6 +134,12 @@ class DatabaseMigrationsTest {
                         while (rows.next()) columns += rows.getString("name")
                         assertTrue("previous_hash" in columns, "V11 must preserve the previous audit hash")
                         assertTrue("entry_hash" in columns, "V11 must preserve the current audit hash")
+                    }
+                    statement.executeQuery("PRAGMA table_info(messages)").use { rows ->
+                        val columns = mutableSetOf<String>()
+                        while (rows.next()) columns += rows.getString("name")
+                        assertTrue("data_trust" in columns, "V12 must persist the message trust classification")
+                        assertTrue("source_run_id" in columns, "V12 must persist the message source run")
                     }
                 }
             }

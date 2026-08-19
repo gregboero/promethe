@@ -138,12 +138,15 @@ object Messages : Table("messages") {
     val role = varchar("role", 50) // "user", "assistant", "system"
     val content = text("content")
     val timestamp = long("timestamp")
+    val dataTrust = varchar("data_trust", 32).default("TRUSTED")
+    val sourceRunId = varchar("source_run_id", 160).nullable()
 
     override val primaryKey = PrimaryKey(id)
 
     init {
         index(isUnique = false, sessionId)
         index(isUnique = false, sessionId, timestamp)
+        index(isUnique = false, sourceRunId)
     }
 }
 
