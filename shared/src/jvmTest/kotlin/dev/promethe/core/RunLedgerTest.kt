@@ -48,7 +48,23 @@ class RunLedgerTest {
             assertEquals(AgentRunStatus.CANCELLED, ledger.get("ledger-cancelled-0001")?.status)
 
             assertTrue(ledger.begin(pendingRun("ledger-running-0001")))
+            assertEquals(listOf("ledger-running-0001"), ledger.interrupted().map(AgentRunRecord::runId))
+            assertTrue(
+                ledger.classifyRecovery(
+                    "ledger-running-0001",
+                    AgentRunStatus.RECOVERABLE,
+                    "interrupted_before_completion",
+                    140,
+                ),
+            )
             assertEquals(listOf("ledger-running-0001"), ledger.recoverable().map(AgentRunRecord::runId))
+
+            val claimed = assertNotNull(ledger.claimResume("ledger-running-0001", 150))
+            assertEquals(AgentRunStatus.RESUMING, claimed.status)
+            assertEquals(null, claimed.errorCode)
+            assertEquals(null, ledger.claimResume("ledger-running-0001", 151))
+            assertTrue(ledger.markResumed("ledger-running-0001", 160))
+            assertEquals(AgentRunStatus.RUNNING, ledger.get("ledger-running-0001")?.status)
         }
 
     @Test

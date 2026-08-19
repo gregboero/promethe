@@ -111,21 +111,6 @@ class AIAgent(
             val effectiveReasoningEffort = overrideReasoningEffort ?: config.reasoningEffort
             var pendingToolTurn: PendingToolTurn? = null
 
-            // ── Checkpoint restore (resume from crash) ──
-            try {
-                val checkpointJson = database.getLatestCheckpoint(sessionId)
-                if (checkpointJson != null) {
-                    val cp = PrometheJson.parseToJsonElement(checkpointJson).jsonObject
-                    iteration = cp["iteration"]?.jsonPrimitive?.intOrNull ?: 0
-                    val cpInput = cp["currentInput"]?.jsonPrimitive?.contentOrNull
-                    if (!cpInput.isNullOrBlank()) currentInput = cpInput
-                    logger.info { "Restored session $sessionId at iteration $iteration" }
-                }
-            } catch (e: Exception) {
-                // No checkpoint or parse error — start fresh
-                logger.debug(e) { "Checkpoint restore failed for session $sessionId — starting fresh" }
-            }
-
             val trajectoryLog = mutableListOf<ConversationTrajectory>()
             val memoryNudge = MemoryNudge()
 
@@ -359,18 +344,6 @@ class AIAgent(
                         )
                         emit(trajObs)
                         trajectoryLog.add(trajObs)
-
-                        try {
-                            val cpJson = buildJsonObject {
-                                put("sessionId", sessionId)
-                                put("iteration", iteration)
-                                put("currentInput", currentInput)
-                                put("isComplete", false)
-                            }.toString()
-                            database.insertCheckpoint(sessionId, iteration, cpJson)
-                        } catch (e: Exception) {
-                            logger.warn(e) { "Checkpoint save failed" }
-                        }
                     }
                     continue
                 }
@@ -499,21 +472,6 @@ class AIAgent(
                                 )
                             emit(trajObs)
                             trajectoryLog.add(trajObs)
-
-                            // ── Checkpoint save after successful tool execution ──
-                            try {
-                                val cpJson =
-                                    buildJsonObject {
-                                        put("sessionId", sessionId)
-                                        put("iteration", iteration)
-                                        put("currentInput", currentInput)
-                                        put("isComplete", false)
-                                    }.toString()
-                                database.insertCheckpoint(sessionId, iteration, cpJson)
-                            } catch (e: Exception) {
-                                // non-fatal
-                                logger.warn(e) { "Checkpoint save failed for session $sessionId at iteration $iteration" }
-                            }
                         }
                     }
 
@@ -538,14 +496,6 @@ class AIAgent(
                         isComplete = true
                     }
                 }
-            }
-
-            // ── Clear checkpoints on loop completion ──
-            try {
-                database.clearCheckpoints(sessionId)
-            } catch (e: Exception) {
-                // non-fatal
-                logger.warn(e) { "Failed to clear checkpoints for session $sessionId" }
             }
 
             // Closed-Loop Learning (gated by RewardSignal)

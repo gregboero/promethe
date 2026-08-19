@@ -8,10 +8,10 @@ import kotlinx.serialization.json.Json
 private val logger = io.github.oshai.kotlinlogging.KotlinLogging.logger {}
 
 /**
- * CheckpointManager — saves and restores agent execution state mid-loop.
+ * CheckpointManager saves and restores explicit session snapshots.
  *
- * After each successful tool call, a checkpoint is saved to the DB.
- * If the agent crashes, it can resume from the last checkpoint.
+ * Durable run recovery is event-based and handled by RunRecoveryService. A
+ * session checkpoint must never be used to resume an arbitrary agent run.
  */
 class CheckpointManager(
     private val database: PrometheDatabaseApi,

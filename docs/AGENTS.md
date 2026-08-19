@@ -75,7 +75,7 @@ At each iteration, the agent loads:
 | **Skills** | `skillLoader.findRelevantSkills()` | Relevant skills by keyword |
 | **FTS5** | `database.searchMessages()` | Semantic history (5 results) |
 | **Project context** | `ContextFileLoader.loadContextFiles()` | .promethe.md, SOUL.md, AGENTS.md |
-| **Checkpoint** | `database.getLatestCheckpoint()` | Resume after crash |
+| **Session checkpoint** | `database.getLatestCheckpoint()` | Explicit session snapshot and rollback |
 
 ### 3. Reasoning (LLM)
 

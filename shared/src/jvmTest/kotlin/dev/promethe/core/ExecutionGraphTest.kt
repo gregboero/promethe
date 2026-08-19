@@ -130,6 +130,36 @@ class ExecutionGraphTest {
         }
 
     @Test
+    fun `resumed graph continues durable step numbering`() =
+        runTest {
+            val database = DatabaseFactory.createInMemory()
+            val ledger = PersistentRunLedger(database)
+            val identity = AgentRunIdentity("graph-run-0006")
+            assertTrue(ledger.begin(pendingRun(identity.runId)))
+            assertTrue(ledger.recordStep(identity.runId, identity.step(2).stepId, 2, 150))
+            val graph =
+                DurableExecutionGraph(
+                    loopExecutor =
+                        AgentLoopExecutor {
+                            flowOf(ConversationTrajectory(inputs = emptyMap(), outputs = mapOf("response" to "done")))
+                        },
+                    runLedger = ledger,
+                    now = { 200L },
+                )
+
+            val step =
+                graph
+                    .execute(request(identity).copy(startingStepIndex = 2))
+                    .toList()
+                    .filterIsInstance<ExecutionGraphTransition.StepPersisted>()
+                    .single()
+
+            assertEquals(3, step.index)
+            assertEquals(identity.step(3).stepId, step.stepId)
+            assertEquals(3, ledger.get(identity.runId)?.stepCount)
+        }
+
+    @Test
     fun `graph reports an upstream loop failure on the active node`() =
         runTest {
             val database = DatabaseFactory.createInMemory()

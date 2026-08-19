@@ -69,6 +69,19 @@ class AgentExecutionArchitectureTest {
         assertEquals(emptyList(), violations, "Agent run events must never be updated or deleted: $violations")
     }
 
+    @Test
+    fun `agent loop never restores session scoped checkpoints`() {
+        val source = projectRoot().resolve("shared/src/commonMain/kotlin/dev/promethe/core/AIAgent.kt")
+        val forbiddenPatterns = listOf("getLatestCheckpoint(", "insertCheckpoint(", "clearCheckpoints(")
+        val violations = source.readLines().filter { line -> forbiddenPatterns.any { pattern -> pattern in line } }
+
+        assertEquals(
+            emptyList(),
+            violations,
+            "Durable run recovery must not depend on session-scoped checkpoints: $violations",
+        )
+    }
+
     private fun projectRoot(): Path {
         var current = Path.of(System.getProperty("user.dir")).toAbsolutePath()
         while (current.parent != null && !Files.exists(current.resolve("settings.gradle.kts"))) {

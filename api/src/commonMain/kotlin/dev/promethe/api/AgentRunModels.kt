@@ -6,6 +6,9 @@ import kotlinx.serialization.Serializable
 enum class AgentRunStatus {
     PENDING,
     RUNNING,
+    RECOVERABLE,
+    RESUMING,
+    NEEDS_REVIEW,
     SUCCEEDED,
     FAILED,
     CANCELLED,
@@ -18,6 +21,7 @@ data class AgentRunRecord(
     val sessionId: String,
     val origin: String,
     val projectId: String? = null,
+    val requestFingerprint: String? = null,
     val status: AgentRunStatus,
     val stepCount: Int = 0,
     val lastStepId: String? = null,

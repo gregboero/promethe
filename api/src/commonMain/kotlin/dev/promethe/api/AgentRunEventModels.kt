@@ -6,6 +6,9 @@ import kotlinx.serialization.Serializable
 enum class AgentRunEventType {
     RUN_STARTED,
     RUN_STEP_RECORDED,
+    RUN_RECOVERY_CLASSIFIED,
+    RUN_RESUME_CLAIMED,
+    RUN_RESUMED,
     INTENT_PROPOSED,
     APPROVAL_RESOLVED,
     TOOL_STARTED,
@@ -33,6 +36,7 @@ data class AgentRunEventRecord(
     val sessionId: String? = null,
     val origin: String? = null,
     val projectId: String? = null,
+    val requestFingerprint: String? = null,
     val stepId: String? = null,
     val stepCount: Int? = null,
     val intentId: String? = null,
