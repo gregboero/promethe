@@ -1,5 +1,7 @@
 package dev.promethe.core.evolution
 
+import dev.promethe.api.SkillContract
+import dev.promethe.api.SkillLifecycle
 import dev.promethe.core.Log
 
 import dev.promethe.core.AgentConfig
@@ -159,11 +161,30 @@ class GepaEvolver(
      * Apply an evolution result: save the improved skill.
      */
     suspend fun apply(result: EvolutionResult) {
-        // Delete old skill first so SkillWriter doesn't skip as duplicate
-        skillLoader.deleteSkill(result.skillName)
-        skillWriter.write(
-            SkillEntry(name = result.skillName, content = result.bestCandidate.content),
-        )
+        val existing = skillLoader.listSkills().find { skill -> skill.name == result.skillName }
+        val candidate =
+            existing?.copy(
+                content = result.bestCandidate.content,
+                contract =
+                    existing.contract.copy(
+                        lifecycle = SkillLifecycle.CANDIDATE,
+                        contentHash = null,
+                    ),
+            ) ?: SkillEntry(
+                name = result.skillName,
+                content = result.bestCandidate.content,
+                contract =
+                    SkillContract(
+                        lifecycle = SkillLifecycle.CANDIDATE,
+                        provenance = "gepa",
+                    ),
+            )
+        if (existing == null) {
+            skillWriter.write(candidate)
+        } else {
+            skillWriter.update(candidate)
+        }
+        skillLoader.invalidateCache()
         logger.info { "Applied evolved skill '${result.skillName}' (delta: ${result.improvementDelta})" }
     }
 

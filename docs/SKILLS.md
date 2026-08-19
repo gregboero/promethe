@@ -24,11 +24,13 @@ Each skill is a Markdown file with a YAML frontmatter:
 ---
 name: kotlin-coroutines-error-handling
 description: Error handling patterns in Kotlin coroutines
-keywords:
-  - coroutines
-  - exception
-  - supervisorScope
-  - CoroutineExceptionHandler
+lifecycle: ACTIVE
+version: 1
+content_hash: 7c5e…
+triggers: coroutines, exception, supervisorScope
+anti_triggers: callback-only code
+required_tools: code_grep, read_file
+eval_suite: kotlin-coroutines-smoke
 ---
 
 ## Context
@@ -45,9 +47,18 @@ Use `supervisorScope` to isolate child failures…
 
 | Field | Required | Description |
 |---|---|---|
-| `name` | ✅ | Unique identifier (kebab-case slug) |
-| `description` | ✅ | Short description (one sentence) |
-| `keywords` | ✅ | List of keywords for matching |
+| `name` | yes | Unique identifier (kebab-case slug) |
+| `description` | recommended | Short description (one sentence) |
+| `lifecycle` | written by Promethe | `DRAFT`, `QUARANTINED`, `CANDIDATE`, `ACTIVE`, or `DEPRECATED` |
+| `version` | written by Promethe | Contract version |
+| `content_hash` | written by Promethe | SHA-256 of the normalized Markdown body |
+| `triggers`, `anti_triggers` | optional | Declarative matching contract; matching still derives its index from description and body in this phase |
+| `required_tools`, `required_skills` | optional | Declared dependencies |
+| `eval_suite` | optional | Evaluation suite identifiers required by future automated promotion |
+| `provenance`, `owner` | optional | Origin and owner metadata |
+
+Files without lifecycle metadata remain `ACTIVE` for backward compatibility. A declared hash mismatch forces
+the skill to `QUARANTINED`. Only `ACTIVE` skills are searchable, loadable, or injected into an agent prompt.
 
 ---
 
@@ -59,7 +70,11 @@ Use `supervisorScope` to isolate child failures…
 2. **Extraction** — The writer isolates the key steps, decisions, and code produced.
 3. **Drafting** — A Markdown skill is generated with the appropriate frontmatter.
 4. **Deduplication** — Checked against existing skills via the keyword index.
-5. **Writing** — The file is saved to `~/.promethe/skills/`.
+5. **Writing** — The file is saved to `~/.promethe/skills/` as `DRAFT`.
+
+The owner promotes a skill through `DRAFT → QUARANTINED → CANDIDATE → ACTIVE`. Content edited by an
+agent or through the management API is quarantined; a GEPA result is stored as a candidate. Deprecation
+removes a skill from agent-side discovery without deleting its file.
 
 ---
 
@@ -86,6 +101,7 @@ Base: `/api/v1/skills`
 | `GET` | `/api/v1/skills/:name` | Retrieves a skill by name |
 | `POST` | `/api/v1/skills` | Creates a new skill |
 | `PUT` | `/api/v1/skills/:name` | Updates an existing skill |
+| `PUT` | `/api/v1/skills/:name/lifecycle` | Applies one valid lifecycle transition |
 | `DELETE` | `/api/v1/skills/:name` | Deletes a skill |
 | `GET` | `/api/v1/skills/search?q=…` | Searches by keywords |
 | `POST` | `/api/v1/skills/curate` | Scores skills and returns quarantined review proposals |
@@ -106,25 +122,10 @@ These tools are available to agents during a conversation:
 
 ### Automatic matching
 
-`SkillLoader.findRelevantSkills()` compares the keywords of the current conversation against the skills' inverted index. Relevant skills are automatically injected into the agent's system prompt.
+`SkillLoader.findRelevantSkills()` compares query terms against an inverted index derived from each active
+skill's description and body. Relevant `ACTIVE` skills are automatically injected into the agent's system prompt.
 
 ---
 
-## CLI usage
-
-```bash
-# List skills
-promethe skills list
-
-# Search
-promethe skills search "coroutines error"
-
-# Show a skill
-promethe skills show kotlin-coroutines-error-handling
-
-# Create manually
-promethe skills create my-new-skill.md
-
-# Delete
-promethe skills delete kotlin-coroutines-error-handling
-```
+The standalone CLI does not currently expose skill-management commands. Use the authenticated REST API or
+the Desktop/Web skill screen.

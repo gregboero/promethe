@@ -842,6 +842,8 @@
     <string name="skills_delete_skill_title">Supprimer le skill</string>
     <string name="skills_delete_skill_confirm">Voulez-vous vraiment supprimer le skill \'%1$s\' ?</string>
     <string name="skills_system_badge">SYSTEM</string>
+    <string name="skills_lifecycle">Cycle : %1$s</string>
+    <string name="skills_move_to_lifecycle">Passer à %1$s</string>
     <string name="skills_delete_skill_a11y">Supprimer le skill</string>
     <string name="skills_architect_title">🧑‍🎨 Architecte de Skills</string>
     <string name="skills_architect_thinking">L\'architecte réfléchit…</string>

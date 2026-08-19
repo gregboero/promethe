@@ -1,5 +1,6 @@
 package dev.promethe.core
 
+import dev.promethe.api.SkillLifecycle
 import kotlinx.coroutines.test.runTest
 import okio.FileSystem
 import okio.Path
@@ -111,5 +112,59 @@ class SkillLoaderTest {
             // Words like "the", "and", "in" are short and should be ignored, and not cause matches.
             val matches = loader.findRelevantSkills("the and in")
             assertTrue(matches.isEmpty())
+        }
+
+    @Test
+    fun `only active skills are executable`() =
+        runTest {
+            writeSkill(
+                "active_skill",
+                """
+                ---
+                name: active_skill
+                lifecycle: ACTIVE
+                ---
+                Kotlin release procedure.
+                """.trimIndent(),
+            )
+            writeSkill(
+                "draft_skill",
+                """
+                ---
+                name: draft_skill
+                lifecycle: DRAFT
+                ---
+                Kotlin draft procedure.
+                """.trimIndent(),
+            )
+
+            val loader = SkillLoader(fs, skillsPath)
+
+            assertEquals(2, loader.listSkills().size)
+            assertEquals(listOf("active_skill"), loader.listExecutableSkills().map { skill -> skill.name })
+            assertEquals(listOf("active_skill"), loader.findRelevantSkills("Kotlin procedure").map { skill -> skill.name })
+            assertTrue(loader.loadByNames(listOf("draft_skill")).isEmpty())
+        }
+
+    @Test
+    fun `content hash mismatch quarantines skill`() =
+        runTest {
+            writeSkill(
+                "tampered_skill",
+                """
+                ---
+                name: tampered_skill
+                lifecycle: ACTIVE
+                content_hash: stale-hash
+                ---
+                Changed instructions.
+                """.trimIndent(),
+            )
+
+            val loader = SkillLoader(fs, skillsPath)
+            val skill = loader.listSkills().single()
+
+            assertEquals(SkillLifecycle.QUARANTINED, skill.contract.lifecycle)
+            assertTrue(loader.listExecutableSkills().isEmpty())
         }
 }
