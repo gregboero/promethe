@@ -94,6 +94,11 @@ fun Route.statusRoutes(
                                     misses = llmStats.cacheMisses,
                                     size = llmStats.cacheSize,
                                     hitRate = if (cacheTotal > 0) llmStats.cacheHits.toDouble() / cacheTotal else 0.0,
+                                    readTokens = llmStats.cacheReadTokens,
+                                    writeTokens = llmStats.cacheWriteTokens,
+                                    observableResponses = llmStats.cacheObservableResponses,
+                                    prefixReuseHits = llmStats.prefixReuseHits,
+                                    prefixReuseMisses = llmStats.prefixReuseMisses,
                                 ),
                         ),
                     memory =

@@ -1501,15 +1501,20 @@ curl http://localhost:8080/api/v1/status
     "executionBackend": "koog"
   },
   "llm": {
-    "totalRequests": 142,
-    "totalPromptTokens": 50000,
-    "totalCompletionTokens": 30000,
-    "totalCostUsd": 0.15,
+    "total_requests": 142,
+    "total_prompt_tokens": 50000,
+    "total_completion_tokens": 30000,
+    "total_cost_usd": 0.15,
     "cache": {
       "hits": 40,
       "misses": 102,
       "size": 40,
-      "hitRate": 0.28
+      "hit_rate": 0.28,
+      "read_tokens": 32000,
+      "write_tokens": 12000,
+      "observable_responses": 142,
+      "prefix_reuse_hits": 120,
+      "prefix_reuse_misses": 22
     }
   },
   "memory": {

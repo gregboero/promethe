@@ -1,6 +1,7 @@
 package dev.promethe.core
 
 import ai.koog.prompt.executor.clients.openai.base.models.ReasoningEffort as KoogReasoningEffort
+import ai.koog.prompt.executor.clients.anthropic.AnthropicCacheControl
 import ai.koog.prompt.executor.clients.openai.models.OpenAIInclude
 import ai.koog.prompt.message.Message
 import ai.koog.prompt.message.MessagePart
@@ -11,6 +12,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
+import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
 class KoogContractTest {
@@ -75,5 +77,27 @@ class KoogContractTest {
         assertEquals("weather", result.tool)
         assertFalse(result.isError)
         assertEquals("encrypted-state", preservedReasoning.encrypted)
+    }
+
+    @Test
+    fun `system messages form a stable anthropic prefix before conversation`() {
+        val prompt =
+            KoogLlmAdapter(AgentConfig()).buildPrompt(
+                systemPrompt = "base",
+                messages =
+                    listOf(
+                        "user" to "question",
+                        "system" to "policy",
+                        "assistant" to "answer",
+                    ),
+                provider = "anthropic",
+            )
+
+        assertEquals(
+            listOf(Message.Role.System, Message.Role.System, Message.Role.User, Message.Role.Assistant),
+            prompt.messages.map { it.role },
+        )
+        assertNull(prompt.messages.first().parts.single().cacheControl)
+        assertIs<AnthropicCacheControl.Default>(prompt.messages[1].parts.single().cacheControl)
     }
 }
