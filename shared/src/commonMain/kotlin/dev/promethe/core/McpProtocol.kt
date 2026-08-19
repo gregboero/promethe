@@ -17,9 +17,11 @@ object McpProtocol {
     const val CLIENT_INFO_META = "io.modelcontextprotocol/clientInfo"
     const val CLIENT_CAPABILITIES_META = "io.modelcontextprotocol/clientCapabilities"
     const val SERVER_INFO_META = "io.modelcontextprotocol/serverInfo"
+    const val TASKS_EXTENSION = "io.modelcontextprotocol/tasks"
 
     const val RESULT_COMPLETE = "complete"
     const val RESULT_INPUT_REQUIRED = "input_required"
+    const val RESULT_TASK = "task"
 
     val multiRoundTripMethods: Set<String> = setOf("tools/call", "prompts/get", "resources/read")
 

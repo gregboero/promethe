@@ -7,6 +7,34 @@ import dev.promethe.api.PolicyDataTrust
 import dev.promethe.api.ReasoningEffort
 import dev.promethe.api.ToolIntentRecord
 import dev.promethe.api.ToolIntentStatus
+import kotlinx.serialization.Serializable
+
+@Serializable
+enum class McpTaskStatus {
+    WORKING,
+    INPUT_REQUIRED,
+    COMPLETED,
+    FAILED,
+    CANCELLED,
+}
+
+@Serializable
+data class McpTaskRecord(
+    val taskId: String,
+    val ownerSessionId: String,
+    val method: String,
+    val resourceName: String,
+    val runId: String? = null,
+    val status: McpTaskStatus,
+    val statusMessage: String? = null,
+    val resultJson: String? = null,
+    val errorJson: String? = null,
+    val inputRequestsJson: String? = null,
+    val createdAt: Long,
+    val lastUpdatedAt: Long,
+    val ttlMs: Long? = null,
+    val pollIntervalMs: Long? = null,
+)
 
 /**
  * Platform-agnostic database interface consumed by core classes in commonMain.
@@ -47,6 +75,28 @@ interface PrometheDatabaseApi {
     suspend fun appendAgentRunEvent(event: AgentRunEventRecord): Boolean = true
 
     suspend fun getAgentRunEvents(runId: String): List<AgentRunEventRecord> = emptyList()
+
+    // ── MCP tasks ──
+    suspend fun insertMcpTask(task: McpTaskRecord): Boolean = true
+
+    suspend fun updateMcpTask(
+        taskId: String,
+        ownerSessionId: String,
+        expectedStatuses: Set<McpTaskStatus>,
+        status: McpTaskStatus,
+        statusMessage: String?,
+        resultJson: String?,
+        errorJson: String?,
+        inputRequestsJson: String?,
+        lastUpdatedAt: Long,
+    ): Boolean = true
+
+    suspend fun getMcpTask(
+        taskId: String,
+        ownerSessionId: String,
+    ): McpTaskRecord? = null
+
+    suspend fun getMcpTasksByStatus(statuses: Set<McpTaskStatus>): List<McpTaskRecord> = emptyList()
 
     // ── Tool intents ──
     suspend fun insertToolIntent(

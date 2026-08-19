@@ -495,11 +495,11 @@ curl http://localhost:8080/api/v1/mcp/tools
 
 ## MCP Protocol Server
 
-Prométhé also exposes its own built-in tools **as an MCP server** (2025-11-05 Streamable HTTP transport), so external MCP clients (IDEs, other agents) can call them. Implemented in `gateway/.../mcp/McpServerEndpoint.kt`, mounted at root (not under `/api`).
+Prométhé also exposes its own built-in tools **as an MCP server**. The same Streamable HTTP endpoint supports stateless `2026-07-28` requests and the legacy `2025-11-25` lifecycle, so external MCP clients can call them. It is implemented in `gateway/.../mcp/McpServerEndpoint.kt` and mounted at root, not under `/api`.
 
 ### GET /.well-known/mcp
 
-Server Card for discovery (name, protocol version, capabilities, `endpoint: "/mcp"`).
+Server Card for discovery (name, supported protocol versions, capabilities, `endpoint: "/mcp"`). The `io.modelcontextprotocol/tasks` extension is present only when durable task storage is active.
 
 ```bash
 curl http://localhost:8080/.well-known/mcp
@@ -507,7 +507,7 @@ curl http://localhost:8080/.well-known/mcp
 
 ### POST /mcp
 
-Full JSON-RPC 2.0 endpoint. Handles `initialize`, `tools/list`, `tools/call`, `tasks/get`, `tasks/cancel`, `notifications/initialized`, `shutdown`. Validates the `MCP-Protocol-Version` header (400 if unsupported), rejects batch JSON-RPC arrays (400), and rejects browser `Origin` values outside `CORS_ALLOWED_ORIGINS` (403). Native MCP clients may omit `Origin`.
+Full JSON-RPC 2.0 endpoint. Modern requests handle `server/discover`, `tools/list`, `tools/call`, `tasks/get`, `tasks/update`, and `tasks/cancel`; legacy requests retain `initialize`, `tools/list`, `tools/call`, `notifications/initialized`, and `shutdown`. Modern Tasks are negotiated per request through `_meta["io.modelcontextprotocol/clientCapabilities"].extensions`, are persisted in SQLite, bound to the authenticated session, and use `taskId` as `Mcp-Name`. The endpoint validates all modern routing headers, rejects unsupported versions and batch arrays with `400`, and rejects browser origins outside `CORS_ALLOWED_ORIGINS` with `403`. Native MCP clients may omit `Origin`.
 
 ```bash
 curl -X POST http://localhost:8080/mcp \

@@ -324,6 +324,158 @@ class McpStreamableHttpTransportTest {
             assertFalse(clientOpened)
         }
 
+    @Test
+    fun `modern MCP advertises tasks and polls a durable tool result`() =
+        runTest {
+            var taskPolls = 0
+            val outboundClient =
+                RecordingOutboundClient { request ->
+                    val result =
+                        when (request.method()) {
+                            "server/discover" -> {
+                                modernDiscoveryResult()
+                            }
+
+                            "tools/call" -> {
+                                buildJsonObject {
+                                    put("resultType", McpProtocol.RESULT_TASK)
+                                    put("taskId", "task-42")
+                                    put("status", "working")
+                                    put("createdAt", "2026-08-19T00:00:00Z")
+                                    put("lastUpdatedAt", "2026-08-19T00:00:00Z")
+                                    put("ttlMs", 60_000)
+                                    put("pollIntervalMs", 25)
+                                }
+                            }
+
+                            "tasks/get" -> {
+                                taskPolls++
+                                assertEquals("task-42", request.headers[McpProtocol.NAME_HEADER])
+                                val params = json.parseToJsonElement(request.body).jsonObject["params"]!!.jsonObject
+                                assertEquals("task-42", params["taskId"]?.jsonPrimitive?.content)
+                                buildJsonObject {
+                                    put("resultType", McpProtocol.RESULT_COMPLETE)
+                                    put("taskId", "task-42")
+                                    put("status", "completed")
+                                    put("createdAt", "2026-08-19T00:00:00Z")
+                                    put("lastUpdatedAt", "2026-08-19T00:00:01Z")
+                                    put("ttlMs", 60_000)
+                                    putJsonObject("result") {
+                                        putJsonArray("content") {
+                                            add(
+                                                buildJsonObject {
+                                                    put("type", "text")
+                                                    put("text", "Task complete")
+                                                },
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
+                            else -> {
+                                error("Unexpected method ${request.method()}")
+                            }
+                        }
+                    jsonRpcResult(request.id(), result).asHttpResponse()
+                }
+            val delays = mutableListOf<Long>()
+            val transport =
+                McpStreamableHttpTransport(
+                    baseUrl = "https://mcp.example/rpc",
+                    outboundClient = outboundClient,
+                    taskPollDelay = { delays += it },
+                )
+
+            transport.initialize()
+            assertEquals("Task complete", transport.callTool("web_crawl", buildJsonObject {}))
+
+            assertEquals(1, taskPolls)
+            assertEquals(listOf(25L), delays)
+            val capabilities =
+                json.parseToJsonElement(outboundClient.requests[1].body).jsonObject["params"]!!.jsonObject["_meta"]!!
+                    .jsonObject[McpProtocol.CLIENT_CAPABILITIES_META]!!.jsonObject
+            assertTrue(capabilities["extensions"]!!.jsonObject.containsKey(McpProtocol.TASKS_EXTENSION))
+        }
+
+    @Test
+    fun `modern MCP updates task input and cancels after bounded polling`() =
+        runTest {
+            var pollCount = 0
+            var updateCount = 0
+            var cancelCount = 0
+            val outboundClient =
+                RecordingOutboundClient { request ->
+                    val result =
+                        when (request.method()) {
+                            "server/discover" -> {
+                                modernDiscoveryResult()
+                            }
+
+                            "tools/call" -> {
+                                taskState(McpProtocol.RESULT_TASK, "working")
+                            }
+
+                            "tasks/get" -> {
+                                pollCount++
+                                if (pollCount <= 2) {
+                                    taskState(McpProtocol.RESULT_COMPLETE, "input_required") {
+                                        putJsonObject("inputRequests") {
+                                            putJsonObject("confirm") {
+                                                put("method", "elicitation/create")
+                                                putJsonObject("params") { put("message", "Continue?") }
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    taskState(McpProtocol.RESULT_COMPLETE, "working")
+                                }
+                            }
+
+                            "tasks/update" -> {
+                                updateCount++
+                                val params = json.parseToJsonElement(request.body).jsonObject["params"]!!.jsonObject
+                                assertEquals("accept", params["inputResponses"]!!.jsonObject["confirm"]!!.jsonObject["action"]?.jsonPrimitive?.content)
+                                buildJsonObject { put("resultType", McpProtocol.RESULT_COMPLETE) }
+                            }
+
+                            "tasks/cancel" -> {
+                                cancelCount++
+                                buildJsonObject { put("resultType", McpProtocol.RESULT_COMPLETE) }
+                            }
+
+                            else -> {
+                                error("Unexpected method ${request.method()}")
+                            }
+                        }
+                    jsonRpcResult(request.id(), result).asHttpResponse()
+                }
+            val transport =
+                McpStreamableHttpTransport(
+                    baseUrl = "https://mcp.example/rpc",
+                    outboundClient = outboundClient,
+                    inputRequestHandlers =
+                        mapOf(
+                            "elicitation/create" to
+                                McpInputRequestHandler { _, _ ->
+                                    buildJsonObject { put("action", "accept") }
+                                },
+                        ),
+                    maxTaskPolls = 3,
+                    taskPollDelay = {},
+                )
+
+            transport.initialize()
+            val failure =
+                assertFailsWith<RuntimeException> {
+                    transport.callTool("web_crawl", buildJsonObject {})
+                }
+
+            assertTrue(failure.message.orEmpty().contains("exceeded 3 polling attempts"))
+            assertEquals(1, updateCount)
+            assertEquals(1, cancelCount)
+        }
+
     private fun assertModernMetadata(body: String) {
         val params = json.parseToJsonElement(body).jsonObject["params"]!!.jsonObject
         val metadata = params["_meta"]!!.jsonObject
@@ -368,6 +520,22 @@ class McpStreamableHttpTransportTest {
             put("resultType", McpProtocol.RESULT_COMPLETE)
             putJsonArray("supportedVersions") { add(McpProtocol.MODERN_VERSION) }
             putJsonObject("capabilities") {}
+        }
+
+    private fun taskState(
+        resultType: String,
+        status: String,
+        content: kotlinx.serialization.json.JsonObjectBuilder.() -> Unit = {},
+    ): JsonObject =
+        buildJsonObject {
+            put("resultType", resultType)
+            put("taskId", "task-input")
+            put("status", status)
+            put("createdAt", "2026-08-19T00:00:00Z")
+            put("lastUpdatedAt", "2026-08-19T00:00:00Z")
+            put("ttlMs", 60_000)
+            put("pollIntervalMs", 25)
+            content()
         }
 
     private fun jsonRpcResult(
