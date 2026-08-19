@@ -4,6 +4,11 @@ import ai.koog.agents.core.tools.ToolParameterType
 import ai.koog.agents.core.tools.annotations.InternalAgentToolsApi
 import dev.promethe.api.voice.ToolSchema
 import dev.promethe.core.Log
+import dev.promethe.core.PolicyEffect
+import dev.promethe.core.PolicyKernel
+import dev.promethe.core.ToolApprovalPolicy
+import dev.promethe.core.ToolCallOrigin
+import dev.promethe.core.ToolExecutionRequest
 import dev.promethe.core.ToolRegistry
 import kotlinx.serialization.json.*
 
@@ -25,8 +30,17 @@ object ToolSchemaExporter {
      * Export all registered tools as portable [ToolSchema] objects.
      */
     @OptIn(InternalAgentToolsApi::class)
-    suspend fun exportFromRegistry(): List<ToolSchema> {
-        val tools = ToolRegistry.listTools()
+    suspend fun exportFromRegistry(policyKernel: PolicyKernel = PolicyKernel()): List<ToolSchema> {
+        val tools =
+            ToolRegistry.listTools().filter { tool ->
+                val request =
+                    ToolExecutionRequest(
+                        toolName = tool.name,
+                        arguments = JsonObject(emptyMap()),
+                        origin = ToolCallOrigin.VOICE,
+                    )
+                policyKernel.evaluate(request, ToolApprovalPolicy.contractFor(tool.name)).effect == PolicyEffect.ALLOW
+            }
         return tools.mapNotNull { tool ->
             try {
                 val desc = tool.descriptor

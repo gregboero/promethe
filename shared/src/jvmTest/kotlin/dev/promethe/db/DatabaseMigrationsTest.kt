@@ -40,6 +40,9 @@ class DatabaseMigrationsTest {
                     statement.executeQuery("SELECT version FROM flyway_schema_history WHERE version = '10'").use { rows ->
                         assertTrue(rows.next(), "V10 artifact reference migration should be recorded")
                     }
+                    statement.executeQuery("SELECT version FROM flyway_schema_history WHERE version = '11'").use { rows ->
+                        assertTrue(rows.next(), "V11 security audit hash-chain migration should be recorded")
+                    }
                     statement.executeQuery("SELECT reasoning_effort FROM agent_profiles WHERE id = 'main'").use { rows ->
                         assertTrue(rows.next())
                         assertEquals("AUTO", rows.getString(1))
@@ -122,6 +125,12 @@ class DatabaseMigrationsTest {
                         assertTrue("invocation_hash" in columns, "V8 must persist only the tool invocation fingerprint")
                         assertTrue("request_fingerprint" in columns, "V9 must preserve the request fingerprint in events")
                         assertTrue("artifact_hash" in columns, "V10 must preserve artifact references in events")
+                    }
+                    statement.executeQuery("PRAGMA table_info(security_audit_logs)").use { rows ->
+                        val columns = mutableSetOf<String>()
+                        while (rows.next()) columns += rows.getString("name")
+                        assertTrue("previous_hash" in columns, "V11 must preserve the previous audit hash")
+                        assertTrue("entry_hash" in columns, "V11 must preserve the current audit hash")
                     }
                 }
             }

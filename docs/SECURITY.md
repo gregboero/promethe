@@ -37,7 +37,9 @@ taking over a newly exposed gateway.
 
 Login failures are rate-limited per remote address. Authentication, owner changes, session logout,
 OAuth events, and MCP configuration changes are written to the security audit log without credentials
-or token values.
+or token values. New entries are append-only and linked to the previous entry with SHA-256; startup and
+diagnostic code can verify the chain. This detects database alteration but is not a blockchain, an external
+timestamp, or a substitute for protected backups.
 
 ## OAuth and Persisted Secrets
 
@@ -74,6 +76,14 @@ write only inside that workspace, and has network access disabled.
 Mandatory approval also covers destructive file operations, Docker, process termination, Git writes,
 external sending tools, browser evaluation, and configuration changes. `APPROVAL_MODE=auto` does not
 bypass this mandatory set.
+
+Every tool invocation is also evaluated by the versioned `PolicyKernel`. Immutable system rules deny
+unknown tools, prevent untrusted content from initiating effects, prevent `SECRET` data from using egress,
+and preserve owner-only restrictions. Organization, project and session rules may only strengthen these
+rules. Policy audit entries contain the tool name, origin, contract metadata and an invocation fingerprint;
+raw arguments and secrets are not stored. MCP and legacy voice schema exports omit tools denied by this
+policy. Destination-level HTTP allow-lists and explicit owner identity propagation remain required before
+the egress and owner policy work can be considered complete.
 
 ## Discord Access and Knowledge Capture
 

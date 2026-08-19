@@ -10,6 +10,7 @@ import dev.promethe.api.ToolIntentStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import java.security.MessageDigest
 import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.jdbc.*
 import org.jetbrains.exposed.v1.jdbc.transactions.experimental.newSuspendedTransaction
@@ -25,6 +26,7 @@ class PrometheDatabase(
     private val db: Database,
 ) : PrometheDatabaseApi {
     private val eventWriteMutex = Mutex()
+    private val securityAuditWriteMutex = Mutex()
 
     /**
      * Initialize schema: create tables + FTS5 index + sync triggers.
@@ -1105,15 +1107,62 @@ class PrometheDatabase(
     }
 
     override suspend fun insertSecurityAuditLog(log: SecurityAuditLogRow) {
-        dbQuery {
-            SecurityAuditLogs.insert {
-                it[eventType] = log.eventType
-                it[actor] = log.actor
-                it[remoteAddress] = log.remoteAddress
-                it[detail] = log.detail
-                it[createdAt] = log.createdAt
+        securityAuditWriteMutex.withLock {
+            dbQuery {
+                val previousHash =
+                    SecurityAuditLogs
+                        .selectAll()
+                        .where { SecurityAuditLogs.entryHash neq "" }
+                        .orderBy(SecurityAuditLogs.id, SortOrder.DESC)
+                        .limit(1)
+                        .singleOrNull()
+                        ?.get(SecurityAuditLogs.entryHash)
+                        ?: SECURITY_AUDIT_GENESIS_HASH
+                val entryHash = securityAuditHash(log, previousHash)
+                SecurityAuditLogs.insert {
+                    it[eventType] = log.eventType
+                    it[actor] = log.actor
+                    it[remoteAddress] = log.remoteAddress
+                    it[detail] = log.detail
+                    it[createdAt] = log.createdAt
+                    it[SecurityAuditLogs.previousHash] = previousHash
+                    it[SecurityAuditLogs.entryHash] = entryHash
+                }
             }
         }
+    }
+
+    override suspend fun listSecurityAuditLogs(limit: Int): List<SecurityAuditLogRow> =
+        dbQuery {
+            SecurityAuditLogs
+                .selectAll()
+                .orderBy(SecurityAuditLogs.id, SortOrder.ASC)
+                .limit(limit.coerceIn(1, MAX_SECURITY_AUDIT_READ_LIMIT))
+                .map(ResultRow::toSecurityAuditLogRow)
+        }
+
+    override suspend fun verifySecurityAuditChain(): SecurityAuditChainVerification {
+        val rows =
+            dbQuery {
+                SecurityAuditLogs
+                    .selectAll()
+                    .where { SecurityAuditLogs.entryHash neq "" }
+                    .orderBy(SecurityAuditLogs.id, SortOrder.ASC)
+                    .map(ResultRow::toSecurityAuditLogRow)
+            }
+        var expectedPreviousHash = SECURITY_AUDIT_GENESIS_HASH
+        rows.forEachIndexed { index, row ->
+            val expectedHash = securityAuditHash(row, expectedPreviousHash)
+            if (row.previousHash != expectedPreviousHash || row.entryHash != expectedHash) {
+                return SecurityAuditChainVerification(
+                    valid = false,
+                    entries = index,
+                    invalidEntryHash = row.entryHash,
+                )
+            }
+            expectedPreviousHash = row.entryHash
+        }
+        return SecurityAuditChainVerification(valid = true, entries = rows.size)
     }
 
     override suspend fun insertOAuthAuthorization(authorization: OAuthAuthorizationRow) {
@@ -1558,3 +1607,44 @@ private fun ResultRow.toMcpServerConfigRow() =
         createdAt = this[McpServerConfigs.createdAt],
         updatedAt = this[McpServerConfigs.updatedAt],
     )
+
+private fun ResultRow.toSecurityAuditLogRow() =
+    SecurityAuditLogRow(
+        eventType = this[SecurityAuditLogs.eventType],
+        actor = this[SecurityAuditLogs.actor],
+        remoteAddress = this[SecurityAuditLogs.remoteAddress],
+        detail = this[SecurityAuditLogs.detail],
+        createdAt = this[SecurityAuditLogs.createdAt],
+        previousHash = this[SecurityAuditLogs.previousHash],
+        entryHash = this[SecurityAuditLogs.entryHash],
+    )
+
+private const val SECURITY_AUDIT_GENESIS_HASH = "promethe-security-audit-genesis-v1"
+private const val MAX_SECURITY_AUDIT_READ_LIMIT = 100_000
+
+private fun securityAuditHash(
+    log: SecurityAuditLogRow,
+    previousHash: String,
+): String {
+    val canonical =
+        buildString {
+            append("promethe-security-audit-v1\u0000")
+            appendField(previousHash)
+            appendField(log.eventType)
+            appendField(log.actor)
+            appendField(log.remoteAddress)
+            appendField(log.detail)
+            append(log.createdAt)
+        }
+    return MessageDigest
+        .getInstance("SHA-256")
+        .digest(canonical.toByteArray(Charsets.UTF_8))
+        .joinToString("") { byte -> "%02x".format(byte) }
+}
+
+private fun StringBuilder.appendField(value: String) {
+    append(value.length)
+    append(':')
+    append(value)
+    append('\u0000')
+}
