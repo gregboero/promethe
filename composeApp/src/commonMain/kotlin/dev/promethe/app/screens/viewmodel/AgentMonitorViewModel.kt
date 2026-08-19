@@ -14,8 +14,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
 
 private val logger = io.github.oshai.kotlinlogging.KotlinLogging.logger {}
 
@@ -30,6 +35,11 @@ data class AgentMonitorUiState(
     val approvalCount: Int = 0,
     val pendingProviderChoices: List<JsonObject> = emptyList(),
     val providerChoiceCount: Int = 0,
+    val pendingMcpElicitations: List<JsonObject> = emptyList(),
+    val mcpElicitationCount: Int = 0,
+    val mcpElicitationDrafts: Map<String, Map<String, String>> = emptyMap(),
+    val mcpElicitationErrors: Map<String, String> = emptyMap(),
+    val mcpElicitationSubmitting: Set<String> = emptySet(),
 )
 
 // ── ViewModel ────────────────────────────────────────────────────────────────
@@ -49,12 +59,14 @@ class AgentMonitorViewModel(
     private var eventStreamJob: Job? = null
     private var approvalPollJob: Job? = null
     private var providerPollJob: Job? = null
+    private var mcpElicitationPollJob: Job? = null
 
     init {
         loadAgents()
         startEventStream()
         startApprovalPolling()
         startProviderChoicePolling()
+        startMcpElicitationPolling()
     }
 
     // ── State Mutation ───────────────────────────────────────────────────────
@@ -225,10 +237,152 @@ class AgentMonitorViewModel(
         }
     }
 
+    private fun startMcpElicitationPolling() {
+        mcpElicitationPollJob?.cancel()
+        mcpElicitationPollJob = viewModelScope.launch {
+            while (true) {
+                try {
+                    val response = client.getPendingMcpElicitations()
+                    val items = response["pending"]?.jsonArray?.map { it.jsonObject }.orEmpty()
+                    val activeIds = items.mapNotNull { it["id"]?.jsonPrimitive?.contentOrNull }.toSet()
+                    _state.update { current ->
+                        val drafts = current.mcpElicitationDrafts.filterKeys(activeIds::contains).toMutableMap()
+                        items.forEach { request ->
+                            val id = request["id"]?.jsonPrimitive?.contentOrNull ?: return@forEach
+                            if (id !in drafts) drafts[id] = defaultMcpDraft(request)
+                        }
+                        current.copy(
+                            pendingMcpElicitations = items,
+                            mcpElicitationCount = items.size,
+                            mcpElicitationDrafts = drafts,
+                            mcpElicitationErrors = current.mcpElicitationErrors.filterKeys(activeIds::contains),
+                        )
+                    }
+                } catch (e: Exception) {
+                    logger.debug(e) { "Failed to poll pending MCP input requests" }
+                }
+                delay(2_000)
+            }
+        }
+    }
+
+    fun updateMcpElicitationField(
+        requestId: String,
+        field: String,
+        value: String,
+    ) {
+        _state.update { current ->
+            current.copy(
+                mcpElicitationDrafts =
+                    current.mcpElicitationDrafts +
+                        (requestId to (current.mcpElicitationDrafts[requestId].orEmpty() + (field to value))),
+                mcpElicitationErrors = current.mcpElicitationErrors - requestId,
+            )
+        }
+    }
+
+    fun submitMcpElicitation(requestId: String) {
+        if (requestId in _state.value.mcpElicitationSubmitting) return
+        _state.update { it.copy(mcpElicitationSubmitting = it.mcpElicitationSubmitting + requestId) }
+        viewModelScope.launch {
+            try {
+                val request = _state.value.pendingMcpElicitations.firstOrNull {
+                    it["id"]?.jsonPrimitive?.contentOrNull == requestId
+                } ?: return@launch
+                val content = buildMcpContent(request, _state.value.mcpElicitationDrafts[requestId].orEmpty())
+                client.respondToMcpElicitation(requestId, action = "accept", content = content)
+                removeMcpElicitation(requestId)
+            } catch (e: Exception) {
+                logger.warn { "Failed to answer MCP input request $requestId" }
+                _state.update { current ->
+                    current.copy(
+                        mcpElicitationErrors = current.mcpElicitationErrors + (requestId to (e.message ?: "Invalid response")),
+                    )
+                }
+            } finally {
+                _state.update { it.copy(mcpElicitationSubmitting = it.mcpElicitationSubmitting - requestId) }
+            }
+        }
+    }
+
+    fun declineMcpElicitation(requestId: String) {
+        if (requestId in _state.value.mcpElicitationSubmitting) return
+        _state.update { it.copy(mcpElicitationSubmitting = it.mcpElicitationSubmitting + requestId) }
+        viewModelScope.launch {
+            try {
+                client.respondToMcpElicitation(requestId, action = "decline")
+                removeMcpElicitation(requestId)
+            } catch (e: Exception) {
+                logger.warn { "Failed to decline MCP input request $requestId" }
+                _state.update { current ->
+                    current.copy(
+                        mcpElicitationErrors = current.mcpElicitationErrors + (requestId to (e.message ?: "Request failed")),
+                    )
+                }
+            } finally {
+                _state.update { it.copy(mcpElicitationSubmitting = it.mcpElicitationSubmitting - requestId) }
+            }
+        }
+    }
+
+    private fun removeMcpElicitation(requestId: String) {
+        _state.update { current ->
+            current.copy(
+                pendingMcpElicitations = current.pendingMcpElicitations.filterNot {
+                    it["id"]?.jsonPrimitive?.contentOrNull == requestId
+                },
+                mcpElicitationCount = (current.mcpElicitationCount - 1).coerceAtLeast(0),
+                mcpElicitationDrafts = current.mcpElicitationDrafts - requestId,
+                mcpElicitationErrors = current.mcpElicitationErrors - requestId,
+                mcpElicitationSubmitting = current.mcpElicitationSubmitting - requestId,
+            )
+        }
+    }
+
+    private fun defaultMcpDraft(request: JsonObject): Map<String, String> {
+        val schema = request["requestedSchema"] as? JsonObject ?: return emptyMap()
+        val properties = schema["properties"] as? JsonObject ?: return emptyMap()
+        return properties.mapNotNull { (name, definitionValue) ->
+            val definition = definitionValue as? JsonObject ?: return@mapNotNull null
+            if (definition["type"]?.jsonPrimitive?.contentOrNull == "boolean") name to "false" else null
+        }.toMap()
+    }
+
+    private fun buildMcpContent(
+        request: JsonObject,
+        draft: Map<String, String>,
+    ): JsonObject {
+        val schema = request["requestedSchema"] as? JsonObject ?: error("Missing requested schema")
+        val properties = schema["properties"] as? JsonObject ?: error("Missing schema properties")
+        val required =
+            (schema["required"] as? JsonArray)
+                ?.mapNotNull { (it as? JsonPrimitive)?.contentOrNull }
+                ?.toSet()
+                .orEmpty()
+        return buildJsonObject {
+            properties.forEach { (name, definitionValue) ->
+                val definition = definitionValue as? JsonObject ?: error("Invalid field definition")
+                val raw = draft[name]
+                if (raw == null || (raw.isBlank() && definition["type"]?.jsonPrimitive?.contentOrNull != "string")) {
+                    require(name !in required) { "A value is required for $name" }
+                    return@forEach
+                }
+                when (definition["type"]?.jsonPrimitive?.contentOrNull) {
+                    "string" -> put(name, raw)
+                    "number" -> put(name, raw.toDoubleOrNull() ?: error("$name must be a number"))
+                    "integer" -> put(name, raw.toLongOrNull() ?: error("$name must be an integer"))
+                    "boolean" -> put(name, raw.toBooleanStrictOrNull() ?: error("$name must be true or false"))
+                    else -> error("Unsupported field type for $name")
+                }
+            }
+        }
+    }
+
     override fun onCleared() {
         eventStreamJob?.cancel()
         approvalPollJob?.cancel()
         providerPollJob?.cancel()
+        mcpElicitationPollJob?.cancel()
         super.onCleared()
     }
 }

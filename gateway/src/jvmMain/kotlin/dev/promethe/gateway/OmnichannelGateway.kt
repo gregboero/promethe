@@ -43,6 +43,7 @@ class OmnichannelGateway(
     private val llmAdapter: KoogLlmAdapter,
     private val feedbackCollector: FeedbackCollector,
     private val mcpBridge: McpBridge,
+    private val mcpElicitationBroker: McpElicitationBroker,
     private val memoryLayer: MemoryLayer,
     private val taskScheduler: dev.promethe.core.TaskScheduler? = null,
     private val hookManager: dev.promethe.core.hooks.HookManager? = null,
@@ -307,6 +308,7 @@ class OmnichannelGateway(
                                 mcpManagementRoutes(mcpBridge, database, dev.promethe.core.security.SecretCipher.fromConfig())
 
                                 approvalRoutes(approvalGate)
+                                mcpElicitationRoutes(mcpElicitationBroker)
                                 sandboxSecurityRoutes(
                                     sandboxManager,
                                     sandboxRuntimePolicy,

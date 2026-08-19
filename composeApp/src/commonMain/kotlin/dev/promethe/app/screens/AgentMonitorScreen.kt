@@ -2,6 +2,8 @@ package dev.promethe.app.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -144,7 +146,7 @@ fun AgentMonitorScreen(client: PrometheClient) {
             color = colors.surface,
             tonalElevation = 1.dp,
         ) {
-            Column {
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 // ── Approval Panel ──
                 if (state.pendingApprovals.isNotEmpty()) {
                     Column(modifier = Modifier.padding(16.dp)) {
@@ -203,6 +205,40 @@ fun AgentMonitorScreen(client: PrometheClient) {
                                     }
                                 }
                             }
+                        }
+                    }
+                    HorizontalDivider(color = colors.outlineVariant)
+                }
+
+                if (state.pendingMcpElicitations.isNotEmpty()) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.Build, null, tint = colors.tertiary, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(6.dp))
+                            Text(
+                                stringResource(Res.string.monitor_mcp_input_title),
+                                style = MaterialTheme.typography.titleSmall,
+                                color = colors.onSurface,
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            Badge(containerColor = colors.tertiary, contentColor = colors.onTertiary) {
+                                Text("${state.mcpElicitationCount}")
+                            }
+                        }
+                        Spacer(Modifier.height(8.dp))
+                        state.pendingMcpElicitations.forEach { request ->
+                            val requestId = request["id"]?.jsonPrimitive?.contentOrNull ?: return@forEach
+                            McpElicitationCard(
+                                request = request,
+                                draft = state.mcpElicitationDrafts[requestId].orEmpty(),
+                                error = state.mcpElicitationErrors[requestId],
+                                isSubmitting = requestId in state.mcpElicitationSubmitting,
+                                onFieldChanged = { field, value ->
+                                    viewModel.updateMcpElicitationField(requestId, field, value)
+                                },
+                                onSubmit = { viewModel.submitMcpElicitation(requestId) },
+                                onDecline = { viewModel.declineMcpElicitation(requestId) },
+                            )
                         }
                     }
                     HorizontalDivider(color = colors.outlineVariant)
@@ -294,6 +330,101 @@ fun AgentMonitorScreen(client: PrometheClient) {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(stringResource(Res.string.monitor_select_agent), color = colors.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                     }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun McpElicitationCard(
+    request: JsonObject,
+    draft: Map<String, String>,
+    error: String?,
+    isSubmitting: Boolean,
+    onFieldChanged: (String, String) -> Unit,
+    onSubmit: () -> Unit,
+    onDecline: () -> Unit,
+) {
+    val colors = MaterialTheme.colorScheme
+    val serverName = request["serverName"]?.jsonPrimitive?.contentOrNull.orEmpty()
+    val message = request["message"]?.jsonPrimitive?.contentOrNull.orEmpty()
+    val schema = request["requestedSchema"] as? JsonObject ?: JsonObject(emptyMap())
+    val properties = schema["properties"] as? JsonObject ?: JsonObject(emptyMap())
+    val required =
+        (schema["required"] as? JsonArray)
+            ?.mapNotNull { (it as? JsonPrimitive)?.contentOrNull }
+            ?.toSet()
+            .orEmpty()
+
+    Card(
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(containerColor = colors.tertiaryContainer.copy(alpha = 0.35f)),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).testTag("monitor_mcp_input"),
+    ) {
+        Column(modifier = Modifier.padding(10.dp)) {
+            Text(serverName, style = MaterialTheme.typography.labelMedium, color = colors.onSurface)
+            Spacer(Modifier.height(2.dp))
+            Text(message, style = MaterialTheme.typography.bodySmall, color = colors.onSurfaceVariant)
+            Text(
+                stringResource(Res.string.monitor_mcp_input_warning),
+                style = MaterialTheme.typography.labelSmall,
+                color = colors.error,
+            )
+            Spacer(Modifier.height(8.dp))
+            properties.forEach { (name, definitionValue) ->
+                val definition = definitionValue as? JsonObject ?: return@forEach
+                val title = definition["title"]?.jsonPrimitive?.contentOrNull ?: name
+                val label = if (name in required) "$title *" else title
+                val description = definition["description"]?.jsonPrimitive?.contentOrNull
+                if (definition["type"]?.jsonPrimitive?.contentOrNull == "boolean") {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Text(label, style = MaterialTheme.typography.bodySmall, color = colors.onSurface)
+                        Switch(
+                            checked = draft[name] == "true",
+                            onCheckedChange = { onFieldChanged(name, it.toString()) },
+                            enabled = !isSubmitting,
+                        )
+                    }
+                } else {
+                    OutlinedTextField(
+                        value = draft[name].orEmpty(),
+                        onValueChange = { onFieldChanged(name, it) },
+                        label = { Text(label) },
+                        supportingText = description?.let { text -> ({ Text(text) }) },
+                        singleLine = true,
+                        enabled = !isSubmitting,
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
+                    )
+                }
+            }
+            if (error != null) {
+                Text(error, style = MaterialTheme.typography.bodySmall, color = colors.error)
+                Spacer(Modifier.height(4.dp))
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FilledTonalButton(
+                    onClick = onSubmit,
+                    enabled = !isSubmitting,
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                ) {
+                    Icon(Icons.Default.CheckCircle, null, modifier = Modifier.size(14.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text(stringResource(Res.string.monitor_mcp_input_submit), style = MaterialTheme.typography.labelSmall)
+                }
+                OutlinedButton(
+                    onClick = onDecline,
+                    enabled = !isSubmitting,
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = colors.error),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                ) {
+                    Icon(Icons.Default.Close, null, modifier = Modifier.size(14.dp))
+                    Spacer(Modifier.width(4.dp))
+                    Text(stringResource(Res.string.monitor_reject), style = MaterialTheme.typography.labelSmall)
                 }
             }
         }
@@ -422,7 +553,7 @@ private fun TimelineNode(event: AgentExecutionEvent) {
 private fun AgentDetailPanel(agent: AgentStatusDto) {
     val colors = MaterialTheme.colorScheme
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
         Text(stringResource(Res.string.monitor_details), style = MaterialTheme.typography.titleMedium, color = colors.onSurface)
         Spacer(Modifier.height(16.dp))
 

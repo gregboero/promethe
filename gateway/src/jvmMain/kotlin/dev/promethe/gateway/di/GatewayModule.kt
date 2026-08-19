@@ -78,6 +78,7 @@ fun gatewayModule(
             llmAdapter = get(),
             feedbackCollector = get(),
             mcpBridge = get(),
+            mcpElicitationBroker = get(),
             memoryLayer = get(),
             taskScheduler = getOrNull(),
             hookManager = getOrNull(),
