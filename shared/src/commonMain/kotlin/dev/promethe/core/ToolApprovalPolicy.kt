@@ -44,6 +44,7 @@ object ToolApprovalPolicy {
             "agent_status",
             "session_history",
             "token_budget",
+            "artifact_read",
             "memory_search",
             "memory_list",
             "skill_search",

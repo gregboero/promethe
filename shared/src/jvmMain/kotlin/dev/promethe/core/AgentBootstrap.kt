@@ -221,6 +221,11 @@ object AgentBootstrap {
                 secureWriter = sandboxFileAccess,
             ),
         )
+        val artifactStore =
+            FileArtifactStore(
+                java.nio.file.Path.of(profileDir.toString()).resolve("artifacts"),
+            )
+        ToolRegistry.register(ArtifactReadTool(artifactStore))
         val outboundPolicy = JvmOutboundUrlPolicy()
         ToolRegistry.register(
             HttpFetchTool(
@@ -273,6 +278,7 @@ object AgentBootstrap {
                 approvalGate = approvalGate,
                 sandboxCommandExecutor = sandboxCommandRunner,
                 toolIntentLedger = PersistentToolIntentLedger(database),
+                artifactStore = artifactStore,
             )
 
         val localCodingAgentService =

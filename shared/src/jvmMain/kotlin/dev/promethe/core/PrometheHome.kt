@@ -38,6 +38,9 @@ object PrometheHome {
     /** Open knowledge archives, including opt-in Discord transcripts. */
     val knowledgeDir: File get() = File(dir, "knowledge")
 
+    /** Content-addressed outputs kept outside user-controlled workspaces. */
+    val artifactsDir: File get() = File(dir, "artifacts")
+
     /** SQLite database file: `~/.promethe/promethe.db` */
     val dbFile: File get() = File(dir, "promethe.db")
 
@@ -55,5 +58,6 @@ object PrometheHome {
         workspaceDir.mkdirs()
         productivityDataDir.mkdirs()
         knowledgeDir.mkdirs()
+        artifactsDir.mkdirs()
     }
 }

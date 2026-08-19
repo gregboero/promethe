@@ -47,6 +47,7 @@ interface ToolIntentLedger {
         intentId: String,
         result: String,
         now: Long,
+        artifactHash: String? = null,
     ): Boolean
 
     suspend fun markFailed(
@@ -85,6 +86,7 @@ object NoOpToolIntentLedger : ToolIntentLedger {
         intentId: String,
         result: String,
         now: Long,
+        artifactHash: String?,
     ): Boolean = true
 
     override suspend fun markFailed(
@@ -157,7 +159,14 @@ class PersistentToolIntentLedger(
             ToolIntentStatus.SUCCEEDED -> {
                 ToolIntentAdmission.Replay(
                     existing.intentId,
-                    "[IDEMPOTENT] This tool call already completed. Use its prior observation; it was not executed again.",
+                    buildString {
+                        append("[IDEMPOTENT] This tool call already completed; it was not executed again.")
+                        existing.artifactHash?.let { hash ->
+                            append(" Its full prior observation is available at artifact://sha256/")
+                            append(hash)
+                            append('.')
+                        }
+                    },
                 )
             }
 
@@ -221,6 +230,7 @@ class PersistentToolIntentLedger(
             expectedStatuses = setOf(ToolIntentStatus.PREPARED),
             status = ToolIntentStatus.EXECUTING,
             resultHash = null,
+            artifactHash = null,
             errorCode = null,
             startedAt = now,
             finishedAt = null,
@@ -233,13 +243,14 @@ class PersistentToolIntentLedger(
         intentId: String,
         result: String,
         now: Long,
-    ): Boolean = finish(intentId, ToolIntentStatus.SUCCEEDED, toolIntentDigest(result), null, now)
+        artifactHash: String?,
+    ): Boolean = finish(intentId, ToolIntentStatus.SUCCEEDED, toolIntentDigest(result), artifactHash, null, now)
 
     override suspend fun markFailed(
         intentId: String,
         errorCode: String,
         now: Long,
-    ): Boolean = finish(intentId, ToolIntentStatus.FAILED, null, errorCode, now)
+    ): Boolean = finish(intentId, ToolIntentStatus.FAILED, null, null, errorCode, now)
 
     override suspend fun markBlocked(
         intentId: String,
@@ -252,6 +263,7 @@ class PersistentToolIntentLedger(
             expectedStatuses = setOf(ToolIntentStatus.PREPARED, ToolIntentStatus.EXECUTING),
             status = ToolIntentStatus.BLOCKED,
             resultHash = null,
+            artifactHash = null,
             errorCode = errorCode,
             startedAt = null,
             finishedAt = now,
@@ -270,6 +282,7 @@ class PersistentToolIntentLedger(
         intentId: String,
         status: ToolIntentStatus,
         resultHash: String?,
+        artifactHash: String?,
         errorCode: String?,
         now: Long,
     ): Boolean =
@@ -279,6 +292,7 @@ class PersistentToolIntentLedger(
                 expectedStatuses = setOf(ToolIntentStatus.EXECUTING),
                 status = status,
                 resultHash = resultHash,
+                artifactHash = artifactHash,
                 errorCode = errorCode,
                 startedAt = null,
                 finishedAt = now,
@@ -289,6 +303,7 @@ class PersistentToolIntentLedger(
                         status = status,
                         now = now,
                         resultHash = resultHash,
+                        artifactHash = artifactHash,
                         errorCode = errorCode,
                     ),
             )
@@ -338,6 +353,7 @@ private fun ToolIntentRecord.transitionEvent(
     status: ToolIntentStatus,
     now: Long,
     resultHash: String? = null,
+    artifactHash: String? = null,
     errorCode: String? = null,
 ): AgentRunEventRecord? =
     runId?.let { effectiveRunId ->
@@ -352,6 +368,7 @@ private fun ToolIntentRecord.transitionEvent(
             risk = risk,
             intentStatus = status,
             resultHash = resultHash,
+            artifactHash = artifactHash,
             errorCode = errorCode,
             createdAt = now,
         )

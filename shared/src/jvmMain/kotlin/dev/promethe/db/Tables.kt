@@ -40,6 +40,7 @@ object ToolIntents : Table("tool_intents") {
     val risk = varchar("risk", 32)
     val status = varchar("status", 32)
     val resultHash = varchar("result_hash", 64).nullable()
+    val artifactHash = varchar("artifact_hash", 64).nullable()
     val errorCode = varchar("error_code", 128).nullable()
     val createdAt = long("created_at")
     val startedAt = long("started_at").nullable()
@@ -52,6 +53,7 @@ object ToolIntents : Table("tool_intents") {
         uniqueIndex(idempotencyKeyHash)
         index(isUnique = false, runId)
         index(isUnique = false, status)
+        index(isUnique = false, artifactHash)
     }
 }
 
@@ -76,6 +78,7 @@ object AgentRunEvents : Table("agent_run_events") {
     val runStatus = varchar("run_status", 32).nullable()
     val intentStatus = varchar("intent_status", 32).nullable()
     val resultHash = varchar("result_hash", 64).nullable()
+    val artifactHash = varchar("artifact_hash", 64).nullable()
     val errorCode = varchar("error_code", 128).nullable()
     val approvalId = varchar("approval_id", 200).nullable()
     val approvalAllowed = bool("approval_allowed").nullable()
@@ -89,6 +92,7 @@ object AgentRunEvents : Table("agent_run_events") {
         uniqueIndex(runId, sequence)
         index(isUnique = false, intentId)
         index(isUnique = false, eventType)
+        index(isUnique = false, artifactHash)
     }
 }
 

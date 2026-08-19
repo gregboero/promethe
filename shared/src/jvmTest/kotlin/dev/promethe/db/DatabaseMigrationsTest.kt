@@ -37,6 +37,9 @@ class DatabaseMigrationsTest {
                     statement.executeQuery("SELECT version FROM flyway_schema_history WHERE version = '9'").use { rows ->
                         assertTrue(rows.next(), "V9 run request fingerprint migration should be recorded")
                     }
+                    statement.executeQuery("SELECT version FROM flyway_schema_history WHERE version = '10'").use { rows ->
+                        assertTrue(rows.next(), "V10 artifact reference migration should be recorded")
+                    }
                     statement.executeQuery("SELECT reasoning_effort FROM agent_profiles WHERE id = 'main'").use { rows ->
                         assertTrue(rows.next())
                         assertEquals("AUTO", rows.getString(1))
@@ -109,6 +112,7 @@ class DatabaseMigrationsTest {
                         while (rows.next()) columns += rows.getString("name")
                         assertTrue("idempotency_key_hash" in columns, "V7 must add durable tool idempotency")
                         assertTrue("invocation_hash" in columns, "V7 must bind idempotency to the full invocation")
+                        assertTrue("artifact_hash" in columns, "V10 must persist the tool-output artifact reference")
                     }
                     statement.executeQuery("PRAGMA table_info(agent_run_events)").use { rows ->
                         val columns = mutableSetOf<String>()
@@ -117,6 +121,7 @@ class DatabaseMigrationsTest {
                         assertTrue("sequence" in columns, "V8 must order events within a run")
                         assertTrue("invocation_hash" in columns, "V8 must persist only the tool invocation fingerprint")
                         assertTrue("request_fingerprint" in columns, "V9 must preserve the request fingerprint in events")
+                        assertTrue("artifact_hash" in columns, "V10 must preserve artifact references in events")
                     }
                 }
             }

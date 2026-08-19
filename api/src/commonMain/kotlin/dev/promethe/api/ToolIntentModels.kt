@@ -24,6 +24,7 @@ data class ToolIntentRecord(
     val risk: ToolRisk,
     val status: ToolIntentStatus,
     val resultHash: String? = null,
+    val artifactHash: String? = null,
     val errorCode: String? = null,
     val createdAt: Long,
     val startedAt: Long? = null,

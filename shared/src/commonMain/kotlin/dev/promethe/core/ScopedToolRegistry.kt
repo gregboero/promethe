@@ -24,6 +24,7 @@ class ScopedToolRegistry(
                 "delegate_task",
                 "get_subtask_result",
                 "execute_command",
+                "artifact_read",
             )
 
         /**

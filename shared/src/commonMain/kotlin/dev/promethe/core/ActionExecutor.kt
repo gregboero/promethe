@@ -79,9 +79,17 @@ class ActionExecutor(
     private val approvalGate: ApprovalGate? = null,
     private val sandboxCommandExecutor: SandboxCommandExecutor? = null,
     private val toolIntentLedger: ToolIntentLedger = NoOpToolIntentLedger,
+    artifactStore: ArtifactStore? = null,
     private val resourceGovernors: ResourceGovernorRegistry = GlobalResourceGovernorRegistry,
 ) : SecureToolExecutor {
     private val logger = Log.create("ActionExecutor")
+    private val artifactExternalizer =
+        artifactStore?.let { store ->
+            ArtifactObservationExternalizer(
+                store = store,
+                maxInlineBytes = minOf(config.maxOutputBytes, ArtifactObservationExternalizer.DEFAULT_MAX_INLINE_BYTES),
+            )
+        }
 
     /** Shared Koog-compatible serializer backed by kotlinx-serialization. */
     private val koogSerializer = KotlinxSerializer()
@@ -111,6 +119,7 @@ class ActionExecutor(
         "get_config",
         "list_profiles",
         "workspace_roots",
+        "artifact_read",
     )
 
     @OptIn(InternalAgentToolsApi::class)
@@ -291,9 +300,8 @@ class ActionExecutor(
                                     tool.executeUnsafe(typedArgs)
                                 }
 
-                            // 4. Coerce result to String, truncate
-                            val raw = execResult?.toString() ?: ""
-                            truncateOutput(raw, config.maxOutputBytes)
+                            // Hooks inspect the complete result before it is compacted or externalized.
+                            execResult?.toString() ?: ""
                         } catch (e: Exception) {
                             "[ERROR] Tool execution failed: ${e.message}"
                         }
@@ -337,16 +345,36 @@ class ActionExecutor(
                     result
                 }
 
-            setAttribute("tool.result.length", finalResult.length)
-            setAttribute("tool.success", !finalResult.startsWith("[ERROR]") && !finalResult.startsWith("[BLOCKED]"))
-            recordOutcome(intentId, finalResult)
+            val successful = !isToolFailure(finalResult)
+            val observation =
+                if (successful && artifactExternalizer != null) {
+                    runCatching {
+                        artifactExternalizer.externalize(
+                            content = finalResult,
+                            runId = request.runId,
+                            stepId = request.stepId,
+                            intentId = intentId,
+                            toolName = toolName,
+                        )
+                    }.getOrElse { error ->
+                        logger.warn(error) { "Failed to externalize output for '$toolName'; returning a bounded result" }
+                        ExternalizedObservation(truncateOutput(finalResult, config.maxOutputBytes))
+                    }
+                } else {
+                    ExternalizedObservation(truncateOutput(finalResult, config.maxOutputBytes))
+                }
+
+            setAttribute("tool.result.length", observation.text.length)
+            setAttribute("tool.success", successful)
+            observation.artifact?.hash?.let { hash -> setAttribute("artifact.hash", hash) }
+            recordOutcome(intentId, observation.text, observation.artifact?.hash)
 
             // ── STORE in dedup cache for safe tools ──
-            if (toolName in dedupSafeTools && !finalResult.startsWith("[ERROR]") && !finalResult.startsWith("[BLOCKED]")) {
-                dedupCache["$toolName|$args"] = finalResult
+            if (toolName in dedupSafeTools && successful) {
+                dedupCache["$toolName|$args"] = observation.text
             }
 
-            finalResult
+            observation.text
         }
     }
 
@@ -365,6 +393,7 @@ class ActionExecutor(
     private suspend fun recordOutcome(
         intentId: String?,
         result: String,
+        artifactHash: String?,
     ) {
         if (intentId == null) return
         val now = Clock.System.now().toEpochMilliseconds()
@@ -377,7 +406,7 @@ class ActionExecutor(
                         result.startsWith("Error:") ||
                         result.startsWith("[SANDBOX") -> toolIntentLedger.markFailed(intentId, "tool_failed", now)
 
-                    else -> toolIntentLedger.markSucceeded(intentId, result, now)
+                    else -> toolIntentLedger.markSucceeded(intentId, result, now, artifactHash)
                 }
             }.getOrElse { error ->
                 logger.error(error) { "Failed to finish tool intent '$intentId'" }
@@ -385,6 +414,12 @@ class ActionExecutor(
             }
         if (!recorded) logger.warn { "Tool intent '$intentId' did not accept its terminal transition" }
     }
+
+    private fun isToolFailure(result: String): Boolean =
+        result.startsWith("[BLOCKED]") ||
+            result.startsWith("[ERROR]") ||
+            result.startsWith("Error:") ||
+            result.startsWith("[SANDBOX")
 
     private val processBackedTools =
         setOf(

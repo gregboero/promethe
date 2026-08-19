@@ -279,6 +279,7 @@ class PrometheDatabase(
                     it[risk] = intent.risk.name
                     it[status] = intent.status.name
                     it[resultHash] = intent.resultHash
+                    it[artifactHash] = intent.artifactHash
                     it[errorCode] = intent.errorCode
                     it[createdAt] = intent.createdAt
                     it[startedAt] = intent.startedAt
@@ -296,6 +297,7 @@ class PrometheDatabase(
         expectedStatuses: Set<ToolIntentStatus>,
         status: ToolIntentStatus,
         resultHash: String?,
+        artifactHash: String?,
         errorCode: String?,
         startedAt: Long?,
         finishedAt: Long?,
@@ -312,6 +314,7 @@ class PrometheDatabase(
             ) {
                 it[ToolIntents.status] = status.name
                 it[ToolIntents.resultHash] = resultHash
+                it[ToolIntents.artifactHash] = artifactHash
                 it[ToolIntents.errorCode] = errorCode
                 if (startedAt != null) it[ToolIntents.startedAt] = startedAt
                 it[ToolIntents.finishedAt] = finishedAt
@@ -357,6 +360,7 @@ class PrometheDatabase(
             ) {
                 it[status] = ToolIntentStatus.PREPARED.name
                 it[resultHash] = null
+                it[artifactHash] = null
                 it[errorCode] = null
                 it[startedAt] = null
                 it[finishedAt] = null
@@ -1317,6 +1321,7 @@ class PrometheDatabase(
                 it[runStatus] = event.runStatus?.name
                 it[intentStatus] = event.intentStatus?.name
                 it[resultHash] = event.resultHash
+                it[artifactHash] = event.artifactHash
                 it[errorCode] = event.errorCode
                 it[approvalId] = event.approvalId
                 it[approvalAllowed] = event.approvalAllowed
@@ -1375,6 +1380,7 @@ private fun ResultRow.toToolIntentRecord() =
         risk = dev.promethe.api.ToolRisk.valueOf(this[ToolIntents.risk]),
         status = ToolIntentStatus.valueOf(this[ToolIntents.status]),
         resultHash = this[ToolIntents.resultHash],
+        artifactHash = this[ToolIntents.artifactHash],
         errorCode = this[ToolIntents.errorCode],
         createdAt = this[ToolIntents.createdAt],
         startedAt = this[ToolIntents.startedAt],
@@ -1403,6 +1409,7 @@ private fun ResultRow.toAgentRunEventRecord() =
         runStatus = this[AgentRunEvents.runStatus]?.let(AgentRunStatus::valueOf),
         intentStatus = this[AgentRunEvents.intentStatus]?.let(ToolIntentStatus::valueOf),
         resultHash = this[AgentRunEvents.resultHash],
+        artifactHash = this[AgentRunEvents.artifactHash],
         errorCode = this[AgentRunEvents.errorCode],
         approvalId = this[AgentRunEvents.approvalId],
         approvalAllowed = this[AgentRunEvents.approvalAllowed],

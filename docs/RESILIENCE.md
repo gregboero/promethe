@@ -5,13 +5,14 @@
 
 ## Overview
 
-Four cooperating components handle the "things go wrong" and "context gets too big"
+Seven cooperating components handle the "things go wrong" and "context gets too big"
 problems:
 
 | Component | File | Role |
 |---|---|---|
 | `ContextCompressor` | `shared/src/commonMain/kotlin/dev/promethe/core/ContextCompressor.kt` | Keeps conversation history within the model's context window |
 | `ToolOutputPruner` | `shared/src/commonMain/kotlin/dev/promethe/core/ToolOutputPruner.kt` | Pre-cleans verbose tool output before compression |
+| `ArtifactStore` | `shared/src/commonMain/kotlin/dev/promethe/core/ArtifactStore.kt`, `FileArtifactStore.kt` | Stores large text tool observations by SHA-256 and returns compact durable references |
 | `ResilienceStrategy` | `shared/src/commonMain/kotlin/dev/promethe/core/ResilienceStrategy.kt` | 3-level failure escalation (retry → replan → decompose) for the agent loop |
 | `AutoHealingExecutor` | `shared/src/jvmMain/kotlin/dev/promethe/core/AutoHealingExecutor.kt` | Wraps `ActionExecutor` with transparent tool-call retries |
 | `KoogLlmAdapter` fallback chain | `shared/src/commonMain/kotlin/dev/promethe/core/KoogLlmAdapter.kt` | Intra-provider then cross-provider model fallback on LLM call failure |
@@ -20,6 +21,15 @@ problems:
 All of this is wired up in `AgentBootstrap.kt`, which constructs one
 `ResilienceStrategy` and one `ContextCompressor` per agent and passes them into
 `AIAgent`, plus one `AutoHealingExecutor` wrapping the shared `ActionExecutor`.
+
+Before a successful tool result enters the conversation, `ActionExecutor` lets
+the after-tool hooks inspect the complete value. Results larger than 8 KiB are
+then written outside the workspace under the active Promethe profile's
+`artifacts/sha256/` directory. The observation keeps a bounded head and tail,
+the SHA-256 hash, byte size and an `artifact://sha256/...` URI. The hash is also
+stored in `tool_intents` and `agent_run_events`; `artifact_read` retrieves at
+most 4096 bytes per call. Failed and blocked results are never externalized and
+remain bounded by the existing output limit.
 
 ---
 
@@ -229,6 +239,9 @@ it does not read `maxContextTokens`/`compressionThreshold` directly.
   huge message blows the budget.
 - The summary cache is in-memory only (per process) and capped at 50 entries;
   it is not persisted across restarts.
+- The ArtifactStore currently covers successful text tool outputs only. It has
+  no encryption, owner quota, retention/garbage collection, remote backend or
+  first-class capture/file/audio metadata yet.
 - `ResilienceStrategy`'s non-retryable error detection is a simple substring
   match on the error message (`"401"`, `"403"`, `"invalid api"`, etc.) — it is
   not based on structured error codes/types.
