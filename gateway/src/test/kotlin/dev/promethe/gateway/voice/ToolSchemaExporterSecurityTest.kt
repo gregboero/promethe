@@ -19,6 +19,7 @@ class ToolSchemaExporterSecurityTest {
     @Test
     fun `voice registry export excludes effectful and unknown tools`() =
         runTest {
+            ToolRegistry.clear()
             ToolRegistry.register(TestTool("read_file"))
             ToolRegistry.register(TestTool("shell"))
             ToolRegistry.register(TestTool("unknown_voice_tool"))

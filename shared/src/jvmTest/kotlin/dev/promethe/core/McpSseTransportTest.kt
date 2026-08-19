@@ -30,7 +30,10 @@ class McpSseTransportTest {
             assertEquals("https://mcp.example/sse", outboundClient.discoveryUrl)
             assertEquals("text/event-stream", outboundClient.discoveryHeaders["Accept"])
             assertEquals("https://mcp.example/messages?session=one", outboundClient.requestUrl)
-            assertEquals("2025-11-05", outboundClient.requestHeaders["MCP-Protocol-Version"])
+            assertEquals(
+                McpProtocol.LEGACY_VERSION,
+                outboundClient.requestHeaders[McpProtocol.PROTOCOL_VERSION_HEADER],
+            )
             assertTrue(outboundClient.requestBody.contains("\"method\":\"initialize\""))
         }
 
