@@ -28,6 +28,55 @@ enum class CapabilityAuthentication {
 }
 
 @Serializable
+enum class ToolContractSource {
+    BUILTIN,
+    INTEGRATION,
+    MCP,
+    ACP,
+    LOCAL_AGENT,
+    PLUGIN,
+    FALLBACK,
+}
+
+@Serializable
+enum class ToolIdempotency {
+    SAFE_RETRY,
+    IDEMPOTENCY_KEY_REQUIRED,
+    NEVER_AUTOMATIC,
+}
+
+@Serializable
+enum class ToolEgress {
+    NONE,
+    SANDBOX_PROXY,
+    REMOTE_SERVICE,
+    DEVICE,
+    UNKNOWN,
+}
+
+@Serializable
+enum class ToolApprovalRequirement {
+    NONE,
+    RISK_BASED,
+    ALWAYS,
+}
+
+@Serializable
+data class ToolContractDescriptor(
+    val source: ToolContractSource,
+    val catalogRisk: ToolRisk,
+    val missingOperationRisk: ToolRisk,
+    val unknownOperationRisk: ToolRisk,
+    val approval: ToolApprovalRequirement,
+    val idempotency: ToolIdempotency,
+    val egress: ToolEgress,
+    val ownerOnly: Boolean = false,
+    val explicit: Boolean = true,
+    val operationKeys: List<String> = emptyList(),
+    val operationRisks: Map<String, ToolRisk> = emptyMap(),
+)
+
+@Serializable
 data class CapabilityDescriptor(
     val id: String,
     val name: String,
@@ -40,6 +89,7 @@ data class CapabilityDescriptor(
     val limitations: List<String> = emptyList(),
     val runtimeVersion: String? = null,
     val authentication: CapabilityAuthentication = CapabilityAuthentication.NOT_APPLICABLE,
+    val toolContract: ToolContractDescriptor? = null,
 )
 
 @Serializable

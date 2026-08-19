@@ -244,7 +244,8 @@ private object CapabilityCatalog {
 
     private suspend fun toolCapabilities(): List<CapabilityDescriptor> =
         ToolRegistry.listTools().map { tool ->
-            val risk = ToolApprovalPolicy.catalogRisk(tool.name)
+            val contract = ToolApprovalPolicy.contractFor(tool.name)
+            val risk = contract.catalogRisk
             CapabilityDescriptor(
                 id = "tool.${tool.name}",
                 name = tool.name,
@@ -252,6 +253,7 @@ private object CapabilityCatalog {
                 maturity = CapabilityMaturity.BETA,
                 availability = CapabilityAvailability.AVAILABLE,
                 risk = risk.name,
+                toolContract = contract.descriptor(),
                 limitations = if (risk.name == "READ") {
                     listOf("Tool certification is required before STABLE")
                 } else {

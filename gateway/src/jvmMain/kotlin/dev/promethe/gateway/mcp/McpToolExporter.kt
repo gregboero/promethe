@@ -6,6 +6,7 @@ import dev.promethe.core.ToolApprovalPolicy
 import dev.promethe.core.ToolCallOrigin
 import dev.promethe.core.ToolExecutionRequest
 import dev.promethe.core.ToolRegistry
+import dev.promethe.core.ToolRisk
 import dev.promethe.api.PrometheVersion
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -98,7 +99,7 @@ class McpToolExporter(
     private suspend fun handleToolsList(): JsonObject {
         val tools =
             ToolRegistry.listTools().filter { tool ->
-                exposeApprovalRequiredTools || tool.name !in ToolApprovalPolicy.dangerousTools
+                exposeApprovalRequiredTools || ToolApprovalPolicy.catalogRisk(tool.name) == ToolRisk.READ
             }
         return buildJsonObject {
             put(

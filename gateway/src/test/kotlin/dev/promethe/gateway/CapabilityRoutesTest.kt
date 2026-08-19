@@ -106,7 +106,10 @@ class CapabilityRoutesTest {
             if (tools.none { it.name.startsWith("mcp_") }) {
                 assertEquals(CapabilityAvailability.MISSING_CONFIGURATION, mcp.availability)
             }
-            assertEquals(tools.map { "tool.${it.name}" }.toSet(), body.capabilities.filter { it.category == "tool" }.map { it.id }.toSet())
+            val toolCapabilities = body.capabilities.filter { it.category == "tool" }
+            assertEquals(tools.map { "tool.${it.name}" }.toSet(), toolCapabilities.map { it.id }.toSet())
+            assertTrue(toolCapabilities.all { it.toolContract != null })
+            assertTrue(toolCapabilities.all { it.risk == it.toolContract?.catalogRisk?.name })
         }
 
     @Test

@@ -54,6 +54,11 @@ Returns the runtime capability registry used by clients and release certificatio
 its `STABLE`, `BETA`, `LAB`, or `UNAVAILABLE` maturity, current availability, risk class, platforms,
 required configuration names, and limitations. Secret values are never returned.
 
+Tool descriptors also include a typed `toolContract`: registration source, catalog and fallback risks,
+approval mode, idempotency, egress class, owner-only restriction, operation keys and operation-specific
+risks. `explicit=false` identifies the fail-closed fallback used for an uncontracted tool; such a tool is
+always classified `EXTERNAL_EFFECT` and requires approval.
+
 ### GET /api/v1/providers
 
 Returns the gateway-owned, secret-free provider catalog with live availability and certification state.

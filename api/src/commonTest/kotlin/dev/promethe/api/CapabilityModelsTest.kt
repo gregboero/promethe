@@ -39,4 +39,35 @@ class CapabilityModelsTest {
         val encoded = Json.encodeToString(ToolInvocation.serializer(), invocation)
         assertEquals(invocation, Json.decodeFromString(ToolInvocation.serializer(), encoded))
     }
+
+    @Test
+    fun `tool contract descriptor survives capability serialization`() {
+        val contract =
+            ToolContractDescriptor(
+                source = ToolContractSource.INTEGRATION,
+                catalogRisk = ToolRisk.CONFIG_CHANGE,
+                missingOperationRisk = ToolRisk.EXTERNAL_EFFECT,
+                unknownOperationRisk = ToolRisk.EXTERNAL_EFFECT,
+                approval = ToolApprovalRequirement.RISK_BASED,
+                idempotency = ToolIdempotency.IDEMPOTENCY_KEY_REQUIRED,
+                egress = ToolEgress.REMOTE_SERVICE,
+                ownerOnly = true,
+                operationKeys = listOf("action"),
+                operationRisks = mapOf("list" to ToolRisk.READ, "allow_user" to ToolRisk.CONFIG_CHANGE),
+            )
+        val descriptor =
+            CapabilityDescriptor(
+                id = "tool.discord_policy",
+                name = "discord_policy",
+                category = "tool",
+                maturity = CapabilityMaturity.BETA,
+                availability = CapabilityAvailability.AVAILABLE,
+                risk = ToolRisk.CONFIG_CHANGE.name,
+                toolContract = contract,
+            )
+
+        val encoded = Json.encodeToString(CapabilityDescriptor.serializer(), descriptor)
+
+        assertEquals(descriptor, Json.decodeFromString(CapabilityDescriptor.serializer(), encoded))
+    }
 }

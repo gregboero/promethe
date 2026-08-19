@@ -68,6 +68,19 @@ class SecurityTest {
             "jira",
             "cronjob",
             "discord_policy",
+            "csv",
+            "generate_image",
+            "analyze_image",
+            "text_to_speech",
+            "video_generate",
+            "video_analyze",
+            "api_call",
+            "web_screenshot",
+            "browser_navigate",
+            "render_ui",
+            "checkpoint_save",
+            "autonomous_goal",
+            "mixture_of_agents",
         )
 
         val dangerousTools = ToolApprovalGate.DANGEROUS_TOOLS

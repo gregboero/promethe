@@ -180,9 +180,9 @@ class ActionExecutor(
                     null
                 }
 
-            if (toolName == "discord_policy" && request.origin !in ownerPolicyOrigins) {
+            if (policy.ownerOnly && request.origin !in ownerPolicyOrigins) {
                 recordBlocked(intentId, "owner_policy_required")
-                return@span "[BLOCKED] Discord policy administration is restricted to owner conversations"
+                return@span "[BLOCKED] '$toolName' administration is restricted to owner conversations"
             }
 
             // ── BEFORE_TOOL_CALL hook ──

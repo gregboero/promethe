@@ -391,7 +391,7 @@ Backends optionnels :
 
 **Durée indicative : 6 à 10 semaines. Priorité P1.**
 
-1. `ToolContractRegistry` et migration des outils sensibles.
+1. **PARTIEL** — `ToolContractRegistry` et migration des outils sensibles. Le registre typé est la source unique pour le risque, l'approbation, l'idempotence, l'egress et la restriction propriétaire ; l'API de capacités expose le même contrat et les outils inconnus échouent fermés. Les premiers outils média, réseau, autonomie et lecture multi-agent sont migrés. Il reste les schémas I/O, domaines autorisés, timeouts, budgets, vérificateurs, compatibilité sandbox et la couverture explicite de tous les outils dynamiques.
 2. `SkillContract`, états de maturité et suite d'evals par skill.
 3. `PolicyKernel`, contrôle d'egress et audit hash-chained.
 4. `UntrustedReader`/`PrivilegedController` pour web, e-mail et canaux.
