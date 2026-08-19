@@ -80,7 +80,7 @@ Une technologie n'est promue que si elle possède un propriétaire, des métriqu
 | Sandbox | `EXISTANT` | Sandbox native Rust, politique réseau et racines canoniques. WASI ou microVM seraient des backends supplémentaires, pas des remplacements immédiats. Voir [SANDBOX.md](SANDBOX.md). |
 | Contexte | `PARTIEL` | [`ContextCompressor`](../shared/src/commonMain/kotlin/dev/promethe/core/ContextCompressor.kt#L42) compresse l'historique et [`ToolOutputPruner`](../shared/src/commonMain/kotlin/dev/promethe/core/ToolOutputPruner.kt#L34) réduit les sorties. Les données brutes ne sont pas reliées à un magasin d'artefacts durable. |
 | Routage LLM | `PARTIEL` | [`MultiModelRouter`](../shared/src/commonMain/kotlin/dev/promethe/core/MultiModelRouter.kt#L26) route par profil/fournisseur et construit des fallbacks, mais ne choisit pas encore selon risque, coût, latence ou difficulté. |
-| Budget autonome | `PARTIEL` | `AutonomousExecutor` contrôle tokens, coût, itérations et durée. Le budget n'est pas encore un gouverneur global commun à chaque appel LLM, outil et sous-agent. |
+| Budget autonome | `PARTIEL` | [`ResourceGovernor`](../shared/src/commonMain/kotlin/dev/promethe/core/ResourceGovernor.kt) réserve désormais les appels LLM, départs d'outil et sous-agents d'un même arbre de runs. Il bloque le départ suivant après dépassement de tokens, coût, durée ou compteurs. Son état reste en mémoire et les quotas durables par propriétaire, fournisseur et outil restent à ajouter. `AutonomousExecutor` conserve en parallèle son enveloppe de tâches historique. |
 | Skills et GEPA | `PARTIEL` | Loader, writer, synthèse et évolution existent. [`SkillCurator`](../shared/src/commonMain/kotlin/dev/promethe/core/SkillCurator.kt) ne modifie plus les skills : il retourne des propositions en quarantaine. Il manque encore le workflow persistant de revue, les contrats et benchmarks de promotion. |
 | Évaluation de trajectoire | `PARTIEL` | [`TrajectoryEvaluator`](../shared/src/commonMain/kotlin/dev/promethe/core/TrajectoryEvaluator.kt#L25) juge surtout le nombre d'outils, l'absence de chaîne `[ERROR]` et l'existence d'une réponse. Ce n'est pas une validation comportementale. |
 | Multi-agent | `PARTIEL` | [`AgentOrchestrator`](../shared/src/jvmMain/kotlin/dev/promethe/core/AgentOrchestrator.kt#L19) gère délégation et concurrence. Le pseudo-mode `vote` a été retiré ; `best_of` et `merge` restent disponibles sans prétendre fournir un consensus vérifié. |
@@ -382,7 +382,7 @@ Backends optionnels :
 1. **FAIT** — Étendre le premier `RunLedger` persistant avec les IDs d'intention et un journal append-only des transitions d'outil.
 2. **FAIT** — Ajouter les clés d'idempotence et états d'outil persistants.
 3. **FAIT** — Envelopper `executeLoop` dans le premier `ExecutionGraph`, classifier les runs interrompus et permettre leur reprise explicite sans thread actif.
-4. Créer `ResourceGovernor` global et propagation des budgets aux sous-agents.
+4. **PARTIEL** — Créer `ResourceGovernor` global et propager le même budget aux sous-agents locaux. Les admissions atomiques couvrent les tentatives LLM, outils et sous-agents ; il reste à persister la consommation et à ajouter les quotas propriétaire, fournisseur et outil.
 5. Introduire `ArtifactStore` et observations référencées par hash.
 6. Stabiliser l'ordre du prompt et mesurer le prefix cache.
 

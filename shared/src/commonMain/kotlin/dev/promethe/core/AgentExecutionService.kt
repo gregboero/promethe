@@ -47,6 +47,7 @@ data class AgentExecutionRequest(
     val projectId: String? = null,
     val runId: String? = null,
     val parentRunId: String? = null,
+    val resourceBudget: ResourceBudget = ResourceBudget.DEFAULT,
 )
 
 sealed interface AgentExecutionEvent {
@@ -92,6 +93,7 @@ class AgentExecutionService(
     private val executionGraph: ExecutionGraph = DurableExecutionGraph(agent.asLoopExecutor(), runLedger),
     private val recoveryService: RunRecoveryService =
         RunRecoveryService(runLedger, PersistentRunEventLedger(database)),
+    private val resourceGovernors: ResourceGovernorRegistry = GlobalResourceGovernorRegistry,
 ) : RecoverableAgentExecutionPort {
     private val logger = Log.create("AgentExecutionService")
 
@@ -109,6 +111,7 @@ class AgentExecutionService(
         var lastStepId: String? = null
         var ledgerStarted = false
         var terminalRecorded = false
+        var governorAcquired = false
         var resumedRun: AgentRunRecord? = null
         val generatedRunId = executionIdGenerator.nextId("run")
         val effectiveRunId = request.runId ?: generatedRunId
@@ -191,6 +194,24 @@ class AgentExecutionService(
                         )
                         return@channelFlow
                     }
+                    when (val acquisition = resourceGovernors.acquire(ledgerRunId, request.sessionId, request.resourceBudget)) {
+                        is ResourceGovernorAcquisition.Acquired -> {
+                            governorAcquired = true
+                        }
+
+                        is ResourceGovernorAcquisition.Conflict -> {
+                            send(
+                                AgentExecutionEvent.Failed(
+                                    code = "run_resume_conflict",
+                                    message = "Another governed run is already active for this session",
+                                    steps = existing.stepCount,
+                                    runId = ledgerRunId,
+                                    stepId = existing.lastStepId,
+                                ),
+                            )
+                            return@channelFlow
+                        }
+                    }
                     val claimed = recoveryService.claimResume(ledgerRunId)
                     if (claimed == null) {
                         send(
@@ -268,6 +289,35 @@ class AgentExecutionService(
                 terminalRecorded = runLedger.fail(runIdentity.runId, 0, null, "empty_input", createdAt)
                 send(AgentExecutionEvent.Failed("empty_input", "Agent input must contain text", 0, runIdentity.runId))
                 return@channelFlow
+            }
+
+            if (!governorAcquired) {
+                when (val acquisition = resourceGovernors.acquire(runIdentity.runId, request.sessionId, request.resourceBudget)) {
+                    is ResourceGovernorAcquisition.Acquired -> {
+                        governorAcquired = true
+                    }
+
+                    is ResourceGovernorAcquisition.Conflict -> {
+                        terminalRecorded =
+                            runLedger.fail(
+                                runIdentity.runId,
+                                stepCount,
+                                lastStepId,
+                                "resource_governor_conflict",
+                                Clock.System.now().toEpochMilliseconds(),
+                            )
+                        send(
+                            AgentExecutionEvent.Failed(
+                                code = "resource_governor_conflict",
+                                message = "Another governed run is already active for this session",
+                                steps = stepCount,
+                                runId = runIdentity.runId,
+                                stepId = lastStepId,
+                            ),
+                        )
+                        return@channelFlow
+                    }
+                }
             }
 
             val resolved = resolveProfile(request)
@@ -388,15 +438,23 @@ class AgentExecutionService(
                 ),
             )
         }.onCompletion { cause ->
-            if (cause is CancellationException && ledgerStarted && !terminalRecorded) {
+            if ((cause is CancellationException && ledgerStarted && !terminalRecorded) || governorAcquired) {
                 withContext(NonCancellable) {
-                    terminalRecorded =
-                        runLedger.cancel(
+                    if (cause is CancellationException && ledgerStarted && !terminalRecorded) {
+                        terminalRecorded =
+                            runLedger.cancel(
+                                effectiveRunId.takeIf(::isValidExecutionId) ?: generatedRunId,
+                                stepCount,
+                                lastStepId,
+                                Clock.System.now().toEpochMilliseconds(),
+                            )
+                    }
+                    if (governorAcquired) {
+                        resourceGovernors.release(
                             effectiveRunId.takeIf(::isValidExecutionId) ?: generatedRunId,
-                            stepCount,
-                            lastStepId,
-                            Clock.System.now().toEpochMilliseconds(),
+                            request.sessionId,
                         )
+                    }
                 }
             }
         }
@@ -560,6 +618,15 @@ internal fun agentExecutionRequestFingerprint(request: AgentExecutionRequest): S
             request.history.forEach { message ->
                 appendFingerprintField(message.role)
                 appendFingerprintField(message.content)
+            }
+            if (request.resourceBudget != ResourceBudget.DEFAULT) {
+                appendFingerprintField("resource-budget-v1")
+                appendFingerprintField(request.resourceBudget.maxTokens.toString())
+                appendFingerprintField(request.resourceBudget.maxCostDollars.toString())
+                appendFingerprintField(request.resourceBudget.maxLlmCalls.toString())
+                appendFingerprintField(request.resourceBudget.maxToolStarts.toString())
+                appendFingerprintField(request.resourceBudget.maxSubAgents.toString())
+                appendFingerprintField(request.resourceBudget.maxDurationMs.toString())
             }
         },
     )

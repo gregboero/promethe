@@ -25,6 +25,7 @@ import kotlinx.coroutines.sync.withLock
 open class KoogLlmAdapter(
     protected val config: AgentConfig,
     private val database: PrometheDatabaseApi? = null,
+    private val resourceGovernors: ResourceGovernorRegistry = GlobalResourceGovernorRegistry,
 ) {
     private val logger = Log.create("KoogLlmAdapter")
 
@@ -357,8 +358,10 @@ open class KoogLlmAdapter(
             // Level 2: cross-provider safety net (Google gemini-3.1-flash-lite)
             var usedFallback: FallbackModel? = null
             val assistantMessage = try {
+                admitLlmCall(context)
                 exec.execute(providerPrompt, llModel, tools)
             } catch (e: Exception) {
+                if (e is AgentExecutionException && e.code == "resource_budget_exceeded") throw e
                 val msg = e.message.orEmpty()
                 logger.error { "LLM execute failed [provider=$provider, model=$model]: $msg" }
 
@@ -394,10 +397,12 @@ open class KoogLlmAdapter(
                     val fbModel = resolveKnownModel(fb.provider, fb.model, config.xaiApiMode)
                     val fallbackPrompt = applyProviderParams(prompt, fb.provider, context, reasoningEffort)
                     try {
+                        admitLlmCall(context)
                         lastResult = fbExec.execute(fallbackPrompt, fbModel, tools)
                         usedFallback = fb
                         break
                     } catch (e2: Exception) {
+                        if (e2 is AgentExecutionException && e2.code == "resource_budget_exceeded") throw e2
                         logger.warn { "Fallback failed [${fb.provider}/${fb.model}]: ${e2.message}" }
                     }
                 }
@@ -433,6 +438,9 @@ open class KoogLlmAdapter(
                     ?: ModelPricingService.KNOWN_PRICING[actualModel]
                     ?: ModelPricingService.DEFAULT_PRICING
             val cost = (pTokens / 1_000_000.0) * pRate + (cTokens / 1_000_000.0) * cRate
+            context?.runId?.let { runId ->
+                resourceGovernors.governorForRun(runId)?.recordLlmUsage((pTokens + cTokens).toLong(), cost)
+            }
 
             // Track stats (thread-safe)
             statsMutex.withLock {
@@ -475,6 +483,15 @@ open class KoogLlmAdapter(
                 rawMessage = assistantMessage,
             )
         }
+
+    private suspend fun admitLlmCall(context: LlmRequestContext?) {
+        val runId = context?.runId ?: return
+        val governor = resourceGovernors.governorForRun(runId) ?: return
+        val admission = governor.admit(GovernedResource.LLM_CALL)
+        if (admission is ResourceAdmission.Denied) {
+            throw AgentExecutionException("resource_budget_exceeded", admission.message())
+        }
+    }
 
     private fun applyProviderParams(
         prompt: Prompt,

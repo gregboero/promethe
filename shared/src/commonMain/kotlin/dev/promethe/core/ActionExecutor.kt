@@ -79,6 +79,7 @@ class ActionExecutor(
     private val approvalGate: ApprovalGate? = null,
     private val sandboxCommandExecutor: SandboxCommandExecutor? = null,
     private val toolIntentLedger: ToolIntentLedger = NoOpToolIntentLedger,
+    private val resourceGovernors: ResourceGovernorRegistry = GlobalResourceGovernorRegistry,
 ) : SecureToolExecutor {
     private val logger = Log.create("ActionExecutor")
 
@@ -247,6 +248,15 @@ class ActionExecutor(
                 if (!approvalResult.allowed) {
                     recordBlocked(intentId, "approval_denied")
                     return@span "[BLOCKED] Approval denied: ${approvalResult.reason}"
+                }
+            }
+
+            request.runId?.let { runId ->
+                val governor = resourceGovernors.governorForRun(runId)
+                val admission = governor?.admit(GovernedResource.TOOL_START)
+                if (admission is ResourceAdmission.Denied) {
+                    recordBlocked(intentId, "resource_budget_exceeded")
+                    return@span "[BLOCKED] ${admission.message()}"
                 }
             }
 

@@ -54,12 +54,14 @@ class DelegateTaskTool(
             """.trimMargin(),
     ) {
     override suspend fun execute(args: DelegateTaskArgs): String {
+        val invocation = currentToolInvocation()
         val request =
             AgentOrchestrator.DelegationRequest(
                 task = args.task,
                 systemPromptOverride = args.systemPrompt.ifBlank { null },
                 profileId = args.profileId.ifBlank { null },
-                parentSessionId = parentSessionId,
+                parentSessionId = invocation?.sessionId ?: parentSessionId,
+                parentRunId = invocation?.runId,
             )
 
         return if (args.blocking) {
