@@ -268,9 +268,10 @@ string check on the line before/independent of full dispatch).
 - **The modern Tasks extension is not implemented yet** — modern discovery does not advertise
   `io.modelcontextprotocol/tasks`; the legacy in-memory task helper is neither durable nor exposed
   to modern clients.
-- **Tool schemas expose Prométhé's current flat parameter descriptors** — they declare the 2020-12
-  dialect, but richer constructs such as `$defs`, `$ref`, `oneOf` and typed output schemas require
-  the next contract/schema migration.
+- **Tool input schemas are generated canonically from Koog descriptors** — MCP and voice share the
+  same deterministic 2020-12 source for nested objects, arrays, enums, `null`, `anyOf`, required
+  properties and typed `additionalProperties`. Constructs absent from Koog descriptors, including
+  `$defs`, `$ref`, `oneOf` and typed output schemas, still require a future contract migration.
 - **`McpStreamableHttpTransport.callTool` only reads the first `content` entry**, unlike
   `McpStdioTransport`/`McpSseTransport`, which join all entries with `\n` — a server returning
   multiple content blocks (e.g. text + image) will only surface the first one over this transport.
