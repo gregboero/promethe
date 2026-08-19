@@ -1,22 +1,23 @@
 package dev.promethe.gateway.mcp
 
 import ai.koog.agents.core.tools.ToolBase
-import dev.promethe.core.SecureToolExecutor
+import dev.promethe.api.PrometheVersion
+import dev.promethe.core.McpProtocol
 import dev.promethe.core.PolicyEffect
 import dev.promethe.core.PolicyKernel
+import dev.promethe.core.SecureToolExecutor
 import dev.promethe.core.ToolApprovalPolicy
 import dev.promethe.core.ToolCallOrigin
 import dev.promethe.core.ToolExecutionRequest
 import dev.promethe.core.ToolRegistry
-import dev.promethe.api.PrometheVersion
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
 
 /**
@@ -26,12 +27,13 @@ import kotlinx.serialization.json.putJsonObject
  * and the Stdio MCP server mode. It translates JSON-RPC 2.0 method calls
  * into ToolRegistry operations and returns well-formed JSON-RPC responses.
  *
- * Supported methods:
- *   - `initialize` → server capabilities and info
- *   - `notifications/initialized` → no-op acknowledgment
+ * Supported protocol eras:
+ *   - 2026-07-28 stateless requests with `server/discover`
+ *   - 2025-11-25 legacy requests with `initialize`
+ *
+ * Shared methods:
  *   - `tools/list` → enumerate all registered tools
  *   - `tools/call` → execute a specific tool
- *   - `shutdown` → graceful shutdown signal
  */
 class McpToolExporter(
     private val secureToolExecutor: SecureToolExecutor? = null,
@@ -41,12 +43,10 @@ class McpToolExporter(
     private val policyKernel: PolicyKernel = PolicyKernel(),
 ) {
     companion object {
-        const val PROTOCOL_VERSION = "2025-11-05"
-    }
-
-    private val json = Json {
-        ignoreUnknownKeys = true
-        encodeDefaults = true
+        const val PROTOCOL_VERSION = McpProtocol.MODERN_VERSION
+        const val LEGACY_PROTOCOL_VERSION = McpProtocol.LEGACY_VERSION
+        private const val DISCOVERY_TTL_MS = 60_000
+        private const val TOOL_CATALOG_TTL_MS = 30_000
     }
 
     /**
@@ -56,22 +56,29 @@ class McpToolExporter(
     suspend fun dispatch(
         request: JsonObject,
         sessionId: String = "unknown",
+        protocolVersion: String? = McpProtocol.requestedVersion(request),
     ): JsonObject? {
         val id: JsonElement = request["id"] ?: return handleNotification(request)
-        val method = request["method"]?.jsonPrimitive?.content ?: ""
-        val params = request["params"]?.jsonObject ?: JsonObject(emptyMap())
+        val method = (request["method"] as? JsonPrimitive)?.content.orEmpty()
+        val params = request["params"] as? JsonObject ?: JsonObject(emptyMap())
+        val requestedVersion = protocolVersion ?: LEGACY_PROTOCOL_VERSION
+        if (requestedVersion !in McpProtocol.supportedVersions) {
+            return unsupportedProtocolVersion(id, requestedVersion)
+        }
+        val modern = requestedVersion == PROTOCOL_VERSION
 
         return try {
             val result = when (method) {
-                "initialize" -> handleInitialize()
-                "tools/list" -> handleToolsList()
+                "server/discover" -> if (modern) handleDiscover() else throw McpMethodNotFound(method)
+                "initialize" -> if (!modern) handleInitialize() else throw McpMethodNotFound(method)
+                "tools/list" -> handleToolsList(modern)
                 "tools/call" -> handleToolsCall(params, sessionId)
-                "tasks/get" -> taskManager.handleTasksGet(params)
-                "tasks/cancel" -> taskManager.handleTasksCancel(params)
-                "shutdown" -> handleShutdown()
+                "tasks/get" -> if (!modern) taskManager.handleTasksGet(params) else throw McpMethodNotFound(method)
+                "tasks/cancel" -> if (!modern) taskManager.handleTasksCancel(params) else throw McpMethodNotFound(method)
+                "shutdown" -> if (!modern) handleShutdown() else throw McpMethodNotFound(method)
                 else -> throw McpMethodNotFound(method)
             }
-            buildJsonRpcResult(id, result)
+            buildJsonRpcResult(id, if (modern) result.withModernEnvelope() else result)
         } catch (e: McpMethodNotFound) {
             buildJsonRpcError(id, code = -32601, message = "Method not found: ${e.method}")
         } catch (e: McpInvalidParams) {
@@ -85,12 +92,11 @@ class McpToolExporter(
 
     private fun handleInitialize(): JsonObject =
         buildJsonObject {
-            put("protocolVersion", PROTOCOL_VERSION)
+            put("protocolVersion", LEGACY_PROTOCOL_VERSION)
             putJsonObject("capabilities") {
                 putJsonObject("tools") {
                     put("listChanged", false)
                 }
-                putJsonObject("tasks") {}
             }
             putJsonObject("serverInfo") {
                 put("name", "promethe")
@@ -98,11 +104,26 @@ class McpToolExporter(
             }
         }
 
-    private suspend fun handleToolsList(): JsonObject {
-        val tools =
-            ToolRegistry.listTools().filter { tool ->
-                isToolExposed(tool.name, JsonObject(emptyMap()))
+    private fun handleDiscover(): JsonObject =
+        buildJsonObject {
+            putJsonArray("supportedVersions") {
+                McpProtocol.supportedVersions.forEach { add(it) }
             }
+            putJsonObject("capabilities") {
+                putJsonObject("tools") {
+                    put("listChanged", false)
+                }
+            }
+            put("instructions", "Promethe exposes policy-controlled agent tools.")
+            put("ttlMs", DISCOVERY_TTL_MS)
+            put("cacheScope", "private")
+        }
+
+    private suspend fun handleToolsList(modern: Boolean): JsonObject {
+        val tools =
+            ToolRegistry.listTools()
+                .filter { tool -> isToolExposed(tool.name, JsonObject(emptyMap())) }
+                .sortedBy { tool -> tool.name }
         return buildJsonObject {
             put(
                 "tools",
@@ -112,6 +133,10 @@ class McpToolExporter(
                     }
                 },
             )
+            if (modern) {
+                put("ttlMs", TOOL_CATALOG_TTL_MS)
+                put("cacheScope", "private")
+            }
         }
     }
 
@@ -119,9 +144,9 @@ class McpToolExporter(
         params: JsonObject,
         sessionId: String,
     ): JsonObject {
-        val toolName = params["name"]?.jsonPrimitive?.content
+        val toolName = (params["name"] as? JsonPrimitive)?.content
             ?: throw McpInvalidParams("Missing required param: 'name'")
-        val arguments = params["arguments"]?.jsonObject ?: JsonObject(emptyMap())
+        val arguments = params["arguments"] as? JsonObject ?: JsonObject(emptyMap())
 
         ToolRegistry.getTool(toolName) ?: throw McpInvalidParams("Unknown tool: $toolName")
         if (!isToolExposed(toolName, arguments)) {
@@ -152,6 +177,7 @@ class McpToolExporter(
                     )
                 },
             )
+            put("isError", false)
         }
     }
 
@@ -170,6 +196,7 @@ class McpToolExporter(
             put("name", desc.name)
             put("description", desc.description)
             putJsonObject("inputSchema") {
+                put("\$schema", "https://json-schema.org/draft/2020-12/schema")
                 put("type", "object")
                 val allParams = desc.requiredParameters + desc.optionalParameters
                 putJsonObject("properties") {
@@ -188,6 +215,7 @@ class McpToolExporter(
                         },
                     )
                 }
+                put("additionalProperties", false)
             }
         }
 
@@ -224,6 +252,7 @@ class McpToolExporter(
         id: JsonElement,
         code: Int,
         message: String,
+        data: JsonObject? = null,
     ): JsonObject =
         buildJsonObject {
             put("jsonrpc", "2.0")
@@ -231,6 +260,36 @@ class McpToolExporter(
             putJsonObject("error") {
                 put("code", code)
                 put("message", message)
+                data?.let { put("data", it) }
+            }
+        }
+
+    private fun unsupportedProtocolVersion(
+        id: JsonElement,
+        requestedVersion: String,
+    ): JsonObject =
+        buildJsonRpcError(
+            id = id,
+            code = -32022,
+            message = "Unsupported protocol version",
+            data =
+                buildJsonObject {
+                    putJsonArray("supported") {
+                        McpProtocol.supportedVersions.forEach { add(it) }
+                    }
+                    put("requested", requestedVersion)
+                },
+        )
+
+    private fun JsonObject.withModernEnvelope(): JsonObject =
+        buildJsonObject {
+            this@withModernEnvelope.forEach { (key, value) -> put(key, value) }
+            if ("resultType" !in this@withModernEnvelope) put("resultType", "complete")
+            putJsonObject("_meta") {
+                putJsonObject(McpProtocol.SERVER_INFO_META) {
+                    put("name", "promethe")
+                    put("version", PrometheVersion.CURRENT)
+                }
             }
         }
 

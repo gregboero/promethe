@@ -2,6 +2,7 @@ package dev.promethe.gateway.mcp
 
 import ai.koog.agents.core.tools.SimpleTool
 import ai.koog.serialization.typeToken
+import dev.promethe.core.McpProtocol
 import dev.promethe.core.SecureToolExecutor
 import dev.promethe.core.ToolExecutionRequest
 import dev.promethe.core.ToolRegistry
@@ -17,6 +18,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class McpToolExporterSecurityTest {
     @AfterTest
@@ -115,6 +117,45 @@ class McpToolExporterSecurityTest {
             assertEquals(true, "read_file" in names)
             assertFalse("unknown_dynamic_tool" in names)
             assertFalse("shell" in names)
+        }
+
+    @Test
+    fun `modern tool catalogs are deterministic cacheable and use 2020-12 schemas`() =
+        runTest {
+            ToolRegistry.register(NeverDirectTool("workspace_roots"))
+            ToolRegistry.register(NeverDirectTool("directory_tree"))
+            val exporter = McpToolExporter(secureToolExecutor = SecureToolExecutor { "unused" })
+
+            val response =
+                exporter.dispatch(
+                    request =
+                        buildJsonObject {
+                            put("jsonrpc", "2.0")
+                            put("id", 1)
+                            put("method", "tools/list")
+                        },
+                    protocolVersion = McpProtocol.MODERN_VERSION,
+                )
+
+            val result = response?.get("result")?.jsonObject
+            assertNotNull(result)
+            assertEquals("complete", result["resultType"]?.jsonPrimitive?.content)
+            assertEquals("private", result["cacheScope"]?.jsonPrimitive?.content)
+            assertTrue(result["ttlMs"]?.jsonPrimitive?.content?.toLongOrNull()!! > 0)
+            val tools = result["tools"]!!.jsonArray.map { it.jsonObject }
+            val names = tools.map { it["name"]!!.jsonPrimitive.content }
+            assertEquals(names.sorted(), names)
+            assertTrue("directory_tree" in names)
+            assertTrue("workspace_roots" in names)
+            tools.forEach { tool ->
+                val schema = tool["inputSchema"]!!.jsonObject
+                assertEquals(
+                    "https://json-schema.org/draft/2020-12/schema",
+                    schema["\$schema"]?.jsonPrimitive?.content,
+                )
+                assertEquals(false, schema["additionalProperties"]?.jsonPrimitive?.content?.toBooleanStrict())
+            }
+            assertNotNull(result["_meta"]?.jsonObject?.get(McpProtocol.SERVER_INFO_META))
         }
 
     @Serializable

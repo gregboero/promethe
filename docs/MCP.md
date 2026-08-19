@@ -31,7 +31,7 @@ server role lets *other* MCP clients use Prométhé's tools.
 | `JvmMcpTransportFactory` | `shared/src/jvmMain/kotlin/dev/promethe/core/JvmMcpTransportFactory.kt` | Implements `McpBridge.TransportFactory`; picks a concrete transport (`stdio`, `sse`, `streamable-http`) based on `McpServerConfig.transport` and wraps it in an adapter implementing `McpBridge.McpTransportApi`. |
 | `McpStdioTransport` | `shared/src/jvmMain/kotlin/dev/promethe/core/McpStdioTransport.kt` | Fails closed with `SANDBOX_PROTOCOL_V2_REQUIRED`; persistent subprocess sessions are not supported by sandbox IPC v1. |
 | `McpSseTransport` | `shared/src/jvmMain/kotlin/dev/promethe/core/McpSseTransport.kt` | Connects to an SSE endpoint to discover a message endpoint, then sends JSON-RPC 2.0 requests via HTTP POST to that endpoint. |
-| `McpStreamableHttpTransport` | `shared/src/jvmMain/kotlin/dev/promethe/core/McpStreamableHttpTransport.kt` | Stateless HTTP transport (2026-style spec): every request is an independent `POST` with no session affinity, compatible with round-robin load balancers. |
+| `McpStreamableHttpTransport` | `shared/src/jvmMain/kotlin/dev/promethe/core/McpStreamableHttpTransport.kt` | Dual-era Streamable HTTP client. It probes `server/discover` with the stateless 2026-07-28 envelope and falls back to the official 2025-11-25 `initialize` lifecycle only when the response identifies a legacy endpoint. |
 
 `McpBridge` itself is declared in `commonMain` and only depends on the `McpTransportApi` /
 `TransportFactory` interfaces — the actual transports (`McpStdioTransport`, `McpSseTransport`,
@@ -46,7 +46,7 @@ until the native sandbox supports managed persistent stdin/stdout sessions.
 | `mcpServerRoutes()` | `gateway/src/jvmMain/kotlin/dev/promethe/gateway/mcp/McpServerEndpoint.kt` | Ktor routing extension mounted at the gateway root. Implements the discovery card, the JSON-RPC endpoint, and a debug REST listing. |
 | `McpToolExporter` | `gateway/src/jvmMain/kotlin/dev/promethe/gateway/mcp/McpToolExporter.kt` | Shared JSON-RPC 2.0 dispatcher: converts `ToolRegistry` tools into MCP `tools/list` / `tools/call` responses. Used by both the HTTP endpoint and the stdio mode. |
 | `McpStdioServerMode` | `gateway/src/jvmMain/kotlin/dev/promethe/gateway/mcp/McpStdioServerMode.kt` | Runs Prométhé as an MCP server over stdio: reads one JSON-RPC message per line from stdin, dispatches through `McpToolExporter`, writes the response to stdout. |
-| `McpTaskManager` | `gateway/src/jvmMain/kotlin/dev/promethe/gateway/mcp/McpTaskManager.kt` | In-memory manager for the MCP Tasks extension (`tasks/get`, `tasks/cancel`) for long-running tool calls; tasks move `PENDING → RUNNING → COMPLETED|FAILED|CANCELLED` and are cleaned up by TTL. |
+| `McpTaskManager` | `gateway/src/jvmMain/kotlin/dev/promethe/gateway/mcp/McpTaskManager.kt` | Legacy in-memory `tasks/get` / `tasks/cancel` implementation. It is not advertised to modern clients and is not yet the 2026 `io.modelcontextprotocol/tasks` extension. |
 | `mcpManagementRoutes()` | `gateway/src/jvmMain/kotlin/dev/promethe/gateway/McpManagementRoutes.kt` | REST management API (list/register/connect/disconnect servers, list tools) used by the client role — mounted under `/api`. |
 
 ### Bootstrap wiring
@@ -124,12 +124,14 @@ key in the example above becomes both `id` and `name`).
 | Transport | Class | Protocol version sent | Notes |
 |---|---|---|---|
 | `stdio` | `McpStdioTransport` | N/A | Unavailable in sandbox IPC v1. Connection fails with `SANDBOX_PROTOCOL_V2_REQUIRED` and no subprocess is started. |
-| `sse` | `McpSseTransport` | `2025-11-05` | `GET baseUrl` with `Accept: text/event-stream` to discover a session endpoint from the first `data:` line of the SSE body; falls back to using `baseUrl` directly as the endpoint if discovery fails; subsequent JSON-RPC calls are `POST` to that endpoint with header `MCP-Protocol-Version: 2025-11-05`. |
-| `streamable-http` | `McpStreamableHttpTransport` | `2025-11-05` | Stateless — every call is an independent `POST baseUrl` with header `MCP-Protocol-Version: 2025-11-05` plus any `customHeaders` (e.g. `Authorization`); no session/sticky routing, so it works behind plain round-robin load balancers. Accepts an injectable Ktor `HttpClientEngine` (used by tests with `MockEngine`). |
+| `sse` | `McpSseTransport` | `2025-11-25` | Deprecated compatibility transport. `GET baseUrl` with `Accept: text/event-stream` discovers a session endpoint; subsequent JSON-RPC calls use the legacy `initialize` lifecycle. New configurations should use `streamable-http`. |
+| `streamable-http` | `McpStreamableHttpTransport` | `2026-07-28`, fallback `2025-11-25` | Starts with `server/discover`. Modern requests carry protocol version, client identity and capabilities in `_meta`, plus `MCP-Protocol-Version`, `Mcp-Method` and, where applicable, `Mcp-Name` headers. It never sends `Mcp-Session-Id`. A legacy handshake is used only after a deterministic compatibility probe. |
 
 All transports implement the common adapter surface. The stdio adapter returns
 the fail-closed error above; SSE and Streamable HTTP implement
-`initialize()`, `listTools()`, `callTool(name, arguments)`, and `close()`.
+`initialize()`, `listTools()`, `callTool(name, arguments)`, and `close()`. For Streamable HTTP,
+the internal `initialize()` adapter method performs modern discovery rather than a wire-level
+`initialize` call; the latter is reserved for the legacy fallback.
 
 `callTool` response parsing: all three transports read the JSON-RPC `result.content` array and, for
 each entry, render `type: "text"` as its `text` field and `type: "image"` as `"[image: {mimeType}]"`
@@ -148,7 +150,7 @@ other two transports which join all entries with `\n`).
   1. Rejects unknown server IDs and disabled servers (`enabled = false`).
   2. Sets status to `CONNECTING`.
   3. Calls `discoverTools(config)`, which asks the registered `TransportFactory` for a transport,
-     calls `initialize()` then `listTools()`, and stores the transport in an internal map keyed by
+     calls the transport's lifecycle adapter then `listTools()`, and stores the transport in an internal map keyed by
      server ID.
   4. For each discovered tool, wraps it in an `McpProxyTool` named `mcp_{serverId}_{toolName}` with
      description `[MCP:{serverName}] {originalDescription}`, and registers it into `ToolRegistry`.
@@ -200,12 +202,13 @@ Mounted under `/api` by `mcpManagementRoutes(mcpBridge)` in
 
 Mounted at the routing root by `mcpServerRoutes()` in
 `gateway/src/jvmMain/kotlin/dev/promethe/gateway/mcp/McpServerEndpoint.kt`, implementing the
-**2025-11-05** MCP spec (Streamable HTTP transport):
+modern **2026-07-28** stateless requests and legacy **2025-11-25** requests on the same Streamable
+HTTP endpoint:
 
 | Method | Route | Description |
 |---|---|---|
-| `GET` | `/.well-known/mcp` | Server Card for discovery: `name`, `version`, `protocolVersion`, `capabilities.tools.listChanged` (`false`), `capabilities.tasks`, and `endpoint: "/mcp"`. |
-| `POST` | `/mcp` | Full JSON-RPC 2.0 endpoint. Browser `Origin` values must be in `CORS_ALLOWED_ORIGINS` (an empty allow-list denies browser origins); native clients may omit `Origin`. It validates `MCP-Protocol-Version` (must match `2025-11-05` if sent), rejects batch arrays with `400`, and otherwise delegates to `McpToolExporter.dispatch()`. Notifications (no `id`) get `202 Accepted` with an empty body. |
+| `GET` | `/.well-known/mcp` | Server Card: preferred version `2026-07-28`, `supportedVersions` (`2026-07-28`, `2025-11-25`), tool capability, and endpoint `/mcp`. |
+| `POST` | `/mcp` | Full JSON-RPC 2.0 endpoint. Browser `Origin` values must be allow-listed. Modern requests must carry matching `_meta` and `MCP-Protocol-Version`, a body-matching `Mcp-Method`, and a body-matching `Mcp-Name` for named calls. Header mismatches return JSON-RPC `-32020`; unsupported versions return `-32022` with the supported list. Batch arrays are rejected with `400`. |
 | `GET` | `/mcp/tools` | Simple REST listing of all `ToolRegistry` tools (`name`, `description`) for debugging/UI — separate from the JSON-RPC `tools/list` method. |
 
 `McpToolExporter.dispatch()` handles these JSON-RPC methods over both the HTTP endpoint and stdio
@@ -213,17 +216,17 @@ mode:
 
 | Method | Behavior |
 |---|---|
-| `initialize` | Returns `protocolVersion`, `capabilities.tools.listChanged=false`, `capabilities.tasks`, `serverInfo` (`name: "promethe"`, `version: "1.0.0"`). |
-| `tools/list` | Enumerates `ToolRegistry.listTools()`, converting each `ToolBase` descriptor into an MCP tool schema (`inputSchema.properties` built from required + optional parameters, `required` array from `requiredParameters`). |
-| `tools/call` | Sends a typed `ToolInvocation` to `SecureToolExecutor`, preserving MCP origin, session, exact arguments, risk classification, and mandatory approval. Direct `executeUnsafe` calls outside `ActionExecutor` are rejected by an architecture test. |
-| `tasks/get` / `tasks/cancel` | Delegated to `McpTaskManager` for the Tasks extension. |
-| `shutdown` | Returns an empty result object. |
-| `notifications/initialized` (or any request without `id`) | Treated as a notification — no response is produced. |
+| `server/discover` | Modern only. Returns supported versions, tool capabilities, server identity in result `_meta`, private cache hints, and `resultType: complete`. |
+| `initialize` | Legacy only. Returns `2025-11-25`, tool capabilities and server info. Modern requests receive `-32601`. |
+| `tools/list` | Enumerates policy-visible tools in deterministic name order. Modern results include `resultType`, `ttlMs`, `cacheScope`, server identity and explicit draft 2020-12 input schemas. |
+| `tools/call` | Sends a typed `ToolInvocation` to `SecureToolExecutor`, preserving MCP origin, owner session, exact arguments, risk classification, and mandatory approval. Modern results include `resultType: complete`. |
+| `tasks/get` / `tasks/cancel` | Legacy only and not advertised. The modern Tasks extension is intentionally deferred until `tasks/update`, real task creation and lifecycle tests are implemented. |
+| `shutdown` / `notifications/initialized` | Legacy lifecycle only. Modern requests do not use the initialize/shutdown exchange. |
 | anything else | JSON-RPC error `-32601` (method not found). |
 
 Errors are mapped to standard JSON-RPC codes: `-32601` (method not found), `-32602` (invalid
 params, e.g. missing `name`/`arguments`), `-32603` (uncaught internal error), `-32700` (parse
-error, malformed JSON on the request body / stdio line).
+error), `-32020` (header/body mismatch), and `-32022` (unsupported protocol version).
 
 For stdio mode (`McpStdioServerMode`, activated via `promethe/gateway`'s `--mcp-stdio` CLI flag —
 see `gateway/src/jvmMain/kotlin/dev/promethe/gateway/Main.kt`), the same `McpToolExporter` is reused:
@@ -240,8 +243,15 @@ string check on the line before/independent of full dispatch).
   after the initial connect.
 - **SSE endpoint discovery is best-effort** — `McpSseTransport.initialize()` falls back to treating
   `baseUrl` as the message endpoint if it cannot parse a `data:` line from the initial SSE response.
+- **MCP HTTP+SSE is legacy-only and deprecated** — it remains available during the compatibility
+  window but receives no new protocol features.
+- **MRTR and the modern Tasks extension are not implemented yet** — modern discovery does not
+  advertise `io.modelcontextprotocol/tasks`, and Prométhé does not emit `input_required` results.
+- **Tool schemas expose Prométhé's current flat parameter descriptors** — they declare the 2020-12
+  dialect, but richer constructs such as `$defs`, `$ref`, `oneOf` and typed output schemas require
+  the next contract/schema migration.
 - **`McpStreamableHttpTransport.callTool` only reads the first `content` entry**, unlike
   `McpStdioTransport`/`McpSseTransport`, which join all entries with `\n` — a server returning
   multiple content blocks (e.g. text + image) will only surface the first one over this transport.
-- **Batch JSON-RPC requests are rejected** (`400 Bad Request`) per the 2025-11-05 spec — only single
+- **Batch JSON-RPC requests are rejected** (`400 Bad Request`) — only single
   JSON-RPC objects are accepted on `POST /mcp` and over stdio.
