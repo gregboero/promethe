@@ -1,5 +1,6 @@
 package dev.promethe.core
 
+import dev.promethe.api.PolicyDataTrust
 import dev.promethe.core.Log
 
 import dev.promethe.core.hooks.HookContext
@@ -66,13 +67,20 @@ class AIAgent(
     ): Flow<ConversationTrajectory> =
         flow {
             val now = Clock.System.now().toEpochMilliseconds()
+            val currentRunId = llmRequestContext?.runId
 
             // Clear tool dedup cache for this new turn
             actionExecutor.clearDedupCache()
 
             // Enregistrer la session et le message utilisateur
             database.insertSessionOrIgnore(id = sessionId, createdAt = now, metadata = "{}")
-            database.insertMessage(sessionId = sessionId, role = "user", content = userInput, timestamp = now)
+            database.insertMessage(
+                sessionId = sessionId,
+                role = "user",
+                content = userInput,
+                timestamp = now,
+                sourceRunId = currentRunId,
+            )
 
             // -- Hook: MESSAGE_RECEIVED --
             hookManager?.fire(
@@ -110,6 +118,8 @@ class AIAgent(
             val maxIterations = 10
             val effectiveReasoningEffort = overrideReasoningEffort ?: config.reasoningEffort
             var pendingToolTurn: PendingToolTurn? = null
+            val privilegedController =
+                PrivilegedController(externalContextPresent = !externalContext.isNullOrBlank())
 
             val trajectoryLog = mutableListOf<ConversationTrajectory>()
             val memoryNudge = MemoryNudge()
@@ -129,6 +139,10 @@ class AIAgent(
 
                 // Récupérer tout l'historique de la session
                 val history = database.getMessagesForSession(sessionId)
+                privilegedController.restore(
+                    runId = iterationLlmContext?.runId,
+                    persistedMessages = history.map { it.content },
+                )
 
                 // Générer le prompt système
                 val baseSystemPrompt =
@@ -153,7 +167,15 @@ class AIAgent(
                     }
 
                 // Context compression: summarize middle turns if history is too long
-                val rawMessages = history.map { msg -> msg.role to msg.content }.toMutableList()
+                val rawMessages =
+                    history
+                        .filterNot { message -> isTrustStateMarker(message.content) }
+                        .filter { message ->
+                            message.dataTrust == PolicyDataTrust.TRUSTED ||
+                                (currentRunId != null && message.sourceRunId == currentRunId)
+                        }
+                        .map { msg -> msg.role to msg.content }
+                        .toMutableList()
                 pendingToolTurn?.let { pending ->
                     val observation = "Observation: ${pending.result}"
                     val observationIndex = rawMessages.indexOfLast { (role, content) ->
@@ -256,7 +278,7 @@ class AIAgent(
                     } else {
                         val observation = try {
                             actionExecutor.execute(
-                                ToolExecutionRequest(
+                                privilegedController.toolInvocation(
                                     toolName = toolName,
                                     arguments = args,
                                     sessionId = sessionId,
@@ -317,13 +339,28 @@ class AIAgent(
                             }
                         }
 
+                        val governedObservation = privilegedController.observe(toolName, observation)
                         val logTime = Clock.System.now().toEpochMilliseconds()
                         database.insertMessage(
                             sessionId = sessionId,
                             role = "system",
-                            content = "Observation: $observation",
+                            content = "Observation: ${governedObservation.promptContent}",
                             timestamp = logTime,
+                            dataTrust = governedObservation.trust,
+                            sourceRunId = currentRunId,
                         )
+                        if (governedObservation.trust == PolicyDataTrust.UNTRUSTED) {
+                            iterationLlmContext?.runId?.let { runId ->
+                                database.insertMessage(
+                                    sessionId = sessionId,
+                                    role = "system",
+                                    content = trustStateMarker(runId),
+                                    timestamp = logTime,
+                                    dataTrust = PolicyDataTrust.UNTRUSTED,
+                                    sourceRunId = runId,
+                                )
+                            }
+                        }
                         val rawAssistantMessage = llmResult.rawMessage
                         if (rawAssistantMessage != null && tc.id.isNotBlank()) {
                             pendingToolTurn =
@@ -331,7 +368,7 @@ class AIAgent(
                                     assistantMessage = rawAssistantMessage,
                                     toolCallId = tc.id,
                                     toolName = toolName,
-                                    result = observation,
+                                    result = governedObservation.promptContent,
                                 )
                         }
 
@@ -388,7 +425,7 @@ class AIAgent(
                             val observation =
                                 try {
                                     actionExecutor.execute(
-                                        ToolExecutionRequest(
+                                        privilegedController.toolInvocation(
                                             toolName = toolName,
                                             arguments = args,
                                             sessionId = sessionId,
@@ -453,14 +490,29 @@ class AIAgent(
                                     }
                                 }
 
+                            val governedObservation = privilegedController.observe(toolName, observation)
                             // Enregistrer l'observation comme message assistant/système
                             val logTime = Clock.System.now().toEpochMilliseconds()
                             database.insertMessage(
                                 sessionId = sessionId,
                                 role = "system",
-                                content = "Observation: $observation",
+                                content = "Observation: ${governedObservation.promptContent}",
                                 timestamp = logTime,
+                                dataTrust = governedObservation.trust,
+                                sourceRunId = currentRunId,
                             )
+                            if (governedObservation.trust == PolicyDataTrust.UNTRUSTED) {
+                                iterationLlmContext?.runId?.let { runId ->
+                                    database.insertMessage(
+                                        sessionId = sessionId,
+                                        role = "system",
+                                        content = trustStateMarker(runId),
+                                        timestamp = logTime,
+                                        dataTrust = PolicyDataTrust.UNTRUSTED,
+                                        sourceRunId = runId,
+                                    )
+                                }
+                            }
 
                             val trajObs =
                                 ConversationTrajectory(
@@ -483,6 +535,8 @@ class AIAgent(
                             role = "assistant",
                             content = llmResponse,
                             timestamp = logTime,
+                            dataTrust = privilegedController.trust(),
+                            sourceRunId = currentRunId,
                         )
 
                         val trajFinal =
@@ -499,7 +553,11 @@ class AIAgent(
             }
 
             // Closed-Loop Learning (gated by RewardSignal)
-            if (!dryRun && trajectoryEvaluator.shouldSynthesize(trajectoryLog)) {
+            if (
+                !dryRun &&
+                privilegedController.trust() == PolicyDataTrust.TRUSTED &&
+                trajectoryEvaluator.shouldSynthesize(trajectoryLog)
+            ) {
                 if (!rewardSignal.shouldAllowSynthesis(null)) {
                     logger.info { "Skipping synthesis — negative feedback trend" }
                 } else {
@@ -530,7 +588,11 @@ class AIAgent(
 
             // ── Memory Fact Extraction (post-loop) ──
             // Extract atomic facts from the completed conversation and persist them.
-            if (!dryRun && memoryLayer != null) {
+            if (
+                !dryRun &&
+                privilegedController.trust() == PolicyDataTrust.TRUSTED &&
+                memoryLayer != null
+            ) {
                 try {
                     val extractedFacts =
                         memoryLayer.extractFacts(

@@ -75,6 +75,18 @@ class PolicyKernelTest {
     }
 
     @Test
+    fun `trust classification changes the policy decision id`() {
+        val trusted = invocation("web_search")
+        val untrusted = invocation("web_search", dataTrust = PolicyDataTrust.UNTRUSTED)
+        val kernel = PolicyKernel()
+
+        val trustedDecision = kernel.evaluate(trusted, ToolContractRegistry.contractFor(trusted.toolName))
+        val untrustedDecision = kernel.evaluate(untrusted, ToolContractRegistry.contractFor(untrusted.toolName))
+
+        assertTrue(trustedDecision.decisionId != untrustedDecision.decisionId)
+    }
+
+    @Test
     fun `secret data cannot use remote egress`() {
         val request =
             invocation(

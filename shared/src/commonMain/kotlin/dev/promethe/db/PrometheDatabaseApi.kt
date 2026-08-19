@@ -3,6 +3,7 @@ package dev.promethe.db
 import dev.promethe.api.AgentRunEventRecord
 import dev.promethe.api.AgentRunRecord
 import dev.promethe.api.AgentRunStatus
+import dev.promethe.api.PolicyDataTrust
 import dev.promethe.api.ReasoningEffort
 import dev.promethe.api.ToolIntentRecord
 import dev.promethe.api.ToolIntentStatus
@@ -137,6 +138,8 @@ interface PrometheDatabaseApi {
         role: String,
         content: String,
         timestamp: Long,
+        dataTrust: PolicyDataTrust = PolicyDataTrust.TRUSTED,
+        sourceRunId: String? = null,
     ): Int
 
     suspend fun getMessagesForSession(sessionId: String): List<MessageRow>
@@ -332,6 +335,8 @@ data class MessageRow(
     val role: String,
     val content: String,
     val timestamp: Long,
+    val dataTrust: PolicyDataTrust = PolicyDataTrust.TRUSTED,
+    val sourceRunId: String? = null,
 )
 
 data class FeedbackRow(

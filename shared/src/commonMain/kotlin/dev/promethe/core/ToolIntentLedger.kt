@@ -377,7 +377,7 @@ private fun ToolIntentRecord.transitionEvent(
 internal fun toolInvocationHash(request: ToolExecutionRequest): String =
     toolIntentDigest(
         buildString {
-            append("promethe-tool-invocation-v1\u0000")
+            append("promethe-tool-invocation-v2\u0000")
             append(request.toolName)
             append('\u0000')
             append(canonicalJson(request.arguments))
@@ -391,6 +391,10 @@ internal fun toolInvocationHash(request: ToolExecutionRequest): String =
             append(request.memoryNamespace)
             append('\u0000')
             append(request.workspaceRelativePath.orEmpty())
+            append('\u0000')
+            append(request.dataTrust.name)
+            append('\u0000')
+            append(request.dataSensitivity.name)
         },
     )
 

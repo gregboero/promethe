@@ -1,5 +1,6 @@
 package dev.promethe.core
 
+import dev.promethe.api.PolicyDataTrust
 import dev.promethe.core.memory.MemoryFact
 import dev.promethe.core.memory.MemoryProvider
 import dev.promethe.core.memory.MemoryTier
@@ -37,7 +38,13 @@ class MemoryLayer(
         model: String? = null,
         memoryNamespace: String = "default",
     ): List<MemoryFact> {
-        val messages = database.getMessagesForSession(sessionId)
+        val messages =
+            database
+                .getMessagesForSession(sessionId)
+                .filter { message ->
+                    message.dataTrust == PolicyDataTrust.TRUSTED &&
+                        !isTrustStateMarker(message.content)
+                }
         if (messages.size < 4) return emptyList()
 
         val conversation = messages.joinToString("\n") { "[${it.role}] ${it.content}" }
