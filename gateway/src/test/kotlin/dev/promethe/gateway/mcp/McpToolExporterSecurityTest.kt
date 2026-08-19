@@ -70,7 +70,8 @@ class McpToolExporterSecurityTest {
     @Test
     fun `stdio style exporter does not advertise approval-required tools`() =
         runTest {
-            ToolRegistry.register(NeverDirectTool("echo"))
+            ToolRegistry.register(NeverDirectTool("read_file"))
+            ToolRegistry.register(NeverDirectTool("unknown_dynamic_tool"))
             ToolRegistry.register(NeverDirectTool("shell"))
             val exporter = McpToolExporter(exposeApprovalRequiredTools = false)
 
@@ -88,7 +89,8 @@ class McpToolExporterSecurityTest {
                     ?.get("tools")?.jsonArray
                     ?.mapNotNull { it.jsonObject["name"]?.jsonPrimitive?.content }
             assertNotNull(names)
-            assertEquals(true, "echo" in names)
+            assertEquals(true, "read_file" in names)
+            assertFalse("unknown_dynamic_tool" in names)
             assertFalse("shell" in names)
         }
 

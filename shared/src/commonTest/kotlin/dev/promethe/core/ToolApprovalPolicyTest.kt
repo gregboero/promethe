@@ -1,5 +1,8 @@
 package dev.promethe.core
 
+import dev.promethe.api.ToolApprovalRequirement
+import dev.promethe.api.ToolContractSource
+import dev.promethe.api.ToolEgress
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlin.test.Test
@@ -17,6 +20,11 @@ class ToolApprovalPolicyTest {
         assertTrue(ToolApprovalPolicy.requiresMandatoryApproval("unknown_tool", arguments))
         assertEquals(ToolRisk.EXTERNAL_EFFECT, ToolApprovalPolicy.catalogRisk("mcp_server_delete_everything"))
         assertTrue(ToolApprovalPolicy.requiresMandatoryApproval("mcp_server_delete_everything", arguments))
+        assertFalse(ToolApprovalPolicy.contractFor("unknown_tool").explicit)
+        assertEquals(ToolContractSource.FALLBACK, ToolApprovalPolicy.contractFor("unknown_tool").source)
+        assertEquals(ToolContractSource.MCP, ToolApprovalPolicy.contractFor("mcp_server_delete_everything").source)
+        assertEquals(ToolApprovalRequirement.ALWAYS, ToolApprovalPolicy.contractFor("unknown_tool").approval)
+        assertEquals(ToolEgress.UNKNOWN, ToolApprovalPolicy.contractFor("unknown_tool").egress)
     }
 
     @Test
@@ -94,6 +102,48 @@ class ToolApprovalPolicyTest {
         assertFalse(read.mandatoryApproval)
         assertEquals(ToolRisk.CONFIG_CHANGE, mutation.risk)
         assertTrue(mutation.mandatoryApproval)
+        assertTrue(read.ownerOnly)
+        assertTrue(ToolApprovalPolicy.contractFor("discord_policy").ownerOnly)
+    }
+
+    @Test
+    fun `sensitive tools have explicit fail closed contracts`() {
+        val sensitiveTools =
+            listOf(
+                "generate_image",
+                "analyze_image",
+                "text_to_speech",
+                "video_generate",
+                "video_analyze",
+                "api_call",
+                "web_screenshot",
+                "browser_navigate",
+                "checkpoint_save",
+                "render_ui",
+                "autonomous_goal",
+                "mixture_of_agents",
+                "list_agents",
+                "get_subtask_result",
+            )
+
+        sensitiveTools.forEach { toolName ->
+            assertTrue(ToolApprovalPolicy.contractFor(toolName).explicit, toolName)
+        }
+        assertEquals(ToolRisk.WRITE, ToolApprovalPolicy.catalogRisk("checkpoint_save"))
+        assertEquals(ToolRisk.READ, ToolApprovalPolicy.catalogRisk("list_agents"))
+        assertEquals(ToolRisk.READ, ToolApprovalPolicy.catalogRisk("get_subtask_result"))
+    }
+
+    @Test
+    fun `unknown composite operations fail closed`() {
+        val decision =
+            ToolApprovalPolicy.evaluate(
+                "github",
+                buildJsonObject { put("action", "delete_repository") },
+            )
+
+        assertEquals(ToolRisk.EXTERNAL_EFFECT, decision.risk)
+        assertTrue(decision.mandatoryApproval)
     }
 
     @Test
