@@ -114,6 +114,195 @@ class McpStreamableHttpTransportTest {
         }
 
     @Test
+    fun `modern MCP fulfills input required and retries the original request`() =
+        runTest {
+            var toolCallCount = 0
+            val outboundClient =
+                RecordingOutboundClient { request ->
+                    when (request.method()) {
+                        "server/discover" -> {
+                            jsonRpcResult(
+                                request.id(),
+                                modernDiscoveryResult(),
+                            ).asHttpResponse()
+                        }
+
+                        "tools/call" -> {
+                            toolCallCount++
+                            val params = json.parseToJsonElement(request.body).jsonObject["params"]!!.jsonObject
+                            assertEquals("weather.get", params["name"]?.jsonPrimitive?.content)
+                            assertEquals("Montreal", params["arguments"]?.jsonObject?.get("city")?.jsonPrimitive?.content)
+                            if (toolCallCount == 1) {
+                                jsonRpcResult(
+                                    request.id(),
+                                    buildJsonObject {
+                                        put("resultType", McpProtocol.RESULT_INPUT_REQUIRED)
+                                        putJsonObject("inputRequests") {
+                                            putJsonObject("confirm") {
+                                                put("method", "elicitation/create")
+                                                putJsonObject("params") { put("message", "Continue?") }
+                                            }
+                                        }
+                                        put("requestState", "sealed-state")
+                                    },
+                                ).asHttpResponse()
+                            } else {
+                                assertEquals("sealed-state", params["requestState"]?.jsonPrimitive?.content)
+                                val response = params["inputResponses"]!!.jsonObject["confirm"]!!.jsonObject
+                                assertEquals("accept", response["action"]?.jsonPrimitive?.content)
+                                jsonRpcResult(
+                                    request.id(),
+                                    buildJsonObject {
+                                        put("resultType", McpProtocol.RESULT_COMPLETE)
+                                        putJsonArray("content") {
+                                            add(
+                                                buildJsonObject {
+                                                    put("type", "text")
+                                                    put("text", "Sunny")
+                                                },
+                                            )
+                                        }
+                                    },
+                                ).asHttpResponse()
+                            }
+                        }
+
+                        else -> {
+                            error("Unexpected method ${request.method()}")
+                        }
+                    }
+                }
+            val handledRequests = mutableListOf<String>()
+            val transport =
+                McpStreamableHttpTransport(
+                    baseUrl = "https://mcp.example/rpc",
+                    outboundClient = outboundClient,
+                    inputRequestHandlers =
+                        mapOf(
+                            "elicitation/create" to
+                                McpInputRequestHandler { key, request ->
+                                    handledRequests += "$key:${request["method"]?.jsonPrimitive?.content}"
+                                    buildJsonObject { put("action", "accept") }
+                                },
+                        ),
+                )
+
+            transport.initialize()
+            assertEquals("Sunny", transport.callTool("weather.get", buildJsonObject { put("city", "Montreal") }))
+
+            assertEquals(listOf("confirm:elicitation/create"), handledRequests)
+            assertEquals(listOf(1, 2, 3), outboundClient.requests.map { it.id() })
+            val firstCallMeta =
+                json.parseToJsonElement(outboundClient.requests[1].body).jsonObject["params"]!!.jsonObject["_meta"]!!.jsonObject
+            assertTrue(firstCallMeta[McpProtocol.CLIENT_CAPABILITIES_META]!!.jsonObject.containsKey("elicitation"))
+        }
+
+    @Test
+    fun `modern MCP input required fails closed without a handler`() =
+        runTest {
+            val outboundClient =
+                RecordingOutboundClient { request ->
+                    val result =
+                        if (request.method() == "server/discover") {
+                            modernDiscoveryResult()
+                        } else {
+                            buildJsonObject {
+                                put("resultType", McpProtocol.RESULT_INPUT_REQUIRED)
+                                putJsonObject("inputRequests") {
+                                    putJsonObject("confirm") {
+                                        put("method", "elicitation/create")
+                                        putJsonObject("params") { put("message", "Continue?") }
+                                    }
+                                }
+                            }
+                        }
+                    jsonRpcResult(request.id(), result).asHttpResponse()
+                }
+            val transport = McpStreamableHttpTransport("https://mcp.example/rpc", outboundClient = outboundClient)
+
+            transport.initialize()
+
+            assertFailsWith<McpInputRequiredException> {
+                transport.callTool("weather.get", buildJsonObject {})
+            }
+            assertEquals(2, outboundClient.requests.size)
+        }
+
+    @Test
+    fun `modern MCP bounds state-only input required retries`() =
+        runTest {
+            val outboundClient =
+                RecordingOutboundClient { request ->
+                    val result =
+                        if (request.method() == "server/discover") {
+                            modernDiscoveryResult()
+                        } else {
+                            buildJsonObject {
+                                put("resultType", McpProtocol.RESULT_INPUT_REQUIRED)
+                                put("requestState", "round-${request.id()}")
+                            }
+                        }
+                    jsonRpcResult(request.id(), result).asHttpResponse()
+                }
+            val transport =
+                McpStreamableHttpTransport(
+                    baseUrl = "https://mcp.example/rpc",
+                    outboundClient = outboundClient,
+                    maxInputRequiredRounds = 2,
+                )
+
+            transport.initialize()
+
+            val failure =
+                assertFailsWith<RuntimeException> {
+                    transport.callTool("weather.get", buildJsonObject {})
+                }
+            assertTrue(failure.message.orEmpty().contains("exceeded 2 rounds"))
+            assertEquals(listOf(1, 2, 3, 4), outboundClient.requests.map { it.id() })
+        }
+
+    @Test
+    fun `modern MCP rejects malformed input required state`() =
+        runTest {
+            val outboundClient =
+                RecordingOutboundClient { request ->
+                    val result =
+                        if (request.method() == "server/discover") {
+                            modernDiscoveryResult()
+                        } else {
+                            buildJsonObject {
+                                put("resultType", McpProtocol.RESULT_INPUT_REQUIRED)
+                                put("requestState", 42)
+                            }
+                        }
+                    jsonRpcResult(request.id(), result).asHttpResponse()
+                }
+            val transport = McpStreamableHttpTransport("https://mcp.example/rpc", outboundClient = outboundClient)
+
+            transport.initialize()
+
+            val failure =
+                assertFailsWith<RuntimeException> {
+                    transport.callTool("weather.get", buildJsonObject {})
+                }
+            assertTrue(failure.message.orEmpty().contains("requestState must be a string"))
+        }
+
+    @Test
+    fun `modern MCP rejects a response with the wrong request id`() =
+        runTest {
+            val outboundClient =
+                RecordingOutboundClient { request ->
+                    jsonRpcResult(request.id() + 1, modernDiscoveryResult()).asHttpResponse()
+                }
+            val transport = McpStreamableHttpTransport("https://mcp.example/rpc", outboundClient = outboundClient)
+
+            val failure = assertFailsWith<RuntimeException> { transport.initialize() }
+
+            assertTrue(failure.message.orEmpty().contains("Invalid MCP JSON-RPC response envelope"))
+        }
+
+    @Test
     fun `MCP rejects private destinations before opening a client`() =
         runTest {
             var clientOpened = false
@@ -150,10 +339,7 @@ class McpStreamableHttpTransportTest {
         val result =
             when (request.method()) {
                 "server/discover" -> {
-                    buildJsonObject {
-                        put("resultType", "complete")
-                        putJsonArray("supportedVersions") { add(McpProtocol.MODERN_VERSION) }
-                    }
+                    modernDiscoveryResult()
                 }
 
                 "tools/call" -> {
@@ -176,6 +362,13 @@ class McpStreamableHttpTransportTest {
             }
         return jsonRpcResult(request.id(), result).asHttpResponse()
     }
+
+    private fun modernDiscoveryResult(): JsonObject =
+        buildJsonObject {
+            put("resultType", McpProtocol.RESULT_COMPLETE)
+            putJsonArray("supportedVersions") { add(McpProtocol.MODERN_VERSION) }
+            putJsonObject("capabilities") {}
+        }
 
     private fun jsonRpcResult(
         id: Int,

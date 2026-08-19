@@ -31,7 +31,8 @@ server role lets *other* MCP clients use Prométhé's tools.
 | `JvmMcpTransportFactory` | `shared/src/jvmMain/kotlin/dev/promethe/core/JvmMcpTransportFactory.kt` | Implements `McpBridge.TransportFactory`; picks a concrete transport (`stdio`, `sse`, `streamable-http`) based on `McpServerConfig.transport` and wraps it in an adapter implementing `McpBridge.McpTransportApi`. |
 | `McpStdioTransport` | `shared/src/jvmMain/kotlin/dev/promethe/core/McpStdioTransport.kt` | Fails closed with `SANDBOX_PROTOCOL_V2_REQUIRED`; persistent subprocess sessions are not supported by sandbox IPC v1. |
 | `McpSseTransport` | `shared/src/jvmMain/kotlin/dev/promethe/core/McpSseTransport.kt` | Connects to an SSE endpoint to discover a message endpoint, then sends JSON-RPC 2.0 requests via HTTP POST to that endpoint. |
-| `McpStreamableHttpTransport` | `shared/src/jvmMain/kotlin/dev/promethe/core/McpStreamableHttpTransport.kt` | Dual-era Streamable HTTP client. It probes `server/discover` with the stateless 2026-07-28 envelope and falls back to the official 2025-11-25 `initialize` lifecycle only when the response identifies a legacy endpoint. |
+| `McpStreamableHttpTransport` | `shared/src/jvmMain/kotlin/dev/promethe/core/McpStreamableHttpTransport.kt` | Dual-era Streamable HTTP client. It probes `server/discover` with the stateless 2026-07-28 envelope, drives bounded MRTR retries when an explicit input handler is configured, and falls back to the official 2025-11-25 `initialize` lifecycle only when the response identifies a legacy endpoint. |
+| `McpInputRequestHandler` | `shared/src/jvmMain/kotlin/dev/promethe/core/McpInputRequestHandler.kt` | Explicit trust boundary for MRTR. It resolves embedded server requests; without a configured handler, non-empty `inputRequests` fail closed with `McpInputRequiredException`. |
 
 `McpBridge` itself is declared in `commonMain` and only depends on the `McpTransportApi` /
 `TransportFactory` interfaces — the actual transports (`McpStdioTransport`, `McpSseTransport`,
@@ -224,6 +225,22 @@ mode:
 | `shutdown` / `notifications/initialized` | Legacy lifecycle only. Modern requests do not use the initialize/shutdown exchange. |
 | anything else | JSON-RPC error `-32601` (method not found). |
 
+### Multi Round-Trip Requests (MRTR)
+
+The modern Streamable HTTP client recognizes `resultType: input_required` for `tools/call`,
+`prompts/get`, and `resources/read`. It resolves every entry through the handler registered for
+its exact method (`elicitation/create`, `sampling/createMessage`, or `roots/list`), then retries
+the original request with a fresh JSON-RPC ID,
+per-round `inputResponses`, and the byte-for-byte `requestState` value supplied by the server.
+Advertised client capabilities are derived from this registry. Retries are limited to ten rounds
+and sixteen embedded requests per round by default.
+
+No implicit user answer is generated. A non-empty `inputRequests` map without an input handler
+raises `McpInputRequiredException`; unknown request methods, malformed envelopes, mismatched
+JSON-RPC IDs, and unsupported result types are rejected. The
+default `JvmMcpTransportFactory` does not install an interactive handler yet, so product UI
+elicitation remains unavailable until its dedicated approval/form bridge is implemented.
+
 Errors are mapped to standard JSON-RPC codes: `-32601` (method not found), `-32602` (invalid
 params, e.g. missing `name`/`arguments`), `-32603` (uncaught internal error), `-32700` (parse
 error), `-32020` (header/body mismatch), and `-32022` (unsupported protocol version).
@@ -245,8 +262,12 @@ string check on the line before/independent of full dispatch).
   `baseUrl` as the message endpoint if it cannot parse a `data:` line from the initial SSE response.
 - **MCP HTTP+SSE is legacy-only and deprecated** — it remains available during the compatibility
   window but receives no new protocol features.
-- **MRTR and the modern Tasks extension are not implemented yet** — modern discovery does not
-  advertise `io.modelcontextprotocol/tasks`, and Prométhé does not emit `input_required` results.
+- **MRTR is client-side and opt-in at the trust boundary** — the Streamable HTTP client can drive
+  bounded modern retries, but the default product wiring has no interactive input handler and
+  Prométhé's server role does not emit `input_required` results yet.
+- **The modern Tasks extension is not implemented yet** — modern discovery does not advertise
+  `io.modelcontextprotocol/tasks`; the legacy in-memory task helper is neither durable nor exposed
+  to modern clients.
 - **Tool schemas expose Prométhé's current flat parameter descriptors** — they declare the 2020-12
   dialect, but richer constructs such as `$defs`, `$ref`, `oneOf` and typed output schemas require
   the next contract/schema migration.
