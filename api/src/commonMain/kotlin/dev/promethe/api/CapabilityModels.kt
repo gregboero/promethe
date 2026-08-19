@@ -113,6 +113,20 @@ enum class ToolCallOrigin {
 }
 
 @Serializable
+enum class PolicyDataTrust {
+    TRUSTED,
+    UNTRUSTED,
+}
+
+@Serializable
+enum class PolicyDataSensitivity {
+    PUBLIC,
+    INTERNAL,
+    CONFIDENTIAL,
+    SECRET,
+}
+
+@Serializable
 enum class ToolRisk {
     READ,
     WRITE,
@@ -135,4 +149,6 @@ data class ToolInvocation(
     val runId: String? = null,
     val stepId: String? = null,
     val idempotencyKey: String? = null,
+    val dataTrust: PolicyDataTrust = PolicyDataTrust.TRUSTED,
+    val dataSensitivity: PolicyDataSensitivity = PolicyDataSensitivity.INTERNAL,
 )

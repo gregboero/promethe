@@ -354,6 +354,8 @@ object SecurityAuditLogs : Table("security_audit_logs") {
     val remoteAddress = varchar("remote_address", 255).default("")
     val detail = text("detail").default("")
     val createdAt = long("created_at")
+    val previousHash = varchar("previous_hash", 64).default("")
+    val entryHash = varchar("entry_hash", 64).default("")
 
     override val primaryKey = PrimaryKey(id)
 

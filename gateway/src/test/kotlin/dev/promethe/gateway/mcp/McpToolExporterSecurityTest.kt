@@ -28,7 +28,7 @@ class McpToolExporterSecurityTest {
     @Test
     fun `tool calls always use the secure executor`() =
         runTest {
-            ToolRegistry.register(NeverDirectTool("echo"))
+            ToolRegistry.register(NeverDirectTool("read_file"))
             var captured: ToolExecutionRequest? = null
             val exporter =
                 McpToolExporter(
@@ -47,7 +47,7 @@ class McpToolExporterSecurityTest {
                         put(
                             "params",
                             buildJsonObject {
-                                put("name", "echo")
+                                put("name", "read_file")
                                 put("arguments", buildJsonObject { put("value", "hello") })
                             },
                         )
@@ -55,7 +55,7 @@ class McpToolExporterSecurityTest {
                     sessionId = "owner-session",
                 )
 
-            assertEquals("echo", captured?.toolName)
+            assertEquals("read_file", captured?.toolName)
             assertEquals("owner-session", captured?.sessionId)
             assertEquals(
                 "secured",
@@ -65,6 +65,29 @@ class McpToolExporterSecurityTest {
                     ?.get("text")?.jsonPrimitive
                     ?.content,
             )
+        }
+
+    @Test
+    fun `unknown tools remain hidden with an interactive executor`() =
+        runTest {
+            ToolRegistry.register(NeverDirectTool("unknown_dynamic_tool"))
+            val exporter = McpToolExporter(secureToolExecutor = SecureToolExecutor { "unexpected" })
+
+            val response =
+                exporter.dispatch(
+                    buildJsonObject {
+                        put("jsonrpc", "2.0")
+                        put("id", 1)
+                        put("method", "tools/list")
+                    },
+                )
+
+            val names =
+                response?.get("result")?.jsonObject
+                    ?.get("tools")?.jsonArray
+                    ?.mapNotNull { it.jsonObject["name"]?.jsonPrimitive?.content }
+            assertNotNull(names)
+            assertFalse("unknown_dynamic_tool" in names)
         }
 
     @Test

@@ -79,6 +79,8 @@ class ActionExecutor(
     private val approvalGate: ApprovalGate? = null,
     private val sandboxCommandExecutor: SandboxCommandExecutor? = null,
     private val toolIntentLedger: ToolIntentLedger = NoOpToolIntentLedger,
+    private val policyKernel: PolicyKernel = PolicyKernel(),
+    private val policyAuditSink: PolicyAuditSink = NoOpPolicyAuditSink,
     artifactStore: ArtifactStore? = null,
     private val resourceGovernors: ResourceGovernorRegistry = GlobalResourceGovernorRegistry,
 ) : SecureToolExecutor {
@@ -147,8 +149,11 @@ class ActionExecutor(
             request.runId?.let { setAttribute("promethe.run.id", it) }
             request.stepId?.let { setAttribute("promethe.step.id", it) }
 
-            val policy = ToolApprovalPolicy.evaluate(toolName, args)
+            val contract = ToolApprovalPolicy.contractFor(toolName)
+            val policy = policyKernel.evaluate(request, contract)
             setAttribute("tool.risk", policy.risk.name)
+            setAttribute("policy.version", policy.policyVersion)
+            setAttribute("policy.effect", policy.effect.name)
 
             // ── DEDUP CHECK — return cached result for identical read-only calls ──
             if (toolName in dedupSafeTools) {
@@ -180,9 +185,22 @@ class ActionExecutor(
                     null
                 }
 
-            if (policy.ownerOnly && request.origin !in ownerPolicyOrigins) {
-                recordBlocked(intentId, "owner_policy_required")
-                return@span "[BLOCKED] '$toolName' administration is restricted to owner conversations"
+            val policyAuditRecorded =
+                runCatching {
+                    policyAuditSink.record(
+                        request = request,
+                        contract = contract,
+                        decision = policy,
+                        createdAt = Clock.System.now().toEpochMilliseconds(),
+                    )
+                }.getOrDefault(false)
+            if (!policyAuditRecorded && policy.risk != ToolRisk.READ) {
+                recordBlocked(intentId, "policy_audit_failed")
+                return@span "[BLOCKED] The policy decision could not be recorded durably"
+            }
+            if (policy.effect == PolicyEffect.DENY) {
+                recordBlocked(intentId, "policy_denied")
+                return@span "[BLOCKED] ${policy.denialReason}"
             }
 
             // ── BEFORE_TOOL_CALL hook ──
@@ -213,7 +231,7 @@ class ActionExecutor(
                 recordBlocked(intentId, "remote_full_file_access")
                 return@span "[BLOCKED] Full local file access is unavailable from ${request.origin.name.lowercase()}"
             }
-            val requiresMandatoryApproval = policy.mandatoryApproval || unconfinedFileAccess
+            val requiresMandatoryApproval = policy.requiresApproval || unconfinedFileAccess
             if (requiresMandatoryApproval && approvalGate == null) {
                 recordBlocked(intentId, "approval_service_required")
                 return@span "[BLOCKED] A human approval service is required for '$toolName'"
@@ -451,7 +469,6 @@ class ActionExecutor(
         )
 
     private val localInteractiveOrigins = setOf(ToolCallOrigin.AGENT, ToolCallOrigin.A2A)
-    private val ownerPolicyOrigins = setOf(ToolCallOrigin.A2A)
 
     private suspend fun runSandboxCommand(
         command: String,

@@ -265,6 +265,10 @@ interface PrometheDatabaseApi {
 
     suspend fun insertSecurityAuditLog(log: SecurityAuditLogRow) = Unit
 
+    suspend fun listSecurityAuditLogs(limit: Int = 1_000): List<SecurityAuditLogRow> = emptyList()
+
+    suspend fun verifySecurityAuditChain(): SecurityAuditChainVerification = SecurityAuditChainVerification(valid = true, entries = 0)
+
     suspend fun insertOAuthAuthorization(authorization: OAuthAuthorizationRow) = Unit
 
     suspend fun consumeOAuthAuthorization(
@@ -451,6 +455,14 @@ data class SecurityAuditLogRow(
     val remoteAddress: String = "",
     val detail: String = "",
     val createdAt: Long,
+    val previousHash: String = "",
+    val entryHash: String = "",
+)
+
+data class SecurityAuditChainVerification(
+    val valid: Boolean,
+    val entries: Int,
+    val invalidEntryHash: String? = null,
 )
 
 data class OAuthAuthorizationRow(

@@ -47,6 +47,7 @@ val agentModule = module {
             httpClient = get(),
             hookManager = get(),
             toolIntentLedger = PersistentToolIntentLedger(get()),
+            policyAuditSink = PersistentPolicyAuditSink(get()),
         )
     }
 

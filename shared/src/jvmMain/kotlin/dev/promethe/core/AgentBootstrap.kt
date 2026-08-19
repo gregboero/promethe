@@ -278,6 +278,7 @@ object AgentBootstrap {
                 approvalGate = approvalGate,
                 sandboxCommandExecutor = sandboxCommandRunner,
                 toolIntentLedger = PersistentToolIntentLedger(database),
+                policyAuditSink = PersistentPolicyAuditSink(database),
                 artifactStore = artifactStore,
             )
 

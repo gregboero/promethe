@@ -2,11 +2,12 @@ package dev.promethe.gateway.mcp
 
 import ai.koog.agents.core.tools.ToolBase
 import dev.promethe.core.SecureToolExecutor
+import dev.promethe.core.PolicyEffect
+import dev.promethe.core.PolicyKernel
 import dev.promethe.core.ToolApprovalPolicy
 import dev.promethe.core.ToolCallOrigin
 import dev.promethe.core.ToolExecutionRequest
 import dev.promethe.core.ToolRegistry
-import dev.promethe.core.ToolRisk
 import dev.promethe.api.PrometheVersion
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -37,6 +38,7 @@ class McpToolExporter(
     private val origin: ToolCallOrigin = ToolCallOrigin.MCP_HTTP,
     private val exposeApprovalRequiredTools: Boolean = secureToolExecutor != null,
     private val taskManager: McpTaskManager = McpTaskManager(),
+    private val policyKernel: PolicyKernel = PolicyKernel(),
 ) {
     companion object {
         const val PROTOCOL_VERSION = "2025-11-05"
@@ -99,7 +101,7 @@ class McpToolExporter(
     private suspend fun handleToolsList(): JsonObject {
         val tools =
             ToolRegistry.listTools().filter { tool ->
-                exposeApprovalRequiredTools || ToolApprovalPolicy.catalogRisk(tool.name) == ToolRisk.READ
+                isToolExposed(tool.name, JsonObject(emptyMap()))
             }
         return buildJsonObject {
             put(
@@ -192,7 +194,19 @@ class McpToolExporter(
     private fun isToolExposed(
         toolName: String,
         arguments: JsonObject,
-    ): Boolean = exposeApprovalRequiredTools || !ToolApprovalPolicy.requiresMandatoryApproval(toolName, arguments)
+    ): Boolean {
+        val request =
+            ToolExecutionRequest(
+                toolName = toolName,
+                arguments = arguments,
+                origin = origin,
+            )
+        return when (policyKernel.evaluate(request, ToolApprovalPolicy.contractFor(toolName)).effect) {
+            PolicyEffect.ALLOW -> true
+            PolicyEffect.REQUIRE_APPROVAL -> exposeApprovalRequiredTools
+            PolicyEffect.DENY -> false
+        }
+    }
 
     // ── JSON-RPC 2.0 response builders ───────────────────────
 
