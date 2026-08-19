@@ -40,6 +40,7 @@ class PrometheDatabase(
                 AgentRuns,
                 ToolIntents,
                 AgentRunEvents,
+                McpTasks,
                 Projects,
                 Sessions,
                 Messages,
@@ -261,6 +262,80 @@ class PrometheDatabase(
                 .where { AgentRunEvents.runId eq runId }
                 .orderBy(AgentRunEvents.sequence, SortOrder.ASC)
                 .map { it.toAgentRunEventRecord() }
+        }
+
+    // ===== MCP TASKS =====
+
+    override suspend fun insertMcpTask(task: McpTaskRecord): Boolean =
+        dbQuery {
+            McpTasks
+                .insertIgnore {
+                    it[taskId] = task.taskId
+                    it[ownerSessionId] = task.ownerSessionId
+                    it[method] = task.method
+                    it[resourceName] = task.resourceName
+                    it[runId] = task.runId
+                    it[status] = task.status.name
+                    it[statusMessage] = task.statusMessage
+                    it[resultJson] = task.resultJson
+                    it[errorJson] = task.errorJson
+                    it[inputRequestsJson] = task.inputRequestsJson
+                    it[createdAt] = task.createdAt
+                    it[lastUpdatedAt] = task.lastUpdatedAt
+                    it[ttlMs] = task.ttlMs
+                    it[pollIntervalMs] = task.pollIntervalMs
+                }.insertedCount > 0
+        }
+
+    override suspend fun updateMcpTask(
+        taskId: String,
+        ownerSessionId: String,
+        expectedStatuses: Set<McpTaskStatus>,
+        status: McpTaskStatus,
+        statusMessage: String?,
+        resultJson: String?,
+        errorJson: String?,
+        inputRequestsJson: String?,
+        lastUpdatedAt: Long,
+    ): Boolean =
+        dbQuery {
+            if (expectedStatuses.isEmpty()) return@dbQuery false
+            McpTasks.update(
+                where = {
+                    (McpTasks.taskId eq taskId) and
+                        (McpTasks.ownerSessionId eq ownerSessionId) and
+                        (McpTasks.status inList expectedStatuses.map(McpTaskStatus::name))
+                },
+            ) {
+                it[McpTasks.status] = status.name
+                it[McpTasks.statusMessage] = statusMessage
+                it[McpTasks.resultJson] = resultJson
+                it[McpTasks.errorJson] = errorJson
+                it[McpTasks.inputRequestsJson] = inputRequestsJson
+                it[McpTasks.lastUpdatedAt] = lastUpdatedAt
+            } > 0
+        }
+
+    override suspend fun getMcpTask(
+        taskId: String,
+        ownerSessionId: String,
+    ): McpTaskRecord? =
+        dbQuery {
+            McpTasks
+                .selectAll()
+                .where { (McpTasks.taskId eq taskId) and (McpTasks.ownerSessionId eq ownerSessionId) }
+                .singleOrNull()
+                ?.toMcpTaskRecord()
+        }
+
+    override suspend fun getMcpTasksByStatus(statuses: Set<McpTaskStatus>): List<McpTaskRecord> =
+        dbQuery {
+            if (statuses.isEmpty()) return@dbQuery emptyList()
+            McpTasks
+                .selectAll()
+                .where { McpTasks.status inList statuses.map(McpTaskStatus::name) }
+                .orderBy(McpTasks.lastUpdatedAt, SortOrder.ASC)
+                .map { it.toMcpTaskRecord() }
         }
 
     // ===== TOOL INTENTS =====
@@ -1420,6 +1495,24 @@ private fun ResultRow.toAgentRunRecord() =
         startedAt = this[AgentRuns.startedAt],
         finishedAt = this[AgentRuns.finishedAt],
         updatedAt = this[AgentRuns.updatedAt],
+    )
+
+private fun ResultRow.toMcpTaskRecord() =
+    McpTaskRecord(
+        taskId = this[McpTasks.taskId],
+        ownerSessionId = this[McpTasks.ownerSessionId],
+        method = this[McpTasks.method],
+        resourceName = this[McpTasks.resourceName],
+        runId = this[McpTasks.runId],
+        status = McpTaskStatus.valueOf(this[McpTasks.status]),
+        statusMessage = this[McpTasks.statusMessage],
+        resultJson = this[McpTasks.resultJson],
+        errorJson = this[McpTasks.errorJson],
+        inputRequestsJson = this[McpTasks.inputRequestsJson],
+        createdAt = this[McpTasks.createdAt],
+        lastUpdatedAt = this[McpTasks.lastUpdatedAt],
+        ttlMs = this[McpTasks.ttlMs],
+        pollIntervalMs = this[McpTasks.pollIntervalMs],
     )
 
 private fun ResultRow.toToolIntentRecord() =

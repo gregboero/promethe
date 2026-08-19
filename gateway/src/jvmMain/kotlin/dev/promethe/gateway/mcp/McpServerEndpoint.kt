@@ -51,8 +51,13 @@ private val logger = io.github.oshai.kotlinlogging.KotlinLogging.logger {}
 fun Route.mcpServerRoutes(
     allowedOrigins: Set<String> = emptySet(),
     secureToolExecutor: SecureToolExecutor? = null,
+    taskManager: McpTaskManager? = null,
 ) {
-    val exporter = McpToolExporter(secureToolExecutor = secureToolExecutor)
+    val exporter =
+        McpToolExporter(
+            secureToolExecutor = secureToolExecutor,
+            taskManager = taskManager,
+        )
     val json = Json {
         ignoreUnknownKeys = true
         encodeDefaults = true
@@ -73,6 +78,11 @@ fun Route.mcpServerRoutes(
                     putJsonObject("capabilities") {
                         putJsonObject("tools") {
                             put("listChanged", false)
+                        }
+                        if (taskManager != null) {
+                            putJsonObject("extensions") {
+                                putJsonObject(McpProtocol.TASKS_EXTENSION) {}
+                            }
                         }
                     }
                     put("endpoint", "/mcp")
@@ -261,6 +271,7 @@ private fun routingName(
         "tools/call" -> (params["name"] as? JsonPrimitive)?.content
         "resources/read" -> (params["uri"] as? JsonPrimitive)?.content
         "prompts/get" -> (params["name"] as? JsonPrimitive)?.content
+        "tasks/get", "tasks/update", "tasks/cancel" -> (params["taskId"] as? JsonPrimitive)?.content
         else -> null
     }
 

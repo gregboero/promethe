@@ -4,6 +4,7 @@ import dev.promethe.api.*
 import dev.promethe.core.*
 import dev.promethe.core.MemoryLayer
 import dev.promethe.db.PrometheDatabaseApi
+import dev.promethe.gateway.mcp.McpTaskManager
 import dev.promethe.gateway.mcp.mcpServerRoutes
 import dev.promethe.gateway.voice.AudioSessionManager
 import dev.promethe.gateway.voice.VoiceProviderRegistry
@@ -26,6 +27,10 @@ import io.ktor.server.http.content.*
 import io.ktor.server.sse.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collect
 import kotlinx.serialization.json.*
 import okio.Path.Companion.toPath
@@ -61,6 +66,8 @@ class OmnichannelGateway(
 ) {
     private var server: EmbeddedServer<*, *>? = null
     private var discordGateway: DiscordGatewayManager? = null
+    private val mcpTaskScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private val mcpTaskManager = McpTaskManager(database, mcpTaskScope)
     private val startTime = System.currentTimeMillis()
 
     fun start() {
@@ -159,6 +166,7 @@ class OmnichannelGateway(
                         mcpServerRoutes(
                             allowedOrigins = securityConfig.allowedOrigins.map { it.value }.toSet(),
                             secureToolExecutor = actionExecutor,
+                            taskManager = mcpTaskManager,
                         )
 
                         capabilityRoutes(providerCatalogSource, localCodingAgentService)
@@ -382,6 +390,7 @@ class OmnichannelGateway(
     fun stop() {
         discordGateway?.close()
         discordGateway = null
+        mcpTaskScope.cancel()
         server?.stop(1000, 2000)
         logger.info { "Promethe Gateway stopped" }
     }

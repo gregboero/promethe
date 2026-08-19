@@ -96,6 +96,33 @@ object AgentRunEvents : Table("agent_run_events") {
     }
 }
 
+/** mcp_tasks - durable state for the MCP Tasks extension. */
+object McpTasks : Table("mcp_tasks") {
+    val taskId = varchar("task_id", 160)
+    val ownerSessionId = varchar("owner_session_id", 255)
+    val method = varchar("method", 80)
+    val resourceName = varchar("resource_name", 255)
+    val runId = varchar("run_id", 160).nullable()
+    val status = varchar("status", 32)
+    val statusMessage = text("status_message").nullable()
+    val resultJson = text("result_json").nullable()
+    val errorJson = text("error_json").nullable()
+    val inputRequestsJson = text("input_requests_json").nullable()
+    val createdAt = long("created_at")
+    val lastUpdatedAt = long("last_updated_at")
+    val ttlMs = long("ttl_ms").nullable()
+    val pollIntervalMs = long("poll_interval_ms").nullable()
+
+    override val primaryKey = PrimaryKey(taskId)
+
+    init {
+        index(isUnique = false, ownerSessionId)
+        index(isUnique = false, status)
+        index(isUnique = false, lastUpdatedAt)
+        index(isUnique = false, runId)
+    }
+}
+
 /** projects — durable work contexts grouping sessions, memory and a workspace. */
 object Projects : Table("projects") {
     val id = varchar("id", 64)

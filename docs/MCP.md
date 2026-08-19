@@ -31,7 +31,7 @@ server role lets *other* MCP clients use Prométhé's tools.
 | `JvmMcpTransportFactory` | `shared/src/jvmMain/kotlin/dev/promethe/core/JvmMcpTransportFactory.kt` | Implements `McpBridge.TransportFactory`; picks a concrete transport (`stdio`, `sse`, `streamable-http`) based on `McpServerConfig.transport` and wraps it in an adapter implementing `McpBridge.McpTransportApi`. |
 | `McpStdioTransport` | `shared/src/jvmMain/kotlin/dev/promethe/core/McpStdioTransport.kt` | Fails closed with `SANDBOX_PROTOCOL_V2_REQUIRED`; persistent subprocess sessions are not supported by sandbox IPC v1. |
 | `McpSseTransport` | `shared/src/jvmMain/kotlin/dev/promethe/core/McpSseTransport.kt` | Connects to an SSE endpoint to discover a message endpoint, then sends JSON-RPC 2.0 requests via HTTP POST to that endpoint. |
-| `McpStreamableHttpTransport` | `shared/src/jvmMain/kotlin/dev/promethe/core/McpStreamableHttpTransport.kt` | Dual-era Streamable HTTP client. It probes `server/discover` with the stateless 2026-07-28 envelope, drives bounded MRTR retries when an explicit input handler is configured, and falls back to the official 2025-11-25 `initialize` lifecycle only when the response identifies a legacy endpoint. |
+| `McpStreamableHttpTransport` | `shared/src/jvmMain/kotlin/dev/promethe/core/McpStreamableHttpTransport.kt` | Dual-era Streamable HTTP client. It probes `server/discover` with the stateless 2026-07-28 envelope, drives bounded MRTR retries, polls negotiated durable Tasks, and falls back to the official 2025-11-25 `initialize` lifecycle only when the response identifies a legacy endpoint. |
 | `McpInputRequestHandler` | `shared/src/jvmMain/kotlin/dev/promethe/core/McpInputRequestHandler.kt` | Explicit trust boundary for MRTR. It resolves embedded server requests; without a configured handler, non-empty `inputRequests` fail closed with `McpInputRequiredException`. |
 
 `McpBridge` itself is declared in `commonMain` and only depends on the `McpTransportApi` /
@@ -47,7 +47,7 @@ until the native sandbox supports managed persistent stdin/stdout sessions.
 | `mcpServerRoutes()` | `gateway/src/jvmMain/kotlin/dev/promethe/gateway/mcp/McpServerEndpoint.kt` | Ktor routing extension mounted at the gateway root. Implements the discovery card, the JSON-RPC endpoint, and a debug REST listing. |
 | `McpToolExporter` | `gateway/src/jvmMain/kotlin/dev/promethe/gateway/mcp/McpToolExporter.kt` | Shared JSON-RPC 2.0 dispatcher: converts `ToolRegistry` tools into MCP `tools/list` / `tools/call` responses. Used by both the HTTP endpoint and the stdio mode. |
 | `McpStdioServerMode` | `gateway/src/jvmMain/kotlin/dev/promethe/gateway/mcp/McpStdioServerMode.kt` | Runs Prométhé as an MCP server over stdio: reads one JSON-RPC message per line from stdin, dispatches through `McpToolExporter`, writes the response to stdout. |
-| `McpTaskManager` | `gateway/src/jvmMain/kotlin/dev/promethe/gateway/mcp/McpTaskManager.kt` | Legacy in-memory `tasks/get` / `tasks/cancel` implementation. It is not advertised to modern clients and is not yet the 2026 `io.modelcontextprotocol/tasks` extension. |
+| `McpTaskManager` | `gateway/src/jvmMain/kotlin/dev/promethe/gateway/mcp/McpTaskManager.kt` | Durable, session-bound implementation of the 2026 `io.modelcontextprotocol/tasks` extension. It persists task state before execution, supports get/update/cancel, enforces TTL, and cancels the active coroutine when possible. |
 | `mcpManagementRoutes()` | `gateway/src/jvmMain/kotlin/dev/promethe/gateway/McpManagementRoutes.kt` | REST management API (list/register/connect/disconnect servers, list tools) used by the client role — mounted under `/api`. |
 
 ### Bootstrap wiring
@@ -208,7 +208,7 @@ HTTP endpoint:
 
 | Method | Route | Description |
 |---|---|---|
-| `GET` | `/.well-known/mcp` | Server Card: preferred version `2026-07-28`, `supportedVersions` (`2026-07-28`, `2025-11-25`), tool capability, and endpoint `/mcp`. |
+| `GET` | `/.well-known/mcp` | Server Card: preferred version `2026-07-28`, `supportedVersions` (`2026-07-28`, `2025-11-25`), tool capability, durable Tasks extension when configured, and endpoint `/mcp`. |
 | `POST` | `/mcp` | Full JSON-RPC 2.0 endpoint. Browser `Origin` values must be allow-listed. Modern requests must carry matching `_meta` and `MCP-Protocol-Version`, a body-matching `Mcp-Method`, and a body-matching `Mcp-Name` for named calls. Header mismatches return JSON-RPC `-32020`; unsupported versions return `-32022` with the supported list. Batch arrays are rejected with `400`. |
 | `GET` | `/mcp/tools` | Simple REST listing of all `ToolRegistry` tools (`name`, `description`) for debugging/UI — separate from the JSON-RPC `tools/list` method. |
 
@@ -217,11 +217,13 @@ mode:
 
 | Method | Behavior |
 |---|---|
-| `server/discover` | Modern only. Returns supported versions, tool capabilities, server identity in result `_meta`, private cache hints, and `resultType: complete`. |
+| `server/discover` | Modern only. Returns supported versions, tool capabilities, the Tasks extension when durable storage is active, server identity in result `_meta`, private cache hints, and `resultType: complete`. |
 | `initialize` | Legacy only. Returns `2025-11-25`, tool capabilities and server info. Modern requests receive `-32601`. |
 | `tools/list` | Enumerates policy-visible tools in deterministic name order. Modern results include `resultType`, `ttlMs`, `cacheScope`, server identity and explicit draft 2020-12 input schemas. |
-| `tools/call` | Sends a typed `ToolInvocation` to `SecureToolExecutor`, preserving MCP origin, owner session, exact arguments, risk classification, and mandatory approval. Modern results include `resultType: complete`. |
-| `tasks/get` / `tasks/cancel` | Legacy only and not advertised. The modern Tasks extension is intentionally deferred until `tasks/update`, real task creation and lifecycle tests are implemented. |
+| `tools/call` | Sends a typed `ToolInvocation` to `SecureToolExecutor`, preserving MCP origin, owner session, exact arguments, risk classification, and mandatory approval. It returns `resultType: task` for an eligible long-running tool only when the client advertises `io.modelcontextprotocol/tasks`; otherwise it remains synchronous. |
+| `tasks/get` | Modern only. Returns the session-owned durable state and final result/error. `Mcp-Name` must equal `taskId`. |
+| `tasks/update` | Modern only. Supplies responses requested by an `input_required` task. The capability must be repeated in request metadata. |
+| `tasks/cancel` | Modern only. Persists cancellation and cancels the active coroutine when it still belongs to this process. Repeated cancellation is idempotent. |
 | `shutdown` / `notifications/initialized` | Legacy lifecycle only. Modern requests do not use the initialize/shutdown exchange. |
 | anything else | JSON-RPC error `-32601` (method not found). |
 
@@ -243,7 +245,21 @@ elicitation remains unavailable until its dedicated approval/form bridge is impl
 
 Errors are mapped to standard JSON-RPC codes: `-32601` (method not found), `-32602` (invalid
 params, e.g. missing `name`/`arguments`), `-32603` (uncaught internal error), `-32700` (parse
-error), `-32020` (header/body mismatch), and `-32022` (unsupported protocol version).
+error), `-32003` (missing required Tasks capability), `-32020` (header/body mismatch), and
+`-32022` (unsupported protocol version).
+
+### Durable Tasks
+
+Prométhé advertises `io.modelcontextprotocol/tasks` per modern request and accepts task results only
+for `tools/call`. Server-side tasks are stored in SQLite before their coroutine starts and are bound
+to the authenticated owner session. The persisted statuses are `working`, `input_required`,
+`completed`, `failed`, and `cancelled`; timestamps are ISO-8601 and TTL/polling hints are included.
+An active task left by a previous process is marked failed on startup rather than replayed blindly.
+
+The Streamable HTTP client polls `tasks/get` with bounded intervals, fulfills supported input requests
+through the same explicit handlers used by MRTR, sends `tasks/update`, and returns the original tool
+result after completion. Local cancellation and exhausted polling trigger a best-effort
+`tasks/cancel`. HTTP and stdio server modes share this implementation.
 
 For stdio mode (`McpStdioServerMode`, activated via `promethe/gateway`'s `--mcp-stdio` CLI flag —
 see `gateway/src/jvmMain/kotlin/dev/promethe/gateway/Main.kt`), the same `McpToolExporter` is reused:
@@ -265,9 +281,11 @@ string check on the line before/independent of full dispatch).
 - **MRTR is client-side and opt-in at the trust boundary** — the Streamable HTTP client can drive
   bounded modern retries, but the default product wiring has no interactive input handler and
   Prométhé's server role does not emit `input_required` results yet.
-- **The modern Tasks extension is not implemented yet** — modern discovery does not advertise
-  `io.modelcontextprotocol/tasks`; the legacy in-memory task helper is neither durable nor exposed
-  to modern clients.
+- **Tasks use polling, not subscriptions** — durable create/get/update/cancel is implemented, but
+  notification subscriptions and resumable push delivery remain future work. The server currently
+  opts in a conservative set of long-running tools rather than allowing every tool to become a task.
+- **Client task IDs are not persisted across process restarts yet** — the server state is durable,
+  but a Prométhé client process currently resumes polling only while its transport instance remains alive.
 - **Tool input schemas are generated canonically from Koog descriptors** — MCP and voice share the
   same deterministic 2020-12 source for nested objects, arrays, enums, `null`, `anyOf`, required
   properties and typed `additionalProperties`. Constructs absent from Koog descriptors, including

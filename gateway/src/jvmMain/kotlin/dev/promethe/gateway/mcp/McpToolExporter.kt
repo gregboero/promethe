@@ -9,9 +9,13 @@ import dev.promethe.core.SecureToolExecutor
 import dev.promethe.core.ToolApprovalPolicy
 import dev.promethe.core.ToolCallOrigin
 import dev.promethe.core.ToolExecutionRequest
+import dev.promethe.core.ToolInputRequestBridge
+import dev.promethe.core.ToolInputRequestContext
 import dev.promethe.core.ToolJsonSchemaGenerator
 import dev.promethe.core.ToolRegistry
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.add
@@ -40,7 +44,7 @@ class McpToolExporter(
     private val secureToolExecutor: SecureToolExecutor? = null,
     private val origin: ToolCallOrigin = ToolCallOrigin.MCP_HTTP,
     private val exposeApprovalRequiredTools: Boolean = secureToolExecutor != null,
-    private val taskManager: McpTaskManager = McpTaskManager(),
+    private val taskManager: McpTaskManager? = null,
     private val policyKernel: PolicyKernel = PolicyKernel(),
 ) {
     companion object {
@@ -59,9 +63,23 @@ class McpToolExporter(
         sessionId: String = "unknown",
         protocolVersion: String? = McpProtocol.requestedVersion(request),
     ): JsonObject? {
-        val id: JsonElement = request["id"] ?: return handleNotification(request)
-        val method = (request["method"] as? JsonPrimitive)?.content.orEmpty()
-        val params = request["params"] as? JsonObject ?: JsonObject(emptyMap())
+        val rawId = request["id"]
+        val responseId = rawId?.takeIf { it is JsonPrimitive || it is JsonNull } ?: JsonNull
+        val jsonRpc = request["jsonrpc"] as? JsonPrimitive
+        val methodValue = request["method"] as? JsonPrimitive
+        if (jsonRpc?.content != "2.0" || methodValue?.isString != true || methodValue.content.isBlank()) {
+            return buildJsonRpcError(responseId, code = -32600, message = "Invalid Request")
+        }
+        if (rawId != null && rawId !is JsonPrimitive && rawId !is JsonNull) {
+            return buildJsonRpcError(JsonNull, code = -32600, message = "Invalid Request")
+        }
+        val id: JsonElement = rawId ?: return handleNotification(request)
+        val method = methodValue.content
+        val rawParams = request["params"]
+        if (rawParams != null && rawParams !is JsonObject) {
+            return buildJsonRpcError(id, code = -32602, message = "Invalid params")
+        }
+        val params = rawParams ?: JsonObject(emptyMap())
         val requestedVersion = protocolVersion ?: LEGACY_PROTOCOL_VERSION
         if (requestedVersion !in McpProtocol.supportedVersions) {
             return unsupportedProtocolVersion(id, requestedVersion)
@@ -70,20 +88,68 @@ class McpToolExporter(
 
         return try {
             val result = when (method) {
-                "server/discover" -> if (modern) handleDiscover() else throw McpMethodNotFound(method)
-                "initialize" -> if (!modern) handleInitialize() else throw McpMethodNotFound(method)
-                "tools/list" -> handleToolsList(modern)
-                "tools/call" -> handleToolsCall(params, sessionId)
-                "tasks/get" -> if (!modern) taskManager.handleTasksGet(params) else throw McpMethodNotFound(method)
-                "tasks/cancel" -> if (!modern) taskManager.handleTasksCancel(params) else throw McpMethodNotFound(method)
-                "shutdown" -> if (!modern) handleShutdown() else throw McpMethodNotFound(method)
-                else -> throw McpMethodNotFound(method)
+                "server/discover" -> {
+                    if (modern) handleDiscover() else throw McpMethodNotFound(method)
+                }
+
+                "initialize" -> {
+                    if (!modern) handleInitialize() else throw McpMethodNotFound(method)
+                }
+
+                "tools/list" -> {
+                    handleToolsList(modern)
+                }
+
+                "tools/call" -> {
+                    handleToolsCall(params, sessionId, modern && clientSupportsTasks(params))
+                }
+
+                "tasks/get" -> {
+                    if (modern) {
+                        modernTaskManager(method, params).handleTasksGet(params, sessionId)
+                    } else {
+                        throw McpMethodNotFound(method)
+                    }
+                }
+
+                "tasks/update" -> {
+                    if (modern) {
+                        modernTaskManager(method, params).handleTasksUpdate(params, sessionId)
+                    } else {
+                        throw McpMethodNotFound(method)
+                    }
+                }
+
+                "tasks/cancel" -> {
+                    if (modern) {
+                        modernTaskManager(method, params).handleTasksCancel(params, sessionId)
+                    } else {
+                        throw McpMethodNotFound(method)
+                    }
+                }
+
+                "shutdown" -> {
+                    if (!modern) handleShutdown() else throw McpMethodNotFound(method)
+                }
+
+                else -> {
+                    throw McpMethodNotFound(method)
+                }
             }
             buildJsonRpcResult(id, if (modern) result.withModernEnvelope() else result)
         } catch (e: McpMethodNotFound) {
             buildJsonRpcError(id, code = -32601, message = "Method not found: ${e.method}")
         } catch (e: McpInvalidParams) {
             buildJsonRpcError(id, code = -32602, message = e.message ?: "Invalid params")
+        } catch (e: IllegalArgumentException) {
+            buildJsonRpcError(id, code = -32602, message = e.message ?: "Invalid params")
+        } catch (_: McpMissingTaskCapability) {
+            buildJsonRpcError(
+                id = id,
+                code = -32003,
+                message = "Missing required client capability",
+                data = requiredTaskCapability(),
+            )
         } catch (e: Exception) {
             buildJsonRpcError(id, code = -32603, message = e.message ?: "Internal error")
         }
@@ -113,6 +179,11 @@ class McpToolExporter(
             putJsonObject("capabilities") {
                 putJsonObject("tools") {
                     put("listChanged", false)
+                }
+                if (taskManager != null) {
+                    putJsonObject("extensions") {
+                        putJsonObject(McpProtocol.TASKS_EXTENSION) {}
+                    }
                 }
             }
             put("instructions", "Promethe exposes policy-controlled agent tools.")
@@ -144,6 +215,7 @@ class McpToolExporter(
     private suspend fun handleToolsCall(
         params: JsonObject,
         sessionId: String,
+        clientSupportsTasks: Boolean,
     ): JsonObject {
         val toolName = (params["name"] as? JsonPrimitive)?.content
             ?: throw McpInvalidParams("Missing required param: 'name'")
@@ -156,16 +228,44 @@ class McpToolExporter(
 
         val executor = secureToolExecutor
             ?: throw McpInvalidParams("Secure tool execution is unavailable")
-        val resultText =
-            executor.execute(
-                ToolExecutionRequest(
-                    toolName = toolName,
-                    arguments = arguments,
-                    sessionId = sessionId,
-                    origin = origin,
-                ),
+        val request =
+            ToolExecutionRequest(
+                toolName = toolName,
+                arguments = arguments,
+                sessionId = sessionId,
+                origin = origin,
             )
+        val manager = taskManager
+        if (clientSupportsTasks && manager != null && manager.isTaskEligible(toolName)) {
+            val task =
+                manager.createTask(
+                    ownerSessionId = sessionId,
+                    toolName = toolName,
+                    runId = request.runId,
+                ) {
+                    executeTool(
+                        executor = executor,
+                        request = request,
+                        inputBridge = ToolInputRequestBridge { inputRequests -> requestInput(inputRequests) },
+                    )
+                }
+            return manager.buildCreateTaskResult(task)
+        }
 
+        return executeTool(executor, request)
+    }
+
+    private suspend fun executeTool(
+        executor: SecureToolExecutor,
+        request: ToolExecutionRequest,
+        inputBridge: ToolInputRequestBridge? = null,
+    ): JsonObject {
+        val resultText =
+            if (inputBridge != null) {
+                withContext(ToolInputRequestContext(inputBridge)) { executor.execute(request) }
+            } else {
+                executor.execute(request)
+            }
         return buildJsonObject {
             put(
                 "content",
@@ -181,6 +281,34 @@ class McpToolExporter(
             put("isError", false)
         }
     }
+
+    private fun modernTaskManager(
+        method: String,
+        params: JsonObject,
+    ): McpTaskManager {
+        val manager = taskManager ?: throw McpMethodNotFound(method)
+        if (!clientSupportsTasks(params)) throw McpMissingTaskCapability()
+        return manager
+    }
+
+    private fun clientSupportsTasks(params: JsonObject): Boolean =
+        (
+            (
+                (params["_meta"] as? JsonObject)
+                    ?.get(McpProtocol.CLIENT_CAPABILITIES_META) as? JsonObject
+            )
+                ?.get("extensions") as? JsonObject
+        )
+            ?.get(McpProtocol.TASKS_EXTENSION) is JsonObject
+
+    private fun requiredTaskCapability(): JsonObject =
+        buildJsonObject {
+            putJsonObject("requiredCapabilities") {
+                putJsonObject("extensions") {
+                    putJsonObject(McpProtocol.TASKS_EXTENSION) {}
+                }
+            }
+        }
 
     private fun handleShutdown(): JsonObject = buildJsonObject {}
 
@@ -282,4 +410,6 @@ class McpToolExporter(
     private class McpInvalidParams(
         message: String,
     ) : Exception(message)
+
+    private class McpMissingTaskCapability : Exception()
 }

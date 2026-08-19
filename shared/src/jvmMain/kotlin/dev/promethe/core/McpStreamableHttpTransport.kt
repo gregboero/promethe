@@ -1,8 +1,13 @@
 package dev.promethe.core
 
 import dev.promethe.api.PrometheVersion
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -28,10 +33,13 @@ class McpStreamableHttpTransport(
     private val inputRequestHandlers: Map<String, McpInputRequestHandler> = emptyMap(),
     private val maxInputRequiredRounds: Int = DEFAULT_MAX_INPUT_REQUIRED_ROUNDS,
     private val maxInputRequestsPerRound: Int = DEFAULT_MAX_INPUT_REQUESTS_PER_ROUND,
+    private val maxTaskPolls: Int = DEFAULT_MAX_TASK_POLLS,
+    private val taskPollDelay: suspend (Long) -> Unit = { delay(it) },
 ) {
     init {
         require(maxInputRequiredRounds > 0) { "maxInputRequiredRounds must be positive" }
         require(maxInputRequestsPerRound > 0) { "maxInputRequestsPerRound must be positive" }
+        require(maxTaskPolls > 0) { "maxTaskPolls must be positive" }
         require(inputRequestHandlers.keys.all { it in SUPPORTED_INPUT_REQUEST_METHODS }) {
             "Unsupported MCP input request handler"
         }
@@ -176,6 +184,13 @@ class McpStreamableHttpTransport(
                     retryParams = buildInputRequiredRetry(originalParams, result)
                 }
 
+                McpProtocol.RESULT_TASK -> {
+                    if (method != "tools/call") {
+                        throw RuntimeException("MCP task result is not valid for method '$method'")
+                    }
+                    return awaitTask(result)
+                }
+
                 else -> {
                     throw RuntimeException("Unsupported MCP result type: ${result.resultType()}")
                 }
@@ -223,26 +238,7 @@ class McpStreamableHttpTransport(
         if (inputRequests.size > maxInputRequestsPerRound) {
             throw RuntimeException("MCP input_required exceeds $maxInputRequestsPerRound requests in one round")
         }
-        val inputResponses =
-            buildJsonObject {
-                inputRequests.forEach { (key, value) ->
-                    val request = value as? JsonObject
-                        ?: throw RuntimeException("MCP input request '$key' must be an object")
-                    val requestMethod =
-                        (request["method"] as? JsonPrimitive)?.content
-                            ?: throw RuntimeException("MCP input request '$key' is missing method")
-                    if (request["params"] !is JsonObject) {
-                        throw RuntimeException("MCP input request '$key' is missing params")
-                    }
-                    val handler =
-                        inputRequestHandlers[requestMethod]
-                            ?: throw McpInputRequiredException(
-                                result,
-                                "MCP input request method '$requestMethod' is not enabled",
-                            )
-                    put(key, handler.fulfill(key, request))
-                }
-            }
+        val inputResponses = fulfillInputRequests(inputRequests, result)
         return buildJsonObject {
             originalParams.forEach { (key, value) ->
                 if (key != "inputResponses" && key != "requestState") put(key, value)
@@ -251,6 +247,148 @@ class McpStreamableHttpTransport(
             requestState?.let { put("requestState", it) }
         }
     }
+
+    private suspend fun awaitTask(initialTask: JsonObject): JsonObject {
+        val taskId = initialTask.requiredTaskId()
+        var task = initialTask
+        val fulfilledInputResponses = mutableMapOf<String, JsonElement>()
+        try {
+            repeat(maxTaskPolls) {
+                if (task.requiredTaskId() != taskId) {
+                    throw RuntimeException("MCP task response changed taskId")
+                }
+                when (task.requiredTaskStatus()) {
+                    "completed" -> {
+                        return task["result"] as? JsonObject
+                            ?: throw RuntimeException("Completed MCP task '$taskId' is missing result")
+                    }
+
+                    "failed" -> {
+                        val error = task["error"] as? JsonObject
+                        val message = error?.get("message")?.jsonPrimitive?.content ?: "Task execution failed"
+                        throw RuntimeException("MCP task '$taskId' failed: $message")
+                    }
+
+                    "cancelled" -> {
+                        throw RuntimeException("MCP task '$taskId' was cancelled")
+                    }
+
+                    "input_required" -> {
+                        updateTaskInput(taskId, task, fulfilledInputResponses)
+                    }
+
+                    "working" -> {}
+
+                    else -> {
+                        throw RuntimeException("MCP task '$taskId' has an unsupported status")
+                    }
+                }
+
+                val pollInterval =
+                    (task["pollIntervalMs"] as? JsonPrimitive)
+                        ?.content
+                        ?.toLongOrNull()
+                        ?.coerceIn(MIN_TASK_POLL_INTERVAL_MS, MAX_TASK_POLL_INTERVAL_MS)
+                        ?: DEFAULT_TASK_POLL_INTERVAL_MS
+                taskPollDelay(pollInterval)
+                task = requestTaskState(taskId)
+            }
+        } catch (error: CancellationException) {
+            withContext(NonCancellable) { bestEffortCancelTask(taskId) }
+            throw error
+        }
+
+        bestEffortCancelTask(taskId)
+        throw RuntimeException("MCP task '$taskId' exceeded $maxTaskPolls polling attempts")
+    }
+
+    private suspend fun updateTaskInput(
+        taskId: String,
+        task: JsonObject,
+        fulfilledInputResponses: MutableMap<String, JsonElement>,
+    ) {
+        val inputRequests = task["inputRequests"] as? JsonObject
+            ?: throw RuntimeException("MCP task '$taskId' requires input but supplied no inputRequests")
+        val newRequests = JsonObject(inputRequests.filterKeys { it !in fulfilledInputResponses })
+        if (newRequests.isEmpty()) return
+        val inputResponses = fulfillInputRequests(newRequests, task)
+        inputResponses.forEach { (key, value) -> fulfilledInputResponses[key] = value }
+        val acknowledgement =
+            postRequest(
+                method = "tasks/update",
+                params =
+                    buildJsonObject {
+                        put("taskId", taskId)
+                        put("inputResponses", inputResponses)
+                    },
+                protocolVersion = McpProtocol.MODERN_VERSION,
+                modern = true,
+            ).resultOrThrow()
+        if (acknowledgement.resultType() != McpProtocol.RESULT_COMPLETE) {
+            throw RuntimeException("MCP tasks/update must return a complete result")
+        }
+    }
+
+    private suspend fun requestTask(
+        method: String,
+        taskId: String,
+    ): JsonObject =
+        postRequest(
+            method = method,
+            params = buildJsonObject { put("taskId", taskId) },
+            protocolVersion = McpProtocol.MODERN_VERSION,
+            modern = true,
+        ).resultOrThrow()
+
+    private suspend fun requestTaskState(taskId: String): JsonObject {
+        val task = requestTask("tasks/get", taskId)
+        if (task.resultType() != McpProtocol.RESULT_COMPLETE) {
+            throw RuntimeException("MCP tasks/get must return a complete result")
+        }
+        if (task.requiredTaskId() != taskId) {
+            throw RuntimeException("MCP task response changed taskId")
+        }
+        return task
+    }
+
+    private suspend fun bestEffortCancelTask(taskId: String) {
+        runCatching { requestTask("tasks/cancel", taskId) }
+    }
+
+    private suspend fun fulfillInputRequests(
+        inputRequests: JsonObject,
+        result: JsonObject,
+    ): JsonObject =
+        buildJsonObject {
+            inputRequests.forEach { (key, value) ->
+                val request = value as? JsonObject
+                    ?: throw RuntimeException("MCP input request '$key' must be an object")
+                val requestMethod =
+                    (request["method"] as? JsonPrimitive)?.content
+                        ?: throw RuntimeException("MCP input request '$key' is missing method")
+                if (request["params"] !is JsonObject) {
+                    throw RuntimeException("MCP input request '$key' is missing params")
+                }
+                val handler =
+                    inputRequestHandlers[requestMethod]
+                        ?: throw McpInputRequiredException(
+                            result,
+                            "MCP input request method '$requestMethod' is not enabled",
+                        )
+                put(key, handler.fulfill(key, request))
+            }
+        }
+
+    private fun JsonObject.requiredTaskId(): String =
+        (this["taskId"] as? JsonPrimitive)
+            ?.content
+            ?.takeIf { it.isNotBlank() }
+            ?: throw RuntimeException("MCP task result is missing taskId")
+
+    private fun JsonObject.requiredTaskStatus(): String =
+        (this["status"] as? JsonPrimitive)
+            ?.content
+            ?: throw RuntimeException("MCP task result is missing status")
 
     private suspend fun sendLegacyRequest(
         method: String,
@@ -314,6 +452,9 @@ class McpStreamableHttpTransport(
                 .distinct()
                 .sorted()
                 .forEach { capability -> putJsonObject(capability) {} }
+            putJsonObject("extensions") {
+                putJsonObject(McpProtocol.TASKS_EXTENSION) {}
+            }
         }
 
     private fun JsonObject.resultType(): String =
@@ -329,6 +470,7 @@ class McpStreamableHttpTransport(
             "tools/call" -> params["name"]?.jsonPrimitive?.content
             "resources/read" -> params["uri"]?.jsonPrimitive?.content
             "prompts/get" -> params["name"]?.jsonPrimitive?.content
+            "tasks/get", "tasks/update", "tasks/cancel" -> params["taskId"]?.jsonPrimitive?.content
             else -> null
         }
 
@@ -400,6 +542,10 @@ class McpStreamableHttpTransport(
     private companion object {
         const val DEFAULT_MAX_INPUT_REQUIRED_ROUNDS = 10
         const val DEFAULT_MAX_INPUT_REQUESTS_PER_ROUND = 16
+        const val DEFAULT_MAX_TASK_POLLS = 3_600
+        const val DEFAULT_TASK_POLL_INTERVAL_MS = 1_000L
+        const val MIN_TASK_POLL_INTERVAL_MS = 10L
+        const val MAX_TASK_POLL_INTERVAL_MS = 10_000L
 
         val INPUT_METHOD_CAPABILITIES =
             mapOf(

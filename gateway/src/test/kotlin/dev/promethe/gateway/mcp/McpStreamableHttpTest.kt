@@ -4,6 +4,7 @@ import dev.promethe.core.JvmOutboundUrlPolicy
 import dev.promethe.core.McpProtocol
 import dev.promethe.core.McpStreamableHttpTransport
 import dev.promethe.core.PinnedJvmOutboundHttpFetcher
+import dev.promethe.db.DatabaseFactory
 import io.ktor.client.HttpClient
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -16,6 +17,10 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.routing.*
 import io.ktor.server.testing.*
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.serialization.json.*
 import java.net.InetAddress
 import kotlin.test.*
@@ -161,6 +166,68 @@ class McpStreamableHttpTest {
                 data["supported"]?.jsonArray?.map { it.jsonPrimitive.content },
             )
         }
+
+    @Test
+    fun `modern MCP task routes use task id routing and advertise durable support`() {
+        val taskScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+        try {
+            testApplication {
+                application {
+                    install(ContentNegotiation) {
+                        json(Json { ignoreUnknownKeys = true })
+                    }
+                }
+                routing {
+                    mcpServerRoutes(
+                        taskManager = McpTaskManager(DatabaseFactory.createInMemory(), taskScope),
+                    )
+                }
+
+                val card = json.parseToJsonElement(client.get("/.well-known/mcp").bodyAsText()).jsonObject
+                assertNotNull(
+                    card["capabilities"]!!.jsonObject["extensions"]!!.jsonObject[McpProtocol.TASKS_EXTENSION],
+                )
+
+                val accepted =
+                    client.post("/mcp") {
+                        contentType(ContentType.Application.Json)
+                        header(McpProtocol.PROTOCOL_VERSION_HEADER, McpProtocol.MODERN_VERSION)
+                        header(McpProtocol.METHOD_HEADER, "tasks/get")
+                        header(McpProtocol.NAME_HEADER, "task-42")
+                        setBody(
+                            modernRequest(
+                                id = 5,
+                                method = "tasks/get",
+                                params = buildJsonObject { put("taskId", "task-42") },
+                                tasks = true,
+                            ),
+                        )
+                    }
+                assertEquals(HttpStatusCode.OK, accepted.status)
+                val error = json.parseToJsonElement(accepted.bodyAsText()).jsonObject["error"]!!.jsonObject
+                assertEquals(-32602, error["code"]?.jsonPrimitive?.int)
+
+                val rejected =
+                    client.post("/mcp") {
+                        contentType(ContentType.Application.Json)
+                        header(McpProtocol.PROTOCOL_VERSION_HEADER, McpProtocol.MODERN_VERSION)
+                        header(McpProtocol.METHOD_HEADER, "tasks/get")
+                        header(McpProtocol.NAME_HEADER, "another-task")
+                        setBody(
+                            modernRequest(
+                                id = 6,
+                                method = "tasks/get",
+                                params = buildJsonObject { put("taskId", "task-42") },
+                                tasks = true,
+                            ),
+                        )
+                    }
+                assertProtocolError(rejected, -32020)
+            }
+        } finally {
+            taskScope.cancel()
+        }
+    }
 
     @Test
     fun `MCP rejects browser origins outside the explicit allow-list`() =
@@ -327,6 +394,7 @@ class McpStreamableHttpTest {
         method: String,
         params: JsonObject = buildJsonObject {},
         protocolVersion: String = McpProtocol.MODERN_VERSION,
+        tasks: Boolean = false,
     ): String =
         buildJsonObject {
             put("jsonrpc", "2.0")
@@ -340,7 +408,13 @@ class McpStreamableHttpTest {
                         put("name", "test-client")
                         put("version", "1.0.0")
                     }
-                    putJsonObject(McpProtocol.CLIENT_CAPABILITIES_META) {}
+                    putJsonObject(McpProtocol.CLIENT_CAPABILITIES_META) {
+                        if (tasks) {
+                            putJsonObject("extensions") {
+                                putJsonObject(McpProtocol.TASKS_EXTENSION) {}
+                            }
+                        }
+                    }
                 }
             }
         }.toString()
