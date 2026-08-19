@@ -18,6 +18,11 @@ object McpProtocol {
     const val CLIENT_CAPABILITIES_META = "io.modelcontextprotocol/clientCapabilities"
     const val SERVER_INFO_META = "io.modelcontextprotocol/serverInfo"
 
+    const val RESULT_COMPLETE = "complete"
+    const val RESULT_INPUT_REQUIRED = "input_required"
+
+    val multiRoundTripMethods: Set<String> = setOf("tools/call", "prompts/get", "resources/read")
+
     val supportedVersions: List<String> = listOf(MODERN_VERSION, LEGACY_VERSION)
 
     fun requestedVersion(request: JsonObject): String? =
