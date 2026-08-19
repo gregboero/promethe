@@ -40,7 +40,26 @@ interface RunLedger {
 
     suspend fun get(runId: String): AgentRunRecord?
 
+    suspend fun interrupted(): List<AgentRunRecord>
+
     suspend fun recoverable(): List<AgentRunRecord>
+
+    suspend fun classifyRecovery(
+        runId: String,
+        status: AgentRunStatus,
+        errorCode: String,
+        updatedAt: Long,
+    ): Boolean
+
+    suspend fun claimResume(
+        runId: String,
+        updatedAt: Long,
+    ): AgentRunRecord?
+
+    suspend fun markResumed(
+        runId: String,
+        updatedAt: Long,
+    ): Boolean
 }
 
 class PersistentRunLedger(
@@ -59,6 +78,7 @@ class PersistentRunLedger(
                 sessionId = run.sessionId,
                 origin = run.origin,
                 projectId = run.projectId,
+                requestFingerprint = run.requestFingerprint,
                 runStatus = AgentRunStatus.RUNNING,
                 createdAt = run.createdAt,
             ),
@@ -144,7 +164,120 @@ class PersistentRunLedger(
 
     override suspend fun get(runId: String): AgentRunRecord? = database.getAgentRun(runId)
 
-    override suspend fun recoverable(): List<AgentRunRecord> = database.getAgentRunsByStatus(setOf(AgentRunStatus.PENDING, AgentRunStatus.RUNNING))
+    override suspend fun interrupted(): List<AgentRunRecord> =
+        database.getAgentRunsByStatus(
+            setOf(
+                AgentRunStatus.PENDING,
+                AgentRunStatus.RUNNING,
+                AgentRunStatus.RESUMING,
+            ),
+        )
+
+    override suspend fun recoverable(): List<AgentRunRecord> = database.getAgentRunsByStatus(setOf(AgentRunStatus.RECOVERABLE))
+
+    override suspend fun classifyRecovery(
+        runId: String,
+        status: AgentRunStatus,
+        errorCode: String,
+        updatedAt: Long,
+    ): Boolean {
+        require(status == AgentRunStatus.RECOVERABLE || status == AgentRunStatus.NEEDS_REVIEW) {
+            "Recovery classification must be RECOVERABLE or NEEDS_REVIEW"
+        }
+        require(errorCode.isNotBlank()) { "Recovery classification requires an error code" }
+        val run = database.getAgentRun(runId) ?: return false
+        return database.transitionAgentRun(
+            runId = runId,
+            expectedStatuses =
+                setOf(
+                    AgentRunStatus.PENDING,
+                    AgentRunStatus.RUNNING,
+                    AgentRunStatus.RESUMING,
+                ),
+            status = status,
+            stepCount = run.stepCount,
+            lastStepId = run.lastStepId,
+            errorCode = errorCode,
+            startedAt = null,
+            finishedAt = null,
+            updatedAt = updatedAt,
+            event =
+                AgentRunEventRecord(
+                    eventId =
+                        agentRunEventId(
+                            runId,
+                            AgentRunEventType.RUN_RECOVERY_CLASSIFIED,
+                            "${status.name}:$updatedAt",
+                        ),
+                    runId = runId,
+                    type = AgentRunEventType.RUN_RECOVERY_CLASSIFIED,
+                    stepId = run.lastStepId,
+                    stepCount = run.stepCount,
+                    runStatus = status,
+                    errorCode = errorCode,
+                    createdAt = updatedAt,
+                ),
+        )
+    }
+
+    override suspend fun claimResume(
+        runId: String,
+        updatedAt: Long,
+    ): AgentRunRecord? {
+        val run = database.getAgentRun(runId) ?: return null
+        if (run.status != AgentRunStatus.RECOVERABLE) return null
+        val claimed =
+            database.transitionAgentRun(
+                runId = runId,
+                expectedStatuses = setOf(AgentRunStatus.RECOVERABLE),
+                status = AgentRunStatus.RESUMING,
+                stepCount = run.stepCount,
+                lastStepId = run.lastStepId,
+                errorCode = null,
+                startedAt = null,
+                finishedAt = null,
+                updatedAt = updatedAt,
+                event =
+                    AgentRunEventRecord(
+                        eventId = agentRunEventId(runId, AgentRunEventType.RUN_RESUME_CLAIMED, updatedAt.toString()),
+                        runId = runId,
+                        type = AgentRunEventType.RUN_RESUME_CLAIMED,
+                        stepId = run.lastStepId,
+                        stepCount = run.stepCount,
+                        runStatus = AgentRunStatus.RESUMING,
+                        createdAt = updatedAt,
+                    ),
+            )
+        return run.copy(status = AgentRunStatus.RESUMING, errorCode = null, updatedAt = updatedAt).takeIf { claimed }
+    }
+
+    override suspend fun markResumed(
+        runId: String,
+        updatedAt: Long,
+    ): Boolean {
+        val run = database.getAgentRun(runId) ?: return false
+        return database.transitionAgentRun(
+            runId = runId,
+            expectedStatuses = setOf(AgentRunStatus.RESUMING),
+            status = AgentRunStatus.RUNNING,
+            stepCount = run.stepCount,
+            lastStepId = run.lastStepId,
+            errorCode = null,
+            startedAt = null,
+            finishedAt = null,
+            updatedAt = updatedAt,
+            event =
+                AgentRunEventRecord(
+                    eventId = agentRunEventId(runId, AgentRunEventType.RUN_RESUMED, updatedAt.toString()),
+                    runId = runId,
+                    type = AgentRunEventType.RUN_RESUMED,
+                    stepId = run.lastStepId,
+                    stepCount = run.stepCount,
+                    runStatus = AgentRunStatus.RUNNING,
+                    createdAt = updatedAt,
+                ),
+        )
+    }
 
     private suspend fun transitionTerminal(
         runId: String,
@@ -157,7 +290,7 @@ class PersistentRunLedger(
     ): Boolean =
         database.transitionAgentRun(
             runId = runId,
-            expectedStatuses = setOf(AgentRunStatus.PENDING, AgentRunStatus.RUNNING),
+            expectedStatuses = setOf(AgentRunStatus.PENDING, AgentRunStatus.RUNNING, AgentRunStatus.RESUMING),
             status = status,
             stepCount = stepCount,
             lastStepId = lastStepId,

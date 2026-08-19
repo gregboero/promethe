@@ -22,7 +22,7 @@ Promethe possède déjà des bases solides : boucle agentique, outils typés, ap
 La priorité n'est toutefois pas d'ajouter du quantique, des essaims ou de l'auto-modification. La Phase 0 a posé les premières fondations du **harness de preuve** : evals-as-code, golden sets, identifiants de run/step et traces OpenTelemetry. Les déficits restants sont notamment :
 
 - `agent_runs` persiste désormais le cycle `PENDING` → `RUNNING` → terminal, mais les intentions et effets d'outils ne sont pas encore journalisés en append-only ;
-- les checkpoints ne journalisent pas assez d'état pour garantir une reprise sans double effet ;
+- la reprise durable classe maintenant les runs interrompus et bloque les effets externes incertains, mais les sorties d'outils ne sont pas encore restaurables sans `ArtifactStore` ;
 - les sorties d'outils sont tronquées sans `ArtifactStore` durable ;
 - les propositions de curation de skills ne disposent pas encore d'un workflow persistant de revue/promotion ;
 - la synthèse multi-agent n'a pas encore de juge fondé sur des preuves ;
@@ -75,7 +75,7 @@ Une technologie n'est promue que si elle possède un propriétaire, des métriqu
 | Domaine | État vérifié | Diagnostic |
 |---|---|---|
 | Boucle agentique | `EXISTANT` | [`AIAgent.executeLoop`](../shared/src/commonMain/kotlin/dev/promethe/core/AIAgent.kt#L51) reste une boucle impérative limitée à dix itérations. Une migration progressive vers un graphe est possible ; une réécriture totale immédiate serait risquée. |
-| Run ledger et checkpoints | `PARTIEL` | `AgentExecutionService` persiste l'identité, l'origine, la progression et l'état terminal dans `agent_runs`. `ActionExecutor` persiste chaque intention, son empreinte, sa clé d'idempotence et ses transitions terminales dans `tool_intents`, en refusant de rejouer une exécution à l'issue incertaine. `agent_run_events` conserve maintenant un journal append-only ordonné des runs, étapes, intentions, décisions d'approbation et outils sans contenu sensible ; les snapshots peuvent être reconstruits depuis ces événements. Un checkpoint est aussi enregistré après les outils, mais seulement avec l'itération, l'entrée courante et `isComplete`. Il manque encore la reprise par événement et l'`ArtifactStore`. |
+| Run ledger et reprise | `PARTIEL` | `AgentExecutionService` persiste l'identité, l'origine, la progression et l'état terminal dans `agent_runs`. `ActionExecutor` persiste chaque intention, son empreinte, sa clé d'idempotence et ses transitions terminales dans `tool_intents`, en refusant de rejouer une exécution à l'issue incertaine. `agent_run_events` conserve un journal append-only ordonné des runs, étapes, intentions, décisions d'approbation et outils sans contenu sensible. `RunRecoveryService` classe les exécutions interrompues en `RECOVERABLE` ou `NEEDS_REVIEW`, réclame atomiquement une reprise et poursuit la numérotation des étapes. Les checkpoints de session ne pilotent plus automatiquement la boucle agent. Il manque encore l'`ArtifactStore` pour restaurer les observations volumineuses. |
 | Approbation et politique | `EXISTANT` | [`ActionExecutor`](../shared/src/commonMain/kotlin/dev/promethe/core/ActionExecutor.kt#L155) classe le risque et impose l'approbation obligatoire. [`ToolApprovalGate`](../shared/src/jvmMain/kotlin/dev/promethe/core/ToolApprovalGate.kt#L136) ne permet pas au mode `auto` de contourner `checkMandatory`. |
 | Sandbox | `EXISTANT` | Sandbox native Rust, politique réseau et racines canoniques. WASI ou microVM seraient des backends supplémentaires, pas des remplacements immédiats. Voir [SANDBOX.md](SANDBOX.md). |
 | Contexte | `PARTIEL` | [`ContextCompressor`](../shared/src/commonMain/kotlin/dev/promethe/core/ContextCompressor.kt#L42) compresse l'historique et [`ToolOutputPruner`](../shared/src/commonMain/kotlin/dev/promethe/core/ToolOutputPruner.kt#L34) réduit les sorties. Les données brutes ne sont pas reliées à un magasin d'artefacts durable. |
@@ -381,7 +381,7 @@ Backends optionnels :
 
 1. **FAIT** — Étendre le premier `RunLedger` persistant avec les IDs d'intention et un journal append-only des transitions d'outil.
 2. **FAIT** — Ajouter les clés d'idempotence et états d'outil persistants.
-3. **FAIT** — Envelopper `executeLoop` dans le premier `ExecutionGraph` sans big bang.
+3. **FAIT** — Envelopper `executeLoop` dans le premier `ExecutionGraph`, classifier les runs interrompus et permettre leur reprise explicite sans thread actif.
 4. Créer `ResourceGovernor` global et propagation des budgets aux sous-agents.
 5. Introduire `ArtifactStore` et observations référencées par hash.
 6. Stabiliser l'ordre du prompt et mesurer le prefix cache.

@@ -7,3 +7,9 @@ interface AgentExecutionPort {
 
     suspend fun executeToCompletion(request: AgentExecutionRequest): String
 }
+
+interface RecoverableAgentExecutionPort : AgentExecutionPort {
+    fun resume(request: AgentExecutionRequest): Flow<AgentExecutionEvent>
+
+    suspend fun auditInterruptedRuns(): List<RunRecoveryAssessment>
+}

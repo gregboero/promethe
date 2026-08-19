@@ -44,6 +44,17 @@ class PersistentRunEventLedger(
                     updatedAt = event.createdAt
                 }
 
+                AgentRunEventType.RUN_RECOVERY_CLASSIFIED,
+                AgentRunEventType.RUN_RESUME_CLAIMED,
+                AgentRunEventType.RUN_RESUMED,
+                -> {
+                    status = event.runStatus ?: status
+                    stepCount = event.stepCount ?: stepCount
+                    lastStepId = event.stepId ?: lastStepId
+                    errorCode = event.errorCode
+                    updatedAt = event.createdAt
+                }
+
                 AgentRunEventType.RUN_FINISHED,
                 AgentRunEventType.RUN_FAILED,
                 AgentRunEventType.RUN_CANCELLED,
@@ -66,6 +77,7 @@ class PersistentRunEventLedger(
             sessionId = sessionId,
             origin = origin,
             projectId = started.projectId,
+            requestFingerprint = started.requestFingerprint,
             status = status,
             stepCount = stepCount,
             lastStepId = lastStepId,

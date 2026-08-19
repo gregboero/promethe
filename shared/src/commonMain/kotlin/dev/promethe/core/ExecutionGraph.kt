@@ -15,6 +15,7 @@ enum class ExecutionGraphNode {
 
 data class ExecutionGraphRequest(
     val identity: AgentRunIdentity,
+    val startingStepIndex: Int = 0,
     val sessionId: String,
     val userInput: String,
     val overrideProvider: String? = null,
@@ -92,7 +93,7 @@ class DurableExecutionGraph(
                     node = ExecutionGraphNode.AGENT_LOOP,
                 ),
             )
-            var stepIndex = 0
+            var stepIndex = request.startingStepIndex
             var loopFailure: Throwable? = null
             loopExecutor
                 .execute(request)

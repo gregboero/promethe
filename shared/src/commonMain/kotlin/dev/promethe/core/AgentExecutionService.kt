@@ -90,36 +90,143 @@ class AgentExecutionService(
     private val executionIdGenerator: ExecutionIdGenerator = DefaultExecutionIdGenerator,
     private val runLedger: RunLedger = PersistentRunLedger(database),
     private val executionGraph: ExecutionGraph = DurableExecutionGraph(agent.asLoopExecutor(), runLedger),
-) : AgentExecutionPort {
+    private val recoveryService: RunRecoveryService =
+        RunRecoveryService(runLedger, PersistentRunEventLedger(database)),
+) : RecoverableAgentExecutionPort {
     private val logger = Log.create("AgentExecutionService")
 
-    override fun execute(request: AgentExecutionRequest): Flow<AgentExecutionEvent> {
+    override fun execute(request: AgentExecutionRequest): Flow<AgentExecutionEvent> = executeInternal(request, resume = false)
+
+    override fun resume(request: AgentExecutionRequest): Flow<AgentExecutionEvent> = executeInternal(request, resume = true)
+
+    override suspend fun auditInterruptedRuns(): List<RunRecoveryAssessment> = recoveryService.auditInterruptedRuns()
+
+    private fun executeInternal(
+        request: AgentExecutionRequest,
+        resume: Boolean,
+    ): Flow<AgentExecutionEvent> {
         var stepCount = 0
         var lastStepId: String? = null
         var ledgerStarted = false
         var terminalRecorded = false
+        var resumedRun: AgentRunRecord? = null
         val generatedRunId = executionIdGenerator.nextId("run")
         val effectiveRunId = request.runId ?: generatedRunId
+        val requestFingerprint = agentExecutionRequestFingerprint(request)
         return channelFlow {
+            if (resume && request.runId == null) {
+                send(
+                    AgentExecutionEvent.Failed(
+                        code = "resume_run_id_required",
+                        message = "A durable run identifier is required to resume execution",
+                        steps = 0,
+                        runId = generatedRunId,
+                    ),
+                )
+                return@channelFlow
+            }
             val identityIsValid =
                 isValidExecutionId(effectiveRunId) &&
                     (request.parentRunId == null || isValidExecutionId(request.parentRunId))
             val ledgerRunId = effectiveRunId.takeIf(::isValidExecutionId) ?: generatedRunId
             val createdAt = Clock.System.now().toEpochMilliseconds()
+            if (resume && !identityIsValid) {
+                send(
+                    AgentExecutionEvent.Failed(
+                        code = "invalid_run_identity",
+                        message = "Run identifiers must contain only letters, digits, '.', '_', ':', or '-'",
+                        steps = 0,
+                        runId = ledgerRunId,
+                    ),
+                )
+                return@channelFlow
+            }
             try {
-                ledgerStarted =
-                    runLedger.begin(
-                        AgentRunRecord(
-                            runId = ledgerRunId,
-                            parentRunId = request.parentRunId?.takeIf(::isValidExecutionId),
-                            sessionId = request.sessionId,
-                            origin = request.origin.name,
-                            projectId = request.projectId,
-                            status = AgentRunStatus.PENDING,
-                            createdAt = createdAt,
-                            updatedAt = createdAt,
-                        ),
-                    )
+                if (resume) {
+                    val existing = runLedger.get(ledgerRunId)
+                    if (existing == null) {
+                        send(
+                            AgentExecutionEvent.Failed(
+                                code = "run_not_found",
+                                message = "The run to resume does not exist",
+                                steps = 0,
+                                runId = ledgerRunId,
+                            ),
+                        )
+                        return@channelFlow
+                    }
+                    val contextMatches =
+                        existing.sessionId == request.sessionId &&
+                            existing.origin == request.origin.name &&
+                            (request.projectId == null || existing.projectId == request.projectId) &&
+                            existing.requestFingerprint == requestFingerprint
+                    if (!contextMatches) {
+                        send(
+                            AgentExecutionEvent.Failed(
+                                code = "resume_context_mismatch",
+                                message = "The resume request does not match the original run context",
+                                steps = existing.stepCount,
+                                runId = ledgerRunId,
+                                stepId = existing.lastStepId,
+                            ),
+                        )
+                        return@channelFlow
+                    }
+                    val assessment = recoveryService.assess(ledgerRunId)
+                    if (assessment?.disposition != RunRecoveryDisposition.RECOVERABLE) {
+                        val needsReview = assessment?.disposition == RunRecoveryDisposition.NEEDS_REVIEW
+                        send(
+                            AgentExecutionEvent.Failed(
+                                code = if (needsReview) "run_needs_review" else "run_not_recoverable",
+                                message =
+                                    if (needsReview) {
+                                        "The run has an external effect with an uncertain outcome"
+                                    } else {
+                                        "The run cannot be resumed from its current state"
+                                    },
+                                steps = existing.stepCount,
+                                runId = ledgerRunId,
+                                stepId = existing.lastStepId,
+                            ),
+                        )
+                        return@channelFlow
+                    }
+                    val claimed = recoveryService.claimResume(ledgerRunId)
+                    if (claimed == null) {
+                        send(
+                            AgentExecutionEvent.Failed(
+                                code = "run_resume_conflict",
+                                message = "The run was claimed by another execution",
+                                steps = existing.stepCount,
+                                runId = ledgerRunId,
+                                stepId = existing.lastStepId,
+                            ),
+                        )
+                        return@channelFlow
+                    }
+                    stepCount = claimed.stepCount
+                    lastStepId = claimed.lastStepId
+                    resumedRun = claimed
+                    ledgerStarted = true
+                    if (!recoveryService.markResumed(ledgerRunId)) {
+                        throw AgentExecutionException("run_ledger_write_failed", "Failed to mark the run as resumed")
+                    }
+                } else {
+                    ledgerStarted =
+                        runLedger.begin(
+                            AgentRunRecord(
+                                runId = ledgerRunId,
+                                parentRunId = request.parentRunId?.takeIf(::isValidExecutionId),
+                                sessionId = request.sessionId,
+                                origin = request.origin.name,
+                                projectId = request.projectId,
+                                requestFingerprint = requestFingerprint,
+                                status = AgentRunStatus.PENDING,
+                                createdAt = createdAt,
+                                updatedAt = createdAt,
+                            ),
+                        )
+                }
             } catch (error: Exception) {
                 logger.error(error) { "Run ledger initialization failed for $ledgerRunId" }
                 send(
@@ -155,7 +262,7 @@ class AgentExecutionService(
                 )
                 return@channelFlow
             }
-            val runIdentity = AgentRunIdentity(effectiveRunId, request.parentRunId)
+            val runIdentity = AgentRunIdentity(effectiveRunId, resumedRun?.parentRunId ?: request.parentRunId)
             val input = request.text.trim()
             if (input.isBlank()) {
                 terminalRecorded = runLedger.fail(runIdentity.runId, 0, null, "empty_input", createdAt)
@@ -165,7 +272,7 @@ class AgentExecutionService(
 
             val resolved = resolveProfile(request)
             val project = resolveProject(request)
-            persistHistory(request)
+            if (!resume) persistHistory(request)
 
             var finalResponse: String? = null
             Tracing.span(
@@ -181,6 +288,7 @@ class AgentExecutionService(
                     .execute(
                         ExecutionGraphRequest(
                             identity = runIdentity,
+                            startingStepIndex = stepCount,
                             sessionId = request.sessionId,
                             userInput = input,
                             overrideProvider = resolved.provider,
@@ -433,4 +541,36 @@ class AgentExecutionService(
             }
             append("Relative file and process paths must use this project workspace.")
         }
+}
+
+internal fun agentExecutionRequestFingerprint(request: AgentExecutionRequest): String =
+    toolIntentDigest(
+        buildString {
+            appendFingerprintField("promethe-agent-request-v1")
+            appendFingerprintField(request.sessionId)
+            appendFingerprintField(request.text.trim())
+            appendFingerprintField(request.profileId)
+            appendFingerprintField(request.provider)
+            appendFingerprintField(request.model)
+            appendFingerprintField(request.origin.name)
+            appendFingerprintField(request.channelHint)
+            appendFingerprintField(request.externalContext)
+            appendFingerprintField(request.projectId)
+            appendFingerprintField(request.parentRunId)
+            request.history.forEach { message ->
+                appendFingerprintField(message.role)
+                appendFingerprintField(message.content)
+            }
+        },
+    )
+
+private fun StringBuilder.appendFingerprintField(value: String?) {
+    if (value == null) {
+        append("-1:")
+    } else {
+        append(value.length)
+        append(':')
+        append(value)
+    }
+    append('\u0000')
 }
