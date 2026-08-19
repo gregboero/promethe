@@ -33,6 +33,7 @@ data class AgentStack(
     val feedbackCollector: FeedbackCollector,
     val orchestrator: AgentOrchestrator,
     val mcpBridge: McpBridge,
+    val mcpElicitationBroker: McpElicitationBroker,
     val config: AgentConfig,
     val httpClient: HttpClient,
     val registry: AgentA2ARegistry,
@@ -412,8 +413,9 @@ object AgentBootstrap {
             )
         logger.info { "Context compressor enabled (threshold=${resolvedConfig.compressionThreshold}, max=${resolvedConfig.maxContextTokens} tokens)" }
         // MCP bridge with JVM transport factory + auto-connect
+        val mcpElicitationBroker = McpElicitationBroker(resolvedConfig.approvalTimeoutMs)
         val mcpBridge = McpBridge()
-        mcpBridge.setTransportFactory(JvmMcpTransportFactory())
+        mcpBridge.setTransportFactory(JvmMcpTransportFactory(mcpElicitationBroker))
 
         // MCP_SERVERS is process-owned; legacy files are imported once into the
         // encrypted database, which is otherwise the UI source of truth.
@@ -578,6 +580,7 @@ object AgentBootstrap {
             feedbackCollector = feedbackCollector,
             orchestrator = orchestrator,
             mcpBridge = mcpBridge,
+            mcpElicitationBroker = mcpElicitationBroker,
             config = resolvedConfig,
             httpClient = httpClient,
             registry = registry,

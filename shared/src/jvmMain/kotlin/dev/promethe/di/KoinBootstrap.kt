@@ -40,6 +40,7 @@ object KoinBootstrap {
             single<FeedbackCollector> { stack.feedbackCollector }
             single<AgentOrchestrator> { stack.orchestrator }
             single<McpBridge> { stack.mcpBridge }
+            single<McpElicitationBroker> { stack.mcpElicitationBroker }
             single<MemoryLayer> { stack.memoryLayer }
             single<AgentA2ARegistry> { stack.registry }
             single<HookManager> { stack.hookManager }

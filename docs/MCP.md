@@ -125,7 +125,7 @@ key in the example above becomes both `id` and `name`).
 | Transport | Class | Protocol version sent | Notes |
 |---|---|---|---|
 | `stdio` | `McpStdioTransport` | N/A | Unavailable in sandbox IPC v1. Connection fails with `SANDBOX_PROTOCOL_V2_REQUIRED` and no subprocess is started. |
-| `sse` | `McpSseTransport` | `2025-11-25` | Deprecated compatibility transport. `GET baseUrl` with `Accept: text/event-stream` discovers a session endpoint; subsequent JSON-RPC calls use the legacy `initialize` lifecycle. New configurations should use `streamable-http`. |
+| `sse` | `McpSseTransport` | `2025-11-25` | Deprecated compatibility transport. `GET baseUrl` with `Accept: text/event-stream` discovers a session endpoint; subsequent JSON-RPC calls use the legacy `initialize` lifecycle. It neither advertises nor handles modern MRTR/elicitation. New configurations should use `streamable-http`. |
 | `streamable-http` | `McpStreamableHttpTransport` | `2026-07-28`, fallback `2025-11-25` | Starts with `server/discover`. Modern requests carry protocol version, client identity and capabilities in `_meta`, plus `MCP-Protocol-Version`, `Mcp-Method` and, where applicable, `Mcp-Name` headers. It never sends `Mcp-Session-Id`. A legacy handshake is used only after a deterministic compatibility probe. |
 
 All transports implement the common adapter surface. The stdio adapter returns
@@ -239,9 +239,15 @@ and sixteen embedded requests per round by default.
 
 No implicit user answer is generated. A non-empty `inputRequests` map without an input handler
 raises `McpInputRequiredException`; unknown request methods, malformed envelopes, mismatched
-JSON-RPC IDs, and unsupported result types are rejected. The
-default `JvmMcpTransportFactory` does not install an interactive handler yet, so product UI
-elicitation remains unavailable until its dedicated approval/form bridge is implemented.
+JSON-RPC IDs, and unsupported result types are rejected. The default `JvmMcpTransportFactory`
+registers only `elicitation/create` and advertises only that capability. Form requests are bound to
+the secured tool invocation, displayed to the owner in the Monitor, validated against their schema,
+and resumed with `accept`, `decline`, or `cancel`. Unsupported modes, sensitive fields, oversized
+schemas, unsupported schema keywords, and requests outside a secured invocation fail closed. Forms
+are limited to 64 KiB, sixteen flat primitive fields, and bounded labels/descriptions. The Monitor
+also warns the owner never to enter credentials or other secrets. A request times out as `cancel`.
+Pending forms are intentionally held in memory because their originating tool coroutine cannot
+survive a process restart. Promethe does not advertise `sampling/createMessage` or `roots/list`.
 
 Errors are mapped to standard JSON-RPC codes: `-32601` (method not found), `-32602` (invalid
 params, e.g. missing `name`/`arguments`), `-32603` (uncaught internal error), `-32700` (parse
@@ -279,8 +285,8 @@ string check on the line before/independent of full dispatch).
 - **MCP HTTP+SSE is legacy-only and deprecated** — it remains available during the compatibility
   window but receives no new protocol features.
 - **MRTR is client-side and opt-in at the trust boundary** — the Streamable HTTP client can drive
-  bounded modern retries, but the default product wiring has no interactive input handler and
-  Prométhé's server role does not emit `input_required` results yet.
+  bounded modern retries and owner-facing form elicitation. URL-mode elicitation and richer schema
+  renderers are not supported, and Prométhé's server role does not emit `input_required` results yet.
 - **Tasks use polling, not subscriptions** — durable create/get/update/cancel is implemented, but
   notification subscriptions and resumable push delivery remain future work. The server currently
   opts in a conservative set of long-running tools rather than allowing every tool to become a task.

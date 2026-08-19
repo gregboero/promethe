@@ -491,6 +491,30 @@ Lists all tools exposed by connected MCP servers, plus all built-in tools (merge
 curl http://localhost:8080/api/v1/mcp/tools
 ```
 
+### GET /api/v1/approval/mcp/pending
+
+Lists owner-visible form requests emitted by external MCP servers while an outbound tool call is
+waiting for `elicitation/create`. The response identifies the requesting server, the user-facing
+message, the JSON schema, and the expiry time. It does not expose the originating session, MCP
+credentials, headers, or internal errors. Authentication is required.
+
+```bash
+curl http://localhost:8080/api/v1/approval/mcp/pending
+```
+
+### POST /api/v1/approval/mcp/{id}
+
+Resumes a pending MCP form with `accept`, `decline`, or `cancel`. An accepted response must include a
+`content` object matching the requested schema. Invalid actions or content return `400`; an expired,
+completed, or unknown request returns `404`. Requests time out as `cancel` and are not persisted
+across a gateway restart.
+
+```bash
+curl -X POST http://localhost:8080/api/v1/approval/mcp/request-id \
+  -H "Content-Type: application/json" \
+  -d '{"action":"accept","content":{"confirmed":true}}'
+```
+
 ---
 
 ## MCP Protocol Server

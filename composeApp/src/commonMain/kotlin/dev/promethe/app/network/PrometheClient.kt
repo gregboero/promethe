@@ -691,6 +691,25 @@ class PrometheClient(
             }.toString(),
         )
 
+    suspend fun getPendingMcpElicitations(): kotlinx.serialization.json.JsonObject = getJson("/api/v1/approval/mcp/pending")
+
+    suspend fun respondToMcpElicitation(
+        id: String,
+        action: String,
+        content: kotlinx.serialization.json.JsonObject? = null,
+    ): String =
+        client
+            .post("$baseUrl/api/v1/approval/mcp/$id") {
+                if (apiKey.isNotBlank()) header("Authorization", "Bearer $apiKey")
+                contentType(ContentType.Application.Json)
+                setBody(
+                    buildJsonObject {
+                        put("action", action)
+                        content?.let { put("content", it) }
+                    }.toString(),
+                )
+            }.requireSuccessfulBody("POST /api/v1/approval/mcp/$id")
+
     // Provider Choice (multi-provider AI capabilities)
 
     suspend fun getPendingProviderChoices(): kotlinx.serialization.json.JsonObject = getJson("/api/v1/approval/providers/pending")

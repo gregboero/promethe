@@ -483,6 +483,9 @@
     <string name="monitor_approve">Approve</string>
     <string name="monitor_reject">Reject</string>
     <string name="monitor_provider_choice">Provider Choice</string>
+    <string name="monitor_mcp_input_title">MCP input requested</string>
+    <string name="monitor_mcp_input_submit">Submit</string>
+    <string name="monitor_mcp_input_warning">Never enter passwords, tokens, payment details, or other secrets.</string>
     <string name="monitor_select_agent">Select an agent</string>
     <string name="monitor_details">Details</string>
     <string name="monitor_detail_agent">Agent</string>
