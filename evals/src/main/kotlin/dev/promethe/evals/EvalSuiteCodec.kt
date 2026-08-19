@@ -19,4 +19,6 @@ object EvalSuiteCodec {
     fun encode(suite: EvalSuite): String = json.encodeToString(suite)
 
     fun encode(run: EvalRun): String = json.encodeToString(run)
+
+    fun encode(report: AdversarialEvalReport): String = json.encodeToString(report)
 }
