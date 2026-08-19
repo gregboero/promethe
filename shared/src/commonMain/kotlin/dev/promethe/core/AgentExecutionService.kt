@@ -81,14 +81,15 @@ class AgentExecutionException(
 ) : IllegalStateException(message, cause)
 
 /**
- * The single application service allowed to enter [AIAgent.executeLoop].
- * Network protocols and background jobs adapt their requests to this contract.
+ * The single application service exposed to network protocols and background jobs.
+ * The execution graph is the only component allowed to enter [AIAgent.executeLoop].
  */
 class AgentExecutionService(
-    private val agent: AIAgent,
+    agent: AIAgent,
     private val database: PrometheDatabaseApi,
     private val executionIdGenerator: ExecutionIdGenerator = DefaultExecutionIdGenerator,
     private val runLedger: RunLedger = PersistentRunLedger(database),
+    private val executionGraph: ExecutionGraph = DurableExecutionGraph(agent.asLoopExecutor(), runLedger),
 ) : AgentExecutionPort {
     private val logger = Log.create("AgentExecutionService")
 
@@ -176,40 +177,43 @@ class AgentExecutionService(
                         runIdentity.parentRunId?.let { put("promethe.run.parent_id", it) }
                     },
             ) {
-                agent.executeLoop(
-                    sessionId = request.sessionId,
-                    userInput = input,
-                    overrideProvider = resolved.provider,
-                    overrideModel = resolved.model,
-                    personaOverlay = resolved.persona,
-                    personaSkillNames = resolved.skills,
-                    toolCallOrigin = request.origin.toToolCallOrigin(),
-                    overrideReasoningEffort = resolved.reasoningEffort,
-                    llmRequestContext =
-                        LlmRequestContext(
+                executionGraph
+                    .execute(
+                        ExecutionGraphRequest(
+                            identity = runIdentity,
                             sessionId = request.sessionId,
+                            userInput = input,
+                            overrideProvider = resolved.provider,
+                            overrideModel = resolved.model,
+                            personaOverlay = resolved.persona,
+                            personaSkillNames = resolved.skills,
                             origin = request.origin,
-                            runId = runIdentity.runId,
-                            parentRunId = runIdentity.parentRunId,
+                            toolCallOrigin = request.origin.toToolCallOrigin(),
+                            overrideReasoningEffort = resolved.reasoningEffort,
+                            externalContext = request.externalContext,
+                            projectId = project?.id,
+                            projectContext = project?.toPromptContext(),
+                            memoryNamespace = project?.memoryNamespace ?: "default",
+                            workspaceRelativePath = project?.workspacePath,
                         ),
-                    externalContext = request.externalContext,
-                    projectId = project?.id,
-                    projectContext = project?.toPromptContext(),
-                    memoryNamespace = project?.memoryNamespace ?: "default",
-                    workspaceRelativePath = project?.workspacePath,
-                ).collect { trajectory ->
-                    stepCount++
-                    val step = runIdentity.step(stepCount)
-                    lastStepId = step.stepId
-                    if (!runLedger.recordStep(step.runId, step.stepId, step.index, Clock.System.now().toEpochMilliseconds())) {
-                        throw AgentExecutionException("run_ledger_write_failed", "Failed to persist agent step")
+                    ).collect { transition ->
+                        if (transition is ExecutionGraphTransition.StepPersisted) {
+                            stepCount = transition.index
+                            lastStepId = transition.stepId
+                            send(
+                                AgentExecutionEvent.Step(
+                                    index = transition.index,
+                                    trajectory = transition.trajectory,
+                                    runId = transition.runId,
+                                    stepId = transition.stepId,
+                                ),
+                            )
+                            transition.trajectory.outputs["response"]
+                                ?.trim()
+                                ?.takeIf { it.isNotBlank() }
+                                ?.let { finalResponse = it }
+                        }
                     }
-                    send(AgentExecutionEvent.Step(step.index, trajectory, step.runId, step.stepId))
-                    trajectory.outputs["response"]
-                        ?.trim()
-                        ?.takeIf { it.isNotBlank() }
-                        ?.let { finalResponse = it }
-                }
             }
 
             val response = finalResponse

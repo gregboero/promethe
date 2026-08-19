@@ -381,7 +381,7 @@ Backends optionnels :
 
 1. **FAIT** — Étendre le premier `RunLedger` persistant avec les IDs d'intention et un journal append-only des transitions d'outil.
 2. **FAIT** — Ajouter les clés d'idempotence et états d'outil persistants.
-3. Envelopper `executeLoop` dans le premier `ExecutionGraph` sans big bang.
+3. **FAIT** — Envelopper `executeLoop` dans le premier `ExecutionGraph` sans big bang.
 4. Créer `ResourceGovernor` global et propagation des budgets aux sous-agents.
 5. Introduire `ArtifactStore` et observations référencées par hash.
 6. Stabiliser l'ordre du prompt et mesurer le prefix cache.
