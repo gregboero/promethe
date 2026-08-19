@@ -122,6 +122,49 @@ class ToolIntentLedgerTest {
         }
 
     @Test
+    fun `large tool output is stored once and recovered through its artifact reference`() =
+        runTest {
+            val directory = createTempDirectory("promethe-tool-artifact")
+            try {
+                val database = DatabaseFactory.createInMemory()
+                val commandExecutor = CountingCommandExecutor("x".repeat(9_000))
+                val executor =
+                    ActionExecutor(
+                        config = AgentConfig(),
+                        httpClient = HttpClient(),
+                        approvalGate = AllowApprovalGate,
+                        sandboxCommandExecutor = commandExecutor,
+                        toolIntentLedger = PersistentToolIntentLedger(database, SequentialIds()),
+                        artifactStore = FileArtifactStore(directory),
+                    )
+                val request =
+                    request(toolName = "execute_command").copy(
+                        arguments =
+                            buildJsonObject {
+                                put("executable", "echo")
+                                put("arguments", kotlinx.serialization.json.buildJsonArray { add(JsonPrimitive("large")) })
+                            },
+                    )
+
+                val first = executor.execute(request)
+                val intent = database.getToolIntentsByStatus(setOf(ToolIntentStatus.SUCCEEDED)).single()
+                val artifactHash = requireNotNull(intent.artifactHash)
+
+                assertTrue(first.contains("artifact://sha256/$artifactHash"))
+                assertTrue(first.length < 2_000)
+                assertEquals("x".repeat(9_000), FileArtifactStore(directory).read(artifactHash)?.decodeToString())
+                assertTrue(executor.execute(request).contains("artifact://sha256/$artifactHash"))
+                assertEquals(1, commandExecutor.count)
+                assertEquals(
+                    artifactHash,
+                    database.getAgentRunEvents(requireNotNull(request.runId)).last().artifactHash,
+                )
+            } finally {
+                directory.toFile().deleteRecursively()
+            }
+        }
+
+    @Test
     fun `tool budget blocks a second distinct execution before process start`() =
         runTest {
             val database = DatabaseFactory.createInMemory()
@@ -190,7 +233,9 @@ class ToolIntentLedgerTest {
         override fun nextId(prefix: String): String = "$prefix-intent-${sequence.incrementAndGet().toString().padStart(8, '0')}"
     }
 
-    private class CountingCommandExecutor : SandboxCommandExecutor {
+    private class CountingCommandExecutor(
+        private val output: String = "done",
+    ) : SandboxCommandExecutor {
         var count = 0
 
         override suspend fun executeCommand(
@@ -201,7 +246,7 @@ class ToolIntentLedgerTest {
             timeoutMillis: Long,
         ): SandboxedExecutionResult {
             count++
-            return SandboxedExecutionResult(executionId = "sandbox-00000001", exitCode = 0, stdout = "done")
+            return SandboxedExecutionResult(executionId = "sandbox-00000001", exitCode = 0, stdout = output)
         }
 
         override fun approvalContext(): String = "workspace"

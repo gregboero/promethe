@@ -58,6 +58,7 @@ interface PrometheDatabaseApi {
         expectedStatuses: Set<ToolIntentStatus>,
         status: ToolIntentStatus,
         resultHash: String?,
+        artifactHash: String?,
         errorCode: String?,
         startedAt: Long?,
         finishedAt: Long?,

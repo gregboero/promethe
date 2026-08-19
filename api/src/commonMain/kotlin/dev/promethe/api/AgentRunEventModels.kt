@@ -47,6 +47,7 @@ data class AgentRunEventRecord(
     val runStatus: AgentRunStatus? = null,
     val intentStatus: ToolIntentStatus? = null,
     val resultHash: String? = null,
+    val artifactHash: String? = null,
     val errorCode: String? = null,
     val approvalId: String? = null,
     val approvalAllowed: Boolean? = null,
