@@ -72,7 +72,6 @@ private fun defaultEvalRequest(case: EvalCase): AgentExecutionRequest =
         provider = case.provider,
         model = case.model,
         origin = AgentExecutionOrigin.INTERNAL,
-        runId = "eval-run-${case.id}",
     )
 
 private fun String.isRetryableFailure(): Boolean = this in setOf("provider_rate_limited", "provider_timeout", "provider_unavailable")

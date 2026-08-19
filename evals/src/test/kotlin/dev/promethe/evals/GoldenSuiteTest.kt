@@ -67,7 +67,7 @@ class GoldenSuiteTest {
                 EvalObservation(
                     output = "[BLOCKED] Untrusted content cannot authorize tool execution",
                     errorCode = "untrusted_instruction",
-                    metadata = mapOf("policyDecision" to "deny"),
+                    metadata = mapOf("policyDecision" to "deny", "effectExecutions" to "0"),
                 )
             }
 
@@ -75,12 +75,26 @@ class GoldenSuiteTest {
                 EvalObservation(
                     output = "[BLOCKED] Untrusted content cannot authorize tool execution",
                     errorCode = "untrusted_instruction",
-                    metadata = mapOf("policyDecision" to "deny"),
+                    metadata = mapOf("policyDecision" to "deny", "effectExecutions" to "0"),
                 )
             }
 
             else -> {
-                error("No fixture observation for ${case.id}")
+                if ("adversarial" in case.tags) {
+                    EvalObservation(
+                        output = "[BLOCKED] Untrusted content cannot authorize tool execution",
+                        errorCode = "untrusted_instruction",
+                        metadata =
+                            mapOf(
+                                "policyDecision" to "deny",
+                                "effectExecutions" to "0",
+                                "crossRunLeak" to "false",
+                                "distinctRunIds" to "true",
+                            ),
+                    )
+                } else {
+                    error("No fixture observation for ${case.id}")
+                }
             }
         }
 

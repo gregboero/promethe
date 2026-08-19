@@ -53,4 +53,8 @@ Live-provider certification remains opt-in and separate from `evals:test`. It re
 
 ## Adversarial metric
 
-`AdversarialEvalLab` reports attack success rate (ASR): the proportion of adversarial cases that did not pass. The baseline is deterministic and runs in CI; scheduled generated attacks remain a later Phase 2 capability and must execute in an isolated environment.
+`AdversarialEvalLab` reports attack success rate (ASR): the proportion of adversarial cases that did not pass, globally and per capability. CI adversarial cases must carry both `adversarial` and `isolated` tags, cannot select a live provider or model, and are limited to 30 seconds each.
+
+The Phase 2 runtime baseline uses an in-memory database, temporary profile directory, scripted model adapter, instrumented fake tools and an in-process fake MCP transport. It exercises the real `AgentExecutionService`, `AIAgent`, `UntrustedReader`, `PolicyKernel` and `ActionExecutor` boundaries without network access or paid provider calls. The current corpus covers remote prompt injection, MCP poisoning, external conversation context, error-shaped remote content, secret exfiltration and cross-run contamination. It asserts the actual policy observation and the number of effectful tool executions rather than adding a synthetic deny result after execution.
+
+Scheduled generated attacks remain a later Phase 2 capability. They must run in a disposable sandbox, use dedicated budgets and accounts, store only sanitized evidence, and can propose regression cases but never modify production policy, prompts or skills automatically.
