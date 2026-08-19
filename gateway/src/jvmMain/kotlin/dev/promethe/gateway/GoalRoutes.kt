@@ -57,9 +57,16 @@ data class GoalTaskResult(
  * concurrent test applications — or a future multi-mount — don't share state.
  */
 class GoalState {
+    @Volatile
     var goal: String = ""
+
+    @Volatile
     var executor: AutonomousExecutor? = null
+
+    @Volatile
     var job: Job? = null
+
+    @Volatile
     var status: GoalStatusResponse = GoalStatusResponse(state = "IDLE")
 }
 
