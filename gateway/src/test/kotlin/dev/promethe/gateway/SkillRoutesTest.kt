@@ -239,6 +239,24 @@ class SkillRoutesTest {
             assertTrue(error.error.contains("system skill"), "Error message should mention system skill")
         }
 
+    @Test
+    fun `system skill display name cannot bypass lifecycle or deletion protection`() =
+        testApplication {
+            writeSkillDir("clean-code", systemSkillContent())
+            val loader = SkillLoader(fs, skillsDir)
+            val writer = SkillWriter(fs, skillsDir)
+            configureApp(loader, writer)
+
+            val lifecycleResponse = client.put("/api/v1/skills/Clean%20Code/lifecycle") {
+                contentType(ContentType.Application.Json)
+                setBody("""{"lifecycle":"DEPRECATED"}""")
+            }
+            val deleteResponse = client.delete("/api/v1/skills/Clean%20Code")
+
+            assertEquals(HttpStatusCode.Forbidden, lifecycleResponse.status)
+            assertEquals(HttpStatusCode.Forbidden, deleteResponse.status)
+        }
+
     // ── 6. DELETE /api/v1/skills/my-custom-skill succeeds ──
 
     @Test
@@ -279,6 +297,36 @@ class SkillRoutesTest {
             // Sanitization: lowercase, non-alnum → underscore, collapse, trim
             assertEquals("my_cool_skill", created.name, "Name should be sanitized to lowercase underscored")
             assertEquals("test desc", created.description)
+            assertEquals(SkillLifecycle.DRAFT, created.contract.lifecycle)
+            assertNotNull(created.contract.contentHash)
+        }
+
+    @Test
+    fun `skill activation requires reviewed lifecycle transitions`() =
+        testApplication {
+            val loader = SkillLoader(fs, skillsDir)
+            val writer = SkillWriter(fs, skillsDir)
+            configureApp(loader, writer)
+            client.post("/api/v1/skills") {
+                contentType(ContentType.Application.Json)
+                setBody("""{"name":"reviewed","content":"Review this procedure"}""")
+            }
+
+            val invalid = client.put("/api/v1/skills/reviewed/lifecycle") {
+                contentType(ContentType.Application.Json)
+                setBody("""{"lifecycle":"ACTIVE"}""")
+            }
+            assertEquals(HttpStatusCode.Conflict, invalid.status)
+
+            listOf(SkillLifecycle.QUARANTINED, SkillLifecycle.CANDIDATE, SkillLifecycle.ACTIVE).forEach { lifecycle ->
+                val response = client.put("/api/v1/skills/reviewed/lifecycle") {
+                    contentType(ContentType.Application.Json)
+                    setBody("""{"lifecycle":"$lifecycle"}""")
+                }
+                assertEquals(HttpStatusCode.OK, response.status)
+            }
+
+            assertEquals(listOf("reviewed"), loader.listExecutableSkills().map { skill -> skill.name })
         }
 
     @Test
@@ -307,7 +355,7 @@ class SkillRoutesTest {
             assertEquals(0, report.merged)
             assertEquals(0, report.deleted)
             assertTrue(report.proposals.any { it.action == SkillCurationActionDto.REVIEW_DUPLICATE })
-            assertTrue(report.proposals.all { it.status == "QUARANTINED" })
+            assertTrue(report.proposals.all { it.status == SkillLifecycle.QUARANTINED })
             assertEquals(2, loader.listSkills().size)
         }
 }

@@ -12,6 +12,43 @@ data class SkillDto(
     val content: String,
     val preview: String = "",
     val isSystem: Boolean = false,
+    val contract: SkillContract = SkillContract(),
+)
+
+@Serializable
+enum class SkillLifecycle {
+    DRAFT,
+    QUARANTINED,
+    CANDIDATE,
+    ACTIVE,
+    DEPRECATED,
+
+    ;
+
+    fun canTransitionTo(target: SkillLifecycle): Boolean =
+        target == this ||
+            target in
+            when (this) {
+                DRAFT -> setOf(QUARANTINED)
+                QUARANTINED -> setOf(DRAFT, CANDIDATE)
+                CANDIDATE -> setOf(QUARANTINED, ACTIVE)
+                ACTIVE -> setOf(QUARANTINED, DEPRECATED)
+                DEPRECATED -> setOf(DRAFT)
+            }
+}
+
+@Serializable
+data class SkillContract(
+    val lifecycle: SkillLifecycle = SkillLifecycle.ACTIVE,
+    val triggers: List<String> = emptyList(),
+    val antiTriggers: List<String> = emptyList(),
+    val requiredTools: List<String> = emptyList(),
+    val requiredSkills: List<String> = emptyList(),
+    val evalSuite: List<String> = emptyList(),
+    val provenance: String? = null,
+    val version: String = "1",
+    val owner: String? = null,
+    val contentHash: String? = null,
 )
 
 @Serializable
@@ -30,6 +67,11 @@ data class CreateSkillRequest(
 @Serializable
 data class UpdateSkillRequest(
     val content: String,
+)
+
+@Serializable
+data class UpdateSkillLifecycleRequest(
+    val lifecycle: SkillLifecycle,
 )
 
 @Serializable
@@ -61,7 +103,7 @@ data class SkillCurationProposalDto(
     val score: Int? = null,
     val similarity: Double? = null,
     val rationale: String,
-    val status: String = "QUARANTINED",
+    val status: SkillLifecycle = SkillLifecycle.QUARANTINED,
 )
 
 @Serializable
@@ -85,6 +127,7 @@ data class SkillSummaryDto(
     val description: String,
     val source: SkillSource = SkillSource.CUSTOM,
     val requirements: SkillRequirements = SkillRequirements(),
+    val contract: SkillContract = SkillContract(),
 )
 
 /**

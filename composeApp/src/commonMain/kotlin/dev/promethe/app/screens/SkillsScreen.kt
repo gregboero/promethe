@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import dev.promethe.api.SkillDto
+import dev.promethe.api.SkillLifecycle
 import dev.promethe.app.network.PrometheClient
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
@@ -209,6 +210,41 @@ fun SkillsScreen(client: PrometheClient) {
                         )
                         Spacer(Modifier.height(12.dp))
                     }
+
+                    val nextLifecycle =
+                        when (selected.contract.lifecycle) {
+                            SkillLifecycle.DRAFT -> SkillLifecycle.QUARANTINED
+                            SkillLifecycle.QUARANTINED -> SkillLifecycle.CANDIDATE
+                            SkillLifecycle.CANDIDATE -> SkillLifecycle.ACTIVE
+                            SkillLifecycle.ACTIVE -> SkillLifecycle.DEPRECATED
+                            SkillLifecycle.DEPRECATED -> SkillLifecycle.DRAFT
+                        }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = stringResource(Res.string.skills_lifecycle, selected.contract.lifecycle.name),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        if (!selected.isSystem && !state.isEditing) {
+                            FilledTonalButton(
+                                onClick = { viewModel.updateLifecycle(nextLifecycle) },
+                                enabled = !state.isSaving,
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.PublishedWithChanges,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp),
+                                )
+                                Spacer(Modifier.width(6.dp))
+                                Text(stringResource(Res.string.skills_move_to_lifecycle, nextLifecycle.name))
+                            }
+                        }
+                    }
+                    Spacer(Modifier.height(12.dp))
 
                     HorizontalDivider()
                     Spacer(Modifier.height(16.dp))

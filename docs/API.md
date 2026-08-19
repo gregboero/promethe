@@ -1042,11 +1042,11 @@ curl -X POST http://localhost:8080/api/v1/plugins/weather/toggle \
 
 ### GET /api/v1/skills
 
-List all available skills.
+List all managed skills, including non-active lifecycle states. Only `ACTIVE` skills are available to agents.
 
 ```bash
 curl http://localhost:8080/api/v1/skills
-# → {"skills": [{"name": "code_review", "description": "...", "preview": "...", "isSystem": true}]}
+# → {"skills": [{"name": "code_review", "description": "...", "preview": "...", "isSystem": true, "contract": {"lifecycle": "ACTIVE", "contentHash": "..."}}]}
 ```
 
 ### GET /api/v1/skills/{name}
@@ -1059,7 +1059,7 @@ curl http://localhost:8080/api/v1/skills/code_review
 
 ### POST /api/v1/skills
 
-Create a new skill.
+Create a new `DRAFT` skill.
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/skills \
@@ -1073,12 +1073,23 @@ curl -X POST http://localhost:8080/api/v1/skills \
 
 ### PUT /api/v1/skills/{name}
 
-Update an existing skill.
+Update an existing skill. Non-system skills are moved to `QUARANTINED` and stop being available to agents.
 
 ```bash
 curl -X PUT http://localhost:8080/api/v1/skills/data_analysis \
   -H "Content-Type: application/json" \
   -d '{"content": "# Data Analysis v2\n\nContenu mis à jour..."}'
+```
+
+### PUT /api/v1/skills/{name}/lifecycle
+
+Apply an owner-reviewed lifecycle transition. Direct `DRAFT → ACTIVE` activation is refused; the promotion
+path is `DRAFT → QUARANTINED → CANDIDATE → ACTIVE`. System skill lifecycle cannot be changed.
+
+```bash
+curl -X PUT http://localhost:8080/api/v1/skills/data_analysis/lifecycle \
+  -H "Content-Type: application/json" \
+  -d '{"lifecycle": "QUARANTINED"}'
 ```
 
 ### DELETE /api/v1/skills/{name}

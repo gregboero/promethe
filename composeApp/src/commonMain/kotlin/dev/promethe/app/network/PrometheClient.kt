@@ -857,6 +857,15 @@ class PrometheClient(
         content: String,
     ): dev.promethe.api.SkillDto = authenticatedPut("$baseUrl/api/v1/skills/$name", dev.promethe.api.UpdateSkillRequest(content = content))
 
+    suspend fun updateSkillLifecycle(
+        name: String,
+        lifecycle: dev.promethe.api.SkillLifecycle,
+    ): dev.promethe.api.SkillDto =
+        authenticatedPut(
+            "$baseUrl/api/v1/skills/$name/lifecycle",
+            dev.promethe.api.UpdateSkillLifecycleRequest(lifecycle),
+        )
+
     suspend fun deleteSkill(name: String) {
         client.delete("$baseUrl/api/v1/skills/$name") {
             if (apiKey.isNotBlank()) header("Authorization", "Bearer $apiKey")

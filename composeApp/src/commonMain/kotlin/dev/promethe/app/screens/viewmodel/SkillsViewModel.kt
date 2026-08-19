@@ -3,6 +3,7 @@ package dev.promethe.app.screens.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.promethe.api.SkillDto
+import dev.promethe.api.SkillLifecycle
 import dev.promethe.api.SkillListResponse
 import dev.promethe.app.network.PrometheClient
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -106,6 +107,26 @@ class SkillsViewModel(
             } catch (e: Exception) {
                 logger.error(e) { "Failed to save skill $name" }
                 _state.update { it.copy(error = e.message, isSaving = false) }
+            }
+        }
+    }
+
+    fun updateLifecycle(lifecycle: SkillLifecycle) {
+        val selected = _state.value.selectedSkill ?: return
+        _state.update { state -> state.copy(isSaving = true, error = null) }
+        viewModelScope.launch {
+            try {
+                val updated = client.updateSkillLifecycle(selected.name, lifecycle)
+                _state.update { state ->
+                    state.copy(
+                        skills = state.skills.map { skill -> if (skill.name == updated.name) updated else skill },
+                        selectedSkill = updated,
+                        isSaving = false,
+                    )
+                }
+            } catch (e: Exception) {
+                logger.error(e) { "Failed to update lifecycle for ${selected.name}" }
+                _state.update { state -> state.copy(error = e.message, isSaving = false) }
             }
         }
     }

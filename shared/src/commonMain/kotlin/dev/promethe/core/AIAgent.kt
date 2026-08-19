@@ -506,13 +506,21 @@ class AIAgent(
                     logger.info { "Task succeeded with ${trajectoryLog.size} steps. Attempting skill synthesis..." }
                     val skill = trajectoryEvaluator.synthesize(trajectoryLog, userInput)
                     if (skill != null) {
-                        val path = skillWriter.write(skill)
+                        val draftSkill =
+                            skill.copy(
+                                contract =
+                                    dev.promethe.api.SkillContract(
+                                        lifecycle = dev.promethe.api.SkillLifecycle.DRAFT,
+                                        provenance = "trajectory_synthesis",
+                                    ),
+                            )
+                        val path = skillWriter.write(draftSkill)
                         if (path != null) {
                             emit(
                                 ConversationTrajectory(
                                     inputs = mapOf("query" to userInput),
-                                    outputs = mapOf("system" to "[Skill Learned] '${skill.name}' saved."),
-                                    thought = "Closed-loop: skill extracted from trajectory.",
+                                    outputs = mapOf("system" to "[Skill Drafted] '${skill.name}' saved for owner review."),
+                                    thought = "Closed-loop: skill extracted from trajectory as a non-active draft.",
                                 ),
                             )
                         }
