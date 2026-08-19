@@ -11,7 +11,7 @@ import kotlin.test.assertEquals
 
 class AgentExecutionArchitectureTest {
     @Test
-    fun `only AgentExecutionService enters the agent loop`() {
+    fun `only ExecutionGraph enters the agent loop`() {
         val root = projectRoot()
         val violations =
             listOf(root.resolve("shared/src"), root.resolve("gateway/src"))
@@ -23,7 +23,7 @@ class AgentExecutionArchitectureTest {
                             paths.filter { path ->
                                 path.extension == "kt" &&
                                     !path.toString().contains("Test") &&
-                                    path.name != "AgentExecutionService.kt"
+                                    path.name != "ExecutionGraph.kt"
                             }.filter { path ->
                                 path.readLines().any { line ->
                                     val trimmed = line.trim()
@@ -36,7 +36,7 @@ class AgentExecutionArchitectureTest {
                     }
                 }
 
-        assertEquals(emptyList(), violations, "Agent loop bypasses AgentExecutionService: $violations")
+        assertEquals(emptyList(), violations, "Agent loop bypasses ExecutionGraph: $violations")
     }
 
     @Test

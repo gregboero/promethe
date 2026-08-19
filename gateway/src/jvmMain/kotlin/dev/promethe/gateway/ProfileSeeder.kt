@@ -9,7 +9,7 @@ private val logger = io.github.oshai.kotlinlogging.KotlinLogging.logger {}
 /**
  * Seeds the database with system agent profiles on first launch.
  *
- * All system agents route through AIAgent.executeLoop() with persona overlay.
+ * All system agents route through AgentExecutionService and its execution graph with persona overlay.
  * System agents are non-deletable (isSystem = true) but modifiable by user/GEPA.
  */
 object ProfileSeeder {

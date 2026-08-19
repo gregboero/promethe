@@ -11,7 +11,7 @@ private val logger = io.github.oshai.kotlinlogging.KotlinLogging.logger {}
  * Internal A2A-aligned execution bridge.
  *
  * All entry points (webhooks, goals, scheduler, ACP) should use this instead of
- * calling `agent.executeLoop()` directly. This ensures:
+ * calling the agent loop directly. This ensures:
  *
  * 1. Session is created/resolved in the database
  * 2. Events are emitted to [AgentEventBus] for the Monitor WebSocket
