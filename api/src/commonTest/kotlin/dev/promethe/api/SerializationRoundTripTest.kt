@@ -4,6 +4,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 /**
  * Serialization round-trip tests for all API data classes.
@@ -350,6 +351,27 @@ class SerializationRoundTripTest {
 
     @Test
     fun healthResponse() = assertRoundTrip(HealthResponse(status = "ok", timestamp = 1718000000000))
+
+    @Test
+    fun cacheStatus() {
+        val status =
+            CacheStatus(
+                hits = 4,
+                misses = 2,
+                size = 3,
+                hitRate = 2.0 / 3.0,
+                readTokens = 1_024,
+                writeTokens = 256,
+                observableResponses = 6,
+                prefixReuseHits = 5,
+                prefixReuseMisses = 1,
+            )
+
+        assertRoundTrip(status)
+        val encoded = json.encodeToString(status)
+        assertTrue("\"read_tokens\":1024" in encoded)
+        assertTrue("\"prefix_reuse_hits\":5" in encoded)
+    }
 
     @Test
     fun errorResponse() = assertRoundTrip(ErrorResponse(error = "Not found"))

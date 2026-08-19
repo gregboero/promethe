@@ -48,7 +48,8 @@ class AgentStatusTool(
             appendLine("  Prompt tokens: ${stats.promptTokens}")
             appendLine("  Completion tokens: ${stats.completionTokens}")
             appendLine("  Estimated cost: $${String.format("%.4f", stats.totalCost)}")
-            appendLine("  Cache: ${stats.cacheHits} hits / ${stats.cacheMisses} misses (${stats.cacheSize} cached)")
+            appendLine("  Provider cache: ${stats.cacheHits} hits / ${stats.cacheMisses} misses (${stats.cacheReadTokens} read tokens)")
+            appendLine("  Stable prefixes: ${stats.prefixReuseHits} reused / ${stats.prefixReuseMisses} new (${stats.cacheSize} tracked)")
 
             if (args.verbose && poolStats.isNotEmpty()) {
                 appendLine("  Provider pools:")
@@ -131,7 +132,9 @@ class TokenBudgetTool(
             appendLine("    Completion: ${stats.completionTokens}")
             appendLine("  Total requests: ${stats.totalRequests}")
             appendLine("  Estimated cost: $${String.format("%.4f", stats.totalCost)}")
-            appendLine("  Cache hit rate: ${String.format("%.1f", hitRate)}%")
+            appendLine("  Provider cache hit rate: ${String.format("%.1f", hitRate)}% (${stats.cacheObservableResponses} observable)")
+            appendLine("  Provider cache tokens: ${stats.cacheReadTokens} read / ${stats.cacheWriteTokens} written")
+            appendLine("  Stable prefix reuse: ${stats.prefixReuseHits} reused / ${stats.prefixReuseMisses} new")
             if (stats.totalRequests > 0) {
                 appendLine("  Avg tokens/request: ${total / stats.totalRequests}")
             }

@@ -64,7 +64,13 @@ Trace attributes are allowlisted metadata, not request payloads. Keys containing
 - `cost` (see cost computation below)
 - a timestamp
 
-It maintains in-memory cumulative counters (`totalRequests`, `totalPromptTokens`, `totalCompletionTokens`, `totalCost`) plus prompt-cache hit/miss/size counters, guarded by a `Mutex`, exposed via:
+It maintains in-memory cumulative counters (`totalRequests`, `totalPromptTokens`, `totalCompletionTokens`, `totalCost`). Prefix-cache telemetry deliberately separates provider-observed cache usage from local prefix reuse candidates:
+
+- `cacheHits`, `cacheMisses`, `cacheReadTokens`, and `cacheWriteTokens` come only from provider response metadata;
+- `prefixReuseHits` and `prefixReuseMisses` report whether the same provider/model/system/tools fingerprint was seen before;
+- `cacheSize` is the bounded number of known prefix fingerprints, not a local response cache.
+
+Anthropic system and tool prefixes receive explicit cache breakpoints. Other providers keep their native automatic cache behavior. If a client does not expose provider cache metadata, Promethe leaves the provider counters unchanged instead of reporting a false miss.
 
 ```kotlin
 data class LlmStats(
@@ -75,6 +81,11 @@ data class LlmStats(
     val cacheHits: Long,
     val cacheMisses: Long,
     val cacheSize: Int,
+    val cacheReadTokens: Long,
+    val cacheWriteTokens: Long,
+    val cacheObservableResponses: Long,
+    val prefixReuseHits: Long,
+    val prefixReuseMisses: Long,
 )
 
 suspend fun getStats(): LlmStats

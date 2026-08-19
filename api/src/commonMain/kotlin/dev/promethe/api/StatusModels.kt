@@ -48,6 +48,11 @@ data class CacheStatus(
     val misses: Long,
     val size: Int,
     @SerialName("hit_rate") val hitRate: Double,
+    @SerialName("read_tokens") val readTokens: Long = 0,
+    @SerialName("write_tokens") val writeTokens: Long = 0,
+    @SerialName("observable_responses") val observableResponses: Long = 0,
+    @SerialName("prefix_reuse_hits") val prefixReuseHits: Long = 0,
+    @SerialName("prefix_reuse_misses") val prefixReuseMisses: Long = 0,
 )
 
 @Serializable
