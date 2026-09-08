@@ -37,6 +37,16 @@ object ToolRegistry {
             registeredTools.values.toList()
         }
 
+    suspend fun contractCoverage(): ToolContractCoverageReport =
+        mutex.withLock {
+            ToolContractRegistry.audit(registeredTools.keys)
+        }
+
+    suspend fun requireCompleteContractCoverage(): ToolContractCoverageReport =
+        mutex.withLock {
+            ToolContractRegistry.requireCompleteCoverage(registeredTools.keys)
+        }
+
     /** Non-suspend snapshot — safe for reads at startup after tools are registered. */
     fun toolsSnapshot(): List<ToolBase<*, *>> = registeredTools.values.toList()
 

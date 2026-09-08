@@ -7,4 +7,11 @@ data class PendingToolTurn(
     val toolCallId: String,
     val toolName: String,
     val result: String,
+    val history: List<PositionedToolTurn> = emptyList(),
+)
+
+/** Index in the accompanying, already filtered and compressed conversation. */
+data class PositionedToolTurn(
+    val messageIndex: Int,
+    val turn: PendingToolTurn,
 )

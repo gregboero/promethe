@@ -1,6 +1,8 @@
 package dev.promethe.gateway
 
 import dev.promethe.core.CredentialsStore
+import dev.promethe.core.ApprovalGate
+import dev.promethe.core.ToolApprovalGate
 import dev.promethe.core.config.ConfigProvider
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.text.Normalizer
@@ -19,8 +21,11 @@ import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.events.session.ReadyEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
+import net.dv8tion.jda.api.components.actionrow.ActionRow
+import net.dv8tion.jda.api.components.buttons.Button
 import net.dv8tion.jda.api.requests.GatewayIntent
 
 private val logger = KotlinLogging.logger {}
@@ -43,6 +48,7 @@ internal data class DiscordGatewayConfiguration(
     val token: String,
     val messageContentEnabled: Boolean,
     val allowedUsers: DiscordIdAllowlist,
+    val approvalUserIds: Set<String>,
     val knowledgeChannelIds: Set<String>,
     val requiresMessageContent: Boolean,
 )
@@ -72,8 +78,12 @@ internal class DiscordGatewayManager(
     private val knowledgeChannelIdsProvider: () -> String = {
         ConfigProvider.get().get("DISCORD_KNOWLEDGE_CHANNEL_IDS", "")
     },
+    private val approvalUserIdsProvider: () -> String = {
+        ConfigProvider.get().get("DISCORD_APPROVER_USER_IDS", "")
+    },
     private val policyService: DiscordPolicyService,
     private val knowledgeArchive: DiscordKnowledgeArchive = DiscordKnowledgeArchive(),
+    private val approvalGate: ToolApprovalGate? = null,
 ) : AutoCloseable {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO + CoroutineName("discord-gateway"))
     private val reloadMutex = Mutex()
@@ -84,6 +94,13 @@ internal class DiscordGatewayManager(
 
     @Volatile
     private var jda: JDA? = null
+
+    private val approvalSubscription =
+        approvalGate?.addRequestListener { request ->
+            if (request.sessionId.startsWith("discord-")) {
+                scope.launch { sendApprovalRequest(request) }
+            }
+        }
 
     fun start() {
         scope.launch { reload() }
@@ -100,6 +117,7 @@ internal class DiscordGatewayManager(
                     token = token,
                     messageContentEnabled = messageContentEnabled,
                     allowedUsers = discordIdAllowlist(allowedUserIdsProvider()),
+                    approvalUserIds = discordIdSet(approvalUserIdsProvider()),
                     knowledgeChannelIds = staticKnowledgeChannelIds,
                     requiresMessageContent =
                         discordRequiresMessageContent(
@@ -129,6 +147,8 @@ internal class DiscordGatewayManager(
                         staticKnowledgeChannelIds = configuration.knowledgeChannelIds,
                         policyService = policyService,
                         knowledgeArchive = knowledgeArchive,
+                        approvalGate = approvalGate,
+                        approvalUserIdsProvider = { discordIdSet(approvalUserIdsProvider()) },
                     )
                 jda =
                     JDABuilder
@@ -144,6 +164,7 @@ internal class DiscordGatewayManager(
                     "Discord Gateway connection starting " +
                         "[messageContent=${configuration.requiresMessageContent}, " +
                         "restrictedUsers=${configuration.allowedUsers.configured}, " +
+                        "approvers=${configuration.approvalUserIds.size}, " +
                         "knowledgeChannels=${effectiveKnowledgeChannelIds.size}]"
                 }
             } catch (error: Exception) {
@@ -154,11 +175,44 @@ internal class DiscordGatewayManager(
     }
 
     override fun close() {
+        approvalSubscription?.close()
         scope.cancel()
         jda?.shutdownNow()
         jda = null
         activeConfiguration = null
         channelMutexes.clear()
+    }
+
+    private fun sendApprovalRequest(request: ToolApprovalGate.ApprovalRequest) {
+        val gate = approvalGate ?: return
+        if (ToolApprovalGate.requiresLocalOwner(request.toolName)) {
+            gate.respond(request.id, approved = false)
+            logger.warn { "Discord request for local-owner-only tool '${request.toolName}' was denied" }
+            return
+        }
+
+        val approverIds = discordIdSet(approvalUserIdsProvider())
+        val activeJda = jda
+        if (activeJda == null || approverIds.isEmpty()) {
+            logger.warn {
+                "Discord approval ${request.id} cannot be delivered: " +
+                    if (activeJda == null) "gateway is unavailable" else "DISCORD_APPROVER_USER_IDS is empty"
+            }
+            return
+        }
+
+        val buttons = discordApprovalButtons(request)
+        val message = discordApprovalMessage(request)
+        approverIds.forEach { approverId ->
+            activeJda
+                .retrieveUserById(approverId)
+                .flatMap { user -> user.openPrivateChannel() }
+                .flatMap { channel -> channel.sendMessage(message).addComponents(ActionRow.of(buttons)) }
+                .queue(
+                    { logger.info { "Discord approval ${request.id} sent to integration approver $approverId" } },
+                    { error -> logger.warn(error) { "Discord approval DM failed for approver $approverId" } },
+                )
+        }
     }
 }
 
@@ -196,6 +250,8 @@ private class DiscordListener(
     private val staticKnowledgeChannelIds: Set<String>,
     private val policyService: DiscordPolicyService,
     private val knowledgeArchive: DiscordKnowledgeArchive,
+    private val approvalGate: ToolApprovalGate?,
+    private val approvalUserIdsProvider: () -> Set<String>,
 ) : ListenerAdapter() {
     override fun onReady(event: ReadyEvent) {
         logger.info { "Discord Gateway ready as ${event.jda.selfUser.name} (${event.jda.guilds.size} guilds)" }
@@ -334,7 +390,112 @@ private class DiscordListener(
             }
         }
     }
+
+    override fun onButtonInteraction(event: ButtonInteractionEvent) {
+        val action = parseDiscordApprovalAction(event.componentId) ?: return
+        if (event.user.id !in approvalUserIdsProvider()) {
+            event.reply("You are not authorized to resolve this Promethe request.").setEphemeral(true).queue()
+            return
+        }
+        val gate = approvalGate
+        if (gate == null) {
+            event.editMessage("This approval service is no longer available.").setComponents(emptyList()).queue()
+            return
+        }
+
+        val result =
+            gate.respondFromIntegrationApprover(
+                requestId = action.requestId,
+                approved = action.approved,
+                scope = action.scope,
+            )
+        val resolution =
+            when (result) {
+                ToolApprovalGate.ResponseResult.ACCEPTED -> {
+                    if (action.approved) {
+                        "Approved by ${event.user.effectiveName} (${action.scope.name.lowercase()})."
+                    } else {
+                        "Rejected by ${event.user.effectiveName}."
+                    }
+                }
+
+                ToolApprovalGate.ResponseResult.NOT_FOUND -> {
+                    "This approval request expired or was already resolved."
+                }
+
+                ToolApprovalGate.ResponseResult.LOCAL_OWNER_REQUIRED -> {
+                    "This operation can only be approved by the local Desktop owner."
+                }
+
+                ToolApprovalGate.ResponseResult.PERSISTENT_REQUIRES_LOCAL_OWNER -> {
+                    "A permanent grant is not allowed for this operation."
+                }
+
+                ToolApprovalGate.ResponseResult.INVALID_EXPIRATION -> {
+                    "The requested approval duration is invalid."
+                }
+
+                ToolApprovalGate.ResponseResult.PERSISTENCE_FAILED -> {
+                    "The permanent approval could not be stored. Resolve it from the local Desktop app."
+                }
+            }
+        event.editMessage(resolution).setComponents(emptyList()).queue()
+    }
 }
+
+internal data class DiscordApprovalAction(
+    val requestId: String,
+    val approved: Boolean,
+    val scope: ApprovalGate.ApprovalScope,
+)
+
+private const val DISCORD_APPROVAL_ACTION_PREFIX = "promethe:approval"
+
+internal fun discordApprovalActionId(
+    requestId: String,
+    approved: Boolean,
+    scope: ApprovalGate.ApprovalScope,
+): String = "$DISCORD_APPROVAL_ACTION_PREFIX:${if (approved) "allow" else "deny"}:${scope.name}:$requestId"
+
+internal fun parseDiscordApprovalAction(customId: String): DiscordApprovalAction? {
+    val parts = customId.split(':', limit = 5)
+    if (parts.size != 5 || parts[0] != "promethe" || parts[1] != "approval") return null
+    val approved =
+        when (parts[2]) {
+            "allow" -> true
+            "deny" -> false
+            else -> return null
+        }
+    val scope = runCatching { ApprovalGate.ApprovalScope.valueOf(parts[3]) }.getOrNull() ?: return null
+    val requestId = parts[4].takeIf(String::isNotBlank) ?: return null
+    return DiscordApprovalAction(requestId, approved, scope)
+}
+
+internal fun discordApprovalButtons(request: ToolApprovalGate.ApprovalRequest): List<Button> =
+    buildList {
+        add(Button.danger(discordApprovalActionId(request.id, false, ApprovalGate.ApprovalScope.ONCE), "Reject"))
+        add(Button.success(discordApprovalActionId(request.id, true, ApprovalGate.ApprovalScope.ONCE), "Allow once"))
+        add(Button.primary(discordApprovalActionId(request.id, true, ApprovalGate.ApprovalScope.SESSION), "Session"))
+        if (request.persistentAllowed) {
+            add(
+                Button.secondary(
+                    discordApprovalActionId(request.id, true, ApprovalGate.ApprovalScope.PERSISTENT),
+                    "Always allow",
+                ),
+            )
+        }
+    }
+
+internal fun discordApprovalMessage(request: ToolApprovalGate.ApprovalRequest): String =
+    buildString {
+        appendLine("**Promethe authorization required**")
+        appendLine("Tool: `${request.toolName}`")
+        appendLine("Session: `${request.sessionId}`")
+        appendLine("Arguments:")
+        append("```json\n")
+        append(request.args.replace("```", "'''").take(1_200))
+        append("\n```")
+    }
 
 internal fun discordInboundMessage(
     content: () -> String,

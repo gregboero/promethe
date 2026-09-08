@@ -1,0 +1,51 @@
+{
+  "batch": "decision-055a4115-207b-44e6-ac66-b3a31280d7a5",
+  "plannedRuns": 18,
+  "recordedRuns": 18,
+  "correctRuns": 18,
+  "completedRuns": 18,
+  "allRawLedgersPreserved": true,
+  "allSessionsCleaned": true,
+  "cohortSettledRequests": 108,
+  "cohortCostUpperBoundMicroUsd": 710014,
+  "campaignCapMicroUsd": 5000000,
+  "campaignReservedRequests": 269,
+  "campaignSettledCostUpperBoundMicroUsd": 1538292,
+  "campaignUncertainReservationMicroUsd": 0,
+  "api:jvmTest": {
+    "tests": 76,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "shared:jvmTest": {
+    "tests": 650,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "gateway:test": {
+    "tests": 213,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "evals:test": {
+    "tests": 15,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "composeApp:desktopTest": {
+    "tests": 23,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "shared:harnessLiveTest": {
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+}

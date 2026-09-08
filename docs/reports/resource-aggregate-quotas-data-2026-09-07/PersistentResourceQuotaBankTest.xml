@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="PersistentResourceQuotaBankTest[jvm]" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-09-08T01:05:18.664Z" hostname="BUREAU" time="4.252">
+  <properties/>
+  <testcase name="separate bank instances never exceed concurrent shared quota[jvm]" classname="dev.promethe.core.PersistentResourceQuotaBankTest" time="3.172"/>
+  <testcase name="calls without a run remain governed and quota data is diagnostic[jvm]" classname="dev.promethe.core.PersistentResourceQuotaBankTest" time="0.25"/>
+  <testcase name="two runs and child share owner quota while run denial does not charge it[jvm]" classname="dev.promethe.core.PersistentResourceQuotaBankTest" time="0.262"/>
+  <testcase name="quota survives reopen and owner scopes are independent[jvm]" classname="dev.promethe.core.PersistentResourceQuotaBankTest" time="0.039"/>
+  <testcase name="sub agent starts share profile quota across independent parents[jvm]" classname="dev.promethe.core.PersistentResourceQuotaBankTest" time="0.251"/>
+  <testcase name="provider normalization and missing identity fail closed[jvm]" classname="dev.promethe.core.PersistentResourceQuotaBankTest" time="0.036"/>
+  <testcase name="window rollover works and backward clock cannot reopen old window[jvm]" classname="dev.promethe.core.PersistentResourceQuotaBankTest" time="0.057"/>
+  <testcase name="all dimensions reserve together and denial charges none[jvm]" classname="dev.promethe.core.PersistentResourceQuotaBankTest" time="0.04"/>
+  <testcase name="invalid policies are rejected rather than silently disabling quotas[jvm]" classname="dev.promethe.core.PersistentResourceQuotaBankTest" time="0.001"/>
+  <testcase name="wildcard tools are distinct and exact selectors do not catch other tools[jvm]" classname="dev.promethe.core.PersistentResourceQuotaBankTest" time="0.067"/>
+  <testcase name="failed run persistence keeps aggregate reservation and starts no work[jvm]" classname="dev.promethe.core.PersistentResourceQuotaBankTest" time="0.029"/>
+  <testcase name="tightening limits preserves consumption and zero denies all[jvm]" classname="dev.promethe.core.PersistentResourceQuotaBankTest" time="0.048"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

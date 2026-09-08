@@ -1,0 +1,13 @@
+{
+  "batch": "decision-8fc0cc54-e24e-4fb6-b854-0ff89c262f9d",
+  "model": "gpt-5.6-terra",
+  "reasoningEffort": "none",
+  "taskCount": 6,
+  "plannedRuns": 18,
+  "pagesPerTask": 4,
+  "fixedSource": "const t = observation.text;\ntry { const v = JSON.parse(t); if (v && Object.prototype.hasOwnProperty.call(v, 'answer')) return String(v.answer); } catch (_) {}\nif (t.startsWith('id,answer\\n')) return t.split('\\n')[1].split(',')[1];\nif (t.startsWith('DATA answer=')) return t.slice('DATA answer='.length);\nreturn t;",
+  "fixedSourceHash": "860b4979aeaf49b5d8f4bceda7a0ec1222a1848a10fb1f9eda441f07f411273e",
+  "presentationGuard": "below256Bytes-or-no-byte-saving",
+  "fixedSetupIncluded": true,
+  "postLoopSkillSynthesisIncluded": true
+}

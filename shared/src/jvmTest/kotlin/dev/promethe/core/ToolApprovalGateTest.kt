@@ -1,8 +1,11 @@
 package dev.promethe.core
 
+import dev.promethe.db.DatabaseFactory
+import dev.promethe.db.PrometheDatabaseApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import kotlin.io.path.createTempDirectory
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -155,7 +158,8 @@ class ToolApprovalGateTest {
     fun `deny wins over a broader persistent allow`() =
         runTest {
             val gate = gate()
-            val sessionDeny = async { gate.checkMandatory("shell", """{"executable":"git"}""", "session-a") }
+            val args = """{"action":"listen_channel","targetId":"123"}"""
+            val sessionDeny = async { gate.checkMandatory("discord_policy", args, "session-a") }
             runCurrent()
             gate.respond(
                 gate.listPending().single().id,
@@ -164,7 +168,7 @@ class ToolApprovalGateTest {
             )
             assertFalse(sessionDeny.await().allowed)
 
-            val persistentAllow = async { gate.checkMandatory("shell", """{"executable":"git"}""", "session-b") }
+            val persistentAllow = async { gate.checkMandatory("discord_policy", args, "session-b") }
             runCurrent()
             gate.respond(
                 gate.listPending().single().id,
@@ -174,7 +178,7 @@ class ToolApprovalGateTest {
             )
             assertTrue(persistentAllow.await().allowed)
 
-            val denied = gate.checkMandatory("shell", """{"executable":"git"}""", "session-a")
+            val denied = gate.checkMandatory("discord_policy", args, "session-a")
             assertFalse(denied.allowed)
             assertTrue(denied.reason.startsWith("denied by"))
         }
@@ -204,7 +208,14 @@ class ToolApprovalGateTest {
     fun `persistent grants require a local owner and mandatory checks ignore auto mode`() =
         runTest {
             val gate = gate(approvalMode = "auto")
-            val pending = async { gate.checkMandatory("shell", "{}", "session-a") }
+            val pending =
+                async {
+                    gate.checkMandatory(
+                        "discord_policy",
+                        """{"action":"listen_channel","targetId":"123"}""",
+                        "session-a",
+                    )
+                }
             runCurrent()
             val requestId = gate.listPending().single().id
             assertEquals(
@@ -221,9 +232,114 @@ class ToolApprovalGateTest {
             assertFalse(pending.await().allowed)
         }
 
+    @Test
+    fun `permanent configuration grant survives restart until local revocation`() =
+        runTest {
+            val directory = createTempDirectory("promethe-approval-grant").toFile()
+            val databaseUrl = "jdbc:sqlite:${java.io.File(directory, "promethe.db").absolutePath}"
+            val args = """{"action":"listen_channel","targetId":"123"}"""
+            try {
+                val firstGate = gate(database = DatabaseFactory.create(databaseUrl))
+                val initial = async { firstGate.checkMandatory("discord_policy", args, "session-a") }
+                runCurrent()
+                assertEquals(
+                    ToolApprovalGate.ResponseResult.ACCEPTED,
+                    firstGate.respond(
+                        firstGate.listPending().single().id,
+                        approved = true,
+                        scope = ApprovalGate.ApprovalScope.PERSISTENT,
+                        localOwner = true,
+                    ),
+                )
+                assertTrue(initial.await().allowed)
+                assertEquals(Long.MAX_VALUE, firstGate.listGrants().single().expiresAt)
+
+                val restartedGate = gate(database = DatabaseFactory.create(databaseUrl))
+                assertTrue(restartedGate.checkMandatory("discord_policy", args, "session-b").allowed)
+                val grantId = restartedGate.listGrants().single().id
+                assertEquals(
+                    ToolApprovalGate.RevocationResult.REVOKED,
+                    restartedGate.revoke(grantId, localOwner = true),
+                )
+
+                val afterRevocationGate = gate(database = DatabaseFactory.create(databaseUrl))
+                val afterRevocation = async { afterRevocationGate.checkMandatory("discord_policy", args, "session-c") }
+                runCurrent()
+                assertEquals(1, afterRevocationGate.listPending().size)
+                afterRevocationGate.respond(afterRevocationGate.listPending().single().id, approved = false)
+                assertFalse(afterRevocation.await().allowed)
+            } finally {
+                directory.deleteRecursively()
+            }
+        }
+
+    @Test
+    fun `only exact configuration changes can be persisted by an integration approver`() =
+        runTest {
+            val gate = gate()
+            val requested = mutableListOf<ToolApprovalGate.ApprovalRequest>()
+            val subscription = gate.addRequestListener(requested::add)
+
+            try {
+                val configChange =
+                    async {
+                        gate.checkMandatory(
+                            "discord_policy",
+                            """{"action":"listen_channel","targetId":"123"}""",
+                            "session-local",
+                        )
+                    }
+                runCurrent()
+                val configRequest = gate.listPending().single()
+                assertTrue(configRequest.persistentAllowed)
+                assertEquals(configRequest.id, requested.single().id)
+                assertEquals(
+                    ToolApprovalGate.ResponseResult.ACCEPTED,
+                    gate.respondFromIntegrationApprover(
+                        configRequest.id,
+                        approved = true,
+                        scope = ApprovalGate.ApprovalScope.PERSISTENT,
+                    ),
+                )
+                assertTrue(configChange.await().allowed)
+
+                val shell = async { gate.checkMandatory("shell", """{"executable":"git"}""", "session-local") }
+                runCurrent()
+                val shellRequest = gate.listPending().single()
+                assertFalse(shellRequest.persistentAllowed)
+                assertEquals(
+                    ToolApprovalGate.ResponseResult.PERSISTENT_REQUIRES_LOCAL_OWNER,
+                    gate.respondFromIntegrationApprover(
+                        shellRequest.id,
+                        approved = true,
+                        scope = ApprovalGate.ApprovalScope.PERSISTENT,
+                    ),
+                )
+                gate.respond(shellRequest.id, approved = false)
+                assertFalse(shell.await().allowed)
+
+                val localAgent = async { gate.checkMandatory("codex_delegate", "{}", "discord-1-2") }
+                runCurrent()
+                val localAgentRequest = gate.listPending().single()
+                assertEquals(
+                    ToolApprovalGate.ResponseResult.LOCAL_OWNER_REQUIRED,
+                    gate.respondFromIntegrationApprover(
+                        localAgentRequest.id,
+                        approved = true,
+                        scope = ApprovalGate.ApprovalScope.ONCE,
+                    ),
+                )
+                gate.respond(localAgentRequest.id, approved = false)
+                assertFalse(localAgent.await().allowed)
+            } finally {
+                subscription.close()
+            }
+        }
+
     private fun gate(
         approvalMode: String = "all",
         clock: () -> Long = System::currentTimeMillis,
+        database: PrometheDatabaseApi? = null,
     ): ToolApprovalGate =
         ToolApprovalGate(
             config =
@@ -232,5 +348,6 @@ class ToolApprovalGateTest {
                     approvalTimeoutMs = 10_000,
                 ),
             clock = clock,
+            database = database,
         )
 }

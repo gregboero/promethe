@@ -1,0 +1,53 @@
+{
+  "batch": "kotlin-directed-e1e34b71-73e6-43d3-b5fd-38e9bb6e1be3",
+  "plannedRuns": 3,
+  "recordedRuns": 3,
+  "completeCohort": true,
+  "successfulRuns": 3,
+  "accounting": {
+    "attemptedCalls": 28,
+    "settledCalls": 28,
+    "uncertainCalls": 0,
+    "unknownUsageCalls": 0,
+    "usageComplete": true,
+    "inputTokens": 96842,
+    "outputTokens": 1910,
+    "costUpperBoundMicroUsd": 265032,
+    "uncertainReservationMicroUsd": 0
+  },
+  "proposals": 1,
+  "activations": 1,
+  "processed": 2,
+  "preflight": {
+    "passed": true,
+    "modelCalls": 0,
+    "compilations": 2,
+    "compilationMillis": 4226,
+    "evaluationMillis": 16,
+    "workerProcesses": 4,
+    "totalMillis": 7974,
+    "cacheCleaned": true
+  },
+  "priorBudgetRowsUnchanged": true,
+  "sourceSha256": {
+    "shared/src/jvmTest/kotlin/dev/promethe/core/HarnessKotlinDirectedLiveTest.kt": "9de6dbad3642c984c7ead9eabfd4a7a2871fce81590481565ee820726d52f6ae",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/HarnessKoogMutationFixture.kt": "80c80b1e4a6b29c4f9e1203f08420dc3122694730f718640d7598da974bad9cf",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/KoogMutationLoopTest.kt": "54fc5762c0f1375a31655bc2289ae7ba2e559f5a1e09a5507086f5076d146aee",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/CampaignKoogRelay.kt": "5c71cfc2cb3c18096d72c2b224ec4b3ea4f8fa12368b25a7e98019f59f2b9c27",
+    "shared/src/jvmMain/kotlin/dev/promethe/core/HarnessKotlinRunner.kt": "10b91f7de8ad30a908babfd221c6ffc6b37d8d742a04dcbfa4161822320b3e5a",
+    "shared/src/jvmMain/kotlin/dev/promethe/core/SessionHarness.kt": "1704e54069fea42a01c1e51246d186a9c611d4714b75caf23528d4dabec04b61",
+    "shared/src/commonMain/kotlin/dev/promethe/core/AIAgent.kt": "08cf9bcdd52efe377b380fd0934ba382530524635f480c43fd194e43fee58854",
+    "shared/src/commonMain/kotlin/dev/promethe/core/KoogLlmAdapter.kt": "ed566fa7e90ed4579282c6d3f714b2972ee22ad2d55c9cbbfda52015306e5773",
+    "shared/src/commonMain/kotlin/dev/promethe/core/NativeToolHistory.kt": "66848f93b9d9f3f77eada2e71db16862c535ffe5e3f667dfda0d89f4841bb772",
+    "scripts/report-kotlin-directed.py": "e8db2077c170bf6e328e5348319a8aa023b1605a18c717dc13702e708943ba7e"
+  },
+  "campaignAfter": {
+    "requests": 707,
+    "consumedMicroUsd": 4242730,
+    "uncertainReservations": 0,
+    "remainingMicroUsd": 757270
+  },
+  "directedSuccess": true,
+  "pairedRuns": 2,
+  "freeMutations": 0
+}

@@ -1,0 +1,45 @@
+> Task :shared:kmpPartiallyResolvedDependenciesChecker
+> Task :api:kmpPartiallyResolvedDependenciesChecker
+> Task :shared:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :api:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :shared:buildSandboxNative UP-TO-DATE
+> Task :shared:syncSandboxNative UP-TO-DATE
+> Task :shared:jvmProcessResources UP-TO-DATE
+> Task :shared:processJvmMainResources SKIPPED
+> Task :shared:jvmTestProcessResources NO-SOURCE
+> Task :shared:processJvmTestResources SKIPPED
+> Task :api:compileKotlinJvm UP-TO-DATE
+> Task :api:compileJvmMainJava NO-SOURCE
+> Task :api:jvmProcessResources NO-SOURCE
+> Task :api:processJvmMainResources SKIPPED
+> Task :api:jvmMainClasses UP-TO-DATE
+> Task :api:jvmJar UP-TO-DATE
+> Task :shared:loadKtlintReporters UP-TO-DATE
+> Task :shared:runKtlintCheckOverCommonMainSourceSet UP-TO-DATE
+> Task :shared:ktlintCommonMainSourceSetCheck UP-TO-DATE
+> Task :shared:runKtlintCheckOverCommonTestSourceSet UP-TO-DATE
+> Task :shared:ktlintCommonTestSourceSetCheck UP-TO-DATE
+> Task :shared:runKtlintCheckOverKotlinScripts UP-TO-DATE
+> Task :shared:ktlintKotlinScriptCheck UP-TO-DATE
+> Task :shared:compileKotlinJvm
+> Task :shared:compileJvmMainJava NO-SOURCE
+> Task :shared:jvmMainClasses
+> Task :shared:jvmJar
+
+> Task :shared:compileTestKotlinJvm
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/AdaptiveSessionHarnessTest.kt:169:100 Unnecessary non-null assertion (!!) on a non-null receiver of type 'String'.
+
+> Task :shared:compileJvmTestJava NO-SOURCE
+> Task :shared:jvmTestClasses
+> Task :shared:runKtlintCheckOverJvmTestSourceSet
+> Task :shared:runKtlintCheckOverJvmMainSourceSet
+> Task :shared:jvmTest
+> Task :shared:ktlintJvmMainSourceSetCheck UP-TO-DATE
+> Task :shared:ktlintJvmTestSourceSetCheck
+> Task :shared:ktlintCheck
+
+[Incubating] Problems report is available at: file:///E:/workspace/perso/projectRandD/promethe/build/reports/problems/problems-report.html
+
+BUILD SUCCESSFUL in 11s
+22 actionable tasks: 9 executed, 13 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.5.1/userguide/configuration_cache_enabling.html

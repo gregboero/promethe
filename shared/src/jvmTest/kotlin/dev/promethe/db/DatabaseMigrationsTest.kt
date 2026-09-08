@@ -49,6 +49,12 @@ class DatabaseMigrationsTest {
                     statement.executeQuery("SELECT version FROM flyway_schema_history WHERE version = '13'").use { rows ->
                         assertTrue(rows.next(), "V13 MCP tasks migration should be recorded")
                     }
+                    statement.executeQuery("SELECT version FROM flyway_schema_history WHERE version = '14'").use { rows ->
+                        assertTrue(rows.next(), "V14 durable approval grant migration should be recorded")
+                    }
+                    statement.executeQuery("SELECT version FROM flyway_schema_history WHERE version = '15'").use { rows ->
+                        assertTrue(rows.next(), "V15 durable resource governor migration should be recorded")
+                    }
                     statement.executeQuery("SELECT reasoning_effort FROM agent_profiles WHERE id = 'main'").use { rows ->
                         assertTrue(rows.next())
                         assertEquals("AUTO", rows.getString(1))
@@ -143,6 +149,25 @@ class DatabaseMigrationsTest {
                         while (rows.next()) columns += rows.getString("name")
                         assertTrue("data_trust" in columns, "V12 must persist the message trust classification")
                         assertTrue("source_run_id" in columns, "V12 must persist the message source run")
+                    }
+                    statement.executeQuery("PRAGMA table_info(approval_grants)").use { rows ->
+                        val columns = mutableSetOf<String>()
+                        while (rows.next()) columns += rows.getString("name")
+                        assertTrue("fingerprint" in columns, "V14 must persist exact approval fingerprints")
+                        assertTrue("expires_at" in columns, "V14 must support revocable expiring grants")
+                    }
+                    statement.executeQuery("PRAGMA table_info(resource_governors)").use { rows ->
+                        val columns = mutableSetOf<String>()
+                        while (rows.next()) columns += rows.getString("name")
+                        assertTrue("root_run_id" in columns, "V15 must persist the root run budget")
+                        assertTrue("tokens_used" in columns, "V15 must persist token consumption")
+                        assertTrue("version" in columns, "V15 must guard concurrent budget updates")
+                    }
+                    statement.executeQuery("PRAGMA table_info(resource_governor_bindings)").use { rows ->
+                        val columns = mutableSetOf<String>()
+                        while (rows.next()) columns += rows.getString("name")
+                        assertTrue("session_id" in columns, "V15 must persist governed sessions")
+                        assertTrue("root_run_id" in columns, "V15 must preserve child budget inheritance")
                     }
                 }
             }

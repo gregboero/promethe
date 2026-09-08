@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="SkillLoaderCacheTest[jvm]" tests="13" skipped="0" failures="0" errors="0" timestamp="2026-09-08T02:14:34.934Z" hostname="BUREAU" time="0.253">
+  <properties/>
+  <testcase name="listSkills_ignoresNonMdFiles[jvm]" classname="dev.promethe.core.SkillLoaderCacheTest" time="0.209"/>
+  <testcase name="invalidateCache_returnsFreshInstance[jvm]" classname="dev.promethe.core.SkillLoaderCacheTest" time="0.005"/>
+  <testcase name="listSkills_nonExistentDirectory_returnsEmptyList[jvm]" classname="dev.promethe.core.SkillLoaderCacheTest" time="0.003"/>
+  <testcase name="findRelevantSkills_returnsEmptyForNoMatch[jvm]" classname="dev.promethe.core.SkillLoaderCacheTest" time="0.004"/>
+  <testcase name="findRelevantSkills_returnsEmptyForShortKeywords[jvm]" classname="dev.promethe.core.SkillLoaderCacheTest" time="0.002"/>
+  <testcase name="findRelevantSkills_returnsEmptyForEmptyQuery[jvm]" classname="dev.promethe.core.SkillLoaderCacheTest" time="0.001"/>
+  <testcase name="findRelevantSkills_findsMatchingSkills[jvm]" classname="dev.promethe.core.SkillLoaderCacheTest" time="0.005"/>
+  <testcase name="listSkills_emptyDirectory_returnsEmptyList[jvm]" classname="dev.promethe.core.SkillLoaderCacheTest" time="0.001"/>
+  <testcase name="invalidateCache_forcesReRead[jvm]" classname="dev.promethe.core.SkillLoaderCacheTest" time="0.005"/>
+  <testcase name="findRelevantSkills_respectsMaxResults[jvm]" classname="dev.promethe.core.SkillLoaderCacheTest" time="0.006"/>
+  <testcase name="listSkills_returnsAllMdFiles[jvm]" classname="dev.promethe.core.SkillLoaderCacheTest" time="0.003"/>
+  <testcase name="listSkills_observesSameSizeEditsWithoutInvalidation[jvm]" classname="dev.promethe.core.SkillLoaderCacheTest" time="0.003"/>
+  <testcase name="findRelevantSkills_emptyDirectory_returnsEmpty[jvm]" classname="dev.promethe.core.SkillLoaderCacheTest" time="0.002"/>
+  <system-out><![CDATA[kotlin-logging: initializing... active logger factory: Slf4jLoggerFactory
+]]></system-out>
+  <system-err><![CDATA[SLF4J(W): No SLF4J providers were found.
+SLF4J(W): Defaulting to no-operation (NOP) logger implementation
+SLF4J(W): See https://www.slf4j.org/codes.html#noProviders for further details.
+]]></system-err>
+</testsuite>

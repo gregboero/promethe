@@ -1,0 +1,137 @@
+> Task :gateway:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :evals:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :harness-kotlin:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :api:kmpPartiallyResolvedDependenciesChecker
+> Task :api:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :evals:processResources NO-SOURCE
+> Task :evals:processTestResources UP-TO-DATE
+> Task :api:compileKotlinJvm UP-TO-DATE
+> Task :gateway:processResources UP-TO-DATE
+> Task :api:compileJvmMainJava NO-SOURCE
+> Task :gateway:processTestResources NO-SOURCE
+> Task :api:jvmProcessResources NO-SOURCE
+> Task :api:processJvmMainResources SKIPPED
+> Task :api:jvmMainClasses UP-TO-DATE
+> Task :harness-kotlin:compileKotlin UP-TO-DATE
+> Task :harness-kotlin:compileJava NO-SOURCE
+> Task :api:jvmJar UP-TO-DATE
+> Task :harness-kotlin:processResources NO-SOURCE
+> Task :harness-kotlin:classes UP-TO-DATE
+> Task :harness-kotlin:jar UP-TO-DATE
+> Task :harness-kotlin:startScripts UP-TO-DATE
+> Task :shared:loadKtlintReporters UP-TO-DATE
+> Task :harness-kotlin:windowsLauncher UP-TO-DATE
+> Task :harness-kotlin:installDist UP-TO-DATE
+> Task :harness-kotlin:prepareRuntime UP-TO-DATE
+> Task :shared:runKtlintCheckOverCommonTestSourceSet UP-TO-DATE
+> Task :api:compileTestKotlinJvm UP-TO-DATE
+> Task :shared:ktlintCommonTestSourceSetCheck UP-TO-DATE
+> Task :api:compileJvmTestJava NO-SOURCE
+> Task :api:jvmTestProcessResources NO-SOURCE
+> Task :api:processJvmTestResources SKIPPED
+> Task :api:jvmTestClasses UP-TO-DATE
+> Task :api:jvmTest UP-TO-DATE
+> Task :shared:runKtlintCheckOverKotlinScripts UP-TO-DATE
+> Task :shared:ktlintKotlinScriptCheck UP-TO-DATE
+> Task :shared:kmpPartiallyResolvedDependenciesChecker
+> Task :shared:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :composeApp:checkDesktopMainComposeLibrariesCompatibility
+> Task :shared:buildSandboxNative UP-TO-DATE
+> Task :shared:syncSandboxNative UP-TO-DATE
+> Task :shared:jvmProcessResources UP-TO-DATE
+> Task :shared:processJvmMainResources SKIPPED
+> Task :shared:jvmTestProcessResources NO-SOURCE
+> Task :shared:processJvmTestResources SKIPPED
+> Task :composeApp:kmpPartiallyResolvedDependenciesChecker
+> Task :composeApp:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :composeApp:convertXmlValueResourcesForCommonMain UP-TO-DATE
+> Task :composeApp:copyNonXmlValueResourcesForCommonMain NO-SOURCE
+> Task :composeApp:prepareComposeResourcesTaskForCommonMain UP-TO-DATE
+> Task :composeApp:generateResourceAccessorsForCommonMain UP-TO-DATE
+> Task :composeApp:convertXmlValueResourcesForDesktopMain NO-SOURCE
+> Task :composeApp:copyNonXmlValueResourcesForDesktopMain NO-SOURCE
+> Task :composeApp:prepareComposeResourcesTaskForDesktopMain NO-SOURCE
+> Task :composeApp:generateResourceAccessorsForDesktopMain NO-SOURCE
+> Task :composeApp:generateActualResourceCollectorsForDesktopMain UP-TO-DATE
+> Task :composeApp:generateComposeResClass UP-TO-DATE
+> Task :composeApp:generateExpectResourceCollectorsForCommonMain UP-TO-DATE
+> Task :composeApp:checkDesktopTestComposeLibrariesCompatibility
+> Task :composeApp:assembleDesktopMainResources UP-TO-DATE
+> Task :composeApp:desktopProcessResources UP-TO-DATE
+> Task :composeApp:processDesktopMainResources SKIPPED
+> Task :composeApp:convertXmlValueResourcesForCommonTest NO-SOURCE
+> Task :composeApp:copyNonXmlValueResourcesForCommonTest NO-SOURCE
+> Task :composeApp:prepareComposeResourcesTaskForCommonTest NO-SOURCE
+> Task :composeApp:generateResourceAccessorsForCommonTest NO-SOURCE
+> Task :composeApp:convertXmlValueResourcesForDesktopTest NO-SOURCE
+> Task :composeApp:copyNonXmlValueResourcesForDesktopTest NO-SOURCE
+> Task :composeApp:prepareComposeResourcesTaskForDesktopTest NO-SOURCE
+> Task :composeApp:generateResourceAccessorsForDesktopTest NO-SOURCE
+> Task :composeApp:assembleDesktopTestResources UP-TO-DATE
+> Task :composeApp:desktopTestProcessResources UP-TO-DATE
+> Task :composeApp:processDesktopTestResources SKIPPED
+> Task :shared:runKtlintCheckOverCommonMainSourceSet
+> Task :shared:ktlintCommonMainSourceSetCheck
+> Task :shared:runKtlintCheckOverJvmTestSourceSet
+> Task :shared:ktlintJvmTestSourceSetCheck
+> Task :shared:runKtlintCheckOverJvmMainSourceSet
+> Task :shared:ktlintJvmMainSourceSetCheck
+> Task :shared:ktlintCheck
+
+> Task :shared:compileKotlinJvm
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmMain/kotlin/dev/promethe/db/PrometheDatabase.kt:1557:50 Redundant call of conversion method.
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmMain/kotlin/dev/promethe/db/PrometheDatabase.kt:1576:51 Redundant call of conversion method.
+
+> Task :shared:compileJvmMainJava NO-SOURCE
+> Task :shared:jvmMainClasses
+> Task :shared:jvmJar
+> Task :evals:compileKotlin
+> Task :evals:compileJava NO-SOURCE
+> Task :evals:classes UP-TO-DATE
+> Task :evals:jar UP-TO-DATE
+> Task :evals:compileTestKotlin
+> Task :evals:compileTestJava NO-SOURCE
+> Task :evals:testClasses UP-TO-DATE
+> Task :gateway:compileKotlin
+> Task :gateway:compileJava NO-SOURCE
+> Task :gateway:classes UP-TO-DATE
+> Task :gateway:jar UP-TO-DATE
+> Task :composeApp:compileKotlinDesktop
+> Task :composeApp:compileDesktopMainJava NO-SOURCE
+> Task :composeApp:desktopMainClasses
+> Task :composeApp:desktopJar UP-TO-DATE
+> Task :composeApp:compileTestKotlinDesktop
+> Task :composeApp:compileDesktopTestJava NO-SOURCE
+> Task :composeApp:desktopTestClasses
+> Task :gateway:compileTestKotlin
+> Task :gateway:compileTestJava NO-SOURCE
+> Task :gateway:testClasses UP-TO-DATE
+> Task :composeApp:desktopTest
+> Task :shared:compileTestKotlinJvm
+> Task :shared:compileJvmTestJava NO-SOURCE
+> Task :shared:jvmTestClasses
+> Task :evals:test
+> Task :gateway:test
+
+> Task :shared:jvmTest
+
+HarnessExposureLoopTest[jvm] > default loop still stops at ten steps[jvm] FAILED
+    dev.promethe.core.AgentExecutionException at HarnessExposureLoopTest.kt:31
+
+662 tests completed, 1 failed
+
+> Task :shared:jvmTest FAILED
+
+[Incubating] Problems report is available at: file:///E:/workspace/perso/projectRandD/promethe/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':shared:jvmTest'.
+> There were failing tests. See the report at: file:///E:/workspace/perso/projectRandD/promethe/shared/build/reports/tests/jvmTest/index.html
+
+* Try:
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+BUILD FAILED in 1m 28s
+57 actionable tasks: 24 executed, 33 up-to-date

@@ -1,5 +1,7 @@
 # External Service Integrations
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 > Reference for the external service tools Promethe can expose to its agent loop: GitHub, Email,
 > Google Calendar, Notion, Jira, Twilio, Slack, Discord, Signal, the web scraper, browser
 > automation (CDP/Browserbase), and Home Assistant.

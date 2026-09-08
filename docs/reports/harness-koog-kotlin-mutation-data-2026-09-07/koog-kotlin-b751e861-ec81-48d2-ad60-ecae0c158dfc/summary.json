@@ -1,0 +1,50 @@
+{
+  "batch": "koog-kotlin-b751e861-ec81-48d2-ad60-ecae0c158dfc",
+  "plannedRuns": 2,
+  "recordedRuns": 2,
+  "completeCohort": true,
+  "successfulRuns": 2,
+  "accounting": {
+    "attemptedCalls": 12,
+    "settledCalls": 12,
+    "uncertainCalls": 0,
+    "unknownUsageCalls": 0,
+    "usageComplete": true,
+    "inputTokens": 30452,
+    "outputTokens": 716,
+    "costUpperBoundMicroUsd": 84725,
+    "uncertainReservationMicroUsd": 0
+  },
+  "proposals": 0,
+  "activations": 0,
+  "processed": 0,
+  "preflight": {
+    "passed": true,
+    "modelCalls": 0,
+    "compilations": 2,
+    "compilationMillis": 4370,
+    "evaluationMillis": 16,
+    "workerProcesses": 4,
+    "totalMillis": 8149,
+    "cacheCleaned": true
+  },
+  "priorBudgetRowsUnchanged": true,
+  "sourceSha256": {
+    "shared/src/jvmTest/kotlin/dev/promethe/core/HarnessKoogMutationLiveTest.kt": "668b8173e0f67cc93ae6bfa063558c5610384e65ce7f09d088e5c3d75157c656",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/HarnessKoogMutationFixture.kt": "f4f32db24941081e9259a0d56a389e035eb5deff98f5995cb7709a2fd9cdca44",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/KoogMutationLoopTest.kt": "d66c8bade686c2f16a7ce2966f3542397e9680222ad3fc15bf284f57eb6211ff",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/CampaignKoogRelay.kt": "5c71cfc2cb3c18096d72c2b224ec4b3ea4f8fa12368b25a7e98019f59f2b9c27",
+    "shared/src/commonMain/kotlin/dev/promethe/core/AIAgent.kt": "08cf9bcdd52efe377b380fd0934ba382530524635f480c43fd194e43fee58854",
+    "shared/src/commonMain/kotlin/dev/promethe/core/KoogLlmAdapter.kt": "ed566fa7e90ed4579282c6d3f714b2972ee22ad2d55c9cbbfda52015306e5773",
+    "shared/src/commonMain/kotlin/dev/promethe/core/NativeToolHistory.kt": "66848f93b9d9f3f77eada2e71db16862c535ffe5e3f667dfda0d89f4841bb772",
+    "shared/src/jvmMain/kotlin/dev/promethe/core/HarnessKotlinRunner.kt": "10b91f7de8ad30a908babfd221c6ffc6b37d8d742a04dcbfa4161822320b3e5a",
+    "shared/src/jvmMain/kotlin/dev/promethe/core/SessionHarness.kt": "1704e54069fea42a01c1e51246d186a9c611d4714b75caf23528d4dabec04b61",
+    "scripts/report-koog-kotlin-mutation.py": "566d5ddf4976308b710ba6c6b88342151d80cbeb35e5a55429095fa8077d24c6"
+  },
+  "campaignAfter": {
+    "requests": 679,
+    "consumedMicroUsd": 3977698,
+    "uncertainReservations": 0,
+    "remainingMicroUsd": 1022302
+  }
+}

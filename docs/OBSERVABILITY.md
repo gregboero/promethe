@@ -1,5 +1,7 @@
 # Observability
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 > Tracing, LLM usage stats, lifecycle hooks, and the Stats dashboard in Prométhé.
 
 ## Overview

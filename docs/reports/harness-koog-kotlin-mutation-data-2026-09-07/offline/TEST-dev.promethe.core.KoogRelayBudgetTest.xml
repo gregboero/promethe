@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="KoogRelayBudgetTest[jvm]" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-09-07T19:28:28.380Z" hostname="BUREAU" time="0.104">
+  <properties/>
+  <testcase name="exhausted shared budget never calls upstream[jvm]" classname="dev.promethe.core.KoogRelayBudgetTest" time="0.059"/>
+  <testcase name="HTTP retry is denied and ambiguous usage keeps its reservation[jvm]" classname="dev.promethe.core.KoogRelayBudgetTest" time="0.045"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

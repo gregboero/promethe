@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="KoogProtocolRelayTest[jvm]" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-09-07T18:06:29.767Z" hostname="BUREAU" time="2.275">
+  <properties/>
+  <testcase name="same adapter without formal tools uses JSON text[jvm]" classname="dev.promethe.core.KoogProtocolRelayTest" time="1.405"/>
+  <testcase name="real Koog serializes none bounded Responses and preserves native tool results[jvm]" classname="dev.promethe.core.KoogProtocolRelayTest" time="0.404"/>
+  <testcase name="repeated native page reads fail completion even with correct final values[jvm]" classname="dev.promethe.core.KoogProtocolRelayTest" time="0.465"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

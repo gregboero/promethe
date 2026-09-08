@@ -1,0 +1,10 @@
+{
+  "session": "agent-live-c9c39d5e-7c48-4b31-ac72-4af28d66855d",
+  "model": "gpt-5.6-terra",
+  "calls": 7,
+  "final": "1037",
+  "processedObservations": 1,
+  "rawLedgerHashPreserved": true,
+  "sessionCleaned": true,
+  "adapter": "live Chat Completions with the existing AIAgent JSON action protocol"
+}

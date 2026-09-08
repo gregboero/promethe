@@ -45,6 +45,7 @@ class McpToolExporter(
     private val origin: ToolCallOrigin = ToolCallOrigin.MCP_HTTP,
     private val exposeApprovalRequiredTools: Boolean = secureToolExecutor != null,
     private val taskManager: McpTaskManager? = null,
+    private val roundTripManager: McpRoundTripManager? = null,
     private val policyKernel: PolicyKernel = PolicyKernel(),
 ) {
     companion object {
@@ -101,7 +102,12 @@ class McpToolExporter(
                 }
 
                 "tools/call" -> {
-                    handleToolsCall(params, sessionId, modern && clientSupportsTasks(params))
+                    handleToolsCall(
+                        params = params,
+                        sessionId = sessionId,
+                        modern = modern,
+                        clientSupportsTasks = modern && clientSupportsTasks(params),
+                    )
                 }
 
                 "tasks/get" -> {
@@ -215,6 +221,7 @@ class McpToolExporter(
     private suspend fun handleToolsCall(
         params: JsonObject,
         sessionId: String,
+        modern: Boolean,
         clientSupportsTasks: Boolean,
     ): JsonObject {
         val toolName = (params["name"] as? JsonPrimitive)?.content
@@ -235,6 +242,33 @@ class McpToolExporter(
                 sessionId = sessionId,
                 origin = origin,
             )
+        val requestState = (params["requestState"] as? JsonPrimitive)?.takeIf { it.isString }?.content
+        val inputResponses = params["inputResponses"] as? JsonObject
+        if (("requestState" in params && requestState == null) || ("inputResponses" in params && inputResponses == null)) {
+            throw McpInvalidParams("requestState must be a string and inputResponses must be an object")
+        }
+        if (!modern && (requestState != null || inputResponses != null)) {
+            throw McpInvalidParams("MCP multi-round trips require protocol ${McpProtocol.MODERN_VERSION}")
+        }
+        val clientInputMethods = clientInputMethods(params)
+        val roundTrips = roundTripManager
+        if (requestState != null || inputResponses != null) {
+            return requireNotNull(roundTrips) { "MCP multi-round-trip execution is unavailable" }
+                .executeOrResume(
+                    ownerSessionId = sessionId,
+                    toolName = toolName,
+                    arguments = arguments,
+                    clientInputMethods = clientInputMethods,
+                    requestState = requestState,
+                    inputResponses = inputResponses,
+                ) {
+                    executeTool(
+                        executor = executor,
+                        request = request,
+                        inputBridge = ToolInputRequestBridge { requested -> requestInput(requested) },
+                    )
+                }
+        }
         val manager = taskManager
         if (clientSupportsTasks && manager != null && manager.isTaskEligible(toolName)) {
             val task =
@@ -250,6 +284,23 @@ class McpToolExporter(
                     )
                 }
             return manager.buildCreateTaskResult(task)
+        }
+
+        if (modern && roundTrips != null) {
+            return roundTrips.executeOrResume(
+                ownerSessionId = sessionId,
+                toolName = toolName,
+                arguments = arguments,
+                clientInputMethods = clientInputMethods,
+                requestState = null,
+                inputResponses = null,
+            ) {
+                executeTool(
+                    executor = executor,
+                    request = request,
+                    inputBridge = ToolInputRequestBridge { requested -> requestInput(requested) },
+                )
+            }
         }
 
         return executeTool(executor, request)
@@ -300,6 +351,16 @@ class McpToolExporter(
                 ?.get("extensions") as? JsonObject
         )
             ?.get(McpProtocol.TASKS_EXTENSION) is JsonObject
+
+    private fun clientInputMethods(params: JsonObject): Set<String> {
+        val capabilities =
+            (params["_meta"] as? JsonObject)
+                ?.get(McpProtocol.CLIENT_CAPABILITIES_META) as? JsonObject
+                ?: return emptySet()
+        return McpProtocol.inputMethodCapabilities
+            .filterValues { capability -> capabilities[capability] is JsonObject }
+            .keys
+    }
 
     private fun requiredTaskCapability(): JsonObject =
         buildJsonObject {

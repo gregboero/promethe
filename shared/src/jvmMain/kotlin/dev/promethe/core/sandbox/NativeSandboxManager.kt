@@ -47,6 +47,9 @@ class NativeSandboxManager internal constructor(
             encodeDefaults = true
             explicitNulls = false
         },
+    // Windows broker permits 10 s to connect, 5 s response grace and 5 s cleanup.
+    // This bounds transport waiting only; the native child still enforces its requested limit.
+    private val transportGraceMillis: Long = if (System.getProperty("os.name").startsWith("Windows")) 20_000L else 2_000L,
 ) : SandboxManager,
     Closeable {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -97,14 +100,13 @@ class NativeSandboxManager internal constructor(
                 SandboxIpcRequest(
                     operation = SandboxIpcOperation.EXECUTE,
                     execution = request,
-                    executionId = request.executionId,
                 ),
             )
             val timeoutMillis =
                 request.profile.limits.timeoutMillis
                     .coerceIn(MIN_EXECUTION_TIMEOUT_MILLIS, MAX_EXECUTION_TIMEOUT_MILLIS)
             val response =
-                withTimeout(timeoutMillis + TRANSPORT_GRACE_MILLIS) {
+                withTimeout(timeoutMillis + transportGraceMillis) {
                     pending.await()
                 }
             executionResult(response, request)
@@ -505,7 +507,6 @@ class NativeSandboxManager internal constructor(
 
         private const val MIN_EXECUTION_TIMEOUT_MILLIS = 1L
         private const val MAX_EXECUTION_TIMEOUT_MILLIS = 24L * 60L * 60L * 1_000L
-        private const val TRANSPORT_GRACE_MILLIS = 2_000L
         private const val CONTROL_TIMEOUT_MILLIS = 5_000L
         private const val SELF_TEST_CONTROL_TIMEOUT_MILLIS = 30_000L
         private const val HELPER_STOP_GRACE_MILLIS = 500L

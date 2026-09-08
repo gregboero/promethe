@@ -1,0 +1,250 @@
+{
+  "batch": "kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0",
+  "plannedRuns": 18,
+  "recordedRuns": 18,
+  "correctRuns": 14,
+  "completedRuns": 15,
+  "allRawLedgersPreserved": false,
+  "allSessionsCleaned": true,
+  "cohortSettledRequests": 145,
+  "cohortCostUpperBoundMicroUsd": 906838,
+  "campaignCapMicroUsd": 5000000,
+  "campaignReservedRequests": 591,
+  "campaignSettledCostUpperBoundMicroUsd": 3603075,
+  "campaignUncertainReservationMicroUsd": 0,
+  "validationScope": {
+    "executedThisIteration": [
+      "shared:ktlintCheck",
+      "shared:jvmTest",
+      "shared:harnessLiveTest",
+      "native identity and fixed-source fixtures preflight",
+      "api:jvmTest",
+      "gateway:test",
+      "evals:test",
+      "composeApp:desktopTest"
+    ],
+    "historicalXmlSnapshotsOnly": []
+  },
+  "sourceSha256": {
+    "shared/src/jvmTest/kotlin/dev/promethe/core/HarnessDecisionLiveTest.kt": "0f18badae6ee8554be20b40dc9b124fe11946f23163cff6e5e3bcb61a9ca3d75",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/HarnessLiveCampaignTest.kt": "a866fd0ca5e6d7609baccb58917feb84347283376c07b50f61ddd6a75b1ae34c",
+    "shared/src/jvmMain/kotlin/dev/promethe/core/HarnessKotlinRunner.kt": "10b91f7de8ad30a908babfd221c6ffc6b37d8d742a04dcbfa4161822320b3e5a",
+    "shared/src/jvmMain/kotlin/dev/promethe/core/KotlinCompilationCache.kt": "0d437a802536d542344cae768e091bf244b7fd72c55004ad58e67dd939b90214",
+    "shared/src/jvmMain/kotlin/dev/promethe/core/SessionHarness.kt": "1704e54069fea42a01c1e51246d186a9c611d4714b75caf23528d4dabec04b61",
+    "scripts/report-harness-decisions.py": "2201fb4ceae16b50926f245ade60270bb9d1a90e0e15825a2470ef7e6427d33d",
+    "shared/src/commonMain/kotlin/dev/promethe/core/AIAgent.kt": "aa75f6fa6452e242e742b011436697992f421dd24712103aced4c31095fc38a3",
+    "shared/src/jvmMain/kotlin/dev/promethe/core/HarnessExposurePolicy.kt": "8936a9a15b9c3e780a37ffe82a413a8af9a5f657b66af4ac79e24ff9ecfe44b2"
+  },
+  "allToolRegistriesCleaned": true,
+  "allObservedRawLedgersPreserved": true,
+  "zeroObservationRuns": 3,
+  "allCachesCleaned": true,
+  "pairedComparisons": [
+    {
+      "family": "long_json",
+      "repeat": 1,
+      "mode": "free",
+      "bothCorrect": true,
+      "costDeltaMicroUsd": 16495,
+      "latencyDeltaMillis": 4463,
+      "inputTokenDelta": 6561,
+      "modelProposed": false
+    },
+    {
+      "family": "long_json",
+      "repeat": 1,
+      "mode": "conditional",
+      "bothCorrect": true,
+      "costDeltaMicroUsd": 13718,
+      "latencyDeltaMillis": 7752,
+      "inputTokenDelta": 5138,
+      "modelProposed": false
+    },
+    {
+      "family": "small_mixed",
+      "repeat": 1,
+      "mode": "conditional",
+      "bothCorrect": true,
+      "costDeltaMicroUsd": 761,
+      "latencyDeltaMillis": 821,
+      "inputTokenDelta": 17,
+      "modelProposed": false
+    },
+    {
+      "family": "small_mixed",
+      "repeat": 1,
+      "mode": "free",
+      "bothCorrect": false,
+      "costDeltaMicroUsd": -19303,
+      "latencyDeltaMillis": -13208,
+      "inputTokenDelta": -5234,
+      "modelProposed": false
+    },
+    {
+      "family": "long_json",
+      "repeat": 2,
+      "mode": "conditional",
+      "bothCorrect": false,
+      "costDeltaMicroUsd": -87428,
+      "latencyDeltaMillis": -17832,
+      "inputTokenDelta": -32417,
+      "modelProposed": false
+    },
+    {
+      "family": "long_json",
+      "repeat": 2,
+      "mode": "free",
+      "bothCorrect": true,
+      "costDeltaMicroUsd": 16549,
+      "latencyDeltaMillis": -4956,
+      "inputTokenDelta": 6585,
+      "modelProposed": false
+    },
+    {
+      "family": "small_mixed",
+      "repeat": 2,
+      "mode": "free",
+      "bothCorrect": false,
+      "costDeltaMicroUsd": -20342,
+      "latencyDeltaMillis": -21969,
+      "inputTokenDelta": -5271,
+      "modelProposed": false
+    },
+    {
+      "family": "small_mixed",
+      "repeat": 2,
+      "mode": "conditional",
+      "bothCorrect": true,
+      "costDeltaMicroUsd": -478,
+      "latencyDeltaMillis": -7972,
+      "inputTokenDelta": -38,
+      "modelProposed": false
+    },
+    {
+      "family": "long_json",
+      "repeat": 3,
+      "mode": "free",
+      "bothCorrect": false,
+      "costDeltaMicroUsd": 106697,
+      "latencyDeltaMillis": 21652,
+      "inputTokenDelta": 39937,
+      "modelProposed": false
+    },
+    {
+      "family": "long_json",
+      "repeat": 3,
+      "mode": "conditional",
+      "bothCorrect": false,
+      "costDeltaMicroUsd": 103283,
+      "latencyDeltaMillis": 16240,
+      "inputTokenDelta": 38586,
+      "modelProposed": false
+    },
+    {
+      "family": "small_mixed",
+      "repeat": 3,
+      "mode": "free",
+      "bothCorrect": true,
+      "costDeltaMicroUsd": 16533,
+      "latencyDeltaMillis": 982,
+      "inputTokenDelta": 6426,
+      "modelProposed": false
+    },
+    {
+      "family": "small_mixed",
+      "repeat": 3,
+      "mode": "conditional",
+      "bothCorrect": true,
+      "costDeltaMicroUsd": -885,
+      "latencyDeltaMillis": -1880,
+      "inputTokenDelta": -119,
+      "modelProposed": false
+    }
+  ],
+  "conditionalVersusAlwaysAvailable": [
+    {
+      "family": "long_json",
+      "repeat": 1,
+      "bothCorrect": true,
+      "costDeltaMicroUsd": -2777,
+      "latencyDeltaMillis": 3289,
+      "inputTokenDelta": -1423
+    },
+    {
+      "family": "small_mixed",
+      "repeat": 1,
+      "bothCorrect": false,
+      "costDeltaMicroUsd": 20064,
+      "latencyDeltaMillis": 14029,
+      "inputTokenDelta": 5251
+    },
+    {
+      "family": "long_json",
+      "repeat": 2,
+      "bothCorrect": false,
+      "costDeltaMicroUsd": -103977,
+      "latencyDeltaMillis": -12876,
+      "inputTokenDelta": -39002
+    },
+    {
+      "family": "small_mixed",
+      "repeat": 2,
+      "bothCorrect": false,
+      "costDeltaMicroUsd": 19864,
+      "latencyDeltaMillis": 13997,
+      "inputTokenDelta": 5233
+    },
+    {
+      "family": "long_json",
+      "repeat": 3,
+      "bothCorrect": true,
+      "costDeltaMicroUsd": -3414,
+      "latencyDeltaMillis": -5412,
+      "inputTokenDelta": -1351
+    },
+    {
+      "family": "small_mixed",
+      "repeat": 3,
+      "bothCorrect": true,
+      "costDeltaMicroUsd": -17418,
+      "latencyDeltaMillis": -2862,
+      "inputTokenDelta": -6545
+    }
+  ],
+  "api:jvmTest": {
+    "tests": 76,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "shared:jvmTest": {
+    "tests": 662,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "gateway:test": {
+    "tests": 213,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "evals:test": {
+    "tests": 15,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "composeApp:desktopTest": {
+    "tests": 23,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "shared:harnessLiveTest": {
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+}

@@ -1,5 +1,7 @@
 # Projects and workspaces
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 Projects are durable, owner-managed work contexts above conversations. A project groups:
 
 - its name, description and trusted agent instructions;

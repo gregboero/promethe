@@ -1,0 +1,21 @@
+{
+  "docs-validation.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "harness-native-history-final-validation.log": "125ef7bfc1201ac67939e3232524f3f41e05250573c4ac5eec1b18affc935e1c",
+  "harness-native-history-live.log": "be936bcdcf546f8c5dd2dd30962262181d63cff5fa068b71908bd48333659595",
+  "harnessLiveTest-TEST-dev.promethe.core.HarnessKoogProtocolLiveTest.xml": "3d5ac15ef823a75f34fe0864cfafab184f9213ef431a66d652d00a934076e828",
+  "jvmTest-TEST-dev.promethe.core.KoogContractTest.xml": "5faf205cbedd1c908105cdaf06a23e7e9172267c64d253edd42e7aa389f7dd49",
+  "jvmTest-TEST-dev.promethe.core.KoogDeepSeekStreamingTest.xml": "74ca9767e90eb87efe1142a03b5056d28fd2fe7e889abe8320a434ada776e2b1",
+  "jvmTest-TEST-dev.promethe.core.KoogProtocolRelayTest.xml": "7b636536342a1513a581237f56ed38fb290f1c98229a5b5250b3914ea7812b63",
+  "jvmTest-TEST-dev.promethe.core.KoogRelayBudgetTest.xml": "edb5ad7bef0a49f9e1eb93a66a52b74d15b94796baffdba716534df76fbd2b5f",
+  "koog-protocol-31c5d6b8-df11-4929-9ffb-fae79e58ae0e-1-structured-transcript.json": "ef315050b8c7027d511023c9c8219943b8a511f091e70f5119a3e3ae7e914e1c",
+  "koog-protocol-31c5d6b8-df11-4929-9ffb-fae79e58ae0e-1-text-transcript.json": "6dc5fc6901c2a5cf4a9e3a5a3fabd94396b8e1a8f93f859bd65182d83ef5a116",
+  "koog-protocol-31c5d6b8-df11-4929-9ffb-fae79e58ae0e-2-structured-transcript.json": "e6891611aa949441454df958998b8422fde5da41b7d8234408e5ff565e884016",
+  "koog-protocol-31c5d6b8-df11-4929-9ffb-fae79e58ae0e-2-text-transcript.json": "cb59323e48e443c6537a0c2059aa4b04b5c369e07dd4bfe31f2b54afdce64cd6",
+  "koog-protocol-31c5d6b8-df11-4929-9ffb-fae79e58ae0e-3-structured-transcript.json": "b826f94a117a51d5544ecbe134f8af0e5a119aa80caeeb54424f39192ad9fbf1",
+  "koog-protocol-31c5d6b8-df11-4929-9ffb-fae79e58ae0e-3-text-transcript.json": "6182a44a4ceebb671e0c560fd748617cb5cd80717d0ac1038fa78d4d62f35e6b",
+  "protocol.json": "4e60a4f5cd00bc1154afaca2c4b352315e2e397021e6235260eec4ffb6f2e6a4",
+  "requests.json": "a3fe9871e71eb5c796362f07c9750c944944744eedaaeac766388602483842de",
+  "results.json": "c43f12e9edcc35e1ea524d8170f194d19b1a7a65c68a4282f9f59b8760d73d60",
+  "summary.json": "b35d626d4b0adb2ef0de31d9ab4beaf6165dcb32ae938c524fd8b2cabd57211a",
+  "test-TEST-dev.promethe.evals.KoogSkillsExperimentTest.xml": "cc9c2a58cb7fb49e5ef7fd215f16dad36d75960111507ce8bb398237c561c8a1"
+}

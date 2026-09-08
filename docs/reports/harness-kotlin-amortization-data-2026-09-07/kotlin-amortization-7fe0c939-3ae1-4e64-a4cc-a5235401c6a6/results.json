@@ -1,0 +1,493 @@
+[
+  {
+    "session": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-baseline",
+    "mode": "baseline",
+    "mutationRequired": false,
+    "exposedAfterReads": null,
+    "expected": [
+      3,
+      0,
+      7,
+      1,
+      0,
+      4,
+      2,
+      0
+    ],
+    "pagesPerTask": 8,
+    "runnerInvocations": 0,
+    "failedRunnerInvocations": 0,
+    "runnerMillisIncludingFailures": 0,
+    "phaseMetricsCoverage": "successful runner invocations only; failures included in runnerMillisIncludingFailures and totalMillis",
+    "proposals": 0,
+    "activations": 0,
+    "processed": 0,
+    "events": [
+      "session_closed"
+    ],
+    "compilations": 0,
+    "cacheHits": 0,
+    "workerProcesses": 0,
+    "compilationMillis": 0,
+    "evaluationMillis": 0,
+    "stagingMillis": 0,
+    "totalMillis": 23243,
+    "rawLedgerPreserved": true,
+    "sessionCleaned": true,
+    "cacheCleaned": true,
+    "callPhases": [
+      {
+        "call": 1,
+        "agentStep": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-baseline-step-0001",
+        "formalToolCount": 1,
+        "harnessExposed": false
+      },
+      {
+        "call": 2,
+        "agentStep": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-baseline-step-0002",
+        "formalToolCount": 1,
+        "harnessExposed": false
+      },
+      {
+        "call": 3,
+        "agentStep": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-baseline-step-0003",
+        "formalToolCount": 1,
+        "harnessExposed": false
+      },
+      {
+        "call": 4,
+        "agentStep": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-baseline-step-0004",
+        "formalToolCount": 1,
+        "harnessExposed": false
+      },
+      {
+        "call": 5,
+        "agentStep": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-baseline-step-0005",
+        "formalToolCount": 1,
+        "harnessExposed": false
+      },
+      {
+        "call": 6,
+        "agentStep": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-baseline-step-0006",
+        "formalToolCount": 1,
+        "harnessExposed": false
+      },
+      {
+        "call": 7,
+        "agentStep": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-baseline-step-0007",
+        "formalToolCount": 1,
+        "harnessExposed": false
+      },
+      {
+        "call": 8,
+        "agentStep": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-baseline-step-0008",
+        "formalToolCount": 1,
+        "harnessExposed": false
+      },
+      {
+        "call": 9,
+        "agentStep": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-baseline-step-0009",
+        "formalToolCount": 1,
+        "harnessExposed": false
+      },
+      {
+        "call": 10,
+        "agentStep": null,
+        "formalToolCount": 0,
+        "harnessExposed": false
+      }
+    ],
+    "calls": 10,
+    "nativeCalls": 8,
+    "readPages": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "completed": true,
+    "failure": null,
+    "final": "[3,0,7,1,0,4,2,0]",
+    "correct": true,
+    "completion": {
+      "complete": true,
+      "reason": "complete",
+      "missingPages": [],
+      "answerCount": 8
+    },
+    "registryCleaned": true,
+    "accounting": {
+      "attemptedCalls": 10,
+      "settledCalls": 10,
+      "uncertainCalls": 0,
+      "unknownUsageCalls": 0,
+      "usageComplete": true,
+      "inputTokens": 63115,
+      "outputTokens": 603,
+      "costUpperBoundMicroUsd": 165025,
+      "uncertainReservationMicroUsd": 0
+    },
+    "mainAccounting": {
+      "attemptedCalls": 9,
+      "settledCalls": 9,
+      "uncertainCalls": 0,
+      "unknownUsageCalls": 0,
+      "usageComplete": true,
+      "inputTokens": 52310,
+      "outputTokens": 165,
+      "costUpperBoundMicroUsd": 132756,
+      "uncertainReservationMicroUsd": 0
+    },
+    "reviewAccounting": {
+      "attemptedCalls": 1,
+      "settledCalls": 1,
+      "uncertainCalls": 0,
+      "unknownUsageCalls": 0,
+      "usageComplete": true,
+      "inputTokens": 10805,
+      "outputTokens": 438,
+      "costUpperBoundMicroUsd": 32269,
+      "uncertainReservationMicroUsd": 0
+    },
+    "relayMillis": 22022,
+    "requestBytes": 295439,
+    "mainRequestBytes": 245291,
+    "formalToolBytes": 2385
+  },
+  {
+    "session": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-reused",
+    "mode": "reused",
+    "mutationRequired": false,
+    "exposedAfterReads": null,
+    "expected": [
+      3,
+      0,
+      7,
+      1,
+      0,
+      4,
+      2,
+      0
+    ],
+    "pagesPerTask": 8,
+    "runnerInvocations": 10,
+    "failedRunnerInvocations": 0,
+    "runnerMillisIncludingFailures": 15980,
+    "phaseMetricsCoverage": "successful runner invocations only; failures included in runnerMillisIncludingFailures and totalMillis",
+    "proposals": 1,
+    "activations": 1,
+    "processed": 8,
+    "events": [
+      "proposed",
+      "validated",
+      "activation_requested",
+      "activated",
+      "processed:1f5dbdee6a101b2ae04771d05d7069a84b09054afbdee36533128d104a4d05e7",
+      "processed:6e372cdc243196f7ee411c3eb511e538d474d6dbfc2729100d583e221218f745",
+      "processed:0d8fb0c00f108f01a1d22bceca11e9c9808b54d1e22cfb79877db069d4a50696",
+      "processed:b1b097aa4811f901320c59a42c8f1e9c83f043f1616cb5dfa07406a53d92a815",
+      "processed:d8bcd8c8cb35a68ffa464e4b9775a0cdc1b1c6e621a3f3706fdb1814532824f3",
+      "processed:3d8408bc04a5ae45b2fc87a9b19baa7946b4bc75c220e16931ff7f4c5abe02ae",
+      "processed:a17f84aac346d937159c340e1a3dc5071fff057a6ddfba50828b74e1756a8f74",
+      "processed:4d8f16330d9bb86e1786d62938bc1ccd4222898d6f9adc842a7f29b33018b517",
+      "session_closed",
+      "session_closed"
+    ],
+    "compilations": 1,
+    "cacheHits": 9,
+    "workerProcesses": 11,
+    "compilationMillis": 2538,
+    "evaluationMillis": 82,
+    "stagingMillis": 2749,
+    "totalMillis": 34909,
+    "rawLedgerPreserved": true,
+    "sessionCleaned": true,
+    "cacheCleaned": true,
+    "callPhases": [
+      {
+        "call": 1,
+        "agentStep": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-reused-step-0001",
+        "formalToolCount": 1,
+        "harnessExposed": false
+      },
+      {
+        "call": 2,
+        "agentStep": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-reused-step-0002",
+        "formalToolCount": 1,
+        "harnessExposed": false
+      },
+      {
+        "call": 3,
+        "agentStep": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-reused-step-0003",
+        "formalToolCount": 1,
+        "harnessExposed": false
+      },
+      {
+        "call": 4,
+        "agentStep": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-reused-step-0004",
+        "formalToolCount": 1,
+        "harnessExposed": false
+      },
+      {
+        "call": 5,
+        "agentStep": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-reused-step-0005",
+        "formalToolCount": 1,
+        "harnessExposed": false
+      },
+      {
+        "call": 6,
+        "agentStep": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-reused-step-0006",
+        "formalToolCount": 1,
+        "harnessExposed": false
+      },
+      {
+        "call": 7,
+        "agentStep": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-reused-step-0007",
+        "formalToolCount": 1,
+        "harnessExposed": false
+      },
+      {
+        "call": 8,
+        "agentStep": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-reused-step-0008",
+        "formalToolCount": 1,
+        "harnessExposed": false
+      },
+      {
+        "call": 9,
+        "agentStep": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-reused-step-0009",
+        "formalToolCount": 1,
+        "harnessExposed": false
+      },
+      {
+        "call": 10,
+        "agentStep": null,
+        "formalToolCount": 0,
+        "harnessExposed": false
+      }
+    ],
+    "calls": 10,
+    "nativeCalls": 8,
+    "readPages": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "completed": true,
+    "failure": null,
+    "final": "[3,0,7,1,0,4,2,0]",
+    "correct": true,
+    "completion": {
+      "complete": true,
+      "reason": "complete",
+      "missingPages": [],
+      "answerCount": 8
+    },
+    "registryCleaned": true,
+    "accounting": {
+      "attemptedCalls": 10,
+      "settledCalls": 10,
+      "uncertainCalls": 0,
+      "unknownUsageCalls": 0,
+      "usageComplete": true,
+      "inputTokens": 10398,
+      "outputTokens": 503,
+      "costUpperBoundMicroUsd": 32034,
+      "uncertainReservationMicroUsd": 0
+    },
+    "mainAccounting": {
+      "attemptedCalls": 9,
+      "settledCalls": 9,
+      "uncertainCalls": 0,
+      "unknownUsageCalls": 0,
+      "usageComplete": true,
+      "inputTokens": 9170,
+      "outputTokens": 165,
+      "costUpperBoundMicroUsd": 24908,
+      "uncertainReservationMicroUsd": 0
+    },
+    "reviewAccounting": {
+      "attemptedCalls": 1,
+      "settledCalls": 1,
+      "uncertainCalls": 0,
+      "unknownUsageCalls": 0,
+      "usageComplete": true,
+      "inputTokens": 1228,
+      "outputTokens": 338,
+      "costUpperBoundMicroUsd": 7126,
+      "uncertainReservationMicroUsd": 0
+    },
+    "relayMillis": 18326,
+    "requestBytes": 43939,
+    "mainRequestBytes": 39524,
+    "formalToolBytes": 2385
+  },
+  {
+    "session": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-conditional",
+    "mode": "conditional",
+    "mutationRequired": false,
+    "exposedAfterReads": 2,
+    "expected": [
+      3,
+      0,
+      7,
+      1,
+      0,
+      4,
+      2,
+      0
+    ],
+    "pagesPerTask": 8,
+    "runnerInvocations": 0,
+    "failedRunnerInvocations": 0,
+    "runnerMillisIncludingFailures": 0,
+    "phaseMetricsCoverage": "successful runner invocations only; failures included in runnerMillisIncludingFailures and totalMillis",
+    "proposals": 0,
+    "activations": 0,
+    "processed": 0,
+    "events": [
+      "session_closed",
+      "session_closed"
+    ],
+    "compilations": 0,
+    "cacheHits": 0,
+    "workerProcesses": 0,
+    "compilationMillis": 0,
+    "evaluationMillis": 0,
+    "stagingMillis": 0,
+    "totalMillis": 18019,
+    "rawLedgerPreserved": true,
+    "sessionCleaned": true,
+    "cacheCleaned": true,
+    "callPhases": [
+      {
+        "call": 1,
+        "agentStep": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-conditional-step-0001",
+        "formalToolCount": 1,
+        "harnessExposed": false
+      },
+      {
+        "call": 2,
+        "agentStep": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-conditional-step-0002",
+        "formalToolCount": 1,
+        "harnessExposed": false
+      },
+      {
+        "call": 3,
+        "agentStep": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-conditional-step-0003",
+        "formalToolCount": 7,
+        "harnessExposed": true
+      },
+      {
+        "call": 4,
+        "agentStep": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-conditional-step-0004",
+        "formalToolCount": 7,
+        "harnessExposed": true
+      },
+      {
+        "call": 5,
+        "agentStep": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-conditional-step-0005",
+        "formalToolCount": 7,
+        "harnessExposed": true
+      },
+      {
+        "call": 6,
+        "agentStep": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-conditional-step-0006",
+        "formalToolCount": 7,
+        "harnessExposed": true
+      },
+      {
+        "call": 7,
+        "agentStep": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-conditional-step-0007",
+        "formalToolCount": 7,
+        "harnessExposed": true
+      },
+      {
+        "call": 8,
+        "agentStep": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-conditional-step-0008",
+        "formalToolCount": 7,
+        "harnessExposed": true
+      },
+      {
+        "call": 9,
+        "agentStep": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-conditional-step-0009",
+        "formalToolCount": 7,
+        "harnessExposed": true
+      },
+      {
+        "call": 10,
+        "agentStep": null,
+        "formalToolCount": 0,
+        "harnessExposed": true
+      }
+    ],
+    "calls": 10,
+    "nativeCalls": 8,
+    "readPages": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "completed": true,
+    "failure": null,
+    "final": "[3,0,7,1,0,4,2,0]",
+    "correct": true,
+    "completion": {
+      "complete": true,
+      "reason": "complete",
+      "missingPages": [],
+      "answerCount": 8
+    },
+    "registryCleaned": true,
+    "accounting": {
+      "attemptedCalls": 10,
+      "settledCalls": 10,
+      "uncertainCalls": 0,
+      "unknownUsageCalls": 0,
+      "usageComplete": true,
+      "inputTokens": 71137,
+      "outputTokens": 547,
+      "costUpperBoundMicroUsd": 184408,
+      "uncertainReservationMicroUsd": 0
+    },
+    "mainAccounting": {
+      "attemptedCalls": 9,
+      "settledCalls": 9,
+      "uncertainCalls": 0,
+      "unknownUsageCalls": 0,
+      "usageComplete": true,
+      "inputTokens": 60332,
+      "outputTokens": 165,
+      "costUpperBoundMicroUsd": 152811,
+      "uncertainReservationMicroUsd": 0
+    },
+    "reviewAccounting": {
+      "attemptedCalls": 1,
+      "settledCalls": 1,
+      "uncertainCalls": 0,
+      "unknownUsageCalls": 0,
+      "usageComplete": true,
+      "inputTokens": 10805,
+      "outputTokens": 382,
+      "costUpperBoundMicroUsd": 31597,
+      "uncertainReservationMicroUsd": 0
+    },
+    "relayMillis": 17576,
+    "requestBytes": 344173,
+    "mainRequestBytes": 294025,
+    "formalToolBytes": 26794
+  }
+]

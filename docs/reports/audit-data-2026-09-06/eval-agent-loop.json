@@ -1,0 +1,30 @@
+{
+    "id": "runtime-agent-loop",
+    "suiteId": "agent-loop",
+    "suiteVersion": 1,
+    "startedAt": 1000,
+    "finishedAt": 1003,
+    "status": "PASSED",
+    "results": [
+        {
+            "caseId": "agent-final-response",
+            "status": "PASSED",
+            "durationMs": 1,
+            "assertions": [
+                {
+                    "assertionId": "final",
+                    "passed": true,
+                    "actual": "final: Hello from the agent",
+                    "message": null
+                },
+                {
+                    "assertionId": "steps",
+                    "passed": true,
+                    "actual": "1",
+                    "message": null
+                }
+            ],
+            "error": null
+        }
+    ]
+}

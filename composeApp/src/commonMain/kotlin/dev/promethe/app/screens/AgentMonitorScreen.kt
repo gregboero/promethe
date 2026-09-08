@@ -15,7 +15,6 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.SmartToy
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.*
@@ -147,69 +146,6 @@ fun AgentMonitorScreen(client: PrometheClient) {
             tonalElevation = 1.dp,
         ) {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                // ── Approval Panel ──
-                if (state.pendingApprovals.isNotEmpty()) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Shield, null, tint = Color(0xFFF59E0B), modifier = Modifier.size(18.dp))
-                            Spacer(Modifier.width(6.dp))
-                            Text(stringResource(Res.string.monitor_pending_approvals), style = MaterialTheme.typography.titleSmall, color = colors.onSurface)
-                            Spacer(Modifier.width(6.dp))
-                            Badge(containerColor = Color(0xFFF59E0B), contentColor = Color.Black) {
-                                Text("${state.approvalCount}")
-                            }
-                        }
-                        Spacer(Modifier.height(8.dp))
-                        state.pendingApprovals.forEach { approval ->
-                            val id = approval["id"]?.jsonPrimitive?.content ?: ""
-                            val tool = approval["tool"]?.jsonPrimitive?.content ?: "unknown"
-                            val args = approval["args"]?.jsonPrimitive?.content ?: ""
-                            Card(
-                                shape = RoundedCornerShape(10.dp),
-                                colors = CardDefaults.cardColors(containerColor = Color(0xFFF59E0B).copy(alpha = 0.08f)),
-                                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                            ) {
-                                Column(modifier = Modifier.padding(10.dp)) {
-                                    Text(tool, style = MaterialTheme.typography.labelMedium, color = colors.onSurface)
-                                    if (args.isNotBlank()) {
-                                        Text(
-                                            args.take(80),
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = colors.onSurfaceVariant,
-                                            maxLines = 2,
-                                        )
-                                    }
-                                    Spacer(Modifier.height(6.dp))
-                                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                        FilledTonalButton(
-                                            onClick = { viewModel.approveAction(id) },
-                                            colors = ButtonDefaults.filledTonalButtonColors(
-                                                containerColor = Color(0xFF22C55E).copy(alpha = 0.15f),
-                                                contentColor = Color(0xFF22C55E),
-                                            ),
-                                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-                                        ) {
-                                            Icon(Icons.Default.CheckCircle, null, modifier = Modifier.size(14.dp))
-                                            Spacer(Modifier.width(4.dp))
-                                            Text(stringResource(Res.string.monitor_approve), style = MaterialTheme.typography.labelSmall)
-                                        }
-                                        OutlinedButton(
-                                            onClick = { viewModel.rejectAction(id) },
-                                            colors = ButtonDefaults.outlinedButtonColors(contentColor = colors.error),
-                                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-                                        ) {
-                                            Icon(Icons.Default.Close, null, modifier = Modifier.size(14.dp))
-                                            Spacer(Modifier.width(4.dp))
-                                            Text(stringResource(Res.string.monitor_reject), style = MaterialTheme.typography.labelSmall)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    HorizontalDivider(color = colors.outlineVariant)
-                }
-
                 if (state.pendingMcpElicitations.isNotEmpty()) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {

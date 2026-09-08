@@ -31,8 +31,6 @@ data class AgentMonitorUiState(
     val selectedAgentId: String? = null,
     val events: List<AgentExecutionEvent> = emptyList(),
     val isLoading: Boolean = true,
-    val pendingApprovals: List<JsonObject> = emptyList(),
-    val approvalCount: Int = 0,
     val pendingProviderChoices: List<JsonObject> = emptyList(),
     val providerChoiceCount: Int = 0,
     val pendingMcpElicitations: List<JsonObject> = emptyList(),
@@ -48,7 +46,7 @@ data class AgentMonitorUiState(
  * ViewModel for the Agent Monitor screen.
  *
  * Manages agent listing, real-time SSE event streaming,
- * pending approval polling, and approval/rejection actions.
+ * provider choice and MCP elicitation polling.
  */
 class AgentMonitorViewModel(
     private val client: PrometheClient,
@@ -57,14 +55,12 @@ class AgentMonitorViewModel(
     val state: StateFlow<AgentMonitorUiState> = _state.asStateFlow()
 
     private var eventStreamJob: Job? = null
-    private var approvalPollJob: Job? = null
     private var providerPollJob: Job? = null
     private var mcpElicitationPollJob: Job? = null
 
     init {
         loadAgents()
         startEventStream()
-        startApprovalPolling()
         startProviderChoicePolling()
         startMcpElicitationPolling()
     }
@@ -120,61 +116,6 @@ class AgentMonitorViewModel(
                 }
             } catch (e: Exception) {
                 logger.debug(e) { "Agent event stream ended" }
-            }
-        }
-    }
-
-    // ── Approval Polling ─────────────────────────────────────────────────────
-
-    private fun startApprovalPolling() {
-        approvalPollJob?.cancel()
-        approvalPollJob = viewModelScope.launch {
-            while (true) {
-                try {
-                    val response = client.getPendingApprovals()
-                    val items = response["pending"]?.jsonArray ?: JsonArray(emptyList())
-                    val approvals = items.map { it.jsonObject }
-                    _state.update { it.copy(pendingApprovals = approvals, approvalCount = approvals.size) }
-                } catch (e: Exception) {
-                    logger.debug(e) { "Failed to poll pending approvals" }
-                }
-                delay(15_000)
-            }
-        }
-    }
-
-    // ── Approval Actions ─────────────────────────────────────────────────────
-
-    fun approveAction(approvalId: String) {
-        viewModelScope.launch {
-            try {
-                client.respondToApproval(approvalId, approved = true)
-                _state.update {
-                    it.copy(
-                        pendingApprovals = it.pendingApprovals.filter { a ->
-                            a["id"]?.toString()?.trim('"') != approvalId
-                        },
-                    )
-                }
-            } catch (e: Exception) {
-                logger.warn(e) { "Failed to approve action $approvalId" }
-            }
-        }
-    }
-
-    fun rejectAction(approvalId: String) {
-        viewModelScope.launch {
-            try {
-                client.respondToApproval(approvalId, approved = false)
-                _state.update {
-                    it.copy(
-                        pendingApprovals = it.pendingApprovals.filter { a ->
-                            a["id"]?.toString()?.trim('"') != approvalId
-                        },
-                    )
-                }
-            } catch (e: Exception) {
-                logger.warn(e) { "Failed to reject action $approvalId" }
             }
         }
     }
@@ -380,7 +321,6 @@ class AgentMonitorViewModel(
 
     override fun onCleared() {
         eventStreamJob?.cancel()
-        approvalPollJob?.cancel()
         providerPollJob?.cancel()
         mcpElicitationPollJob?.cancel()
         super.onCleared()

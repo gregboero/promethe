@@ -42,7 +42,7 @@ dependencies {
 
     // Logging (kotlin-logging → SLF4J → Logback)
     implementation(libs.kotlin.logging)
-    implementation("ch.qos.logback:logback-classic:1.5.18")
+    implementation(libs.logback.classic)
 
     // Koin DI (Ktor integration)
     implementation(libs.koin.core)

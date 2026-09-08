@@ -1,5 +1,7 @@
 # Desktop Interface Guide
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 > User guide to the screens of the Compose Multiplatform app (Desktop/Web/Android/iOS).
 
 ## Overview

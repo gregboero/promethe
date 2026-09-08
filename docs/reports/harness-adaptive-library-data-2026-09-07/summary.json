@@ -1,0 +1,23 @@
+{
+  "sourceHash": "09211ce22a956ae92b8bdca61617999ee4ad13674144cf899a584717e7806e8e",
+  "tasks": 2,
+  "correctTransformedObservations": 12,
+  "baselineObservationBytes": 132306,
+  "presentedObservationBytes": 1998,
+  "totalNativeMillis": 47560,
+  "compilations": 4,
+  "workerProcesses": 28,
+  "modelCalls": 0,
+  "providerSavingsMeasured": false,
+  "freshRevisionAcrossSessions": true,
+  "runtimeCleaned": true,
+  "rawHashesVerified": true,
+  "invalidationPreservesOriginal": true,
+  "sourceOrigin": "Pinned prior model-generated source; not generated during this test",
+  "jvmTests": 1041,
+  "nativeTests": 1,
+  "budgetRowsUnchanged": true,
+  "campaignRequests": 737,
+  "consumedMicroUsd": 4624197,
+  "limitation": "Windows/Java21 native replay with pinned prior source; scripted agent integration, no autonomous model decision or provider cost/latency measurement"
+}

@@ -1,0 +1,5 @@
+{
+  "actualRuns": 1,
+  "actualMode": "baseline",
+  "note": "Initial diagnostic run only. Its inherited protocol repetition/order fields describe the later comparison template, not the actual profile count. No optimized profile was run."
+}

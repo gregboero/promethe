@@ -1,0 +1,106 @@
+{
+  "captured_at": "2026-09-07T02:20:59.552187+00:00",
+  "logs": [
+    {
+      "file": "final-consolidated.txt",
+      "command": "gradlew --no-daemon :api:jvmTest :shared:jvmTest :gateway:test :evals:test :composeApp:desktopTest :androidApp:assembleDebug :gateway:shadowJar :composeApp:wasmJsBrowserDistribution ktlintCheck verifyDependencyAlignment -I scripts/audit-resolved-dependencies.init.gradle.kts auditResolvedDependencies --write-locks --write-verification-metadata sha256",
+      "sha256": "6dc3b81d6bf44ec40e74a09eb828e59fd7d052093f9e7c14da888f7639cfb5de"
+    },
+    {
+      "file": "web-tooling-build.txt",
+      "command": "gradlew --no-daemon -PenableAndroid=false :gateway:shadowJar :composeApp:wasmJsBrowserDistribution auditWebTooling ktlintCheck (intermediate shared npm tooling)",
+      "sha256": "32ef33a59b99491971a6e0391f7589f987113eeb6c836b59a3aab6b8045b505f"
+    },
+    {
+      "file": "web-tooling-owned-build.txt",
+      "command": "gradlew --no-daemon --no-configuration-cache -PenableAndroid=false :composeApp:wasmJsBrowserDistribution auditWebTooling (final owned npm tooling)",
+      "sha256": "a02839d386e525884254e726fcd0d1da3d3c10b08b829b7750e143caddeff622"
+    },
+    {
+      "file": "web-tooling-owned-final.txt",
+      "command": "gradlew --no-daemon --no-configuration-cache -PenableAndroid=false auditWebTooling :composeApp:wasmJsBrowserDistribution ktlintCheck",
+      "sha256": "3aacec018f09107bb7fc07e755698939a15e68f6e38259bcbb37e4b12a0ec36d"
+    },
+    {
+      "file": "rust-final.txt",
+      "command": "sandbox-native/check-msvc.bat test --locked",
+      "sha256": "674644128d736aa94e818419d11ecd4580148ee368022a94f165a5060d1f243d"
+    },
+    {
+      "file": "docs-final.txt",
+      "command": "pwsh -NoProfile -File docs/verify-docs.ps1",
+      "sha256": "b71b88bee293c34c77e7b79c9f31e92eb5ff0a24efb8bd7eec8038fff84c0e31"
+    },
+    {
+      "file": "containers-final.txt",
+      "command": "python scripts/test-container-configuration.py",
+      "sha256": "57412044ef8e5ccb7f91284cb920bbe38dfb511729a0d9e5687f29581c1339ff"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "gateway/build/libs/gateway-all.jar",
+      "bytes": 109105750,
+      "sha256": "8724f23ecf57bc74a5bb53602d80d02563ac8c4995e2a0e70d1a8b1b544bd3f5"
+    },
+    {
+      "path": "androidApp/build/outputs/apk/debug/androidApp-debug.apk",
+      "bytes": 91701825,
+      "sha256": "1bcf876149d25f28fb57b878b617542d7bf54383dc443a2f881c3c2ab6240103"
+    },
+    {
+      "path": "composeApp/build/dist/wasmJs/productionExecutable/4ff6dc77de8bcaeda511.wasm",
+      "bytes": 10047736,
+      "sha256": "5a08c30318d95efb51cb7bf86f1f90fe8b3be4370a49e774b9b3789ac155590d"
+    },
+    {
+      "path": "composeApp/build/dist/wasmJs/productionExecutable/bfa5198fb2fe683c613a.wasm",
+      "bytes": 8640316,
+      "sha256": "089052ba37e2a6e8345117bf6fe0f5730cfc8de1eb4c2bbc8921cf8e457ae3cb"
+    },
+    {
+      "path": "composeApp/build/dist/wasmJs/productionExecutable/composeResources/promethe.composeapp.generated.resources/values/strings.commonMain.cvr",
+      "bytes": 65123,
+      "sha256": "ce96737f32f311e740c61a56f38e71ae079513e5f6ce0af5a86bae40276712a7"
+    },
+    {
+      "path": "composeApp/build/dist/wasmJs/productionExecutable/composeResources/promethe.composeapp.generated.resources/values-fr/strings.commonMain.cvr",
+      "bytes": 71159,
+      "sha256": "193496c3748000086bec5524bc9458659a8820e004bbbd9332af176396044840"
+    },
+    {
+      "path": "composeApp/build/dist/wasmJs/productionExecutable/index.html",
+      "bytes": 4072,
+      "sha256": "96ca037cea5b4a427f5ff756169482dade2d45956a48739602211ba64b38c2ba"
+    },
+    {
+      "path": "composeApp/build/dist/wasmJs/productionExecutable/promethe.js",
+      "bytes": 560477,
+      "sha256": "6468ea428f3d9156e9d171d5993c0e68bcd31e158cd2be06214204e1d867117a"
+    },
+    {
+      "path": "composeApp/build/dist/wasmJs/productionExecutable/promethe.js.LICENSE.txt",
+      "bytes": 1298,
+      "sha256": "85a703daf937b69e6a45c75947dcea43f4026a835b84a7ea4300843217311baf"
+    },
+    {
+      "path": "composeApp/build/dist/wasmJs/productionExecutable/promethe.js.map",
+      "bytes": 1528632,
+      "sha256": "91188a8f679aefc5669e595c792bb1600273e9945246d42702cee6889bd798ec"
+    }
+  ],
+  "docker_image_build": "Not executed successfully: local daemon unresponsive; config tests and host Gradle targets pass",
+  "tests": {
+    "api": 138,
+    "shared": 630,
+    "gateway": 213,
+    "evals": 15,
+    "composeApp": 23
+  },
+  "osv": {
+    "queried": 1345,
+    "matches": 0,
+    "errors": 0
+  },
+  "scope": "Promethe only; local working tree, no commit or deployment; XML results include previously executed up-to-date tasks"
+}

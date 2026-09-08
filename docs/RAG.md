@@ -1,5 +1,7 @@
 # RAG / Knowledge Base System
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 ## Overview
 
 Prométhé ships a pluggable Retrieval-Augmented Generation (RAG) system, referred to internally
@@ -102,7 +104,7 @@ OpenAI (`text-embedding-3-small/large`), Gemini (`text-embedding-004`,
 
 Unknown store types fall back to `SqliteVecStore`. `SqliteVecStore` is documented as "optimized for
 simplicity and small-to-medium datasets (< 100K vectors)"; the doc comment recommends
-Qdrant/Pinecone/Milvus for production scale.
+Qdrant/Pinecone/Milvus for experiments with larger datasets; this does not change the project's non-production status.
 
 `SqliteVecStore` stores embeddings as BLOBs (serialized `FloatArray`) in a plain table plus an
 FTS5 virtual table (`tokenize='unicode61'`) kept in sync via SQL triggers on insert/delete/update —

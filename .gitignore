@@ -35,6 +35,7 @@ promethe-data/
 
 # Logs & debug
 *.log
+!docs/reports/**/*.log
 logs/
 docs/tmp/
 *_inspect.txt
@@ -44,6 +45,12 @@ jar_classes.txt
 # Toolchain
 .kotlin/
 .temp_sdk/
+web-tooling/node_modules/
+!kotlin-js-store/
+kotlin-js-store/*
+!kotlin-js-store/wasm/
+kotlin-js-store/wasm/*
+!kotlin-js-store/wasm/yarn.lock
 sandbox-native/target/
 
 # Secrets & machine-specific

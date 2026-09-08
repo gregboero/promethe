@@ -167,7 +167,7 @@ class GepaEvolver(
                 content = result.bestCandidate.content,
                 contract =
                     existing.contract.copy(
-                        lifecycle = SkillLifecycle.CANDIDATE,
+                        lifecycle = SkillLifecycle.QUARANTINED,
                         contentHash = null,
                     ),
             ) ?: SkillEntry(
@@ -175,7 +175,7 @@ class GepaEvolver(
                 content = result.bestCandidate.content,
                 contract =
                     SkillContract(
-                        lifecycle = SkillLifecycle.CANDIDATE,
+                        lifecycle = SkillLifecycle.DRAFT,
                         provenance = "gepa",
                     ),
             )

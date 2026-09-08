@@ -83,6 +83,7 @@ class ActionExecutor(
     private val policyAuditSink: PolicyAuditSink = NoOpPolicyAuditSink,
     artifactStore: ArtifactStore? = null,
     private val resourceGovernors: ResourceGovernorRegistry = GlobalResourceGovernorRegistry,
+    private val observationProcessor: ObservationProcessor? = null,
 ) : SecureToolExecutor {
     private val logger = Log.create("ActionExecutor")
     private val artifactExternalizer =
@@ -109,6 +110,18 @@ class ActionExecutor(
     /** Clear the dedup cache (call at the start of each agent turn). */
     fun clearDedupCache() {
         dedupCache.clear()
+    }
+
+    suspend fun beginHarnessStep(
+        sessionId: String,
+        runId: String?,
+        stepId: String?,
+    ) {
+        observationProcessor?.beginStep(sessionId, runId, stepId)
+    }
+
+    suspend fun endHarnessSession(sessionId: String) {
+        observationProcessor?.endSession(sessionId)
     }
 
     /** Tools that are safe to deduplicate (read-only, no side effects). */
@@ -156,8 +169,8 @@ class ActionExecutor(
             setAttribute("policy.effect", policy.effect.name)
 
             // ── DEDUP CHECK — return cached result for identical read-only calls ──
-            if (toolName in dedupSafeTools) {
-                val cacheKey = "$toolName|$args"
+            if (toolName in dedupSafeTools && observationProcessor == null) {
+                val cacheKey = "${request.sessionId}|${observationProcessor?.revisionKey(request.sessionId)}|$toolName|$args"
                 dedupCache[cacheKey]?.let { cached ->
                     return@span "$cached\n\n[NOTE: Cached result — you already called this tool with identical arguments. Use the information above to formulate your response.]"
                 }
@@ -208,6 +221,8 @@ class ActionExecutor(
                 val beforeCtx =
                     HookContext(
                         event = HookEvent.BEFORE_TOOL_CALL,
+                        sessionId = request.sessionId,
+                        metadata = mapOf("runId" to (request.runId ?: ""), "stepId" to (request.stepId ?: "")),
                         toolName = toolName,
                         toolArgs = args,
                     )
@@ -278,9 +293,15 @@ class ActionExecutor(
                 }
             }
 
-            request.runId?.let { runId ->
-                val governor = resourceGovernors.governorForRun(runId)
-                val admission = governor?.admit(GovernedResource.TOOL_START)
+            run {
+                val admission = try {
+                    resourceGovernors.admit(request.runId, GovernedResource.TOOL_START, ResourceQuotaScope(toolName = toolName))
+                } catch (cancelled: kotlinx.coroutines.CancellationException) {
+                    throw cancelled
+                } catch (_: Exception) {
+                    recordBlocked(intentId, "resource_budget_unavailable")
+                    return@span "[BLOCKED] Resource budget admission could not be recorded; tool start blocked"
+                }
                 if (admission is ResourceAdmission.Denied) {
                     recordBlocked(intentId, "resource_budget_exceeded")
                     return@span "[BLOCKED] ${admission.message()}"
@@ -351,6 +372,8 @@ class ActionExecutor(
                     val afterCtx =
                         HookContext(
                             event = HookEvent.AFTER_TOOL_CALL,
+                            sessionId = request.sessionId,
+                            metadata = mapOf("runId" to (request.runId ?: ""), "stepId" to (request.stepId ?: "")),
                             toolName = toolName,
                             toolArgs = args,
                             toolResult = result,
@@ -363,12 +386,32 @@ class ActionExecutor(
                     result
                 }
 
-            val successful = !isToolFailure(finalResult)
+            val successful = !isToolFailure(result)
+            // Persist the original observation, never a mutation's interpretation of success.
+            val rawObservation = if (successful && artifactExternalizer != null) {
+                try {
+                    artifactExternalizer.externalize(result, request.runId, request.stepId, intentId, toolName)
+                } catch (cancelled: kotlinx.coroutines.CancellationException) {
+                    throw cancelled
+                } catch (_: Exception) {
+                    ExternalizedObservation(truncateOutput(result, config.maxOutputBytes))
+                }
+            } else {
+                ExternalizedObservation(truncateOutput(result, config.maxOutputBytes))
+            }
+            recordOutcome(intentId, rawObservation.text, rawObservation.artifact?.hash)
+            val presented = if (successful && observationProcessor != null) {
+                observationProcessor.process(request, result).let { if (it.revision == null) finalResult else it.text }
+            } else if (successful) {
+                finalResult
+            } else {
+                result
+            }
             val observation =
                 if (successful && artifactExternalizer != null) {
                     runCatching {
                         artifactExternalizer.externalize(
-                            content = finalResult,
+                            content = presented,
                             runId = request.runId,
                             stepId = request.stepId,
                             intentId = intentId,
@@ -376,20 +419,19 @@ class ActionExecutor(
                         )
                     }.getOrElse { error ->
                         logger.warn(error) { "Failed to externalize output for '$toolName'; returning a bounded result" }
-                        ExternalizedObservation(truncateOutput(finalResult, config.maxOutputBytes))
+                        ExternalizedObservation(truncateOutput(presented, config.maxOutputBytes))
                     }
                 } else {
-                    ExternalizedObservation(truncateOutput(finalResult, config.maxOutputBytes))
+                    ExternalizedObservation(truncateOutput(presented, config.maxOutputBytes))
                 }
 
             setAttribute("tool.result.length", observation.text.length)
             setAttribute("tool.success", successful)
             observation.artifact?.hash?.let { hash -> setAttribute("artifact.hash", hash) }
-            recordOutcome(intentId, observation.text, observation.artifact?.hash)
 
             // ── STORE in dedup cache for safe tools ──
-            if (toolName in dedupSafeTools && successful) {
-                dedupCache["$toolName|$args"] = observation.text
+            if (toolName in dedupSafeTools && successful && observationProcessor == null) {
+                dedupCache["${request.sessionId}|${observationProcessor?.revisionKey(request.sessionId)}|$toolName|$args"] = observation.text
             }
 
             observation.text

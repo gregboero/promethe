@@ -1,5 +1,7 @@
 # Development Guide
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 > Local setup, project structure, conventions, CI/CD, and guides for contributing.
 
 ## Prerequisites
@@ -127,11 +129,22 @@ The `.github/workflows/ci.yml` pipeline compiles the gateway, API, shared core, 
 ### Adding a new agent tool
 
 1. Create a class that extends `ToolBase<Input, Output>`
-2. Register it in `BuiltinTools.kt`:
+2. Add an explicit entry to `ToolContractRegistry`. Declare every read and effectful operation, its
+   approval policy, idempotency, owner restriction and egress. Unknown names are deliberately
+   rejected by the startup coverage audit.
+3. Register it in `BuiltinTools.kt`:
    ```kotlin
    ToolRegistry.register(MyTool())
    ```
-3. The tool will automatically be available in the system prompt
+4. Add a negative policy test for every operation that can write, execute, delete, change
+   configuration, control a device or cause an external effect.
+5. Run `./gradlew shared:jvmTest`. `ToolContractCoverageArchitectureTest` inventories literal
+   `SimpleTool` declarations, validates dynamic MCP/ACP families and fails when an effect lacks
+   mandatory approval.
+
+The gateway validates the live `ToolRegistry` again during startup. MCP and ACP tools use explicit
+fail-closed family contracts; only MCP tools explicitly certified by the server owner can be reduced
+to read-only risk.
 
 ## Running tests
 

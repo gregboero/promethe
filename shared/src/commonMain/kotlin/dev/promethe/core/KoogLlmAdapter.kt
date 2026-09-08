@@ -27,11 +27,11 @@ open class KoogLlmAdapter(
     protected val config: AgentConfig,
     private val database: PrometheDatabaseApi? = null,
     private val resourceGovernors: ResourceGovernorRegistry = GlobalResourceGovernorRegistry,
+    private var executor: MultiLLMPromptExecutor? = null,
 ) {
     private val logger = Log.create("KoogLlmAdapter")
 
     // Legacy single executor (for backward compat when router is not set)
-    private var executor: MultiLLMPromptExecutor? = null
     private var pricingClient: io.ktor.client.HttpClient? = null
     private var pricingService: ModelPricingService? = null
     private var apiKeys: Map<String, String> = emptyMap()
@@ -347,7 +347,7 @@ open class KoogLlmAdapter(
             // (data class equality). A custom LLModel with the same id but different
             // capabilities/contextLength won’t match and causes “Unsupported model”.
             val llModel = resolveKnownModel(provider, model, config.xaiApiMode)
-            val providerPrompt = applyProviderParams(prepared.prompt, provider, context, reasoningEffort)
+            val providerPrompt = applyProviderParams(prepared.prompt, provider, context, reasoningEffort, llModel)
 
             // ── Execute with 2-level fallback chain ──────────────────────
             // Level 1: same provider, known-good model
@@ -356,10 +356,10 @@ open class KoogLlmAdapter(
             var usedPrefix = prepared.prefix
             var reusedPrefix = prepared.reusedPrefix
             val assistantMessage = try {
-                admitLlmCall(context)
+                admitLlmCall(context, provider)
                 exec.execute(providerPrompt, llModel, prepared.tools)
             } catch (e: Exception) {
-                if (e is AgentExecutionException && e.code == "resource_budget_exceeded") throw e
+                if (e is kotlinx.coroutines.CancellationException || (e is AgentExecutionException && e.code.startsWith("resource_budget_"))) throw e
                 val msg = e.message.orEmpty()
                 logger.error { "LLM execute failed [provider=$provider, model=$model]: $msg" }
 
@@ -403,16 +403,16 @@ open class KoogLlmAdapter(
                             pendingToolTurn = pendingToolTurn,
                         )
                     val fallbackPrompt =
-                        applyProviderParams(fallbackPrepared.prompt, fb.provider, context, reasoningEffort)
+                        applyProviderParams(fallbackPrepared.prompt, fb.provider, context, reasoningEffort, fbModel)
                     try {
-                        admitLlmCall(context)
+                        admitLlmCall(context, fb.provider)
                         lastResult = fbExec.execute(fallbackPrompt, fbModel, fallbackPrepared.tools)
                         usedFallback = fb
                         usedPrefix = fallbackPrepared.prefix
                         reusedPrefix = fallbackPrepared.reusedPrefix
                         break
                     } catch (e2: Exception) {
-                        if (e2 is AgentExecutionException && e2.code == "resource_budget_exceeded") throw e2
+                        if (e2 is kotlinx.coroutines.CancellationException || (e2 is AgentExecutionException && e2.code.startsWith("resource_budget_"))) throw e2
                         logger.warn { "Fallback failed [${fb.provider}/${fb.model}]: ${e2.message}" }
                     }
                 }
@@ -501,10 +501,17 @@ open class KoogLlmAdapter(
             )
         }
 
-    private suspend fun admitLlmCall(context: LlmRequestContext?) {
-        val runId = context?.runId ?: return
-        val governor = resourceGovernors.governorForRun(runId) ?: return
-        val admission = governor.admit(GovernedResource.LLM_CALL)
+    private suspend fun admitLlmCall(
+        context: LlmRequestContext?,
+        provider: String,
+    ) {
+        val admission = try {
+            resourceGovernors.admit(context?.runId, GovernedResource.LLM_CALL, ResourceQuotaScope(provider = provider))
+        } catch (cancelled: kotlinx.coroutines.CancellationException) {
+            throw cancelled
+        } catch (_: Exception) {
+            throw AgentExecutionException("resource_budget_unavailable", "Resource budget admission could not be recorded; provider call blocked")
+        }
         if (admission is ResourceAdmission.Denied) {
             throw AgentExecutionException("resource_budget_exceeded", admission.message())
         }
@@ -515,8 +522,13 @@ open class KoogLlmAdapter(
         provider: String,
         context: LlmRequestContext?,
         reasoningEffort: ReasoningEffort,
+        model: LLModel,
     ): Prompt =
         when (dev.promethe.api.ProviderRegistry.canonicalKey(provider)) {
+            "openai" -> {
+                prompt.withParams(OpenAiCompatibleProviderPolicy.openAIParams(model, reasoningEffort, config.maxTokens))
+            }
+
             "kimi" -> {
                 prompt.withParams(OpenAiCompatibleProviderPolicy.kimiChatParams(context, reasoningEffort))
             }
@@ -643,7 +655,10 @@ open class KoogLlmAdapter(
         provider: String = config.provider,
     ): Prompt {
         val builder = Prompt.builder("promethe-prompt")
-        val systemMessages = listOf(systemPrompt) + messages.filter { it.first == "system" }.map { it.second }
+        val typedTurns = pendingToolTurn?.history.orEmpty().associate { it.messageIndex to it.turn }
+        require(typedTurns.keys.all { it in messages.indices }) { "Native tool history index outside conversation" }
+        val typedStart = typedTurns.keys.minOrNull() ?: messages.size
+        val systemMessages = listOf(systemPrompt) + messages.take(typedStart).filter { it.first == "system" }.map { it.second }
         val cacheControl =
             if (dev.promethe.api.ProviderRegistry.canonicalKey(provider) == "anthropic") {
                 AnthropicCacheControl.Default
@@ -653,14 +668,8 @@ open class KoogLlmAdapter(
         systemMessages.forEachIndexed { index, content ->
             builder.system(content, cache = cacheControl.takeIf { index == systemMessages.lastIndex })
         }
-        for ((role, content) in messages.filterNot { it.first == "system" }) {
-            when (role) {
-                "user" -> builder.user(content)
-                "assistant" -> builder.assistant(content)
-                else -> builder.user(content)
-            }
-        }
-        pendingToolTurn?.let { pending ->
+
+        fun appendTurn(pending: PendingToolTurn) {
             builder.message(pending.assistantMessage)
             builder.toolResult(
                 tool = pending.toolName,
@@ -669,6 +678,21 @@ open class KoogLlmAdapter(
                 isError = pending.result.startsWith("Error:", ignoreCase = true),
             )
         }
+        for ((index, pair) in messages.withIndex()) {
+            val (role, content) = pair
+            val typed = typedTurns[index]
+            if (typed != null) {
+                appendTurn(typed)
+                continue
+            }
+            when (role) {
+                "system" -> if (index >= typedStart) builder.system(content)
+                "user" -> builder.user(content)
+                "assistant" -> builder.assistant(content)
+                else -> builder.user(content)
+            }
+        }
+        if (typedTurns.isEmpty()) pendingToolTurn?.let(::appendTurn)
         return builder.build()
     }
 

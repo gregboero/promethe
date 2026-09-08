@@ -1,0 +1,1 @@
+{"session":"fixture","mode":"structured","calls":5,"nativeCalls":4,"readPages":[0,1,0,1],"completed":false,"failure":"task_duplicate_page_read","final":"[11,22]","correct":true,"completion":{"complete":false,"reason":"duplicate_page_read","missingPages":[],"answerCount":null},"registryCleaned":true}

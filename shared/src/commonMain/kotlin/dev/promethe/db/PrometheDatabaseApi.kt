@@ -36,6 +36,40 @@ data class McpTaskRecord(
     val pollIntervalMs: Long? = null,
 )
 
+data class PersistentApprovalGrantRow(
+    val id: String,
+    val fingerprint: String,
+    val allowed: Boolean,
+    val createdAt: Long,
+    val expiresAt: Long,
+)
+
+data class ResourceGovernorStateRow(
+    val rootRunId: String,
+    val maxTokens: Long,
+    val maxCostDollars: Double,
+    val maxLlmCalls: Int,
+    val maxToolStarts: Int,
+    val maxSubAgents: Int,
+    val maxDurationMs: Long,
+    val startedAt: Long,
+    val tokensUsed: Long,
+    val costDollars: Double,
+    val llmCallsStarted: Int,
+    val toolsStarted: Int,
+    val subAgentsStarted: Int,
+    val version: Long,
+    val updatedAt: Long,
+)
+
+data class ResourceGovernorBindingRow(
+    val sessionId: String,
+    val rootRunId: String,
+    val runId: String?,
+    val createdAt: Long,
+    val updatedAt: Long,
+)
+
 /**
  * Platform-agnostic database interface consumed by core classes in commonMain.
  * The actual implementation (Exposed) lives in jvmMain.
@@ -75,6 +109,34 @@ interface PrometheDatabaseApi {
     suspend fun appendAgentRunEvent(event: AgentRunEventRecord): Boolean = true
 
     suspend fun getAgentRunEvents(runId: String): List<AgentRunEventRecord> = emptyList()
+
+    // ── Durable resource budgets ──
+    suspend fun insertResourceGovernorState(state: ResourceGovernorStateRow): Boolean = true
+
+    suspend fun updateResourceGovernorState(
+        expectedVersion: Long,
+        state: ResourceGovernorStateRow,
+    ): Boolean = true
+
+    suspend fun getResourceGovernorState(rootRunId: String): ResourceGovernorStateRow? = null
+
+    suspend fun insertResourceGovernorBinding(binding: ResourceGovernorBindingRow): Boolean = true
+
+    suspend fun claimResourceGovernorBinding(
+        sessionId: String,
+        expectedRunId: String?,
+        runId: String,
+        updatedAt: Long,
+    ): Boolean = true
+
+    suspend fun getResourceGovernorBinding(sessionId: String): ResourceGovernorBindingRow? = null
+
+    suspend fun getResourceGovernorBindingForRun(runId: String): ResourceGovernorBindingRow? = null
+
+    suspend fun deleteResourceGovernorBinding(
+        sessionId: String,
+        runId: String?,
+    ): Boolean = true
 
     // ── MCP tasks ──
     suspend fun insertMcpTask(task: McpTaskRecord): Boolean = true
@@ -292,6 +354,12 @@ interface PrometheDatabaseApi {
 
     suspend fun getAllSettings(): Map<String, String>
 
+    suspend fun getPersistentApprovalGrants(now: Long): List<PersistentApprovalGrantRow> = emptyList()
+
+    suspend fun replacePersistentApprovalGrant(grant: PersistentApprovalGrantRow): Unit = throw UnsupportedApprovalGrantStorage()
+
+    suspend fun deletePersistentApprovalGrant(id: String): Unit = throw UnsupportedApprovalGrantStorage()
+
     // ── Gateway security (JVM implementation overrides these methods) ──
     suspend fun getRemoteOwner(): RemoteOwnerRow? = null
 
@@ -356,6 +424,11 @@ interface PrometheDatabaseApi {
 
     suspend fun getLlmUsageByProvider(): Map<String, LlmProviderStats>
 }
+
+private class UnsupportedApprovalGrantStorage :
+    UnsupportedOperationException(
+        "Persistent approval grants are not supported by this database",
+    )
 
 // ── Data classes shared between commonMain and jvmMain ──
 

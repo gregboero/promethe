@@ -1,0 +1,111 @@
+{
+  "benchmark": {
+    "javascript": {
+      "batches": 9,
+      "correctObservations": 45,
+      "medianThreeBatchSequenceMillis": 2587,
+      "medianFirstBatchMillis": 889,
+      "medianFollowingBatchMillis": 853.0,
+      "maxBatchMillis": 904,
+      "sequenceMillis": [
+        2650,
+        2587,
+        2533
+      ],
+      "cacheHits": 0,
+      "workerProcesses": 9
+    },
+    "kotlin_uncached": {
+      "batches": 9,
+      "correctObservations": 45,
+      "medianThreeBatchSequenceMillis": 13083,
+      "medianFirstBatchMillis": 4299,
+      "medianFollowingBatchMillis": 4392.0,
+      "maxBatchMillis": 13141,
+      "sequenceMillis": [
+        13083,
+        12810,
+        21957
+      ],
+      "cacheHits": 0,
+      "workerProcesses": 18
+    },
+    "kotlin_cached": {
+      "batches": 9,
+      "correctObservations": 45,
+      "medianThreeBatchSequenceMillis": 7074,
+      "medianFirstBatchMillis": 4421,
+      "medianFollowingBatchMillis": 1294.5,
+      "maxBatchMillis": 4495,
+      "sequenceMillis": [
+        7018,
+        7074,
+        7092
+      ],
+      "cacheHits": 6,
+      "workerProcesses": 12
+    }
+  },
+  "sequenceReductionVersusUncachedPercent": 45.92983260720018,
+  "iterationRequests": 7,
+  "iterationCostUpperBoundMicroUsd": 45063,
+  "campaignRequests": 283,
+  "campaignCapMicroUsd": 5000000,
+  "campaignSettledCostUpperBoundMicroUsd": 1628185,
+  "campaignUncertainReservationMicroUsd": 0,
+  "tests": {
+    "api:jvmTest": {
+      "tests": 76,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared:jvmTest": {
+      "tests": 656,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "gateway:test": {
+      "tests": 213,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "evals:test": {
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "composeApp:desktopTest": {
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared:harnessKotlinNativeTest": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared:harnessLiveTest": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "sourceSha256": {
+    "harness-kotlin/src/main/kotlin/dev/promethe/harness/kotlin/CompiledArtifact.kt": "84c1bee4104b9e1ba5d35d062909b691d8dedb3f39158b32732103ba5eaa018b",
+    "harness-kotlin/src/main/kotlin/dev/promethe/harness/kotlin/Main.kt": "4cdffe999c7d6409401266f9f74b7218300db9b2e5d208d8622e568e7ff9f8b4",
+    "harness-kotlin/native/build-windows.cmd": "692853d515a6bcf7b3b7717ab3c5f3b6449d8e1d2a1dc43b2c1191611b65823d",
+    "harness-kotlin/native/windows-launcher.c": "856075ef645b5e1fabdc08a4f8f92b307c5d6b40501209f83a63717208ac5055",
+    "shared/src/jvmMain/kotlin/dev/promethe/core/HarnessKotlinRunner.kt": "10b91f7de8ad30a908babfd221c6ffc6b37d8d742a04dcbfa4161822320b3e5a",
+    "shared/src/jvmMain/kotlin/dev/promethe/core/KotlinCompilationCache.kt": "0d437a802536d542344cae768e091bf244b7fd72c55004ad58e67dd939b90214",
+    "shared/src/jvmMain/kotlin/dev/promethe/core/SessionHarness.kt": "1704e54069fea42a01c1e51246d186a9c611d4714b75caf23528d4dabec04b61",
+    "shared/src/jvmMain/kotlin/dev/promethe/core/HarnessNodeRunner.kt": "1ab6f5e9f9d7a87f15809f67a4b5af653cc0404aba5a639a76704d398a666eeb",
+    "shared/src/jvmMain/kotlin/dev/promethe/core/sandbox/NativeSandboxManager.kt": "98615e687b0ed38b010ec7fe3154a815ec970b7aa5379a551d0fe33f5fa8634d"
+  }
+}

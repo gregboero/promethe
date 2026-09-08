@@ -1,0 +1,213 @@
+[
+  {
+    "session": "koog-kotlin-b751e861-ec81-48d2-ad60-ecae0c158dfc-baseline",
+    "mode": "baseline",
+    "proposals": 0,
+    "activations": 0,
+    "processed": 0,
+    "events": [
+      "session_closed"
+    ],
+    "compilations": 0,
+    "cacheHits": 0,
+    "workerProcesses": 0,
+    "compilationMillis": 0,
+    "evaluationMillis": 0,
+    "stagingMillis": 0,
+    "totalMillis": 12529,
+    "rawLedgerPreserved": true,
+    "sessionCleaned": true,
+    "cacheCleaned": true,
+    "callPhases": [
+      {
+        "call": 1,
+        "agentStep": "koog-kotlin-b751e861-ec81-48d2-ad60-ecae0c158dfc-baseline-step-0001",
+        "formalToolCount": 1
+      },
+      {
+        "call": 2,
+        "agentStep": "koog-kotlin-b751e861-ec81-48d2-ad60-ecae0c158dfc-baseline-step-0002",
+        "formalToolCount": 1
+      },
+      {
+        "call": 3,
+        "agentStep": "koog-kotlin-b751e861-ec81-48d2-ad60-ecae0c158dfc-baseline-step-0003",
+        "formalToolCount": 1
+      },
+      {
+        "call": 4,
+        "agentStep": "koog-kotlin-b751e861-ec81-48d2-ad60-ecae0c158dfc-baseline-step-0004",
+        "formalToolCount": 1
+      },
+      {
+        "call": 5,
+        "agentStep": "koog-kotlin-b751e861-ec81-48d2-ad60-ecae0c158dfc-baseline-step-0005",
+        "formalToolCount": 1
+      },
+      {
+        "call": 6,
+        "agentStep": null,
+        "formalToolCount": 0
+      }
+    ],
+    "calls": 6,
+    "nativeCalls": 4,
+    "readPages": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "completed": true,
+    "failure": null,
+    "final": "[6284,1739,8452,3906]",
+    "correct": true,
+    "completion": {
+      "complete": true,
+      "reason": "complete",
+      "missingPages": [],
+      "answerCount": 4
+    },
+    "registryCleaned": true,
+    "accounting": {
+      "attemptedCalls": 6,
+      "settledCalls": 6,
+      "uncertainCalls": 0,
+      "unknownUsageCalls": 0,
+      "usageComplete": true,
+      "inputTokens": 12361,
+      "outputTokens": 349,
+      "costUpperBoundMicroUsd": 35092,
+      "uncertainReservationMicroUsd": 0
+    },
+    "relayMillis": 11406,
+    "mainAccounting": {
+      "attemptedCalls": 5,
+      "settledCalls": 5,
+      "uncertainCalls": 0,
+      "unknownUsageCalls": 0,
+      "usageComplete": true,
+      "inputTokens": 9416,
+      "outputTokens": 89,
+      "costUpperBoundMicroUsd": 24609,
+      "uncertainReservationMicroUsd": 0
+    },
+    "reviewAccounting": {
+      "attemptedCalls": 1,
+      "settledCalls": 1,
+      "uncertainCalls": 0,
+      "unknownUsageCalls": 0,
+      "usageComplete": true,
+      "inputTokens": 2945,
+      "outputTokens": 260,
+      "costUpperBoundMicroUsd": 10483,
+      "uncertainReservationMicroUsd": 0
+    }
+  },
+  {
+    "session": "koog-kotlin-b751e861-ec81-48d2-ad60-ecae0c158dfc-free",
+    "mode": "free",
+    "proposals": 0,
+    "activations": 0,
+    "processed": 0,
+    "events": [
+      "session_closed",
+      "session_closed"
+    ],
+    "compilations": 0,
+    "cacheHits": 0,
+    "workerProcesses": 0,
+    "compilationMillis": 0,
+    "evaluationMillis": 0,
+    "stagingMillis": 0,
+    "totalMillis": 11016,
+    "rawLedgerPreserved": true,
+    "sessionCleaned": true,
+    "cacheCleaned": true,
+    "callPhases": [
+      {
+        "call": 1,
+        "agentStep": "koog-kotlin-b751e861-ec81-48d2-ad60-ecae0c158dfc-free-step-0001",
+        "formalToolCount": 7
+      },
+      {
+        "call": 2,
+        "agentStep": "koog-kotlin-b751e861-ec81-48d2-ad60-ecae0c158dfc-free-step-0002",
+        "formalToolCount": 7
+      },
+      {
+        "call": 3,
+        "agentStep": "koog-kotlin-b751e861-ec81-48d2-ad60-ecae0c158dfc-free-step-0003",
+        "formalToolCount": 7
+      },
+      {
+        "call": 4,
+        "agentStep": "koog-kotlin-b751e861-ec81-48d2-ad60-ecae0c158dfc-free-step-0004",
+        "formalToolCount": 7
+      },
+      {
+        "call": 5,
+        "agentStep": "koog-kotlin-b751e861-ec81-48d2-ad60-ecae0c158dfc-free-step-0005",
+        "formalToolCount": 7
+      },
+      {
+        "call": 6,
+        "agentStep": null,
+        "formalToolCount": 0
+      }
+    ],
+    "calls": 6,
+    "nativeCalls": 4,
+    "readPages": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "completed": true,
+    "failure": null,
+    "final": "[6284,1739,8452,3906]",
+    "correct": true,
+    "completion": {
+      "complete": true,
+      "reason": "complete",
+      "missingPages": [],
+      "answerCount": 4
+    },
+    "registryCleaned": true,
+    "accounting": {
+      "attemptedCalls": 6,
+      "settledCalls": 6,
+      "uncertainCalls": 0,
+      "unknownUsageCalls": 0,
+      "usageComplete": true,
+      "inputTokens": 18091,
+      "outputTokens": 367,
+      "costUpperBoundMicroUsd": 49633,
+      "uncertainReservationMicroUsd": 0
+    },
+    "relayMillis": 10664,
+    "mainAccounting": {
+      "attemptedCalls": 5,
+      "settledCalls": 5,
+      "uncertainCalls": 0,
+      "unknownUsageCalls": 0,
+      "usageComplete": true,
+      "inputTokens": 15146,
+      "outputTokens": 89,
+      "costUpperBoundMicroUsd": 38934,
+      "uncertainReservationMicroUsd": 0
+    },
+    "reviewAccounting": {
+      "attemptedCalls": 1,
+      "settledCalls": 1,
+      "uncertainCalls": 0,
+      "unknownUsageCalls": 0,
+      "usageComplete": true,
+      "inputTokens": 2945,
+      "outputTokens": 278,
+      "costUpperBoundMicroUsd": 10699,
+      "uncertainReservationMicroUsd": 0
+    }
+  }
+]

@@ -25,6 +25,13 @@ object McpProtocol {
 
     val multiRoundTripMethods: Set<String> = setOf("tools/call", "prompts/get", "resources/read")
 
+    val inputMethodCapabilities: Map<String, String> =
+        mapOf(
+            "elicitation/create" to "elicitation",
+            "sampling/createMessage" to "sampling",
+            "roots/list" to "roots",
+        )
+
     val supportedVersions: List<String> = listOf(MODERN_VERSION, LEGACY_VERSION)
 
     fun requestedVersion(request: JsonObject): String? =

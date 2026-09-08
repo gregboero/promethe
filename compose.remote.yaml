@@ -7,7 +7,7 @@ services:
       - PROMETHE_MASTER_KEY=${PROMETHE_MASTER_KEY:?Set a Base64-encoded 32-byte master key}
 
   promethe-proxy:
-    image: caddy:2.10.0-alpine
+    image: caddy:2.10.0-alpine@sha256:ae4458638da8e1a91aafffb231c5f8778e964bca650c8a8cb23a7e8ac557aa3c
     depends_on:
       promethe-core:
         condition: service_healthy

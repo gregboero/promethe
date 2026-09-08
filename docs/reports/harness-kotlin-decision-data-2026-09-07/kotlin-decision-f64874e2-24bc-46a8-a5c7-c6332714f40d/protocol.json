@@ -1,0 +1,21 @@
+{
+  "batch": "kotlin-decision-f64874e2-24bc-46a8-a5c7-c6332714f40d",
+  "protocolVersion": 4,
+  "language": "KOTLIN",
+  "compilationCache": true,
+  "actionParser": "balanced-object-with-string-escapes",
+  "model": "gpt-5.6-terra",
+  "reasoningEffort": "none",
+  "taskCount": 9,
+  "plannedRuns": 27,
+  "repetitions": 3,
+  "pagesPerTask": 4,
+  "seedFormula": "7391 + repeat * 101 + familyIndex",
+  "campaignCapMicroUsd": 5000000,
+  "fixedSource": "val text = observation.text\nval value = try { Json.parseToJsonElement(text) } catch (_: Exception) { null }\nwhen {\n    value is JsonObject && value[\"answer\"] is JsonPrimitive -> (value[\"answer\"] as JsonPrimitive).content\n    text.startsWith(\"id,answer\\n\") -> text.substringAfter('\\n').substringAfter(',')\n    text.startsWith(\"DATA answer=\") -> text.removePrefix(\"DATA answer=\")\n    else -> text\n}",
+  "fixedSourceHash": "b155594c154d168132cdcf781e0c72b7d5b5e2ce4554eac7d757551483374398",
+  "fixedSourceModelGenerationIncluded": false,
+  "presentationGuard": "below256Bytes-or-no-byte-saving",
+  "fixedSetupIncluded": true,
+  "postLoopSkillSynthesisIncluded": true
+}

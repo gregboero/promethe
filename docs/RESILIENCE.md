@@ -1,5 +1,7 @@
 # Context Management & Resilience
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 > How Promethe keeps long-running agent sessions within token budgets and recovers
 > from LLM/tool failures without dropping the conversation.
 
@@ -30,6 +32,8 @@ the SHA-256 hash, byte size and an `artifact://sha256/...` URI. The hash is also
 stored in `tool_intents` and `agent_run_events`; `artifact_read` retrieves at
 most 4096 bytes per call. Failed and blocked results are never externalized and
 remain bounded by the existing output limit.
+
+The file store caps each artifact at 16 MiB and the complete store at 256 MiB by default. A process lock serializes writes across instances; existing content is counted again after a restart, and deduplication does not consume extra quota. Quota exhaustion fails explicitly. `retentionCandidates(referencedHashes, olderThanMillis)` produces a read-only plan excluding supplied ledger references. It never deletes automatically: callers must assemble the complete reference set before deciding on cleanup. This is a bounded local store, not encrypted archival storage.
 
 ---
 
@@ -68,14 +72,16 @@ skipped even if over budget.
    skipped entirely.
 2. **Sliding-window summarization** — if still over budget, the compressor keeps
    the first 2 messages (`keepFirstN`) and last 6 messages (`keepLastN`)
-   untouched, and replaces everything in between with one `system` message:
+   untouched. Middle `system` and `developer` instructions remain verbatim; other middle messages become an `assistant` message:
    `[Context Summary — N messages compressed]` followed by an LLM-generated
    summary (prompted to stay under 300 words, temperature 0.1, using the
-   agent's configured model).
-3. **Summary caching** — summaries are cached in-memory keyed by the hash of
+   agent's configured model). The summary is explicitly fallible conversation data, not authoritative instructions. Artifact addresses are retained outside the generated summary so they can be reread even when the summary is lossy.
+3. **Summary caching** — summaries are cached in-memory keyed by SHA-256 of length-delimited fields in
    the compressed message block, so the same block is never re-summarized
    twice in a session. Capped at 50 entries (oldest evicted first); can be
-   cleared via `clearCache()` (e.g. on session reset).
+   cleared via suspend `clearCache()` (e.g. on session reset). Access is serialized; raw histories are not logged as cache keys.
+
+Compression remains a heuristic and does not guarantee that every result fits a tiny token budget or retains every fact. Deterministic tests cover instruction/reference retention and colliding JVM hashes; they do not measure model recall quality.
 
 If there's nothing between head and tail to compress, the original messages are
 returned unchanged.

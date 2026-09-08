@@ -1,5 +1,7 @@
 # Configuration Reference
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 > All Prométhé configuration variables, organized by domain.
 
 ## Configuration methods
@@ -10,7 +12,7 @@
 | **Settings Screen** (Desktop app) | 2nd | Change config while in use |
 | **REST API** (`/api/v1/config/env`) | 3rd | Automation, scripts |
 | **`.env` file** | 4th | Docker, CI/CD |
-| **System environment variables** | 5th | Production |
+| **System environment variables** | 5th | Headless/container experiments |
 
 ---
 
@@ -34,7 +36,7 @@
 | `GOOGLE_API_KEY` | Google AI Studio | `AIza...` |
 | `DEEPSEEK_API_KEY` | DeepSeek | `sk-...` |
 | `NVIDIA_NIM_API_KEY` | NVIDIA NIM | `nvapi-...` |
-| `LITELLM_API_KEY` | LiteLLM proxy | *(depends on proxy config, e.g. `sk-promethe-dev`)* |
+| `LITELLM_API_KEY` | LiteLLM proxy | Dedicated key configured on your proxy |
 | `MOONSHOT_API_KEY` | Kimi | `sk-...` |
 | `XAI_API_KEY` | xAI (Grok) | `xai-...` |
 
@@ -305,7 +307,7 @@ Claude Agent SDK execution are not included in this release.
 | Channel | Required | Optional / secondary |
 |---|---|---|
 | **Telegram** | `TELEGRAM_BOT_TOKEN` | `TELEGRAM_SECRET_TOKEN` |
-| **Discord** | `DISCORD_BOT_TOKEN` | `DISCORD_PUBLIC_KEY` (slash commands), `DISCORD_MESSAGE_CONTENT_ENABLED` (default `false`), `DISCORD_ALLOWED_USER_IDS`, `DISCORD_KNOWLEDGE_CHANNEL_IDS` |
+| **Discord** | `DISCORD_BOT_TOKEN` | `DISCORD_PUBLIC_KEY` (slash commands), `DISCORD_MESSAGE_CONTENT_ENABLED` (default `false`), `DISCORD_ALLOWED_USER_IDS`, `DISCORD_APPROVER_USER_IDS`, `DISCORD_KNOWLEDGE_CHANNEL_IDS` |
 | **Slack** | `SLACK_BOT_TOKEN` | `SLACK_SIGNING_SECRET` |
 | **WhatsApp** | `WHATSAPP_PHONE_NUMBER_ID` | `WHATSAPP_ACCESS_TOKEN` |
 | **Signal** | `SIGNAL_CLI_REST_URL` | `SIGNAL_PHONE_NUMBER` |
@@ -334,6 +336,13 @@ nothing. These variables remain the static bootstrap policy. Authenticated owner
 allow/deny rules, deterministic subject phrases, channel capture and project association. Dynamic
 `DENY` rules take precedence and policy changes do not require a process restart.
 
+`DISCORD_APPROVER_USER_IDS` contains the Discord user IDs responsible for approving effectful tool
+requests initiated from Discord. Promethe sends each responsible user a private message containing
+redacted arguments and Reject, Allow once, and Session buttons. Exact `CONFIG_CHANGE` requests also
+offer an Always allow choice. This stores only the exact operation fingerprint in SQLite and remains in
+force across restarts until the local owner revokes it. Leave this setting empty to disable Discord approval delivery; pending
+requests remain visible to the local owner and eventually time out closed.
+
 ---
 
 ## 10. Integrations
@@ -353,7 +362,7 @@ allow/deny rules, deterministic subject phrases, channel capture and project ass
 
 | Variable | Type | Default | Description |
 |---|---|---|---|
-| `LITELLM_MASTER_KEY` | string | `sk-promethe-dev` | LiteLLM proxy master key |
+| `LITELLM_MASTER_KEY` | string | required, no default | Dedicated LiteLLM proxy master key for the Compose overlay |
 | `LITELLM_API_KEY` | string | — | Key to connect to the proxy |
 
 ---
@@ -473,6 +482,39 @@ The canonical provider-secret registry also includes `OPENAI_API_KEY`, `GOOGLE_A
 | Budget preset `UNLIMITED` | — | — | No limits (⚠️ costly) |
 
 Budgets are configured via the API (`POST /api/v1/goal`) with the `budgetPreset` field.
+
+### Aggregate resource quotas
+
+`PROMETHE_RESOURCE_QUOTAS` is a process-owned JSON array loaded at bootstrap, default `[]` (no aggregate quotas). It adds shared admission counters across sessions of the local bootstrap profile. **These limits count admitted attempts/starts, not successful operations, tokens or USD.** This local profile scope is not an authenticated multi-user identity. The implementation is locally validated; see the [quota report](reports/RESOURCE_AGGREGATE_QUOTAS_2026-09-07.md) for evidence and concurrency-test limits.
+
+| Field | Values and meaning |
+|---|---|
+| `id` | Unique within at most 128 rules; 1–64 letters, digits, `.`, `_` or `-` |
+| `dimension` | `OWNER`, `PROVIDER` or `TOOL` |
+| `resource` | `LLM_CALL`, `TOOL_START` or `SUB_AGENT` |
+| `maxStarts` | Integer from 0 to 1,000,000,000; zero denies all matching starts |
+| `windowSeconds` | Integer from 60 to 31,536,000; default 86,400 |
+| `selector` | Default `*`; otherwise 1–128 letters, digits or `_.:/-` |
+
+`OWNER` requires `selector="*"` and totals the chosen resource across sessions of the local profile. `PROVIDER` only supports `LLM_CALL`, using lowercase provider names; `TOOL` only supports `TOOL_START`, using exact tool names. A `*` provider/tool selector means **a separate quota per encountered provider/tool**, not one combined quota. Multiple matching rules apply together.
+
+Example PowerShell configuration before launching the application:
+
+```powershell
+$env:PROMETHE_RESOURCE_QUOTAS = '[{"id":"profile-llm-day","dimension":"OWNER","resource":"LLM_CALL","maxStarts":100},{"id":"provider-hour","dimension":"PROVIDER","resource":"LLM_CALL","selector":"*","maxStarts":30,"windowSeconds":3600},{"id":"command-day","dimension":"TOOL","resource":"TOOL_START","selector":"execute_command","maxStarts":10},{"id":"agents-day","dimension":"OWNER","resource":"SUB_AGENT","maxStarts":5}]'
+```
+
+These sample values impose 100 admitted LLM attempts per profile/day, 30 per provider/hour, ten `execute_command` starts/day and five sub-agent starts/day. Choose limits for the experiment before launch. The JSON configuration is limited to 65,536 characters; copying `.env.example` alone does not export process variables.
+
+Counters persist in `<profile>/resource-quotas.sqlite`. Windows are fixed and aligned to the Unix epoch in UTC, not rolling periods from the first request. A backward clock change cannot reopen a past quota window. Changing only `maxStarts` preserves consumption; changing the rule identity, dimension, resource, normalized selector or period establishes a different policy. No automatic history purge is performed.
+
+Rules are loaded at bootstrap: restart the affected sessions/processes to apply a configuration change. Editing the JSON for an already-open session does not reload its rules; no dynamic reload is implemented. Processes sharing a profile must use the same quota configuration.
+
+All matching counters are reserved atomically: a quota denial charges none of them. Aggregate admission occurs before run persistence. A subsequent persistence failure or cancellation keeps the admitted count, with no automatic refund. A root-run budget denial before aggregate admission does not consume an aggregate start.
+
+The integration covers Koog attempts including missing run context and provider fallback, direct tools and sub-agent starts. It does not promise to count SDK-internal HTTP retries individually. A quota denial or unavailable admission storage blocks the provider without fallback.
+
+For diagnostics, use the existing `token_budget` tool to inspect rules, usage and limits, including `resetsAt` (Unix timestamp in milliseconds); policies show their window length in seconds. With wildcard provider/tool rules, counters appear for subjects encountered in the current window; an empty list does not mean the policy is disabled. A consumed start after failure can be expected. These counters are separate from provider billing and the existing run/goal budgets.
 
 ---
 

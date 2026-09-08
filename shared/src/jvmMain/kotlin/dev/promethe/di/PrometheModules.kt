@@ -34,6 +34,7 @@ val coreModule = module {
 
     // HttpClient — created with plugins
     // single { HttpClient { ... } } → registered by AgentBootstrap
+    single<ResourceGovernorRegistry> { PersistentResourceGovernorRegistry(get()) }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -48,6 +49,7 @@ val agentModule = module {
             hookManager = get(),
             toolIntentLedger = PersistentToolIntentLedger(get()),
             policyAuditSink = PersistentPolicyAuditSink(get()),
+            resourceGovernors = get(),
         )
     }
 
@@ -103,6 +105,7 @@ val orchestratorModule = module {
             skillWriter = get(),
             trajectoryEvaluator = get(),
             registry = getOrNull(),
+            resourceGovernors = get(),
         )
     }
 

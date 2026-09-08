@@ -1,0 +1,10 @@
+{
+  "checked_at": "2026-09-07T02:17:35.439098+00:00",
+  "source": "https://api.osv.dev/v1/querybatch",
+  "scope": "Six resolved JVM/Desktop/Web/Android/evals classpaths, Cargo.lock, active Wasm Yarn lock and installed Web tooling npm lock; excludes non-registry Git/tarball dependencies, OS images, external services, disposable Python experiments and Gradle tooling plugins",
+  "npm_lock_entries": 528,
+  "queried": 1345,
+  "matches": [],
+  "errors": [],
+  "advisories": []
+}

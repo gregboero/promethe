@@ -1,0 +1,256 @@
+{
+  "batch": "kotlin-decision-f64874e2-24bc-46a8-a5c7-c6332714f40d",
+  "plannedRuns": 27,
+  "recordedRuns": 27,
+  "correctRuns": 27,
+  "completedRuns": 27,
+  "allRawLedgersPreserved": true,
+  "allSessionsCleaned": true,
+  "cohortSettledRequests": 163,
+  "cohortCostUpperBoundMicroUsd": 1068052,
+  "campaignCapMicroUsd": 5000000,
+  "campaignReservedRequests": 446,
+  "campaignSettledCostUpperBoundMicroUsd": 2696237,
+  "campaignUncertainReservationMicroUsd": 0,
+  "validationScope": {
+    "executedThisIteration": [
+      "shared:ktlintCheck",
+      "shared:jvmTest",
+      "shared:harnessLiveTest",
+      "native identity and fixed-source fixtures preflight"
+    ],
+    "historicalXmlSnapshotsOnly": [
+      "api:jvmTest",
+      "gateway:test",
+      "evals:test",
+      "composeApp:desktopTest"
+    ]
+  },
+  "sourceSha256": {
+    "shared/src/jvmTest/kotlin/dev/promethe/core/HarnessDecisionLiveTest.kt": "a25058974dc021d251e655014d4c484ff861fd8eca82c81e8b755b7bae45dfb1",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/HarnessLiveCampaignTest.kt": "a866fd0ca5e6d7609baccb58917feb84347283376c07b50f61ddd6a75b1ae34c",
+    "shared/src/jvmMain/kotlin/dev/promethe/core/HarnessKotlinRunner.kt": "10b91f7de8ad30a908babfd221c6ffc6b37d8d742a04dcbfa4161822320b3e5a",
+    "shared/src/jvmMain/kotlin/dev/promethe/core/KotlinCompilationCache.kt": "0d437a802536d542344cae768e091bf244b7fd72c55004ad58e67dd939b90214",
+    "shared/src/jvmMain/kotlin/dev/promethe/core/SessionHarness.kt": "1704e54069fea42a01c1e51246d186a9c611d4714b75caf23528d4dabec04b61",
+    "scripts/report-harness-decisions.py": "0617f7746c961cf8d4568c257e6e9c3b1f130bbae8a85e22f4ea2f65f6bddb94"
+  },
+  "allCachesCleaned": true,
+  "pairedComparisons": [
+    {
+      "family": "large_json",
+      "repeat": 1,
+      "mode": "fixed",
+      "bothCorrect": true,
+      "costDeltaMicroUsd": -42643,
+      "latencyDeltaMillis": 14807,
+      "inputTokenDelta": -17153,
+      "modelProposed": false
+    },
+    {
+      "family": "large_json",
+      "repeat": 1,
+      "mode": "free",
+      "bothCorrect": true,
+      "costDeltaMicroUsd": 8657,
+      "latencyDeltaMillis": 1075,
+      "inputTokenDelta": 3645,
+      "modelProposed": false
+    },
+    {
+      "family": "small_mixed",
+      "repeat": 1,
+      "mode": "free",
+      "bothCorrect": true,
+      "costDeltaMicroUsd": 8797,
+      "latencyDeltaMillis": 6738,
+      "inputTokenDelta": 3634,
+      "modelProposed": false
+    },
+    {
+      "family": "small_mixed",
+      "repeat": 1,
+      "mode": "fixed",
+      "bothCorrect": true,
+      "costDeltaMicroUsd": -371,
+      "latencyDeltaMillis": 14210,
+      "inputTokenDelta": -9,
+      "modelProposed": false
+    },
+    {
+      "family": "schema_shift",
+      "repeat": 1,
+      "mode": "fixed",
+      "bothCorrect": true,
+      "costDeltaMicroUsd": -26611,
+      "latencyDeltaMillis": 12186,
+      "inputTokenDelta": -11004,
+      "modelProposed": false
+    },
+    {
+      "family": "schema_shift",
+      "repeat": 1,
+      "mode": "free",
+      "bothCorrect": true,
+      "costDeltaMicroUsd": 9112,
+      "latencyDeltaMillis": -443,
+      "inputTokenDelta": 3645,
+      "modelProposed": false
+    },
+    {
+      "family": "large_json",
+      "repeat": 2,
+      "mode": "free",
+      "bothCorrect": true,
+      "costDeltaMicroUsd": 9270,
+      "latencyDeltaMillis": 276,
+      "inputTokenDelta": 3645,
+      "modelProposed": false
+    },
+    {
+      "family": "large_json",
+      "repeat": 2,
+      "mode": "fixed",
+      "bothCorrect": true,
+      "costDeltaMicroUsd": -38958,
+      "latencyDeltaMillis": 23470,
+      "inputTokenDelta": -16448,
+      "modelProposed": false
+    },
+    {
+      "family": "small_mixed",
+      "repeat": 2,
+      "mode": "fixed",
+      "bothCorrect": true,
+      "costDeltaMicroUsd": 389,
+      "latencyDeltaMillis": 8512,
+      "inputTokenDelta": 31,
+      "modelProposed": false
+    },
+    {
+      "family": "small_mixed",
+      "repeat": 2,
+      "mode": "free",
+      "bothCorrect": true,
+      "costDeltaMicroUsd": 9514,
+      "latencyDeltaMillis": 75,
+      "inputTokenDelta": 3647,
+      "modelProposed": false
+    },
+    {
+      "family": "schema_shift",
+      "repeat": 2,
+      "mode": "fixed",
+      "bothCorrect": true,
+      "costDeltaMicroUsd": -28156,
+      "latencyDeltaMillis": 20867,
+      "inputTokenDelta": -11013,
+      "modelProposed": false
+    },
+    {
+      "family": "schema_shift",
+      "repeat": 2,
+      "mode": "free",
+      "bothCorrect": true,
+      "costDeltaMicroUsd": 8574,
+      "latencyDeltaMillis": -1865,
+      "inputTokenDelta": 3645,
+      "modelProposed": false
+    },
+    {
+      "family": "large_json",
+      "repeat": 3,
+      "mode": "fixed",
+      "bothCorrect": true,
+      "costDeltaMicroUsd": -42179,
+      "latencyDeltaMillis": 20797,
+      "inputTokenDelta": -17059,
+      "modelProposed": false
+    },
+    {
+      "family": "large_json",
+      "repeat": 3,
+      "mode": "free",
+      "bothCorrect": true,
+      "costDeltaMicroUsd": 9581,
+      "latencyDeltaMillis": -423,
+      "inputTokenDelta": 3645,
+      "modelProposed": false
+    },
+    {
+      "family": "small_mixed",
+      "repeat": 3,
+      "mode": "fixed",
+      "bothCorrect": true,
+      "costDeltaMicroUsd": -183,
+      "latencyDeltaMillis": 5547,
+      "inputTokenDelta": -1,
+      "modelProposed": false
+    },
+    {
+      "family": "small_mixed",
+      "repeat": 3,
+      "mode": "free",
+      "bothCorrect": true,
+      "costDeltaMicroUsd": 9177,
+      "latencyDeltaMillis": 986,
+      "inputTokenDelta": 3642,
+      "modelProposed": false
+    },
+    {
+      "family": "schema_shift",
+      "repeat": 3,
+      "mode": "free",
+      "bothCorrect": true,
+      "costDeltaMicroUsd": 8981,
+      "latencyDeltaMillis": 3980,
+      "inputTokenDelta": 3645,
+      "modelProposed": false
+    },
+    {
+      "family": "schema_shift",
+      "repeat": 3,
+      "mode": "fixed",
+      "bothCorrect": true,
+      "costDeltaMicroUsd": -28008,
+      "latencyDeltaMillis": 18402,
+      "inputTokenDelta": -11040,
+      "modelProposed": false
+    }
+  ],
+  "api:jvmTest": {
+    "tests": 76,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "shared:jvmTest": {
+    "tests": 656,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "gateway:test": {
+    "tests": 213,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "evals:test": {
+    "tests": 15,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "composeApp:desktopTest": {
+    "tests": 23,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "shared:harnessLiveTest": {
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+}

@@ -448,7 +448,7 @@ class McpStreamableHttpTransport(
     private fun advertisedClientCapabilities(): JsonObject =
         buildJsonObject {
             inputRequestHandlers.keys
-                .mapNotNull(INPUT_METHOD_CAPABILITIES::get)
+                .mapNotNull(McpProtocol.inputMethodCapabilities::get)
                 .distinct()
                 .sorted()
                 .forEach { capability -> putJsonObject(capability) {} }
@@ -547,12 +547,6 @@ class McpStreamableHttpTransport(
         const val MIN_TASK_POLL_INTERVAL_MS = 10L
         const val MAX_TASK_POLL_INTERVAL_MS = 10_000L
 
-        val INPUT_METHOD_CAPABILITIES =
-            mapOf(
-                "elicitation/create" to "elicitation",
-                "sampling/createMessage" to "sampling",
-                "roots/list" to "roots",
-            )
-        val SUPPORTED_INPUT_REQUEST_METHODS: Set<String> = INPUT_METHOD_CAPABILITIES.keys
+        val SUPPORTED_INPUT_REQUEST_METHODS: Set<String> = McpProtocol.inputMethodCapabilities.keys
     }
 }

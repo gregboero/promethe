@@ -1,0 +1,199 @@
+{
+  "batch": "empty-probe-1e7816a7-f025-4e60-8d9d-622f37f5e266",
+  "recordedCalls": 15,
+  "plannedCalls": 15,
+  "expectedFirstResponses": 12,
+  "responseErrors": {
+    "campaign_empty_content": 1
+  },
+  "finishReasons": {
+    "stop": 15
+  },
+  "independentWireAudits": 15,
+  "requestPayloadHashesVerified": true,
+  "independentDecodersAgree": true,
+  "accounting": {
+    "attemptedCalls": 15,
+    "settledCalls": 15,
+    "uncertainCalls": 0,
+    "unknownUsageCalls": 0,
+    "usageComplete": true,
+    "inputTokens": 3126,
+    "outputTokens": 1421,
+    "costUpperBoundMicroUsd": 24867,
+    "uncertainReservationMicroUsd": 0
+  },
+  "metrics": [
+    {
+      "variant": "text_user",
+      "calls": 3,
+      "expected": 3,
+      "empty": 0,
+      "errors": {},
+      "reasoningTokens": [
+        0,
+        0,
+        0
+      ],
+      "accounting": {
+        "attemptedCalls": 3,
+        "settledCalls": 3,
+        "uncertainCalls": 0,
+        "unknownUsageCalls": 0,
+        "usageComplete": true,
+        "inputTokens": 30,
+        "outputTokens": 12,
+        "costUpperBoundMicroUsd": 219,
+        "uncertainReservationMicroUsd": 0
+      }
+    },
+    {
+      "variant": "text_roles",
+      "calls": 3,
+      "expected": 3,
+      "empty": 0,
+      "errors": {},
+      "reasoningTokens": [
+        0,
+        0,
+        0
+      ],
+      "accounting": {
+        "attemptedCalls": 3,
+        "settledCalls": 3,
+        "uncertainCalls": 0,
+        "unknownUsageCalls": 0,
+        "usageComplete": true,
+        "inputTokens": 60,
+        "outputTokens": 12,
+        "costUpperBoundMicroUsd": 294,
+        "uncertainReservationMicroUsd": 0
+      }
+    },
+    {
+      "variant": "json_roles",
+      "calls": 3,
+      "expected": 3,
+      "empty": 0,
+      "errors": {},
+      "reasoningTokens": [
+        0,
+        0,
+        0
+      ],
+      "accounting": {
+        "attemptedCalls": 3,
+        "settledCalls": 3,
+        "uncertainCalls": 0,
+        "unknownUsageCalls": 0,
+        "usageComplete": true,
+        "inputTokens": 120,
+        "outputTokens": 57,
+        "costUpperBoundMicroUsd": 984,
+        "uncertainReservationMicroUsd": 0
+      }
+    },
+    {
+      "variant": "reconstructed_none",
+      "calls": 3,
+      "expected": 3,
+      "empty": 0,
+      "errors": {},
+      "reasoningTokens": [
+        0,
+        0,
+        0
+      ],
+      "accounting": {
+        "attemptedCalls": 3,
+        "settledCalls": 3,
+        "uncertainCalls": 0,
+        "unknownUsageCalls": 0,
+        "usageComplete": true,
+        "inputTokens": 1458,
+        "outputTokens": 75,
+        "costUpperBoundMicroUsd": 4545,
+        "uncertainReservationMicroUsd": 0
+      }
+    },
+    {
+      "variant": "reconstructed_default",
+      "calls": 3,
+      "expected": 0,
+      "empty": 1,
+      "errors": {
+        "campaign_empty_content": 1
+      },
+      "reasoningTokens": [
+        354,
+        168,
+        86
+      ],
+      "accounting": {
+        "attemptedCalls": 3,
+        "settledCalls": 3,
+        "uncertainCalls": 0,
+        "unknownUsageCalls": 0,
+        "usageComplete": true,
+        "inputTokens": 1458,
+        "outputTokens": 1265,
+        "costUpperBoundMicroUsd": 18825,
+        "uncertainReservationMicroUsd": 0
+      }
+    }
+  ],
+  "campaignBefore": {
+    "requests": 623,
+    "settledMicroUsd": 3827072
+  },
+  "campaignAfter": {
+    "requests": 638,
+    "settledMicroUsd": 3851939,
+    "uncertainReservations": 0,
+    "remainingMicroUsd": 1148061
+  },
+  "priorBudgetRowsUnchanged": true,
+  "toolsExecuted": 0,
+  "nativeWorkers": 0,
+  "sourceSha256": {
+    "shared/src/jvmTest/kotlin/dev/promethe/core/HarnessEmptyResponseLiveTest.kt": "044f83f7572790903579ae4b1773f11f450e9f96e28012bfb163198956029033",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/HarnessProbePrompt.kt": "0f8f30be6077ed7e030e1ec846b188278417366ea93b5bf38eccbe31d1f04541",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/CampaignWireAudit.kt": "4d2e0e0baaa6c7be23d97f85597880ebed70f0d3c633477788ed1196babf1ba5",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/HarnessLiveCampaignTest.kt": "04772d02f715ee026186f3e7125aff54f36b778f44999f7a053978cacee9a4b1",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/CampaignResponseDiagnostics.kt": "800bae85caa28bf5a96fe3f6cdc5a89597aa93e418cd5b52818d838506f59a8d",
+    "scripts/report-harness-empty-probe.py": "1d57b45e8a7e14a27defb331a0b70c63230360fcac9479b72f8e198af82769d4"
+  },
+  "validation": {
+    "shared:jvmTest": {
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared:harnessLiveTest": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "measurementInputSha256": {
+    "build/reports/harness-iteration/live/empty-probe-1e7816a7-f025-4e60-8d9d-622f37f5e266/protocol.json": "4786de004e1499b1d1fbacd7e6cc8c82c3229778d77c186198f03e821b6555ba",
+    "build/reports/harness-iteration/live/empty-probe-1e7816a7-f025-4e60-8d9d-622f37f5e266/results.json": "ecbe5d0a0f6cf4ded11d0e7354c6afa2e93aac77b8cc0604d30521fc9c5ffc51",
+    "build/reports/harness-iteration/live/request-319618db-9839-4980-b5fc-9efb91767058.json": "4aa06cbdeabcbfeabe074b4a0dc714cf205ca5afbb70b491496d5eaeff884633",
+    "build/reports/harness-iteration/live/request-3f95bc7c-7a24-431e-aacb-01674f0a80a5.json": "98dd8f3041e2c14067fcde2f2ce64d3ce98a29bddbfdb9cbdc484cc7afd1d7c0",
+    "build/reports/harness-iteration/live/request-455379cf-a9f1-46c1-9546-dc952be93154.json": "4abc4bdce0d280d968b2e32c4498c0f20c15afca25252cff7faf15c211b3f846",
+    "build/reports/harness-iteration/live/request-507049f7-3395-49c7-af8d-b1b89ab652a7.json": "c75e54d1cde127bac8ab7f2549abbd132a35ed3ecf0ee0d49a17f406b8f25906",
+    "build/reports/harness-iteration/live/request-63fa1893-a40a-43bc-8ffb-a2a10c22b8c6.json": "7853f2c68a8da45fb8ed14fecf32897f66082c063e657a7e7919bd81953613e9",
+    "build/reports/harness-iteration/live/request-66b22a4b-eb25-4ce9-b0ec-c33e7b4d2c06.json": "c1a26c9755787a299f009883afe8143904690c8f9ff15dee4951275f2a309701",
+    "build/reports/harness-iteration/live/request-67bed65d-c575-4061-8a8d-eb091e1495ce.json": "43c122b9b32703e5ef8240ef0a591a2c93646f59802abe148a0453ecac61a6ff",
+    "build/reports/harness-iteration/live/request-6bd60e10-12a1-4a56-b8c0-4a67f7c2758a.json": "5b104ff9910024689ceec6ebf453618e9cf76e1b15d048d99bcf201b5d8d097d",
+    "build/reports/harness-iteration/live/request-72fdbd7f-9a19-45ea-8059-efeac3c2067f.json": "9f7cecb4f90fe2bab76f2281a118d0ca5d70caba49b7cbe128e238bab6bab617",
+    "build/reports/harness-iteration/live/request-998bfbea-4b52-44cc-8ac4-f7a94b0f41f9.json": "ddd27d9baf2211915d9e9a380ac9d6603ac033e211bf9f8977eef85b4dd01bbe",
+    "build/reports/harness-iteration/live/request-b2a663c2-e16e-4948-ac51-c48303f4e416.json": "b6f16af67bbae0c838123171865882fe0e6af5b7e0878ece212b29c79dd15998",
+    "build/reports/harness-iteration/live/request-bfb029ce-5c3b-4ff7-816e-40e88931db2c.json": "c8f084890e513915381bd85816e06e0e219867b4b9a7a30a64d2d5e121c2fcc4",
+    "build/reports/harness-iteration/live/request-c0a11ac5-33b8-485d-9079-94f2074ba615.json": "a573b3ce0cb646bdf1689cfd5ee66141fb155d90af2917baae3c616a02557d1a",
+    "build/reports/harness-iteration/live/request-dbab0caa-c7cc-440f-8520-79a2b7509c1a.json": "162155350ea8988747dcf3726e6a9dfae13e8d75473de079d564edf263565bd9",
+    "build/reports/harness-iteration/live/request-f76c0a52-436a-4902-a66b-1c70a0d67ffb.json": "81c31e0cf7fe7d12dc97094868affb9a470890fca2e7e1547944bafd9583fbbb"
+  }
+}

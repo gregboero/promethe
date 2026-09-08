@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="HarnessExposurePolicyTest[jvm]" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-09-07T20:39:55.652Z" hostname="BUREAU" time="0.0">
+  <properties/>
+  <testcase name="reject invalid measurements and configuration[jvm]" classname="dev.promethe.core.HarnessExposurePolicyTest" time="0.0"/>
+  <testcase name="require repeated large observations and enough remaining work[jvm]" classname="dev.promethe.core.HarnessExposurePolicyTest" time="0.0"/>
+  <testcase name="default hides tools when even complete removal cannot amortize exposure[jvm]" classname="dev.promethe.core.HarnessExposurePolicyTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

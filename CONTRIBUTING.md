@@ -1,5 +1,7 @@
 # Contributing to Promethe
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](docs/EXPERIMENTAL_STATUS.md).
+
 Thank you for your interest in contributing! This document covers what you need
 to get started, the conventions we follow, and the pull-request process.
 

@@ -6,11 +6,11 @@
 
 services:
   litellm:
-    image: ghcr.io/berriai/litellm:main-latest
+    image: ghcr.io/berriai/litellm:v1.100.0@sha256:c8756e7b9a61fe45df2ccb5b781d388c3b2f3a21ef9e4956630caef20f9f03aa
     ports:
-      - "4000:4000"
+      - "127.0.0.1:4000:4000"
     environment:
-      - LITELLM_MASTER_KEY=${LITELLM_MASTER_KEY:-sk-promethe-dev}
+      - LITELLM_MASTER_KEY=${LITELLM_MASTER_KEY:?Set a dedicated LiteLLM test key}
       # Pass-through provider keys to LiteLLM
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
@@ -19,7 +19,7 @@ services:
       - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
       - NVIDIA_NIM_API_KEY=${NVIDIA_NIM_API_KEY:-}
     volumes:
-      - ./litellm-config.yaml:/app/config.yaml
+      - ./litellm-config.yaml:/app/config.yaml:ro
     command: ["--config", "/app/config.yaml", "--port", "4000"]
     restart: unless-stopped
     healthcheck:
@@ -36,4 +36,4 @@ services:
       - LLM_PROVIDER=litellm
       - LLM_MODEL=${LITELLM_MODEL:?Set LITELLM_MODEL to a configured LiteLLM alias}
       - LLM_BASE_URL=http://litellm:4000
-      - LITELLM_API_KEY=${LITELLM_MASTER_KEY:-sk-promethe-dev}
+      - LITELLM_API_KEY=${LITELLM_MASTER_KEY:?Set a dedicated LiteLLM test key}

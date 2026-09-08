@@ -75,6 +75,7 @@ fun gatewayModule(
         OmnichannelGateway(
             agent = get(),
             database = get(),
+            resourceGovernors = get(),
             llmAdapter = get(),
             feedbackCollector = get(),
             mcpBridge = get(),

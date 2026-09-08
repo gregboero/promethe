@@ -81,6 +81,21 @@ kotlin {
 // Exposed and SQLite are JVM-only (no KMP metadata).
 // Must be added via the JVM-specific Gradle configuration directly.
 dependencies {
+    // Security maintenance for transitives brought by Koog/JDA/Twilio/Flyway.
+    add("jvmMainImplementation", platform(libs.netty.bom))
+    add("jvmMainImplementation", platform(libs.jackson2.bom))
+    add("jvmMainImplementation", platform(libs.jackson3.bom))
+    constraints {
+        add("jvmMainImplementation", libs.httpclient5) {
+            because("GHSA-hjcp-jmpx-g3qm: connection pool exhaustion")
+        }
+        add("jvmMainImplementation", libs.httpcore5.core) {
+            because("GHSA-hf6x-8p5f-cgmf: unbounded HTTP header parsing")
+        }
+        add("jvmMainImplementation", libs.httpcore5.h2) {
+            because("GHSA-v3jc-474w-2wm6: unbounded HPACK header list")
+        }
+    }
     add("jvmMainImplementation", libs.ktor.client.cio)
     add("jvmMainImplementation", libs.opentelemetry.api)
     add("jvmMainImplementation", libs.opentelemetry.extension.kotlin)
@@ -97,6 +112,15 @@ dependencies {
     add("jvmMainImplementation", libs.flyway.core)
 }
 
+tasks.withType<Test>().configureEach {
+    doFirst {
+        val file = layout.buildDirectory.file("test-fixtures/$name-classpath.txt").get().asFile
+        file.parentFile.mkdirs()
+        file.writeText(classpath.asPath)
+        systemProperty("promethe.test.classpathFile", file.absolutePath)
+    }
+}
+
 tasks.withType<Test> {
     environment("PROMETHE_DB_URL", "jdbc:sqlite::memory:")
 }
@@ -104,6 +128,50 @@ tasks.withType<Test> {
 val jvmTestTask = tasks.named<Test>("jvmTest")
 jvmTestTask.configure {
     exclude("**/NocturnalProviderTest*")
+    exclude("**/HarnessLiveCampaignTest*")
+    exclude("**/HarnessDecisionLiveTest*")
+    exclude("**/HarnessEmptyResponseLiveTest*")
+    exclude("**/HarnessKoogProtocolLiveTest*")
+    exclude("**/HarnessKoogMutationLiveTest*")
+    exclude("**/HarnessKotlinDirectedLiveTest*")
+    exclude("**/HarnessKotlinAmortizationLiveTest*")
+    exclude("**/HarnessKotlinNativeTest*")
+    exclude("**/HarnessKotlinCacheNativeTest*")
+    exclude("**/HarnessKotlinWorkerLatencyNativeTest*")
+    exclude("**/HarnessKotlinRuntimeNativeTest*")
+    exclude("**/HarnessAdaptationNativeTest*")
+}
+
+tasks.register<Test>("harnessLiveTest") {
+    description = "Runs the opt-in native harness experiment with a durable five USD ceiling"
+    group = "verification"
+    testClassesDirs = jvmTestTask.get().testClassesDirs
+    classpath = jvmTestTask.get().classpath
+    include("**/HarnessLiveCampaignTest*")
+    include("**/HarnessDecisionLiveTest*")
+    include("**/HarnessEmptyResponseLiveTest*")
+    include("**/HarnessKoogProtocolLiveTest*")
+    include("**/HarnessKoogMutationLiveTest*")
+    include("**/HarnessKotlinDirectedLiveTest*")
+    include("**/HarnessKotlinAmortizationLiveTest*")
+    environment("PROMETHE_DB_URL", "jdbc:sqlite::memory:")
+    outputs.upToDateWhen { false }
+    shouldRunAfter(jvmTestTask)
+}
+
+tasks.register<Test>("harnessKotlinNativeTest") {
+    dependsOn(":harness-kotlin:prepareRuntime")
+    description = "Runs the opt-in native Kotlin scripting experiment (no model calls)"
+    group = "verification"
+    testClassesDirs = jvmTestTask.get().testClassesDirs
+    classpath = jvmTestTask.get().classpath
+    include("**/HarnessKotlinNativeTest*")
+    include("**/HarnessKotlinCacheNativeTest*")
+    include("**/HarnessKotlinWorkerLatencyNativeTest*")
+    include("**/HarnessKotlinRuntimeNativeTest*")
+    include("**/HarnessAdaptationNativeTest*")
+    environment("PROMETHE_DB_URL", "jdbc:sqlite::memory:")
+    outputs.upToDateWhen { false }
 }
 
 tasks.register<Test>("providerLiveTest") {

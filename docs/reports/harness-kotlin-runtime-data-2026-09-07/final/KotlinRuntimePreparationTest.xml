@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="KotlinRuntimePreparationTest[jvm]" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-09-07T22:25:31.846Z" hostname="BUREAU" time="0.214">
+  <properties/>
+  <testcase name="capacity never evicts an active session and overflow remains disposable[jvm]" classname="dev.promethe.core.KotlinRuntimePreparationTest" time="0.073"/>
+  <testcase name="reuse checks bytes in both source and prepared files[jvm]" classname="dev.promethe.core.KotlinRuntimePreparationTest" time="0.108"/>
+  <testcase name="unreadable source discards its prior prepared snapshot[jvm]" classname="dev.promethe.core.KotlinRuntimePreparationTest" time="0.032"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

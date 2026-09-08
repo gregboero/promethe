@@ -2,6 +2,7 @@ package dev.promethe.core
 
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.serialization.Serializable
 import kotlin.time.Clock
 
 data class ResourceBudget(
@@ -26,6 +27,7 @@ data class ResourceBudget(
     }
 }
 
+@Serializable
 enum class GovernedResource {
     LLM_CALL,
     TOOL_START,
@@ -39,6 +41,7 @@ enum class ResourceLimit {
     TOOL_STARTS,
     SUB_AGENTS,
     DURATION,
+    AGGREGATE_STARTS,
 }
 
 sealed interface ResourceAdmission {
@@ -49,6 +52,7 @@ sealed interface ResourceAdmission {
     data class Denied(
         val limit: ResourceLimit,
         val snapshot: ResourceUsageSnapshot,
+        val quota: ResourceQuotaUsage? = null,
     ) : ResourceAdmission
 }
 
@@ -63,26 +67,80 @@ data class ResourceUsageSnapshot(
     val elapsedMs: Long,
 )
 
+data class ResourceGovernorState(
+    val rootRunId: String,
+    val budget: ResourceBudget,
+    val startedAt: Long,
+    val tokensUsed: Long = 0,
+    val costDollars: Double = 0.0,
+    val llmCallsStarted: Int = 0,
+    val toolsStarted: Int = 0,
+    val subAgentsStarted: Int = 0,
+    val version: Long = 0,
+) {
+    init {
+        require(tokensUsed >= 0) { "Persisted token usage must not be negative" }
+        require(costDollars >= 0.0 && costDollars.isFinite()) { "Persisted cost must be finite and non-negative" }
+        require(llmCallsStarted >= 0) { "Persisted LLM starts must not be negative" }
+        require(toolsStarted >= 0) { "Persisted tool starts must not be negative" }
+        require(subAgentsStarted >= 0) { "Persisted sub-agent starts must not be negative" }
+        require(version >= 0) { "Persisted resource version must not be negative" }
+    }
+}
+
+fun interface ResourceGovernorStateWriter {
+    suspend fun persist(
+        expectedVersion: Long,
+        state: ResourceGovernorState,
+    ): Boolean
+}
+
 class ResourceGovernor(
     val rootRunId: String,
     val budget: ResourceBudget,
     private val now: () -> Long = { Clock.System.now().toEpochMilliseconds() },
+    initialState: ResourceGovernorState? = null,
+    private val stateWriter: ResourceGovernorStateWriter? = null,
+    private val aggregateQuotas: ResourceQuotaBank = ResourceQuotaBank.NONE,
 ) {
     private val mutex = Mutex()
-    private val startedAt = now()
-    private var tokensUsed = 0L
-    private var costDollars = 0.0
-    private var llmCallsStarted = 0
-    private var toolsStarted = 0
-    private var subAgentsStarted = 0
+    private val startedAt = initialState?.startedAt ?: now()
+    private var tokensUsed = initialState?.tokensUsed ?: 0L
+    private var costDollars = initialState?.costDollars ?: 0.0
+    private var llmCallsStarted = initialState?.llmCallsStarted ?: 0
+    private var toolsStarted = initialState?.toolsStarted ?: 0
+    private var subAgentsStarted = initialState?.subAgentsStarted ?: 0
+    private var version = initialState?.version ?: 0L
 
-    suspend fun admit(resource: GovernedResource): ResourceAdmission =
+    init {
+        require(initialState == null || initialState.rootRunId == rootRunId) { "Persisted resource state belongs to another run" }
+        require(initialState == null || initialState.budget == budget) { "Persisted resource budget does not match the requested budget" }
+    }
+
+    suspend fun admit(
+        resource: GovernedResource,
+        scope: ResourceQuotaScope = ResourceQuotaScope(),
+    ): ResourceAdmission =
         mutex.withLock {
             val deniedLimit = exhaustedLimit()
             if (deniedLimit != null) return@withLock ResourceAdmission.Denied(deniedLimit, snapshotUnsafe())
             val countLimit = countLimit(resource)
             if (countLimit != null) return@withLock ResourceAdmission.Denied(countLimit, snapshotUnsafe())
 
+            aggregateQuotas.reserve(resource, scope)?.let { quota ->
+                return@withLock ResourceAdmission.Denied(ResourceLimit.AGGREGATE_STARTS, snapshotUnsafe(), quota)
+            }
+
+            val nextLlmCalls = llmCallsStarted.incrementIf(resource == GovernedResource.LLM_CALL)
+            val nextTools = toolsStarted.incrementIf(resource == GovernedResource.TOOL_START)
+            val nextSubAgents = subAgentsStarted.incrementIf(resource == GovernedResource.SUB_AGENT)
+            persistNext(
+                tokens = tokensUsed,
+                cost = costDollars,
+                llmCalls = nextLlmCalls,
+                tools = nextTools,
+                subAgents = nextSubAgents,
+            )
             when (resource) {
                 GovernedResource.LLM_CALL -> llmCallsStarted++
                 GovernedResource.TOOL_START -> toolsStarted++
@@ -98,8 +156,17 @@ class ResourceGovernor(
         mutex.withLock {
             require(tokens >= 0) { "Recorded token usage must not be negative" }
             require(cost >= 0.0 && cost.isFinite()) { "Recorded cost must be finite and non-negative" }
-            tokensUsed = if (Long.MAX_VALUE - tokensUsed < tokens) Long.MAX_VALUE else tokensUsed + tokens
-            costDollars = (costDollars + cost).takeIf(Double::isFinite) ?: Double.MAX_VALUE
+            val nextTokens = if (Long.MAX_VALUE - tokensUsed < tokens) Long.MAX_VALUE else tokensUsed + tokens
+            val nextCost = (costDollars + cost).takeIf(Double::isFinite) ?: Double.MAX_VALUE
+            persistNext(
+                tokens = nextTokens,
+                cost = nextCost,
+                llmCalls = llmCallsStarted,
+                tools = toolsStarted,
+                subAgents = subAgentsStarted,
+            )
+            tokensUsed = nextTokens
+            costDollars = nextCost
             snapshotUnsafe()
         }
 
@@ -140,8 +207,37 @@ class ResourceGovernor(
             elapsedMs = elapsedMs(),
         )
 
+    private suspend fun persistNext(
+        tokens: Long,
+        cost: Double,
+        llmCalls: Int,
+        tools: Int,
+        subAgents: Int,
+    ) {
+        val writer = stateWriter ?: return
+        val expectedVersion = version
+        val nextState =
+            ResourceGovernorState(
+                rootRunId = rootRunId,
+                budget = budget,
+                startedAt = startedAt,
+                tokensUsed = tokens,
+                costDollars = cost,
+                llmCallsStarted = llmCalls,
+                toolsStarted = tools,
+                subAgentsStarted = subAgents,
+                version = expectedVersion + 1,
+            )
+        check(writer.persist(expectedVersion, nextState)) {
+            "Resource budget state changed concurrently or could not be persisted"
+        }
+        version = nextState.version
+    }
+
     private fun elapsedMs(): Long = (now() - startedAt).coerceAtLeast(0)
 }
+
+private fun Int.incrementIf(condition: Boolean): Int = if (!condition || this == Int.MAX_VALUE) this else this + 1
 
 sealed interface ResourceGovernorAcquisition {
     data class Acquired(
@@ -168,6 +264,16 @@ sealed interface ChildResourceBinding {
 }
 
 interface ResourceGovernorRegistry {
+    fun quotaPolicies(): List<ResourceQuotaRule> = emptyList()
+
+    suspend fun admit(
+        runId: String?,
+        resource: GovernedResource,
+        scope: ResourceQuotaScope = ResourceQuotaScope(),
+    ): ResourceAdmission? = runId?.let { governorForRun(it)?.admit(resource, scope) }
+
+    suspend fun quotaSnapshot(): List<ResourceQuotaUsage> = emptyList()
+
     suspend fun acquire(
         runId: String,
         sessionId: String,
@@ -270,6 +376,9 @@ class InMemoryResourceGovernorRegistry : ResourceGovernorRegistry {
 object GlobalResourceGovernorRegistry : ResourceGovernorRegistry by InMemoryResourceGovernorRegistry()
 
 internal fun ResourceAdmission.Denied.message(): String =
-    "Resource budget exceeded: ${limit.name.lowercase()} " +
-        "(tokens=${snapshot.tokensUsed}, cost=${snapshot.costDollars}, llm=${snapshot.llmCallsStarted}, " +
-        "tools=${snapshot.toolsStarted}, subAgents=${snapshot.subAgentsStarted}, elapsedMs=${snapshot.elapsedMs})"
+    quota?.let { "Aggregate start quota exceeded: ${it.ruleId} (${it.dimension.name.lowercase()}/${it.subject}, used=${it.used}, max=${it.maxStarts}, resetsAt=${it.resetsAt})" }
+        ?: (
+            "Resource budget exceeded: ${limit.name.lowercase()} " +
+                "(tokens=${snapshot.tokensUsed}, cost=${snapshot.costDollars}, llm=${snapshot.llmCallsStarted}, " +
+                "tools=${snapshot.toolsStarted}, subAgents=${snapshot.subAgentsStarted}, elapsedMs=${snapshot.elapsedMs})"
+        )

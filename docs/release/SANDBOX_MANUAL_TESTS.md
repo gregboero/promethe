@@ -1,5 +1,7 @@
 # Sandbox Manual Test Matrix
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](../EXPERIMENTAL_STATUS.md).
+
 Run these checks with a release artifact, not from the IDE. Record Promethe
 version, helper checksum, OS/build, workspace path, tester, timestamp,
 expected result, observed result and a redacted log or screenshot. Do not use
@@ -49,7 +51,7 @@ used. If the helper is absent, the expected result for process tools is
 | S17 | Request `ALLOWLIST` or change network settings while using selected roots or `FULL_ACCESS` | The request is rejected or remains `OFF`; no network access is enabled and no silent downgrade occurs. |
 | S18 | Change the permission profile from a remote owner session to `FULL_ACCESS` | The API returns forbidden; remote access cannot grant full local file access. |
 | S19 | Submit an approval, mutate one argument, then reuse the approval | The mutated request requires a new approval. The old grant does not match. |
-| S20 | Exercise ONCE, SESSION and PERSISTENT approval scopes | ONCE is consumed, SESSION expires/revokes with the session, and PERSISTENT lasts only for the current gateway process until durable persistence is implemented. Deny always wins. |
+| S20 | Exercise ONCE, SESSION and PERSISTENT approval scopes | ONCE is consumed, SESSION expires/revokes with the session, and PERSISTENT is offered only for an exact CONFIG_CHANGE fingerprint, survives a gateway restart, and remains effective until local-owner revocation. Deny always wins. |
 | S21 | Start MCP stdio | It fails closed with `SANDBOX_PROTOCOL_V2_REQUIRED`; no unmanaged stdio process is created. |
 | S22 | Start MCP over an implemented network transport | It follows its own authenticated gateway/network policy; this test does not imply stdio support. |
 | S23 | Run the Linux helper self-test | On a Linux target with compatible Bubblewrap/seccomp, status is available and self-test passes; otherwise process tools remain unavailable. |

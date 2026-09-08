@@ -1,0 +1,6452 @@
+{
+  "checked_at": "2026-09-07T00:06:36.999847+00:00",
+  "source": "https://api.osv.dev/v1/querybatch",
+  "scope": "Four resolved JVM/Desktop/Web classpaths and Cargo.lock; excludes OS images, external services and tooling plugins",
+  "queried": 689,
+  "matches": [
+    {
+      "package": {
+        "ecosystem": "Maven",
+        "name": "ch.qos.logback:logback-core"
+      },
+      "version": "1.5.18",
+      "vulns": [
+        {
+          "id": "GHSA-25qh-j22f-pwp8",
+          "modified": "2026-02-04T04:36:33.093619Z"
+        },
+        {
+          "id": "GHSA-jhq6-gfmj-v8fx",
+          "modified": "2026-07-15T22:00:52.732394Z"
+        },
+        {
+          "id": "GHSA-p47f-322f-whfh",
+          "modified": "2026-07-03T10:14:36.248327Z"
+        },
+        {
+          "id": "GHSA-qqpg-mvqg-649v",
+          "modified": "2026-02-04T04:14:42.648926Z"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "Maven",
+        "name": "com.fasterxml.jackson.core:jackson-core"
+      },
+      "version": "2.21.3",
+      "vulns": [
+        {
+          "id": "GHSA-r7wm-3cxj-wff9",
+          "modified": "2026-08-05T03:41:57.338106Z"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "Maven",
+        "name": "com.fasterxml.jackson.core:jackson-databind"
+      },
+      "version": "2.21.3",
+      "vulns": [
+        {
+          "id": "GHSA-3pjw-73gf-8qr5",
+          "modified": "2026-07-25T03:29:37.657238Z"
+        },
+        {
+          "id": "GHSA-5gvw-p9qm-jgwh",
+          "modified": "2026-08-03T21:00:23.035506Z"
+        },
+        {
+          "id": "GHSA-5hh8-q8hv-fr38",
+          "modified": "2026-07-20T21:30:31.775056Z"
+        },
+        {
+          "id": "GHSA-5jmj-h7xm-6q6v",
+          "modified": "2026-07-16T21:30:21.943601Z"
+        },
+        {
+          "id": "GHSA-9fxm-vc8v-hj55",
+          "modified": "2026-07-20T21:30:34.130614Z"
+        },
+        {
+          "id": "GHSA-hgj6-7826-r7m5",
+          "modified": "2026-07-20T21:30:31.809711Z"
+        },
+        {
+          "id": "GHSA-j3rv-43j4-c7qm",
+          "modified": "2026-07-20T21:30:40.174709Z"
+        },
+        {
+          "id": "GHSA-mhm7-754m-9p8w",
+          "modified": "2026-07-22T20:59:38.271594Z"
+        },
+        {
+          "id": "GHSA-rcqc-6cw3-h962",
+          "modified": "2026-07-20T21:30:42.517351Z"
+        },
+        {
+          "id": "GHSA-rmj7-2vxq-3g9f",
+          "modified": "2026-09-02T15:45:20.112407Z"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "Maven",
+        "name": "io.netty:netty-codec-dns"
+      },
+      "version": "4.2.5.Final",
+      "vulns": [
+        {
+          "id": "GHSA-cm33-6792-r9fm",
+          "modified": "2026-05-14T20:50:50.147382Z"
+        },
+        {
+          "id": "GHSA-mfg7-5gfp-c4w3",
+          "modified": "2026-08-15T02:11:52.623012Z"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "Maven",
+        "name": "io.netty:netty-handler"
+      },
+      "version": "4.2.5.Final",
+      "vulns": [
+        {
+          "id": "GHSA-3qp7-7mw8-wx86",
+          "modified": "2026-06-12T19:30:08.471567Z"
+        },
+        {
+          "id": "GHSA-c653-97m9-rcg9",
+          "modified": "2026-06-16T15:44:21.668164Z"
+        },
+        {
+          "id": "GHSA-x4gw-5cx5-pgmh",
+          "modified": "2026-06-12T19:45:13.007385Z"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "Maven",
+        "name": "io.netty:netty-resolver-dns"
+      },
+      "version": "4.2.5.Final",
+      "vulns": [
+        {
+          "id": "GHSA-5pvg-856g-cp85",
+          "modified": "2026-09-02T15:45:20.049120Z"
+        },
+        {
+          "id": "GHSA-676x-f7gg-47vc",
+          "modified": "2026-09-02T15:45:32.649308Z"
+        },
+        {
+          "id": "GHSA-xmv7-r254-6q78",
+          "modified": "2026-06-12T19:45:12.897371Z"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "Maven",
+        "name": "org.apache.httpcomponents.client5:httpclient5"
+      },
+      "version": "5.5.1",
+      "vulns": [
+        {
+          "id": "GHSA-hjcp-jmpx-g3qm",
+          "modified": "2026-08-14T21:42:00.776314Z"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "Maven",
+        "name": "org.apache.httpcomponents.core5:httpcore5"
+      },
+      "version": "5.3.6",
+      "vulns": [
+        {
+          "id": "GHSA-hf6x-8p5f-cgmf",
+          "modified": "2026-08-13T21:42:04.308288Z"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "Maven",
+        "name": "org.apache.httpcomponents.core5:httpcore5-h2"
+      },
+      "version": "5.3.6",
+      "vulns": [
+        {
+          "id": "GHSA-v3jc-474w-2wm6",
+          "modified": "2026-08-14T15:42:06.375163Z"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "Maven",
+        "name": "tools.jackson.core:jackson-core"
+      },
+      "version": "3.1.1",
+      "vulns": [
+        {
+          "id": "GHSA-r7wm-3cxj-wff9",
+          "modified": "2026-08-05T03:41:57.338106Z"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "Maven",
+        "name": "tools.jackson.core:jackson-databind"
+      },
+      "version": "3.1.1",
+      "vulns": [
+        {
+          "id": "GHSA-3pjw-73gf-8qr5",
+          "modified": "2026-07-25T03:29:37.657238Z"
+        },
+        {
+          "id": "GHSA-5gvw-p9qm-jgwh",
+          "modified": "2026-08-03T21:00:23.035506Z"
+        },
+        {
+          "id": "GHSA-5hh8-q8hv-fr38",
+          "modified": "2026-07-20T21:30:31.775056Z"
+        },
+        {
+          "id": "GHSA-5jmj-h7xm-6q6v",
+          "modified": "2026-07-16T21:30:21.943601Z"
+        },
+        {
+          "id": "GHSA-9fxm-vc8v-hj55",
+          "modified": "2026-07-20T21:30:34.130614Z"
+        },
+        {
+          "id": "GHSA-hgj6-7826-r7m5",
+          "modified": "2026-07-20T21:30:31.809711Z"
+        },
+        {
+          "id": "GHSA-j3rv-43j4-c7qm",
+          "modified": "2026-07-20T21:30:40.174709Z"
+        },
+        {
+          "id": "GHSA-rcqc-6cw3-h962",
+          "modified": "2026-07-20T21:30:42.517351Z"
+        },
+        {
+          "id": "GHSA-rmj7-2vxq-3g9f",
+          "modified": "2026-09-02T15:45:20.112407Z"
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "advisories": [
+    {
+      "id": "GHSA-25qh-j22f-pwp8",
+      "summary": "QOS.CH logback-core is vulnerable to Arbitrary Code Execution through file processing",
+      "aliases": [
+        "CVE-2025-11226"
+      ],
+      "published": "2025-10-01T09:30:24Z",
+      "modified": "2026-02-04T04:36:33.093619Z",
+      "withdrawn": null,
+      "severity": [
+        {
+          "type": "CVSS_V4",
+          "score": "CVSS:4.0/AV:L/AC:L/AT:P/PR:H/UI:P/VC:H/VI:L/VA:L/SC:H/SI:L/SA:L"
+        }
+      ],
+      "references": [
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-11226"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/qos-ch/logback/issues/974"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/qos-ch/logback/commit/61f6a2544f36b3016e0efd434ee21f19269f1df7"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/qos-ch/logback"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/qos-ch/logback/releases/tag/v_1.5.19"
+        },
+        {
+          "type": "WEB",
+          "url": "https://logback.qos.ch/news.html#1.3.16"
+        },
+        {
+          "type": "WEB",
+          "url": "https://logback.qos.ch/news.html#1.5.19"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "ch.qos.logback:logback-core",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/ch.qos.logback/logback-core"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "1.4.0"
+                },
+                {
+                  "fixed": "1.5.19"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "1.4.0",
+            "1.4.1",
+            "1.4.10",
+            "1.4.11",
+            "1.4.12",
+            "1.4.13",
+            "1.4.14",
+            "1.4.2",
+            "1.4.3",
+            "1.4.4",
+            "1.4.5",
+            "1.4.6",
+            "1.4.7",
+            "1.4.8",
+            "1.4.9",
+            "1.5.0",
+            "1.5.1",
+            "1.5.10",
+            "1.5.11",
+            "1.5.12",
+            "1.5.13",
+            "1.5.14",
+            "1.5.15",
+            "1.5.16",
+            "1.5.17",
+            "1.5.18",
+            "1.5.2",
+            "1.5.3",
+            "1.5.4",
+            "1.5.5",
+            "1.5.6",
+            "1.5.7",
+            "1.5.8",
+            "1.5.9"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2025/10/GHSA-25qh-j22f-pwp8/GHSA-25qh-j22f-pwp8.json"
+          }
+        },
+        {
+          "package": {
+            "name": "ch.qos.logback:logback-core",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/ch.qos.logback/logback-core"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "0"
+                },
+                {
+                  "fixed": "1.3.16"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "0.2.5",
+            "0.3",
+            "0.5",
+            "0.6",
+            "0.7",
+            "0.7.1",
+            "0.8",
+            "0.8.1",
+            "0.9",
+            "0.9.1",
+            "0.9.10",
+            "0.9.11",
+            "0.9.12",
+            "0.9.13",
+            "0.9.14",
+            "0.9.15",
+            "0.9.16",
+            "0.9.17",
+            "0.9.18",
+            "0.9.19",
+            "0.9.2",
+            "0.9.20",
+            "0.9.21",
+            "0.9.22",
+            "0.9.23",
+            "0.9.24",
+            "0.9.25",
+            "0.9.26",
+            "0.9.27",
+            "0.9.28",
+            "0.9.29",
+            "0.9.3",
+            "0.9.30",
+            "0.9.4",
+            "0.9.5",
+            "0.9.6",
+            "0.9.7",
+            "0.9.8",
+            "0.9.9",
+            "1.0.0",
+            "1.0.1",
+            "1.0.10",
+            "1.0.11",
+            "1.0.12",
+            "1.0.13",
+            "1.0.2",
+            "1.0.3",
+            "1.0.4",
+            "1.0.5",
+            "1.0.6",
+            "1.0.7",
+            "1.0.8",
+            "1.0.9",
+            "1.1.0",
+            "1.1.1",
+            "1.1.10",
+            "1.1.11",
+            "1.1.2",
+            "1.1.3",
+            "1.1.4",
+            "1.1.5",
+            "1.1.6",
+            "1.1.7",
+            "1.1.8",
+            "1.1.9",
+            "1.2.0",
+            "1.2.1",
+            "1.2.10",
+            "1.2.11",
+            "1.2.12",
+            "1.2.13",
+            "1.2.2",
+            "1.2.3",
+            "1.2.4",
+            "1.2.4-groovyless",
+            "1.2.5",
+            "1.2.6",
+            "1.2.7",
+            "1.2.8",
+            "1.2.9",
+            "1.3.0",
+            "1.3.0-alpha0",
+            "1.3.0-alpha1",
+            "1.3.0-alpha10",
+            "1.3.0-alpha11",
+            "1.3.0-alpha12",
+            "1.3.0-alpha13",
+            "1.3.0-alpha14",
+            "1.3.0-alpha15",
+            "1.3.0-alpha16",
+            "1.3.0-alpha2",
+            "1.3.0-alpha3",
+            "1.3.0-alpha4",
+            "1.3.0-alpha5",
+            "1.3.0-alpha6",
+            "1.3.0-alpha7",
+            "1.3.0-alpha8",
+            "1.3.0-alpha9",
+            "1.3.0-beta0",
+            "1.3.1",
+            "1.3.10",
+            "1.3.11",
+            "1.3.12",
+            "1.3.13",
+            "1.3.14",
+            "1.3.15",
+            "1.3.2",
+            "1.3.3",
+            "1.3.4",
+            "1.3.5",
+            "1.3.6",
+            "1.3.7",
+            "1.3.8",
+            "1.3.9"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2025/10/GHSA-25qh-j22f-pwp8/GHSA-25qh-j22f-pwp8.json"
+          }
+        }
+      ]
+    },
+    {
+      "id": "GHSA-3pjw-73gf-8qr5",
+      "summary": "jackson-databind: @JsonIgnore on a Record property is bypassed with a PropertyNamingStrategy",
+      "aliases": [
+        "CVE-2026-59888"
+      ],
+      "published": "2026-07-21T19:33:06Z",
+      "modified": "2026-07-25T03:29:37.657238077Z",
+      "withdrawn": null,
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N"
+        }
+      ],
+      "references": [
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/security/advisories/GHSA-3pjw-73gf-8qr5"
+        },
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-59888"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/pull/5974"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/commit/baa2cdf5ca2b2717fbb88d91955d69d8651df3e4"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/commit/c7c678360624da5bc7eed2152789fa522880db9d"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/FasterXML/jackson-databind"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "com.fasterxml.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "2.15.0"
+                },
+                {
+                  "fixed": "2.18.8"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "2.15.0",
+            "2.15.1",
+            "2.15.2",
+            "2.15.3",
+            "2.15.4",
+            "2.16.0",
+            "2.16.0-rc1",
+            "2.16.1",
+            "2.16.2",
+            "2.17.0",
+            "2.17.0-rc1",
+            "2.17.1",
+            "2.17.2",
+            "2.17.3",
+            "2.18.0",
+            "2.18.0-rc1",
+            "2.18.1",
+            "2.18.2",
+            "2.18.3",
+            "2.18.4",
+            "2.18.5",
+            "2.18.6",
+            "2.18.7"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/07/GHSA-3pjw-73gf-8qr5/GHSA-3pjw-73gf-8qr5.json"
+          }
+        },
+        {
+          "package": {
+            "name": "com.fasterxml.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "2.19.0"
+                },
+                {
+                  "fixed": "2.21.4"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "2.19.0",
+            "2.19.1",
+            "2.19.2",
+            "2.19.3",
+            "2.19.4",
+            "2.20.0",
+            "2.20.0-rc1",
+            "2.20.1",
+            "2.20.2",
+            "2.21.0",
+            "2.21.1",
+            "2.21.2",
+            "2.21.3"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/07/GHSA-3pjw-73gf-8qr5/GHSA-3pjw-73gf-8qr5.json"
+          }
+        },
+        {
+          "package": {
+            "name": "tools.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/tools.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "3.0.0"
+                },
+                {
+                  "fixed": "3.1.4"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "3.0.0",
+            "3.0.1",
+            "3.0.2",
+            "3.0.3",
+            "3.0.4",
+            "3.1.0",
+            "3.1.0-rc1",
+            "3.1.1",
+            "3.1.2",
+            "3.1.3"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/07/GHSA-3pjw-73gf-8qr5/GHSA-3pjw-73gf-8qr5.json"
+          }
+        }
+      ]
+    },
+    {
+      "id": "GHSA-3qp7-7mw8-wx86",
+      "summary": "Netty has an IPv6 Subnet Filter Bypass via Incorrect Comparator Masking",
+      "aliases": [
+        "CVE-2026-44249"
+      ],
+      "published": "2026-06-08T19:00:33Z",
+      "modified": "2026-06-12T19:30:08.471567878Z",
+      "withdrawn": null,
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        }
+      ],
+      "references": [
+        {
+          "type": "WEB",
+          "url": "https://github.com/netty/netty/security/advisories/GHSA-3qp7-7mw8-wx86"
+        },
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-44249"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/netty/netty"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/netty/netty/releases/tag/netty-4.1.135.Final"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/netty/netty/releases/tag/netty-4.2.15.Final"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "io.netty:netty-handler",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/io.netty/netty-handler"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "4.2.0.Final"
+                },
+                {
+                  "fixed": "4.2.15.Final"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "4.2.0.Final",
+            "4.2.1.Final",
+            "4.2.10.Final",
+            "4.2.11.Final",
+            "4.2.12.Final",
+            "4.2.13.Final",
+            "4.2.14.Final",
+            "4.2.2.Final",
+            "4.2.3.Final",
+            "4.2.4.Final",
+            "4.2.5.Final",
+            "4.2.6.Final",
+            "4.2.7.Final",
+            "4.2.8.Final",
+            "4.2.9.Final"
+          ],
+          "database_specific": {
+            "last_known_affected_version_range": "<= 4.2.14.Final",
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-3qp7-7mw8-wx86/GHSA-3qp7-7mw8-wx86.json"
+          }
+        },
+        {
+          "package": {
+            "name": "io.netty:netty-handler",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/io.netty/netty-handler"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "0"
+                },
+                {
+                  "fixed": "4.1.135.Final"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "4.0.0.Alpha1",
+            "4.0.0.Alpha2",
+            "4.0.0.Alpha3",
+            "4.0.0.Alpha4",
+            "4.0.0.Alpha5",
+            "4.0.0.Alpha6",
+            "4.0.0.Alpha7",
+            "4.0.0.Alpha8",
+            "4.0.0.Beta1",
+            "4.0.0.Beta2",
+            "4.0.0.Beta3",
+            "4.0.0.CR1",
+            "4.0.0.CR2",
+            "4.0.0.CR3",
+            "4.0.0.CR4",
+            "4.0.0.CR5",
+            "4.0.0.CR6",
+            "4.0.0.CR7",
+            "4.0.0.CR8",
+            "4.0.0.CR9",
+            "4.0.0.Final",
+            "4.0.1.Final",
+            "4.0.10.Final",
+            "4.0.11.Final",
+            "4.0.12.Final",
+            "4.0.13.Final",
+            "4.0.14.Beta1",
+            "4.0.14.Final",
+            "4.0.15.Final",
+            "4.0.16.Final",
+            "4.0.17.Final",
+            "4.0.18.Final",
+            "4.0.19.Final",
+            "4.0.2.Final",
+            "4.0.20.Final",
+            "4.0.21.Final",
+            "4.0.22.Final",
+            "4.0.23.Final",
+            "4.0.24.Final",
+            "4.0.25.Final",
+            "4.0.26.Final",
+            "4.0.27.Final",
+            "4.0.28.Final",
+            "4.0.29.Final",
+            "4.0.3.Final",
+            "4.0.30.Final",
+            "4.0.31.Final",
+            "4.0.32.Final",
+            "4.0.33.Final",
+            "4.0.34.Final",
+            "4.0.35.Final",
+            "4.0.36.Final",
+            "4.0.37.Final",
+            "4.0.38.Final",
+            "4.0.39.Final",
+            "4.0.4.Final",
+            "4.0.40.Final",
+            "4.0.41.Final",
+            "4.0.42.Final",
+            "4.0.43.Final",
+            "4.0.44.Final",
+            "4.0.45.Final",
+            "4.0.46.Final",
+            "4.0.47.Final",
+            "4.0.48.Final",
+            "4.0.49.Final",
+            "4.0.5.Final",
+            "4.0.50.Final",
+            "4.0.51.Final",
+            "4.0.52.Final",
+            "4.0.53.Final",
+            "4.0.54.Final",
+            "4.0.55.Final",
+            "4.0.56.Final",
+            "4.0.6.Final",
+            "4.0.7.Final",
+            "4.0.8.Final",
+            "4.0.9.Final",
+            "4.1.0.Beta1",
+            "4.1.0.Beta2",
+            "4.1.0.Beta3",
+            "4.1.0.Beta4",
+            "4.1.0.Beta5",
+            "4.1.0.Beta6",
+            "4.1.0.Beta7",
+            "4.1.0.Beta8",
+            "4.1.0.CR1",
+            "4.1.0.CR2",
+            "4.1.0.CR3",
+            "4.1.0.CR4",
+            "4.1.0.CR5",
+            "4.1.0.CR6",
+            "4.1.0.CR7",
+            "4.1.0.Final",
+            "4.1.1.Final",
+            "4.1.10.Final",
+            "4.1.100.Final",
+            "4.1.101.Final",
+            "4.1.102.Final",
+            "4.1.103.Final",
+            "4.1.104.Final",
+            "4.1.105.Final",
+            "4.1.106.Final",
+            "4.1.107.Final",
+            "4.1.108.Final",
+            "4.1.109.Final",
+            "4.1.11.Final",
+            "4.1.110.Final",
+            "4.1.111.Final",
+            "4.1.112.Final",
+            "4.1.113.Final",
+            "4.1.114.Final",
+            "4.1.115.Final",
+            "4.1.116.Final",
+            "4.1.117.Final",
+            "4.1.118.Final",
+            "4.1.119.Final",
+            "4.1.12.Final",
+            "4.1.120.Final",
+            "4.1.121.Final",
+            "4.1.122.Final",
+            "4.1.123.Final",
+            "4.1.124.Final",
+            "4.1.125.Final",
+            "4.1.126.Final",
+            "4.1.127.Final",
+            "4.1.128.Final",
+            "4.1.129.Final",
+            "4.1.13.Final",
+            "4.1.130.Final",
+            "4.1.131.Final",
+            "4.1.132.Final",
+            "4.1.133.Final",
+            "4.1.134.Final",
+            "4.1.14.Final",
+            "4.1.15.Final",
+            "4.1.16.Final",
+            "4.1.17.Final",
+            "4.1.18.Final",
+            "4.1.19.Final",
+            "4.1.2.Final",
+            "4.1.20.Final",
+            "4.1.21.Final",
+            "4.1.22.Final",
+            "4.1.23.Final",
+            "4.1.24.Final",
+            "4.1.25.Final",
+            "4.1.26.Final",
+            "4.1.27.Final",
+            "4.1.28.Final",
+            "4.1.29.Final",
+            "4.1.3.Final",
+            "4.1.30.Final",
+            "4.1.31.Final",
+            "4.1.32.Final",
+            "4.1.33.Final",
+            "4.1.34.Final",
+            "4.1.35.Final",
+            "4.1.36.Final",
+            "4.1.37.Final",
+            "4.1.38.Final",
+            "4.1.39.Final",
+            "4.1.4.Final",
+            "4.1.40.Final",
+            "4.1.41.Final",
+            "4.1.42.Final",
+            "4.1.43.Final",
+            "4.1.44.Final",
+            "4.1.45.Final",
+            "4.1.46.Final",
+            "4.1.47.Final",
+            "4.1.48.Final",
+            "4.1.49.Final",
+            "4.1.5.Final",
+            "4.1.50.Final",
+            "4.1.51.Final",
+            "4.1.52.Final",
+            "4.1.53.Final",
+            "4.1.54.Final",
+            "4.1.55.Final",
+            "4.1.56.Final",
+            "4.1.57.Final",
+            "4.1.58.Final",
+            "4.1.59.Final",
+            "4.1.6.Final",
+            "4.1.60.Final",
+            "4.1.61.Final",
+            "4.1.62.Final",
+            "4.1.63.Final",
+            "4.1.64.Final",
+            "4.1.65.Final",
+            "4.1.66.Final",
+            "4.1.67.Final",
+            "4.1.68.Final",
+            "4.1.69.Final",
+            "4.1.7.Final",
+            "4.1.70.Final",
+            "4.1.71.Final",
+            "4.1.72.Final",
+            "4.1.73.Final",
+            "4.1.74.Final",
+            "4.1.75.Final",
+            "4.1.76.Final",
+            "4.1.77.Final",
+            "4.1.78.Final",
+            "4.1.79.Final",
+            "4.1.8.Final",
+            "4.1.80.Final",
+            "4.1.81.Final",
+            "4.1.82.Final",
+            "4.1.83.Final",
+            "4.1.84.Final",
+            "4.1.85.Final",
+            "4.1.86.Final",
+            "4.1.87.Final",
+            "4.1.88.Final",
+            "4.1.89.Final",
+            "4.1.9.Final",
+            "4.1.90.Final",
+            "4.1.91.Final",
+            "4.1.92.Final",
+            "4.1.93.Final",
+            "4.1.94.Final",
+            "4.1.95.Final",
+            "4.1.96.Final",
+            "4.1.97.Final",
+            "4.1.98.Final",
+            "4.1.99.Final"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-3qp7-7mw8-wx86/GHSA-3qp7-7mw8-wx86.json",
+            "last_known_affected_version_range": "<= 4.1.134.Final"
+          }
+        }
+      ]
+    },
+    {
+      "id": "GHSA-5gvw-p9qm-jgwh",
+      "summary": "jackson-databind: @JsonView bypassed for @JsonUnwrapped container properties on deserialization",
+      "aliases": [
+        "CVE-2026-59889"
+      ],
+      "published": "2026-07-21T22:00:43Z",
+      "modified": "2026-08-03T21:00:23.035506112Z",
+      "withdrawn": null,
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N"
+        }
+      ],
+      "references": [
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/security/advisories/GHSA-5gvw-p9qm-jgwh"
+        },
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-59889"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/issues/6060"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/pull/6056"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/commit/d627a8a86fcb062429282f79f3f256f181ed2c7b"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/FasterXML/jackson-databind"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "com.fasterxml.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "2.21.0"
+                },
+                {
+                  "fixed": "2.21.5"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "2.21.0",
+            "2.21.1",
+            "2.21.2",
+            "2.21.3",
+            "2.21.4"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/07/GHSA-5gvw-p9qm-jgwh/GHSA-5gvw-p9qm-jgwh.json"
+          }
+        },
+        {
+          "package": {
+            "name": "tools.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/tools.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "3.0.0"
+                },
+                {
+                  "fixed": "3.1.5"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "3.0.0",
+            "3.0.1",
+            "3.0.2",
+            "3.0.3",
+            "3.0.4",
+            "3.1.0",
+            "3.1.0-rc1",
+            "3.1.1",
+            "3.1.2",
+            "3.1.3",
+            "3.1.4"
+          ],
+          "database_specific": {
+            "last_known_affected_version_range": "<= 3.1.4",
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/07/GHSA-5gvw-p9qm-jgwh/GHSA-5gvw-p9qm-jgwh.json"
+          }
+        },
+        {
+          "package": {
+            "name": "com.fasterxml.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "2.18.0"
+                },
+                {
+                  "fixed": "2.18.9"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "2.18.0",
+            "2.18.1",
+            "2.18.2",
+            "2.18.3",
+            "2.18.4",
+            "2.18.5",
+            "2.18.6",
+            "2.18.7",
+            "2.18.8"
+          ],
+          "database_specific": {
+            "last_known_affected_version_range": "<= 2.18.8",
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/07/GHSA-5gvw-p9qm-jgwh/GHSA-5gvw-p9qm-jgwh.json"
+          }
+        },
+        {
+          "package": {
+            "name": "com.fasterxml.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "2.22.0"
+                },
+                {
+                  "fixed": "2.22.1"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "2.22.0"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/07/GHSA-5gvw-p9qm-jgwh/GHSA-5gvw-p9qm-jgwh.json"
+          }
+        },
+        {
+          "package": {
+            "name": "tools.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/tools.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "3.2.0"
+                },
+                {
+                  "fixed": "3.2.1"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "3.2.0"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/07/GHSA-5gvw-p9qm-jgwh/GHSA-5gvw-p9qm-jgwh.json"
+          }
+        }
+      ]
+    },
+    {
+      "id": "GHSA-5hh8-q8hv-fr38",
+      "summary": "jackson-databind has @JsonView bypass for setterless creator properties",
+      "aliases": [
+        "CVE-2026-54517"
+      ],
+      "published": "2026-06-23T21:24:50Z",
+      "modified": "2026-07-20T21:30:31.775056815Z",
+      "withdrawn": null,
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N"
+        }
+      ],
+      "references": [
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/security/advisories/GHSA-5hh8-q8hv-fr38"
+        },
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-54517"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/pull/5969"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/pull/5970"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/commit/5bf23edb4221f7dd2ec8e71ff6d26c61640f261d"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/commit/94c5d215b3af1505098c686405d9641f041a9962"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/FasterXML/jackson-databind"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "com.fasterxml.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "2.21.0"
+                },
+                {
+                  "fixed": "2.21.4"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "2.21.0",
+            "2.21.1",
+            "2.21.2",
+            "2.21.3"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-5hh8-q8hv-fr38/GHSA-5hh8-q8hv-fr38.json"
+          }
+        },
+        {
+          "package": {
+            "name": "com.fasterxml.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "3.0.0"
+                },
+                {
+                  "fixed": "3.1.4"
+                }
+              ]
+            }
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-5hh8-q8hv-fr38/GHSA-5hh8-q8hv-fr38.json"
+          }
+        },
+        {
+          "package": {
+            "name": "tools.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/tools.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "3.0.0"
+                },
+                {
+                  "fixed": "3.1.4"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "3.0.0",
+            "3.0.1",
+            "3.0.2",
+            "3.0.3",
+            "3.0.4",
+            "3.1.0",
+            "3.1.0-rc1",
+            "3.1.1",
+            "3.1.2",
+            "3.1.3"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-5hh8-q8hv-fr38/GHSA-5hh8-q8hv-fr38.json"
+          }
+        }
+      ]
+    },
+    {
+      "id": "GHSA-5jmj-h7xm-6q6v",
+      "summary": "jackson-databind has case-insensitive deserialization bypasses per-property @JsonIgnoreProperties",
+      "aliases": [
+        "CVE-2026-54515"
+      ],
+      "published": "2026-06-23T21:23:58Z",
+      "modified": "2026-07-16T21:30:21.943601698Z",
+      "withdrawn": null,
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N"
+        }
+      ],
+      "references": [
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/security/advisories/GHSA-5jmj-h7xm-6q6v"
+        },
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-54515"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/issues/5962"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/issues/5964"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/commit/0e1b0b211f7a53baa62ba2f4c9bd006c7bf4d5fa"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/FasterXML/jackson-databind"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "com.fasterxml.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "3.1.0"
+                },
+                {
+                  "fixed": "3.1.4"
+                }
+              ]
+            }
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-5jmj-h7xm-6q6v/GHSA-5jmj-h7xm-6q6v.json"
+          }
+        },
+        {
+          "package": {
+            "name": "tools.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/tools.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "3.1.0"
+                },
+                {
+                  "fixed": "3.1.4"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "3.1.0",
+            "3.1.1",
+            "3.1.2",
+            "3.1.3"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-5jmj-h7xm-6q6v/GHSA-5jmj-h7xm-6q6v.json"
+          }
+        },
+        {
+          "package": {
+            "name": "com.fasterxml.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "2.8.0"
+                },
+                {
+                  "fixed": "2.18.9"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "2.10.0",
+            "2.10.0.pr1",
+            "2.10.0.pr2",
+            "2.10.0.pr3",
+            "2.10.1",
+            "2.10.2",
+            "2.10.3",
+            "2.10.4",
+            "2.10.5",
+            "2.10.5.1",
+            "2.11.0",
+            "2.11.0.rc1",
+            "2.11.1",
+            "2.11.2",
+            "2.11.3",
+            "2.11.4",
+            "2.12.0",
+            "2.12.0-rc1",
+            "2.12.0-rc2",
+            "2.12.1",
+            "2.12.2",
+            "2.12.3",
+            "2.12.4",
+            "2.12.5",
+            "2.12.6",
+            "2.12.6.1",
+            "2.12.7",
+            "2.12.7.1",
+            "2.12.7.2",
+            "2.13.0",
+            "2.13.0-rc1",
+            "2.13.0-rc2",
+            "2.13.1",
+            "2.13.2",
+            "2.13.2.1",
+            "2.13.2.2",
+            "2.13.3",
+            "2.13.4",
+            "2.13.4.1",
+            "2.13.4.2",
+            "2.13.5",
+            "2.14.0",
+            "2.14.0-rc1",
+            "2.14.0-rc2",
+            "2.14.0-rc3",
+            "2.14.1",
+            "2.14.2",
+            "2.14.3",
+            "2.15.0",
+            "2.15.0-rc1",
+            "2.15.0-rc2",
+            "2.15.0-rc3",
+            "2.15.1",
+            "2.15.2",
+            "2.15.3",
+            "2.15.4",
+            "2.16.0",
+            "2.16.0-rc1",
+            "2.16.1",
+            "2.16.2",
+            "2.17.0",
+            "2.17.0-rc1",
+            "2.17.1",
+            "2.17.2",
+            "2.17.3",
+            "2.18.0",
+            "2.18.0-rc1",
+            "2.18.1",
+            "2.18.2",
+            "2.18.3",
+            "2.18.4",
+            "2.18.5",
+            "2.18.6",
+            "2.18.7",
+            "2.18.8",
+            "2.8.0",
+            "2.8.1",
+            "2.8.10",
+            "2.8.11",
+            "2.8.11.1",
+            "2.8.11.2",
+            "2.8.11.3",
+            "2.8.11.4",
+            "2.8.11.5",
+            "2.8.11.6",
+            "2.8.2",
+            "2.8.3",
+            "2.8.4",
+            "2.8.5",
+            "2.8.6",
+            "2.8.7",
+            "2.8.8",
+            "2.8.8.1",
+            "2.8.9",
+            "2.9.0",
+            "2.9.0.pr1",
+            "2.9.0.pr2",
+            "2.9.0.pr3",
+            "2.9.0.pr4",
+            "2.9.1",
+            "2.9.10",
+            "2.9.10.1",
+            "2.9.10.2",
+            "2.9.10.3",
+            "2.9.10.4",
+            "2.9.10.5",
+            "2.9.10.6",
+            "2.9.10.7",
+            "2.9.10.8",
+            "2.9.2",
+            "2.9.3",
+            "2.9.4",
+            "2.9.5",
+            "2.9.6",
+            "2.9.7",
+            "2.9.8",
+            "2.9.9",
+            "2.9.9.1",
+            "2.9.9.2",
+            "2.9.9.3"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-5jmj-h7xm-6q6v/GHSA-5jmj-h7xm-6q6v.json"
+          }
+        },
+        {
+          "package": {
+            "name": "com.fasterxml.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "2.19.0"
+                },
+                {
+                  "fixed": "2.21.5"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "2.19.0",
+            "2.19.1",
+            "2.19.2",
+            "2.19.3",
+            "2.19.4",
+            "2.20.0",
+            "2.20.0-rc1",
+            "2.20.1",
+            "2.20.2",
+            "2.21.0",
+            "2.21.1",
+            "2.21.2",
+            "2.21.3",
+            "2.21.4"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-5jmj-h7xm-6q6v/GHSA-5jmj-h7xm-6q6v.json"
+          }
+        },
+        {
+          "package": {
+            "name": "com.fasterxml.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "2.22.0"
+                },
+                {
+                  "fixed": "2.22.1"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "2.22.0"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-5jmj-h7xm-6q6v/GHSA-5jmj-h7xm-6q6v.json"
+          }
+        }
+      ]
+    },
+    {
+      "id": "GHSA-5pvg-856g-cp85",
+      "summary": "Netty has Insufficient Bailiwick Validation for NS Records",
+      "aliases": [
+        "CVE-2026-47691"
+      ],
+      "published": "2026-06-08T23:02:48Z",
+      "modified": "2026-09-02T15:45:20.049120459Z",
+      "withdrawn": null,
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:H/I:H/A:N"
+        }
+      ],
+      "references": [
+        {
+          "type": "WEB",
+          "url": "https://github.com/netty/netty/security/advisories/GHSA-5pvg-856g-cp85"
+        },
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-47691"
+        },
+        {
+          "type": "WEB",
+          "url": "https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-47691.json"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/netty/netty/releases/tag/netty-4.2.15.Final"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/netty/netty/releases/tag/netty-4.1.135.Final"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/netty/netty"
+        },
+        {
+          "type": "WEB",
+          "url": "https://bugzilla.redhat.com/show_bug.cgi?id=2488439"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/security/cve/CVE-2026-47691"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:62260"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:54435"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:53806"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:53644"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:50085"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:49701"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:49700"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:48151"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:41951"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:37390"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:34608"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:26586"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:26018"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:26017"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "io.netty:netty-resolver-dns",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/io.netty/netty-resolver-dns"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "4.2.0.Final"
+                },
+                {
+                  "fixed": "4.2.15.Final"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "4.2.0.Final",
+            "4.2.1.Final",
+            "4.2.10.Final",
+            "4.2.11.Final",
+            "4.2.12.Final",
+            "4.2.13.Final",
+            "4.2.14.Final",
+            "4.2.2.Final",
+            "4.2.3.Final",
+            "4.2.4.Final",
+            "4.2.5.Final",
+            "4.2.6.Final",
+            "4.2.7.Final",
+            "4.2.8.Final",
+            "4.2.9.Final"
+          ],
+          "database_specific": {
+            "last_known_affected_version_range": "<= 4.2.14.Final",
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-5pvg-856g-cp85/GHSA-5pvg-856g-cp85.json"
+          }
+        },
+        {
+          "package": {
+            "name": "io.netty:netty-resolver-dns",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/io.netty/netty-resolver-dns"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "0"
+                },
+                {
+                  "fixed": "4.1.135.Final"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "4.1.0.Beta4",
+            "4.1.0.Beta5",
+            "4.1.0.Beta6",
+            "4.1.0.Beta7",
+            "4.1.0.Beta8",
+            "4.1.0.CR1",
+            "4.1.0.CR2",
+            "4.1.0.CR3",
+            "4.1.0.CR4",
+            "4.1.0.CR5",
+            "4.1.0.CR6",
+            "4.1.0.CR7",
+            "4.1.0.Final",
+            "4.1.1.Final",
+            "4.1.10.Final",
+            "4.1.100.Final",
+            "4.1.101.Final",
+            "4.1.102.Final",
+            "4.1.103.Final",
+            "4.1.104.Final",
+            "4.1.105.Final",
+            "4.1.106.Final",
+            "4.1.107.Final",
+            "4.1.108.Final",
+            "4.1.109.Final",
+            "4.1.11.Final",
+            "4.1.110.Final",
+            "4.1.111.Final",
+            "4.1.112.Final",
+            "4.1.113.Final",
+            "4.1.114.Final",
+            "4.1.115.Final",
+            "4.1.116.Final",
+            "4.1.117.Final",
+            "4.1.118.Final",
+            "4.1.119.Final",
+            "4.1.12.Final",
+            "4.1.120.Final",
+            "4.1.121.Final",
+            "4.1.122.Final",
+            "4.1.123.Final",
+            "4.1.124.Final",
+            "4.1.125.Final",
+            "4.1.126.Final",
+            "4.1.127.Final",
+            "4.1.128.Final",
+            "4.1.129.Final",
+            "4.1.13.Final",
+            "4.1.130.Final",
+            "4.1.131.Final",
+            "4.1.132.Final",
+            "4.1.133.Final",
+            "4.1.134.Final",
+            "4.1.14.Final",
+            "4.1.15.Final",
+            "4.1.16.Final",
+            "4.1.17.Final",
+            "4.1.18.Final",
+            "4.1.19.Final",
+            "4.1.2.Final",
+            "4.1.20.Final",
+            "4.1.21.Final",
+            "4.1.22.Final",
+            "4.1.23.Final",
+            "4.1.24.Final",
+            "4.1.25.Final",
+            "4.1.26.Final",
+            "4.1.27.Final",
+            "4.1.28.Final",
+            "4.1.29.Final",
+            "4.1.3.Final",
+            "4.1.30.Final",
+            "4.1.31.Final",
+            "4.1.32.Final",
+            "4.1.33.Final",
+            "4.1.34.Final",
+            "4.1.35.Final",
+            "4.1.36.Final",
+            "4.1.37.Final",
+            "4.1.38.Final",
+            "4.1.39.Final",
+            "4.1.4.Final",
+            "4.1.40.Final",
+            "4.1.41.Final",
+            "4.1.42.Final",
+            "4.1.43.Final",
+            "4.1.44.Final",
+            "4.1.45.Final",
+            "4.1.46.Final",
+            "4.1.47.Final",
+            "4.1.48.Final",
+            "4.1.49.Final",
+            "4.1.5.Final",
+            "4.1.50.Final",
+            "4.1.51.Final",
+            "4.1.52.Final",
+            "4.1.53.Final",
+            "4.1.54.Final",
+            "4.1.55.Final",
+            "4.1.56.Final",
+            "4.1.57.Final",
+            "4.1.58.Final",
+            "4.1.59.Final",
+            "4.1.6.Final",
+            "4.1.60.Final",
+            "4.1.61.Final",
+            "4.1.62.Final",
+            "4.1.63.Final",
+            "4.1.64.Final",
+            "4.1.65.Final",
+            "4.1.66.Final",
+            "4.1.67.Final",
+            "4.1.68.Final",
+            "4.1.69.Final",
+            "4.1.7.Final",
+            "4.1.70.Final",
+            "4.1.71.Final",
+            "4.1.72.Final",
+            "4.1.73.Final",
+            "4.1.74.Final",
+            "4.1.75.Final",
+            "4.1.76.Final",
+            "4.1.77.Final",
+            "4.1.78.Final",
+            "4.1.79.Final",
+            "4.1.8.Final",
+            "4.1.80.Final",
+            "4.1.81.Final",
+            "4.1.82.Final",
+            "4.1.83.Final",
+            "4.1.84.Final",
+            "4.1.85.Final",
+            "4.1.86.Final",
+            "4.1.87.Final",
+            "4.1.88.Final",
+            "4.1.89.Final",
+            "4.1.9.Final",
+            "4.1.90.Final",
+            "4.1.91.Final",
+            "4.1.92.Final",
+            "4.1.93.Final",
+            "4.1.94.Final",
+            "4.1.95.Final",
+            "4.1.96.Final",
+            "4.1.97.Final",
+            "4.1.98.Final",
+            "4.1.99.Final"
+          ],
+          "database_specific": {
+            "last_known_affected_version_range": "<= 4.1.134.Final",
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-5pvg-856g-cp85/GHSA-5pvg-856g-cp85.json"
+          }
+        }
+      ]
+    },
+    {
+      "id": "GHSA-676x-f7gg-47vc",
+      "summary": "Netty Vulnerable to DNS Cache Poisoning via Missing Bailiwick Checks in CNAME Records",
+      "aliases": [
+        "CVE-2026-45674"
+      ],
+      "published": "2026-06-08T23:02:26Z",
+      "modified": "2026-09-02T15:45:32.649308665Z",
+      "withdrawn": null,
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:H/I:H/A:N"
+        }
+      ],
+      "references": [
+        {
+          "type": "WEB",
+          "url": "https://github.com/netty/netty/security/advisories/GHSA-676x-f7gg-47vc"
+        },
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-45674"
+        },
+        {
+          "type": "WEB",
+          "url": "https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-45674.json"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/netty/netty/releases/tag/netty-4.2.15.Final"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/netty/netty/releases/tag/netty-4.1.135.Final"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/netty/netty"
+        },
+        {
+          "type": "WEB",
+          "url": "https://bugzilla.redhat.com/show_bug.cgi?id=2488400"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/security/cve/CVE-2026-45674"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:62260"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:54435"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:53806"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:53644"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:50085"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:49701"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:49700"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:48151"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:41951"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:37390"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:34608"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:26586"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:26018"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:26017"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "io.netty:netty-resolver-dns",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/io.netty/netty-resolver-dns"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "4.2.0.Final"
+                },
+                {
+                  "fixed": "4.2.15.Final"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "4.2.0.Final",
+            "4.2.1.Final",
+            "4.2.10.Final",
+            "4.2.11.Final",
+            "4.2.12.Final",
+            "4.2.13.Final",
+            "4.2.14.Final",
+            "4.2.2.Final",
+            "4.2.3.Final",
+            "4.2.4.Final",
+            "4.2.5.Final",
+            "4.2.6.Final",
+            "4.2.7.Final",
+            "4.2.8.Final",
+            "4.2.9.Final"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-676x-f7gg-47vc/GHSA-676x-f7gg-47vc.json",
+            "last_known_affected_version_range": "<= 4.2.14.Final"
+          }
+        },
+        {
+          "package": {
+            "name": "io.netty:netty-resolver-dns",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/io.netty/netty-resolver-dns"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "0"
+                },
+                {
+                  "fixed": "4.1.135.Final"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "4.1.0.Beta4",
+            "4.1.0.Beta5",
+            "4.1.0.Beta6",
+            "4.1.0.Beta7",
+            "4.1.0.Beta8",
+            "4.1.0.CR1",
+            "4.1.0.CR2",
+            "4.1.0.CR3",
+            "4.1.0.CR4",
+            "4.1.0.CR5",
+            "4.1.0.CR6",
+            "4.1.0.CR7",
+            "4.1.0.Final",
+            "4.1.1.Final",
+            "4.1.10.Final",
+            "4.1.100.Final",
+            "4.1.101.Final",
+            "4.1.102.Final",
+            "4.1.103.Final",
+            "4.1.104.Final",
+            "4.1.105.Final",
+            "4.1.106.Final",
+            "4.1.107.Final",
+            "4.1.108.Final",
+            "4.1.109.Final",
+            "4.1.11.Final",
+            "4.1.110.Final",
+            "4.1.111.Final",
+            "4.1.112.Final",
+            "4.1.113.Final",
+            "4.1.114.Final",
+            "4.1.115.Final",
+            "4.1.116.Final",
+            "4.1.117.Final",
+            "4.1.118.Final",
+            "4.1.119.Final",
+            "4.1.12.Final",
+            "4.1.120.Final",
+            "4.1.121.Final",
+            "4.1.122.Final",
+            "4.1.123.Final",
+            "4.1.124.Final",
+            "4.1.125.Final",
+            "4.1.126.Final",
+            "4.1.127.Final",
+            "4.1.128.Final",
+            "4.1.129.Final",
+            "4.1.13.Final",
+            "4.1.130.Final",
+            "4.1.131.Final",
+            "4.1.132.Final",
+            "4.1.133.Final",
+            "4.1.134.Final",
+            "4.1.14.Final",
+            "4.1.15.Final",
+            "4.1.16.Final",
+            "4.1.17.Final",
+            "4.1.18.Final",
+            "4.1.19.Final",
+            "4.1.2.Final",
+            "4.1.20.Final",
+            "4.1.21.Final",
+            "4.1.22.Final",
+            "4.1.23.Final",
+            "4.1.24.Final",
+            "4.1.25.Final",
+            "4.1.26.Final",
+            "4.1.27.Final",
+            "4.1.28.Final",
+            "4.1.29.Final",
+            "4.1.3.Final",
+            "4.1.30.Final",
+            "4.1.31.Final",
+            "4.1.32.Final",
+            "4.1.33.Final",
+            "4.1.34.Final",
+            "4.1.35.Final",
+            "4.1.36.Final",
+            "4.1.37.Final",
+            "4.1.38.Final",
+            "4.1.39.Final",
+            "4.1.4.Final",
+            "4.1.40.Final",
+            "4.1.41.Final",
+            "4.1.42.Final",
+            "4.1.43.Final",
+            "4.1.44.Final",
+            "4.1.45.Final",
+            "4.1.46.Final",
+            "4.1.47.Final",
+            "4.1.48.Final",
+            "4.1.49.Final",
+            "4.1.5.Final",
+            "4.1.50.Final",
+            "4.1.51.Final",
+            "4.1.52.Final",
+            "4.1.53.Final",
+            "4.1.54.Final",
+            "4.1.55.Final",
+            "4.1.56.Final",
+            "4.1.57.Final",
+            "4.1.58.Final",
+            "4.1.59.Final",
+            "4.1.6.Final",
+            "4.1.60.Final",
+            "4.1.61.Final",
+            "4.1.62.Final",
+            "4.1.63.Final",
+            "4.1.64.Final",
+            "4.1.65.Final",
+            "4.1.66.Final",
+            "4.1.67.Final",
+            "4.1.68.Final",
+            "4.1.69.Final",
+            "4.1.7.Final",
+            "4.1.70.Final",
+            "4.1.71.Final",
+            "4.1.72.Final",
+            "4.1.73.Final",
+            "4.1.74.Final",
+            "4.1.75.Final",
+            "4.1.76.Final",
+            "4.1.77.Final",
+            "4.1.78.Final",
+            "4.1.79.Final",
+            "4.1.8.Final",
+            "4.1.80.Final",
+            "4.1.81.Final",
+            "4.1.82.Final",
+            "4.1.83.Final",
+            "4.1.84.Final",
+            "4.1.85.Final",
+            "4.1.86.Final",
+            "4.1.87.Final",
+            "4.1.88.Final",
+            "4.1.89.Final",
+            "4.1.9.Final",
+            "4.1.90.Final",
+            "4.1.91.Final",
+            "4.1.92.Final",
+            "4.1.93.Final",
+            "4.1.94.Final",
+            "4.1.95.Final",
+            "4.1.96.Final",
+            "4.1.97.Final",
+            "4.1.98.Final",
+            "4.1.99.Final"
+          ],
+          "database_specific": {
+            "last_known_affected_version_range": "<= 4.1.134.Final",
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-676x-f7gg-47vc/GHSA-676x-f7gg-47vc.json"
+          }
+        }
+      ]
+    },
+    {
+      "id": "GHSA-9fxm-vc8v-hj55",
+      "summary": "jackson-databind's renamed @JsonIgnore'd setters can deserialize via private fields",
+      "aliases": [
+        "CVE-2026-54516"
+      ],
+      "published": "2026-06-23T21:24:26Z",
+      "modified": "2026-07-20T21:30:34.130614300Z",
+      "withdrawn": null,
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N"
+        }
+      ],
+      "references": [
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/security/advisories/GHSA-9fxm-vc8v-hj55"
+        },
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-54516"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/pull/5967"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/pull/5968"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/commit/c3d56dd25d52319828147c5b9aeabf2d485c250a"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/commit/e88cb17006b6af4883b973058f0bb6486e5074af"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/FasterXML/jackson-databind"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "com.fasterxml.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "2.21.0"
+                },
+                {
+                  "fixed": "2.21.4"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "2.21.0",
+            "2.21.1",
+            "2.21.2",
+            "2.21.3"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-9fxm-vc8v-hj55/GHSA-9fxm-vc8v-hj55.json"
+          }
+        },
+        {
+          "package": {
+            "name": "com.fasterxml.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "3.0.0"
+                },
+                {
+                  "fixed": "3.1.4"
+                }
+              ]
+            }
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-9fxm-vc8v-hj55/GHSA-9fxm-vc8v-hj55.json"
+          }
+        },
+        {
+          "package": {
+            "name": "tools.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/tools.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "3.0.0"
+                },
+                {
+                  "fixed": "3.1.4"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "3.0.0",
+            "3.0.1",
+            "3.0.2",
+            "3.0.3",
+            "3.0.4",
+            "3.1.0",
+            "3.1.0-rc1",
+            "3.1.1",
+            "3.1.2",
+            "3.1.3"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-9fxm-vc8v-hj55/GHSA-9fxm-vc8v-hj55.json"
+          }
+        }
+      ]
+    },
+    {
+      "id": "GHSA-c653-97m9-rcg9",
+      "summary": "Netty: Wrapping plain trust manager silently disables hostname verification",
+      "aliases": [
+        "CVE-2026-50010"
+      ],
+      "published": "2026-06-15T20:45:45Z",
+      "modified": "2026-06-16T15:44:21.668164195Z",
+      "withdrawn": null,
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N"
+        }
+      ],
+      "references": [
+        {
+          "type": "WEB",
+          "url": "https://github.com/netty/netty/security/advisories/GHSA-c653-97m9-rcg9"
+        },
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-50010"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/netty/netty"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/netty/netty/releases/tag/netty-4.1.135.Final"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/netty/netty/releases/tag/netty-4.2.15.Final"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "io.netty:netty-handler",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/io.netty/netty-handler"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "4.2.0.Final"
+                },
+                {
+                  "fixed": "4.2.15.Final"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "4.2.0.Final",
+            "4.2.1.Final",
+            "4.2.10.Final",
+            "4.2.11.Final",
+            "4.2.12.Final",
+            "4.2.13.Final",
+            "4.2.14.Final",
+            "4.2.2.Final",
+            "4.2.3.Final",
+            "4.2.4.Final",
+            "4.2.5.Final",
+            "4.2.6.Final",
+            "4.2.7.Final",
+            "4.2.8.Final",
+            "4.2.9.Final"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-c653-97m9-rcg9/GHSA-c653-97m9-rcg9.json"
+          }
+        },
+        {
+          "package": {
+            "name": "io.netty:netty-handler",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/io.netty/netty-handler"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "0"
+                },
+                {
+                  "fixed": "4.1.135.Final"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "4.0.0.Alpha1",
+            "4.0.0.Alpha2",
+            "4.0.0.Alpha3",
+            "4.0.0.Alpha4",
+            "4.0.0.Alpha5",
+            "4.0.0.Alpha6",
+            "4.0.0.Alpha7",
+            "4.0.0.Alpha8",
+            "4.0.0.Beta1",
+            "4.0.0.Beta2",
+            "4.0.0.Beta3",
+            "4.0.0.CR1",
+            "4.0.0.CR2",
+            "4.0.0.CR3",
+            "4.0.0.CR4",
+            "4.0.0.CR5",
+            "4.0.0.CR6",
+            "4.0.0.CR7",
+            "4.0.0.CR8",
+            "4.0.0.CR9",
+            "4.0.0.Final",
+            "4.0.1.Final",
+            "4.0.10.Final",
+            "4.0.11.Final",
+            "4.0.12.Final",
+            "4.0.13.Final",
+            "4.0.14.Beta1",
+            "4.0.14.Final",
+            "4.0.15.Final",
+            "4.0.16.Final",
+            "4.0.17.Final",
+            "4.0.18.Final",
+            "4.0.19.Final",
+            "4.0.2.Final",
+            "4.0.20.Final",
+            "4.0.21.Final",
+            "4.0.22.Final",
+            "4.0.23.Final",
+            "4.0.24.Final",
+            "4.0.25.Final",
+            "4.0.26.Final",
+            "4.0.27.Final",
+            "4.0.28.Final",
+            "4.0.29.Final",
+            "4.0.3.Final",
+            "4.0.30.Final",
+            "4.0.31.Final",
+            "4.0.32.Final",
+            "4.0.33.Final",
+            "4.0.34.Final",
+            "4.0.35.Final",
+            "4.0.36.Final",
+            "4.0.37.Final",
+            "4.0.38.Final",
+            "4.0.39.Final",
+            "4.0.4.Final",
+            "4.0.40.Final",
+            "4.0.41.Final",
+            "4.0.42.Final",
+            "4.0.43.Final",
+            "4.0.44.Final",
+            "4.0.45.Final",
+            "4.0.46.Final",
+            "4.0.47.Final",
+            "4.0.48.Final",
+            "4.0.49.Final",
+            "4.0.5.Final",
+            "4.0.50.Final",
+            "4.0.51.Final",
+            "4.0.52.Final",
+            "4.0.53.Final",
+            "4.0.54.Final",
+            "4.0.55.Final",
+            "4.0.56.Final",
+            "4.0.6.Final",
+            "4.0.7.Final",
+            "4.0.8.Final",
+            "4.0.9.Final",
+            "4.1.0.Beta1",
+            "4.1.0.Beta2",
+            "4.1.0.Beta3",
+            "4.1.0.Beta4",
+            "4.1.0.Beta5",
+            "4.1.0.Beta6",
+            "4.1.0.Beta7",
+            "4.1.0.Beta8",
+            "4.1.0.CR1",
+            "4.1.0.CR2",
+            "4.1.0.CR3",
+            "4.1.0.CR4",
+            "4.1.0.CR5",
+            "4.1.0.CR6",
+            "4.1.0.CR7",
+            "4.1.0.Final",
+            "4.1.1.Final",
+            "4.1.10.Final",
+            "4.1.100.Final",
+            "4.1.101.Final",
+            "4.1.102.Final",
+            "4.1.103.Final",
+            "4.1.104.Final",
+            "4.1.105.Final",
+            "4.1.106.Final",
+            "4.1.107.Final",
+            "4.1.108.Final",
+            "4.1.109.Final",
+            "4.1.11.Final",
+            "4.1.110.Final",
+            "4.1.111.Final",
+            "4.1.112.Final",
+            "4.1.113.Final",
+            "4.1.114.Final",
+            "4.1.115.Final",
+            "4.1.116.Final",
+            "4.1.117.Final",
+            "4.1.118.Final",
+            "4.1.119.Final",
+            "4.1.12.Final",
+            "4.1.120.Final",
+            "4.1.121.Final",
+            "4.1.122.Final",
+            "4.1.123.Final",
+            "4.1.124.Final",
+            "4.1.125.Final",
+            "4.1.126.Final",
+            "4.1.127.Final",
+            "4.1.128.Final",
+            "4.1.129.Final",
+            "4.1.13.Final",
+            "4.1.130.Final",
+            "4.1.131.Final",
+            "4.1.132.Final",
+            "4.1.133.Final",
+            "4.1.134.Final",
+            "4.1.14.Final",
+            "4.1.15.Final",
+            "4.1.16.Final",
+            "4.1.17.Final",
+            "4.1.18.Final",
+            "4.1.19.Final",
+            "4.1.2.Final",
+            "4.1.20.Final",
+            "4.1.21.Final",
+            "4.1.22.Final",
+            "4.1.23.Final",
+            "4.1.24.Final",
+            "4.1.25.Final",
+            "4.1.26.Final",
+            "4.1.27.Final",
+            "4.1.28.Final",
+            "4.1.29.Final",
+            "4.1.3.Final",
+            "4.1.30.Final",
+            "4.1.31.Final",
+            "4.1.32.Final",
+            "4.1.33.Final",
+            "4.1.34.Final",
+            "4.1.35.Final",
+            "4.1.36.Final",
+            "4.1.37.Final",
+            "4.1.38.Final",
+            "4.1.39.Final",
+            "4.1.4.Final",
+            "4.1.40.Final",
+            "4.1.41.Final",
+            "4.1.42.Final",
+            "4.1.43.Final",
+            "4.1.44.Final",
+            "4.1.45.Final",
+            "4.1.46.Final",
+            "4.1.47.Final",
+            "4.1.48.Final",
+            "4.1.49.Final",
+            "4.1.5.Final",
+            "4.1.50.Final",
+            "4.1.51.Final",
+            "4.1.52.Final",
+            "4.1.53.Final",
+            "4.1.54.Final",
+            "4.1.55.Final",
+            "4.1.56.Final",
+            "4.1.57.Final",
+            "4.1.58.Final",
+            "4.1.59.Final",
+            "4.1.6.Final",
+            "4.1.60.Final",
+            "4.1.61.Final",
+            "4.1.62.Final",
+            "4.1.63.Final",
+            "4.1.64.Final",
+            "4.1.65.Final",
+            "4.1.66.Final",
+            "4.1.67.Final",
+            "4.1.68.Final",
+            "4.1.69.Final",
+            "4.1.7.Final",
+            "4.1.70.Final",
+            "4.1.71.Final",
+            "4.1.72.Final",
+            "4.1.73.Final",
+            "4.1.74.Final",
+            "4.1.75.Final",
+            "4.1.76.Final",
+            "4.1.77.Final",
+            "4.1.78.Final",
+            "4.1.79.Final",
+            "4.1.8.Final",
+            "4.1.80.Final",
+            "4.1.81.Final",
+            "4.1.82.Final",
+            "4.1.83.Final",
+            "4.1.84.Final",
+            "4.1.85.Final",
+            "4.1.86.Final",
+            "4.1.87.Final",
+            "4.1.88.Final",
+            "4.1.89.Final",
+            "4.1.9.Final",
+            "4.1.90.Final",
+            "4.1.91.Final",
+            "4.1.92.Final",
+            "4.1.93.Final",
+            "4.1.94.Final",
+            "4.1.95.Final",
+            "4.1.96.Final",
+            "4.1.97.Final",
+            "4.1.98.Final",
+            "4.1.99.Final"
+          ],
+          "database_specific": {
+            "last_known_affected_version_range": "<= 4.1.134.Final",
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-c653-97m9-rcg9/GHSA-c653-97m9-rcg9.json"
+          }
+        }
+      ]
+    },
+    {
+      "id": "GHSA-cm33-6792-r9fm",
+      "summary": "Netty has a DNS Codec Input Validation Bypass (Encoder + Decoder)",
+      "aliases": [
+        "CVE-2026-42579"
+      ],
+      "published": "2026-05-07T00:12:47Z",
+      "modified": "2026-05-14T20:50:50.147382Z",
+      "withdrawn": null,
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N"
+        }
+      ],
+      "references": [
+        {
+          "type": "WEB",
+          "url": "https://github.com/netty/netty/security/advisories/GHSA-cm33-6792-r9fm"
+        },
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-42579"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/netty/netty"
+        },
+        {
+          "type": "WEB",
+          "url": "https://tools.ietf.org/html/rfc1035#section-2.3.4"
+        },
+        {
+          "type": "WEB",
+          "url": "https://tools.ietf.org/html/rfc1035#section-4.1.4"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "io.netty:netty-codec-dns",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/io.netty/netty-codec-dns"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "4.2.0.Alpha1"
+                },
+                {
+                  "fixed": "4.2.13.Final"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "4.2.0.Alpha1",
+            "4.2.0.Alpha2",
+            "4.2.0.Alpha3",
+            "4.2.0.Alpha4",
+            "4.2.0.Alpha5",
+            "4.2.0.Beta1",
+            "4.2.0.Final",
+            "4.2.0.RC1",
+            "4.2.0.RC2",
+            "4.2.0.RC3",
+            "4.2.0.RC4",
+            "4.2.1.Final",
+            "4.2.10.Final",
+            "4.2.11.Final",
+            "4.2.12.Final",
+            "4.2.2.Final",
+            "4.2.3.Final",
+            "4.2.4.Final",
+            "4.2.5.Final",
+            "4.2.6.Final",
+            "4.2.7.Final",
+            "4.2.8.Final",
+            "4.2.9.Final"
+          ],
+          "database_specific": {
+            "last_known_affected_version_range": "<= 4.2.12.Final",
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/05/GHSA-cm33-6792-r9fm/GHSA-cm33-6792-r9fm.json"
+          }
+        },
+        {
+          "package": {
+            "name": "io.netty:netty-codec-dns",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/io.netty/netty-codec-dns"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "0"
+                },
+                {
+                  "fixed": "4.1.133.Final"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "4.1.0.Beta1",
+            "4.1.0.Beta2",
+            "4.1.0.Beta3",
+            "4.1.0.Beta4",
+            "4.1.0.Beta5",
+            "4.1.0.Beta6",
+            "4.1.0.Beta7",
+            "4.1.0.Beta8",
+            "4.1.0.CR1",
+            "4.1.0.CR2",
+            "4.1.0.CR3",
+            "4.1.0.CR4",
+            "4.1.0.CR5",
+            "4.1.0.CR6",
+            "4.1.0.CR7",
+            "4.1.0.Final",
+            "4.1.1.Final",
+            "4.1.10.Final",
+            "4.1.100.Final",
+            "4.1.101.Final",
+            "4.1.102.Final",
+            "4.1.103.Final",
+            "4.1.104.Final",
+            "4.1.105.Final",
+            "4.1.106.Final",
+            "4.1.107.Final",
+            "4.1.108.Final",
+            "4.1.109.Final",
+            "4.1.11.Final",
+            "4.1.110.Final",
+            "4.1.111.Final",
+            "4.1.112.Final",
+            "4.1.113.Final",
+            "4.1.114.Final",
+            "4.1.115.Final",
+            "4.1.116.Final",
+            "4.1.117.Final",
+            "4.1.118.Final",
+            "4.1.119.Final",
+            "4.1.12.Final",
+            "4.1.120.Final",
+            "4.1.121.Final",
+            "4.1.122.Final",
+            "4.1.123.Final",
+            "4.1.124.Final",
+            "4.1.125.Final",
+            "4.1.126.Final",
+            "4.1.127.Final",
+            "4.1.128.Final",
+            "4.1.129.Final",
+            "4.1.13.Final",
+            "4.1.130.Final",
+            "4.1.131.Final",
+            "4.1.132.Final",
+            "4.1.14.Final",
+            "4.1.15.Final",
+            "4.1.16.Final",
+            "4.1.17.Final",
+            "4.1.18.Final",
+            "4.1.19.Final",
+            "4.1.2.Final",
+            "4.1.20.Final",
+            "4.1.21.Final",
+            "4.1.22.Final",
+            "4.1.23.Final",
+            "4.1.24.Final",
+            "4.1.25.Final",
+            "4.1.26.Final",
+            "4.1.27.Final",
+            "4.1.28.Final",
+            "4.1.29.Final",
+            "4.1.3.Final",
+            "4.1.30.Final",
+            "4.1.31.Final",
+            "4.1.32.Final",
+            "4.1.33.Final",
+            "4.1.34.Final",
+            "4.1.35.Final",
+            "4.1.36.Final",
+            "4.1.37.Final",
+            "4.1.38.Final",
+            "4.1.39.Final",
+            "4.1.4.Final",
+            "4.1.40.Final",
+            "4.1.41.Final",
+            "4.1.42.Final",
+            "4.1.43.Final",
+            "4.1.44.Final",
+            "4.1.45.Final",
+            "4.1.46.Final",
+            "4.1.47.Final",
+            "4.1.48.Final",
+            "4.1.49.Final",
+            "4.1.5.Final",
+            "4.1.50.Final",
+            "4.1.51.Final",
+            "4.1.52.Final",
+            "4.1.53.Final",
+            "4.1.54.Final",
+            "4.1.55.Final",
+            "4.1.56.Final",
+            "4.1.57.Final",
+            "4.1.58.Final",
+            "4.1.59.Final",
+            "4.1.6.Final",
+            "4.1.60.Final",
+            "4.1.61.Final",
+            "4.1.62.Final",
+            "4.1.63.Final",
+            "4.1.64.Final",
+            "4.1.65.Final",
+            "4.1.66.Final",
+            "4.1.67.Final",
+            "4.1.68.Final",
+            "4.1.69.Final",
+            "4.1.7.Final",
+            "4.1.70.Final",
+            "4.1.71.Final",
+            "4.1.72.Final",
+            "4.1.73.Final",
+            "4.1.74.Final",
+            "4.1.75.Final",
+            "4.1.76.Final",
+            "4.1.77.Final",
+            "4.1.78.Final",
+            "4.1.79.Final",
+            "4.1.8.Final",
+            "4.1.80.Final",
+            "4.1.81.Final",
+            "4.1.82.Final",
+            "4.1.83.Final",
+            "4.1.84.Final",
+            "4.1.85.Final",
+            "4.1.86.Final",
+            "4.1.87.Final",
+            "4.1.88.Final",
+            "4.1.89.Final",
+            "4.1.9.Final",
+            "4.1.90.Final",
+            "4.1.91.Final",
+            "4.1.92.Final",
+            "4.1.93.Final",
+            "4.1.94.Final",
+            "4.1.95.Final",
+            "4.1.96.Final",
+            "4.1.97.Final",
+            "4.1.98.Final",
+            "4.1.99.Final"
+          ],
+          "database_specific": {
+            "last_known_affected_version_range": "<= 4.1.132.Final",
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/05/GHSA-cm33-6792-r9fm/GHSA-cm33-6792-r9fm.json"
+          }
+        }
+      ]
+    },
+    {
+      "id": "GHSA-hf6x-8p5f-cgmf",
+      "summary": "Apache HttpComponents Core HTTP/1 header parsing can cause memory-exhaustion denial of service",
+      "aliases": [
+        "CVE-2026-54399"
+      ],
+      "published": "2026-07-01T18:31:55Z",
+      "modified": "2026-08-13T21:42:04.308288254Z",
+      "withdrawn": null,
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+        }
+      ],
+      "references": [
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-54399"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/apache/httpcomponents-core/commit/d96a00fec9b2e19f8005e35681df5f6cd6e21a9e"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/apache/httpcomponents-core/commit/fdc53a32fe0fccf098cc67e71cd125e447c759ed"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/apache/httpcomponents-core"
+        },
+        {
+          "type": "WEB",
+          "url": "https://lists.apache.org/thread/zmxh1pl2zohov5ntdh4lt85gfrlchgpy"
+        },
+        {
+          "type": "WEB",
+          "url": "http://www.openwall.com/lists/oss-security/2026/07/01/4"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "org.apache.httpcomponents.core5:httpcore5",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/org.apache.httpcomponents.core5/httpcore5"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "0"
+                },
+                {
+                  "fixed": "5.4.3"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "5.0",
+            "5.0-alpha1",
+            "5.0-alpha2",
+            "5.0-alpha3",
+            "5.0-alpha4",
+            "5.0-beta1",
+            "5.0-beta10",
+            "5.0-beta11",
+            "5.0-beta2",
+            "5.0-beta3",
+            "5.0-beta4",
+            "5.0-beta5",
+            "5.0-beta6",
+            "5.0-beta7",
+            "5.0-beta8",
+            "5.0-beta9",
+            "5.0.1",
+            "5.0.2",
+            "5.0.3",
+            "5.0.4",
+            "5.1",
+            "5.1-beta1",
+            "5.1-beta2",
+            "5.1-beta3",
+            "5.1.1",
+            "5.1.2",
+            "5.1.3",
+            "5.1.4",
+            "5.1.5",
+            "5.2",
+            "5.2-alpha1",
+            "5.2-alpha2",
+            "5.2-beta1",
+            "5.2-beta2",
+            "5.2.1",
+            "5.2.2",
+            "5.2.3",
+            "5.2.4",
+            "5.2.5",
+            "5.3",
+            "5.3-alpha1",
+            "5.3-alpha2",
+            "5.3-beta1",
+            "5.3.1",
+            "5.3.2",
+            "5.3.3",
+            "5.3.4",
+            "5.3.5",
+            "5.3.6",
+            "5.4",
+            "5.4-alpha1",
+            "5.4.1",
+            "5.4.2"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/07/GHSA-hf6x-8p5f-cgmf/GHSA-hf6x-8p5f-cgmf.json"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.httpcomponents.core5:httpcore5",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/org.apache.httpcomponents.core5/httpcore5"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "5.5-alpha1"
+                },
+                {
+                  "fixed": "5.5-beta2"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "5.5-alpha1",
+            "5.5-beta1"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/07/GHSA-hf6x-8p5f-cgmf/GHSA-hf6x-8p5f-cgmf.json"
+          }
+        }
+      ]
+    },
+    {
+      "id": "GHSA-hgj6-7826-r7m5",
+      "summary": "jackson-databind: InetSocketAddress deserialization triggers eager DNS resolution (SSRF)",
+      "aliases": [
+        "CVE-2026-54514"
+      ],
+      "published": "2026-06-23T21:22:54Z",
+      "modified": "2026-07-20T21:30:31.809711002Z",
+      "withdrawn": null,
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N"
+        }
+      ],
+      "references": [
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/security/advisories/GHSA-hgj6-7826-r7m5"
+        },
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-54514"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/pull/5951"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/commit/1f5a1037b1e9e05920e755cb35f198bcd46667e4"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/FasterXML/jackson-databind"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "com.fasterxml.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "2.0.0"
+                },
+                {
+                  "fixed": "2.18.8"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "2.0.0",
+            "2.0.1",
+            "2.0.2",
+            "2.0.4",
+            "2.0.5",
+            "2.0.6",
+            "2.1.0",
+            "2.1.1",
+            "2.1.2",
+            "2.1.3",
+            "2.1.4",
+            "2.1.5",
+            "2.10.0",
+            "2.10.0.pr1",
+            "2.10.0.pr2",
+            "2.10.0.pr3",
+            "2.10.1",
+            "2.10.2",
+            "2.10.3",
+            "2.10.4",
+            "2.10.5",
+            "2.10.5.1",
+            "2.11.0",
+            "2.11.0.rc1",
+            "2.11.1",
+            "2.11.2",
+            "2.11.3",
+            "2.11.4",
+            "2.12.0",
+            "2.12.0-rc1",
+            "2.12.0-rc2",
+            "2.12.1",
+            "2.12.2",
+            "2.12.3",
+            "2.12.4",
+            "2.12.5",
+            "2.12.6",
+            "2.12.6.1",
+            "2.12.7",
+            "2.12.7.1",
+            "2.12.7.2",
+            "2.13.0",
+            "2.13.0-rc1",
+            "2.13.0-rc2",
+            "2.13.1",
+            "2.13.2",
+            "2.13.2.1",
+            "2.13.2.2",
+            "2.13.3",
+            "2.13.4",
+            "2.13.4.1",
+            "2.13.4.2",
+            "2.13.5",
+            "2.14.0",
+            "2.14.0-rc1",
+            "2.14.0-rc2",
+            "2.14.0-rc3",
+            "2.14.1",
+            "2.14.2",
+            "2.14.3",
+            "2.15.0",
+            "2.15.0-rc1",
+            "2.15.0-rc2",
+            "2.15.0-rc3",
+            "2.15.1",
+            "2.15.2",
+            "2.15.3",
+            "2.15.4",
+            "2.16.0",
+            "2.16.0-rc1",
+            "2.16.1",
+            "2.16.2",
+            "2.17.0",
+            "2.17.0-rc1",
+            "2.17.1",
+            "2.17.2",
+            "2.17.3",
+            "2.18.0",
+            "2.18.0-rc1",
+            "2.18.1",
+            "2.18.2",
+            "2.18.3",
+            "2.18.4",
+            "2.18.5",
+            "2.18.6",
+            "2.18.7",
+            "2.2.0",
+            "2.2.0-rc1",
+            "2.2.1",
+            "2.2.2",
+            "2.2.3",
+            "2.2.4",
+            "2.3.0",
+            "2.3.0-rc1",
+            "2.3.1",
+            "2.3.2",
+            "2.3.3",
+            "2.3.4",
+            "2.3.5",
+            "2.4.0",
+            "2.4.0-rc1",
+            "2.4.0-rc2",
+            "2.4.0-rc3",
+            "2.4.1",
+            "2.4.1.1",
+            "2.4.1.2",
+            "2.4.1.3",
+            "2.4.2",
+            "2.4.3",
+            "2.4.4",
+            "2.4.5",
+            "2.4.5.1",
+            "2.4.6",
+            "2.4.6.1",
+            "2.5.0",
+            "2.5.0-rc1",
+            "2.5.1",
+            "2.5.2",
+            "2.5.3",
+            "2.5.4",
+            "2.5.5",
+            "2.6.0",
+            "2.6.0-rc1",
+            "2.6.0-rc2",
+            "2.6.0-rc3",
+            "2.6.0-rc4",
+            "2.6.1",
+            "2.6.2",
+            "2.6.3",
+            "2.6.4",
+            "2.6.5",
+            "2.6.6",
+            "2.6.7",
+            "2.6.7.1",
+            "2.6.7.2",
+            "2.6.7.3",
+            "2.6.7.4",
+            "2.6.7.5",
+            "2.7.0",
+            "2.7.0-rc1",
+            "2.7.0-rc2",
+            "2.7.0-rc3",
+            "2.7.1",
+            "2.7.1-1",
+            "2.7.2",
+            "2.7.3",
+            "2.7.4",
+            "2.7.5",
+            "2.7.6",
+            "2.7.7",
+            "2.7.8",
+            "2.7.9",
+            "2.7.9.1",
+            "2.7.9.2",
+            "2.7.9.3",
+            "2.7.9.4",
+            "2.7.9.5",
+            "2.7.9.6",
+            "2.7.9.7",
+            "2.8.0",
+            "2.8.0.rc1",
+            "2.8.0.rc2",
+            "2.8.1",
+            "2.8.10",
+            "2.8.11",
+            "2.8.11.1",
+            "2.8.11.2",
+            "2.8.11.3",
+            "2.8.11.4",
+            "2.8.11.5",
+            "2.8.11.6",
+            "2.8.2",
+            "2.8.3",
+            "2.8.4",
+            "2.8.5",
+            "2.8.6",
+            "2.8.7",
+            "2.8.8",
+            "2.8.8.1",
+            "2.8.9",
+            "2.9.0",
+            "2.9.0.pr1",
+            "2.9.0.pr2",
+            "2.9.0.pr3",
+            "2.9.0.pr4",
+            "2.9.1",
+            "2.9.10",
+            "2.9.10.1",
+            "2.9.10.2",
+            "2.9.10.3",
+            "2.9.10.4",
+            "2.9.10.5",
+            "2.9.10.6",
+            "2.9.10.7",
+            "2.9.10.8",
+            "2.9.2",
+            "2.9.3",
+            "2.9.4",
+            "2.9.5",
+            "2.9.6",
+            "2.9.7",
+            "2.9.8",
+            "2.9.9",
+            "2.9.9.1",
+            "2.9.9.2",
+            "2.9.9.3"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-hgj6-7826-r7m5/GHSA-hgj6-7826-r7m5.json"
+          }
+        },
+        {
+          "package": {
+            "name": "com.fasterxml.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "2.19.0"
+                },
+                {
+                  "fixed": "2.21.4"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "2.19.0",
+            "2.19.1",
+            "2.19.2",
+            "2.19.3",
+            "2.19.4",
+            "2.20.0",
+            "2.20.0-rc1",
+            "2.20.1",
+            "2.20.2",
+            "2.21.0",
+            "2.21.1",
+            "2.21.2",
+            "2.21.3"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-hgj6-7826-r7m5/GHSA-hgj6-7826-r7m5.json"
+          }
+        },
+        {
+          "package": {
+            "name": "com.fasterxml.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "3.0.0"
+                },
+                {
+                  "fixed": "3.1.4"
+                }
+              ]
+            }
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-hgj6-7826-r7m5/GHSA-hgj6-7826-r7m5.json"
+          }
+        },
+        {
+          "package": {
+            "name": "tools.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/tools.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "2.19.0"
+                },
+                {
+                  "fixed": "2.21.4"
+                }
+              ]
+            }
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-hgj6-7826-r7m5/GHSA-hgj6-7826-r7m5.json"
+          }
+        },
+        {
+          "package": {
+            "name": "tools.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/tools.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "3.0.0"
+                },
+                {
+                  "fixed": "3.1.4"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "3.0.0",
+            "3.0.1",
+            "3.0.2",
+            "3.0.3",
+            "3.0.4",
+            "3.1.0",
+            "3.1.0-rc1",
+            "3.1.1",
+            "3.1.2",
+            "3.1.3"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-hgj6-7826-r7m5/GHSA-hgj6-7826-r7m5.json"
+          }
+        }
+      ]
+    },
+    {
+      "id": "GHSA-hjcp-jmpx-g3qm",
+      "summary": "Apache HttpComponents Client: Connection Leak on Content-Encoding Decode Error Leads to Pool Exhaustion DoS",
+      "aliases": [
+        "CVE-2026-64607"
+      ],
+      "published": "2026-07-31T12:30:30Z",
+      "modified": "2026-08-14T21:42:00.776314912Z",
+      "withdrawn": null,
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L"
+        }
+      ],
+      "references": [
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-64607"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/apache/httpcomponents-client/commit/55733f4121f7ba26ddf04fe12739d9c15962cb94"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/apache/httpcomponents-client/commit/ebac9512f555c4a355cad3f59ef2db69b597cc97"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/apache/httpcomponents-client"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/apache/httpcomponents-client/releases/tag/rel/v5.6.3"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/apache/httpcomponents-client/releases/tag/rel/v5.7-alpha1"
+        },
+        {
+          "type": "WEB",
+          "url": "https://lists.apache.org/thread/qqfzo3fqcdk4l5496vz95ppvl4ty511q"
+        },
+        {
+          "type": "WEB",
+          "url": "http://www.openwall.com/lists/oss-security/2026/08/13/5"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "org.apache.httpcomponents.client5:httpclient5",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/org.apache.httpcomponents.client5/httpclient5"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "5.0-alpha1"
+                },
+                {
+                  "fixed": "5.6.3"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "5.0",
+            "5.0-alpha1",
+            "5.0-alpha2",
+            "5.0-alpha3",
+            "5.0-beta1",
+            "5.0-beta2",
+            "5.0-beta3",
+            "5.0-beta4",
+            "5.0-beta5",
+            "5.0-beta6",
+            "5.0-beta7",
+            "5.0.1",
+            "5.0.2",
+            "5.0.3",
+            "5.0.4",
+            "5.1",
+            "5.1-beta1",
+            "5.1.1",
+            "5.1.2",
+            "5.1.3",
+            "5.1.4",
+            "5.2",
+            "5.2-alpha1",
+            "5.2-beta1",
+            "5.2.1",
+            "5.2.2",
+            "5.2.3",
+            "5.3",
+            "5.3-alpha1",
+            "5.3.1",
+            "5.4",
+            "5.4-alpha1",
+            "5.4-alpha2",
+            "5.4-beta1",
+            "5.4.1",
+            "5.4.2",
+            "5.4.3",
+            "5.4.4",
+            "5.5",
+            "5.5-alpha1",
+            "5.5.1",
+            "5.5.2",
+            "5.6",
+            "5.6-alpha1",
+            "5.6.1",
+            "5.6.2"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/07/GHSA-hjcp-jmpx-g3qm/GHSA-hjcp-jmpx-g3qm.json"
+          }
+        }
+      ]
+    },
+    {
+      "id": "GHSA-j3rv-43j4-c7qm",
+      "summary": "jackson-databind has a PolymorphicTypeValidator bypass via generic type parameters that allows arbitrary class instantiation",
+      "aliases": [
+        "CVE-2026-54512"
+      ],
+      "published": "2026-06-23T21:21:38Z",
+      "modified": "2026-07-20T21:30:40.174709386Z",
+      "withdrawn": null,
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        }
+      ],
+      "references": [
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/security/advisories/GHSA-j3rv-43j4-c7qm"
+        },
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-54512"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/issues/5988"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/commit/434d6c511de7fdd9872f29157aafb6162d12d8d5"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/FasterXML/jackson-databind"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "com.fasterxml.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "2.10.0"
+                },
+                {
+                  "fixed": "2.18.8"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "2.10.0",
+            "2.10.0.pr1",
+            "2.10.0.pr2",
+            "2.10.0.pr3",
+            "2.10.1",
+            "2.10.2",
+            "2.10.3",
+            "2.10.4",
+            "2.10.5",
+            "2.10.5.1",
+            "2.11.0",
+            "2.11.0.rc1",
+            "2.11.1",
+            "2.11.2",
+            "2.11.3",
+            "2.11.4",
+            "2.12.0",
+            "2.12.0-rc1",
+            "2.12.0-rc2",
+            "2.12.1",
+            "2.12.2",
+            "2.12.3",
+            "2.12.4",
+            "2.12.5",
+            "2.12.6",
+            "2.12.6.1",
+            "2.12.7",
+            "2.12.7.1",
+            "2.12.7.2",
+            "2.13.0",
+            "2.13.0-rc1",
+            "2.13.0-rc2",
+            "2.13.1",
+            "2.13.2",
+            "2.13.2.1",
+            "2.13.2.2",
+            "2.13.3",
+            "2.13.4",
+            "2.13.4.1",
+            "2.13.4.2",
+            "2.13.5",
+            "2.14.0",
+            "2.14.0-rc1",
+            "2.14.0-rc2",
+            "2.14.0-rc3",
+            "2.14.1",
+            "2.14.2",
+            "2.14.3",
+            "2.15.0",
+            "2.15.0-rc1",
+            "2.15.0-rc2",
+            "2.15.0-rc3",
+            "2.15.1",
+            "2.15.2",
+            "2.15.3",
+            "2.15.4",
+            "2.16.0",
+            "2.16.0-rc1",
+            "2.16.1",
+            "2.16.2",
+            "2.17.0",
+            "2.17.0-rc1",
+            "2.17.1",
+            "2.17.2",
+            "2.17.3",
+            "2.18.0",
+            "2.18.0-rc1",
+            "2.18.1",
+            "2.18.2",
+            "2.18.3",
+            "2.18.4",
+            "2.18.5",
+            "2.18.6",
+            "2.18.7"
+          ],
+          "database_specific": {
+            "last_known_affected_version_range": "<= 2.18.7",
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-j3rv-43j4-c7qm/GHSA-j3rv-43j4-c7qm.json"
+          }
+        },
+        {
+          "package": {
+            "name": "com.fasterxml.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "3.0.0"
+                },
+                {
+                  "fixed": "3.1.4"
+                }
+              ]
+            }
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-j3rv-43j4-c7qm/GHSA-j3rv-43j4-c7qm.json",
+            "last_known_affected_version_range": "<= 3.1.3"
+          }
+        },
+        {
+          "package": {
+            "name": "com.fasterxml.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "2.19.0"
+                },
+                {
+                  "fixed": "2.21.4"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "2.19.0",
+            "2.19.1",
+            "2.19.2",
+            "2.19.3",
+            "2.19.4",
+            "2.20.0",
+            "2.20.0-rc1",
+            "2.20.1",
+            "2.20.2",
+            "2.21.0",
+            "2.21.1",
+            "2.21.2",
+            "2.21.3"
+          ],
+          "database_specific": {
+            "last_known_affected_version_range": "<= 2.21.3",
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-j3rv-43j4-c7qm/GHSA-j3rv-43j4-c7qm.json"
+          }
+        },
+        {
+          "package": {
+            "name": "tools.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/tools.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "3.0.0"
+                },
+                {
+                  "fixed": "3.1.4"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "3.0.0",
+            "3.0.1",
+            "3.0.2",
+            "3.0.3",
+            "3.0.4",
+            "3.1.0",
+            "3.1.0-rc1",
+            "3.1.1",
+            "3.1.2",
+            "3.1.3"
+          ],
+          "database_specific": {
+            "last_known_affected_version_range": "<= 3.1.3",
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-j3rv-43j4-c7qm/GHSA-j3rv-43j4-c7qm.json"
+          }
+        }
+      ]
+    },
+    {
+      "id": "GHSA-jhq6-gfmj-v8fx",
+      "summary": "Logback vulnerable to Object Injection through HardenedObjectInputStream modules",
+      "aliases": [
+        "CVE-2026-10532"
+      ],
+      "published": "2026-06-01T15:30:40Z",
+      "modified": "2026-07-15T22:00:52.732394384Z",
+      "withdrawn": null,
+      "severity": [
+        {
+          "type": "CVSS_V4",
+          "score": "CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:L/VI:L/VA:N/SC:L/SI:L/SA:N/E:P/RE:M/U:Green"
+        }
+      ],
+      "references": [
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-10532"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/qos-ch/logback"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/qos-ch/logback/releases/tag/v_1.5.34"
+        },
+        {
+          "type": "WEB",
+          "url": "https://logback.qos.ch/news.html#1.5.34"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "ch.qos.logback:logback-core",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/ch.qos.logback/logback-core"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "0"
+                },
+                {
+                  "fixed": "1.5.34"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "0.2.5",
+            "0.3",
+            "0.5",
+            "0.6",
+            "0.7",
+            "0.7.1",
+            "0.8",
+            "0.8.1",
+            "0.9",
+            "0.9.1",
+            "0.9.10",
+            "0.9.11",
+            "0.9.12",
+            "0.9.13",
+            "0.9.14",
+            "0.9.15",
+            "0.9.16",
+            "0.9.17",
+            "0.9.18",
+            "0.9.19",
+            "0.9.2",
+            "0.9.20",
+            "0.9.21",
+            "0.9.22",
+            "0.9.23",
+            "0.9.24",
+            "0.9.25",
+            "0.9.26",
+            "0.9.27",
+            "0.9.28",
+            "0.9.29",
+            "0.9.3",
+            "0.9.30",
+            "0.9.4",
+            "0.9.5",
+            "0.9.6",
+            "0.9.7",
+            "0.9.8",
+            "0.9.9",
+            "1.0.0",
+            "1.0.1",
+            "1.0.10",
+            "1.0.11",
+            "1.0.12",
+            "1.0.13",
+            "1.0.2",
+            "1.0.3",
+            "1.0.4",
+            "1.0.5",
+            "1.0.6",
+            "1.0.7",
+            "1.0.8",
+            "1.0.9",
+            "1.1.0",
+            "1.1.1",
+            "1.1.10",
+            "1.1.11",
+            "1.1.2",
+            "1.1.3",
+            "1.1.4",
+            "1.1.5",
+            "1.1.6",
+            "1.1.7",
+            "1.1.8",
+            "1.1.9",
+            "1.2.0",
+            "1.2.1",
+            "1.2.10",
+            "1.2.11",
+            "1.2.12",
+            "1.2.13",
+            "1.2.2",
+            "1.2.3",
+            "1.2.4",
+            "1.2.4-groovyless",
+            "1.2.5",
+            "1.2.6",
+            "1.2.7",
+            "1.2.8",
+            "1.2.9",
+            "1.3.0",
+            "1.3.0-alpha0",
+            "1.3.0-alpha1",
+            "1.3.0-alpha10",
+            "1.3.0-alpha11",
+            "1.3.0-alpha12",
+            "1.3.0-alpha13",
+            "1.3.0-alpha14",
+            "1.3.0-alpha15",
+            "1.3.0-alpha16",
+            "1.3.0-alpha2",
+            "1.3.0-alpha3",
+            "1.3.0-alpha4",
+            "1.3.0-alpha5",
+            "1.3.0-alpha6",
+            "1.3.0-alpha7",
+            "1.3.0-alpha8",
+            "1.3.0-alpha9",
+            "1.3.0-beta0",
+            "1.3.1",
+            "1.3.10",
+            "1.3.11",
+            "1.3.12",
+            "1.3.13",
+            "1.3.14",
+            "1.3.15",
+            "1.3.16",
+            "1.3.2",
+            "1.3.3",
+            "1.3.4",
+            "1.3.5",
+            "1.3.6",
+            "1.3.7",
+            "1.3.8",
+            "1.3.9",
+            "1.4.0",
+            "1.4.1",
+            "1.4.10",
+            "1.4.11",
+            "1.4.12",
+            "1.4.13",
+            "1.4.14",
+            "1.4.2",
+            "1.4.3",
+            "1.4.4",
+            "1.4.5",
+            "1.4.6",
+            "1.4.7",
+            "1.4.8",
+            "1.4.9",
+            "1.5.0",
+            "1.5.1",
+            "1.5.10",
+            "1.5.11",
+            "1.5.12",
+            "1.5.13",
+            "1.5.14",
+            "1.5.15",
+            "1.5.16",
+            "1.5.17",
+            "1.5.18",
+            "1.5.19",
+            "1.5.2",
+            "1.5.20",
+            "1.5.21",
+            "1.5.22",
+            "1.5.23",
+            "1.5.24",
+            "1.5.25",
+            "1.5.26",
+            "1.5.27",
+            "1.5.28",
+            "1.5.29",
+            "1.5.3",
+            "1.5.30",
+            "1.5.31",
+            "1.5.32",
+            "1.5.33",
+            "1.5.4",
+            "1.5.5",
+            "1.5.6",
+            "1.5.7",
+            "1.5.8",
+            "1.5.9"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-jhq6-gfmj-v8fx/GHSA-jhq6-gfmj-v8fx.json"
+          }
+        }
+      ]
+    },
+    {
+      "id": "GHSA-mfg7-5gfp-c4w3",
+      "summary": "Netty: Memory Leak in DNS Record Decoder via Malformed Domain Names",
+      "aliases": [
+        "CVE-2026-73508"
+      ],
+      "published": "2026-07-24T16:52:50Z",
+      "modified": "2026-08-15T02:11:52.623012404Z",
+      "withdrawn": null,
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L"
+        }
+      ],
+      "references": [
+        {
+          "type": "WEB",
+          "url": "https://github.com/netty/netty/security/advisories/GHSA-mfg7-5gfp-c4w3"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/netty/netty/pull/17063"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/netty/netty/pull/17065"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/netty/netty/commit/5b68c61f37aa4a3045cba624cbea239655c9003b"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/netty/netty/commit/bb2ff68a1fb71cb4b0eb9a9e17b66c52aff680c6"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/netty/netty"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/netty/netty/releases/tag/netty-4.1.136.Final"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/netty/netty/releases/tag/netty-4.2.16.Final"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "io.netty:netty-codec-dns",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/io.netty/netty-codec-dns"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "4.2.0.Final"
+                },
+                {
+                  "fixed": "4.2.16.Final"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "4.2.0.Final",
+            "4.2.1.Final",
+            "4.2.10.Final",
+            "4.2.11.Final",
+            "4.2.12.Final",
+            "4.2.13.Final",
+            "4.2.14.Final",
+            "4.2.15.Final",
+            "4.2.2.Final",
+            "4.2.3.Final",
+            "4.2.4.Final",
+            "4.2.5.Final",
+            "4.2.6.Final",
+            "4.2.7.Final",
+            "4.2.8.Final",
+            "4.2.9.Final"
+          ],
+          "database_specific": {
+            "last_known_affected_version_range": "<= 4.2.15.Final",
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/07/GHSA-mfg7-5gfp-c4w3/GHSA-mfg7-5gfp-c4w3.json"
+          }
+        },
+        {
+          "package": {
+            "name": "io.netty:netty-codec-dns",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/io.netty/netty-codec-dns"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "0"
+                },
+                {
+                  "fixed": "4.1.136.Final"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "4.1.0.Beta1",
+            "4.1.0.Beta2",
+            "4.1.0.Beta3",
+            "4.1.0.Beta4",
+            "4.1.0.Beta5",
+            "4.1.0.Beta6",
+            "4.1.0.Beta7",
+            "4.1.0.Beta8",
+            "4.1.0.CR1",
+            "4.1.0.CR2",
+            "4.1.0.CR3",
+            "4.1.0.CR4",
+            "4.1.0.CR5",
+            "4.1.0.CR6",
+            "4.1.0.CR7",
+            "4.1.0.Final",
+            "4.1.1.Final",
+            "4.1.10.Final",
+            "4.1.100.Final",
+            "4.1.101.Final",
+            "4.1.102.Final",
+            "4.1.103.Final",
+            "4.1.104.Final",
+            "4.1.105.Final",
+            "4.1.106.Final",
+            "4.1.107.Final",
+            "4.1.108.Final",
+            "4.1.109.Final",
+            "4.1.11.Final",
+            "4.1.110.Final",
+            "4.1.111.Final",
+            "4.1.112.Final",
+            "4.1.113.Final",
+            "4.1.114.Final",
+            "4.1.115.Final",
+            "4.1.116.Final",
+            "4.1.117.Final",
+            "4.1.118.Final",
+            "4.1.119.Final",
+            "4.1.12.Final",
+            "4.1.120.Final",
+            "4.1.121.Final",
+            "4.1.122.Final",
+            "4.1.123.Final",
+            "4.1.124.Final",
+            "4.1.125.Final",
+            "4.1.126.Final",
+            "4.1.127.Final",
+            "4.1.128.Final",
+            "4.1.129.Final",
+            "4.1.13.Final",
+            "4.1.130.Final",
+            "4.1.131.Final",
+            "4.1.132.Final",
+            "4.1.133.Final",
+            "4.1.134.Final",
+            "4.1.135.Final",
+            "4.1.14.Final",
+            "4.1.15.Final",
+            "4.1.16.Final",
+            "4.1.17.Final",
+            "4.1.18.Final",
+            "4.1.19.Final",
+            "4.1.2.Final",
+            "4.1.20.Final",
+            "4.1.21.Final",
+            "4.1.22.Final",
+            "4.1.23.Final",
+            "4.1.24.Final",
+            "4.1.25.Final",
+            "4.1.26.Final",
+            "4.1.27.Final",
+            "4.1.28.Final",
+            "4.1.29.Final",
+            "4.1.3.Final",
+            "4.1.30.Final",
+            "4.1.31.Final",
+            "4.1.32.Final",
+            "4.1.33.Final",
+            "4.1.34.Final",
+            "4.1.35.Final",
+            "4.1.36.Final",
+            "4.1.37.Final",
+            "4.1.38.Final",
+            "4.1.39.Final",
+            "4.1.4.Final",
+            "4.1.40.Final",
+            "4.1.41.Final",
+            "4.1.42.Final",
+            "4.1.43.Final",
+            "4.1.44.Final",
+            "4.1.45.Final",
+            "4.1.46.Final",
+            "4.1.47.Final",
+            "4.1.48.Final",
+            "4.1.49.Final",
+            "4.1.5.Final",
+            "4.1.50.Final",
+            "4.1.51.Final",
+            "4.1.52.Final",
+            "4.1.53.Final",
+            "4.1.54.Final",
+            "4.1.55.Final",
+            "4.1.56.Final",
+            "4.1.57.Final",
+            "4.1.58.Final",
+            "4.1.59.Final",
+            "4.1.6.Final",
+            "4.1.60.Final",
+            "4.1.61.Final",
+            "4.1.62.Final",
+            "4.1.63.Final",
+            "4.1.64.Final",
+            "4.1.65.Final",
+            "4.1.66.Final",
+            "4.1.67.Final",
+            "4.1.68.Final",
+            "4.1.69.Final",
+            "4.1.7.Final",
+            "4.1.70.Final",
+            "4.1.71.Final",
+            "4.1.72.Final",
+            "4.1.73.Final",
+            "4.1.74.Final",
+            "4.1.75.Final",
+            "4.1.76.Final",
+            "4.1.77.Final",
+            "4.1.78.Final",
+            "4.1.79.Final",
+            "4.1.8.Final",
+            "4.1.80.Final",
+            "4.1.81.Final",
+            "4.1.82.Final",
+            "4.1.83.Final",
+            "4.1.84.Final",
+            "4.1.85.Final",
+            "4.1.86.Final",
+            "4.1.87.Final",
+            "4.1.88.Final",
+            "4.1.89.Final",
+            "4.1.9.Final",
+            "4.1.90.Final",
+            "4.1.91.Final",
+            "4.1.92.Final",
+            "4.1.93.Final",
+            "4.1.94.Final",
+            "4.1.95.Final",
+            "4.1.96.Final",
+            "4.1.97.Final",
+            "4.1.98.Final",
+            "4.1.99.Final"
+          ],
+          "database_specific": {
+            "last_known_affected_version_range": "<= 4.1.135.Final",
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/07/GHSA-mfg7-5gfp-c4w3/GHSA-mfg7-5gfp-c4w3.json"
+          }
+        }
+      ]
+    },
+    {
+      "id": "GHSA-mhm7-754m-9p8w",
+      "summary": "jackson-databind: `@JsonView` bypass for creator properties with `@JsonTypeInfo(include=As.EXTERNAL_PROPERTY)`",
+      "aliases": null,
+      "published": "2026-07-21T19:40:12Z",
+      "modified": "2026-07-22T20:59:38.271594763Z",
+      "withdrawn": null,
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N"
+        }
+      ],
+      "references": [
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/security/advisories/GHSA-mhm7-754m-9p8w"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/commit/c628b357ed143d8492756d5c1458cfb9fbeb29ed"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/commit/dea7eb466e98cc226c4ac65587581fb49926820c"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/FasterXML/jackson-databind"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "com.fasterxml.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "2.18.0"
+                },
+                {
+                  "fixed": "2.18.9"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "2.18.0",
+            "2.18.1",
+            "2.18.2",
+            "2.18.3",
+            "2.18.4",
+            "2.18.5",
+            "2.18.6",
+            "2.18.7",
+            "2.18.8"
+          ],
+          "database_specific": {
+            "last_known_affected_version_range": "<= 2.18.8",
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/07/GHSA-mhm7-754m-9p8w/GHSA-mhm7-754m-9p8w.json"
+          }
+        },
+        {
+          "package": {
+            "name": "com.fasterxml.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "2.21.0"
+                },
+                {
+                  "fixed": "2.21.5"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "2.21.0",
+            "2.21.1",
+            "2.21.2",
+            "2.21.3",
+            "2.21.4"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/07/GHSA-mhm7-754m-9p8w/GHSA-mhm7-754m-9p8w.json",
+            "last_known_affected_version_range": "<= 2.21.4"
+          }
+        }
+      ]
+    },
+    {
+      "id": "GHSA-p47f-322f-whfh",
+      "summary": "QOS.CH Sarl logback logback-core has a deserialization of untrusted data vulnerability",
+      "aliases": [
+        "CVE-2026-9828"
+      ],
+      "published": "2026-05-28T15:39:50Z",
+      "modified": "2026-07-03T10:14:36.248327289Z",
+      "withdrawn": null,
+      "severity": [
+        {
+          "type": "CVSS_V4",
+          "score": "CVSS:4.0/AV:L/AC:H/AT:P/PR:N/UI:N/VC:L/VI:L/VA:N/SC:L/SI:L/SA:N/E:P/RE:L/U:Green"
+        }
+      ],
+      "references": [
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-9828"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/qos-ch/logback"
+        },
+        {
+          "type": "WEB",
+          "url": "https://logback.qos.ch/news.html#1.5.33"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "ch.qos.logback:logback-core",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/ch.qos.logback/logback-core"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "0"
+                },
+                {
+                  "fixed": "1.5.33"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "0.2.5",
+            "0.3",
+            "0.5",
+            "0.6",
+            "0.7",
+            "0.7.1",
+            "0.8",
+            "0.8.1",
+            "0.9",
+            "0.9.1",
+            "0.9.10",
+            "0.9.11",
+            "0.9.12",
+            "0.9.13",
+            "0.9.14",
+            "0.9.15",
+            "0.9.16",
+            "0.9.17",
+            "0.9.18",
+            "0.9.19",
+            "0.9.2",
+            "0.9.20",
+            "0.9.21",
+            "0.9.22",
+            "0.9.23",
+            "0.9.24",
+            "0.9.25",
+            "0.9.26",
+            "0.9.27",
+            "0.9.28",
+            "0.9.29",
+            "0.9.3",
+            "0.9.30",
+            "0.9.4",
+            "0.9.5",
+            "0.9.6",
+            "0.9.7",
+            "0.9.8",
+            "0.9.9",
+            "1.0.0",
+            "1.0.1",
+            "1.0.10",
+            "1.0.11",
+            "1.0.12",
+            "1.0.13",
+            "1.0.2",
+            "1.0.3",
+            "1.0.4",
+            "1.0.5",
+            "1.0.6",
+            "1.0.7",
+            "1.0.8",
+            "1.0.9",
+            "1.1.0",
+            "1.1.1",
+            "1.1.10",
+            "1.1.11",
+            "1.1.2",
+            "1.1.3",
+            "1.1.4",
+            "1.1.5",
+            "1.1.6",
+            "1.1.7",
+            "1.1.8",
+            "1.1.9",
+            "1.2.0",
+            "1.2.1",
+            "1.2.10",
+            "1.2.11",
+            "1.2.12",
+            "1.2.13",
+            "1.2.2",
+            "1.2.3",
+            "1.2.4",
+            "1.2.4-groovyless",
+            "1.2.5",
+            "1.2.6",
+            "1.2.7",
+            "1.2.8",
+            "1.2.9",
+            "1.3.0",
+            "1.3.0-alpha0",
+            "1.3.0-alpha1",
+            "1.3.0-alpha10",
+            "1.3.0-alpha11",
+            "1.3.0-alpha12",
+            "1.3.0-alpha13",
+            "1.3.0-alpha14",
+            "1.3.0-alpha15",
+            "1.3.0-alpha16",
+            "1.3.0-alpha2",
+            "1.3.0-alpha3",
+            "1.3.0-alpha4",
+            "1.3.0-alpha5",
+            "1.3.0-alpha6",
+            "1.3.0-alpha7",
+            "1.3.0-alpha8",
+            "1.3.0-alpha9",
+            "1.3.0-beta0",
+            "1.3.1",
+            "1.3.10",
+            "1.3.11",
+            "1.3.12",
+            "1.3.13",
+            "1.3.14",
+            "1.3.15",
+            "1.3.16",
+            "1.3.2",
+            "1.3.3",
+            "1.3.4",
+            "1.3.5",
+            "1.3.6",
+            "1.3.7",
+            "1.3.8",
+            "1.3.9",
+            "1.4.0",
+            "1.4.1",
+            "1.4.10",
+            "1.4.11",
+            "1.4.12",
+            "1.4.13",
+            "1.4.14",
+            "1.4.2",
+            "1.4.3",
+            "1.4.4",
+            "1.4.5",
+            "1.4.6",
+            "1.4.7",
+            "1.4.8",
+            "1.4.9",
+            "1.5.0",
+            "1.5.1",
+            "1.5.10",
+            "1.5.11",
+            "1.5.12",
+            "1.5.13",
+            "1.5.14",
+            "1.5.15",
+            "1.5.16",
+            "1.5.17",
+            "1.5.18",
+            "1.5.19",
+            "1.5.2",
+            "1.5.20",
+            "1.5.21",
+            "1.5.22",
+            "1.5.23",
+            "1.5.24",
+            "1.5.25",
+            "1.5.26",
+            "1.5.27",
+            "1.5.28",
+            "1.5.29",
+            "1.5.3",
+            "1.5.30",
+            "1.5.31",
+            "1.5.32",
+            "1.5.4",
+            "1.5.5",
+            "1.5.6",
+            "1.5.7",
+            "1.5.8",
+            "1.5.9"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/05/GHSA-p47f-322f-whfh/GHSA-p47f-322f-whfh.json",
+            "last_known_affected_version_range": "<= 1.5.32"
+          }
+        }
+      ]
+    },
+    {
+      "id": "GHSA-qqpg-mvqg-649v",
+      "summary": "Logback allows an attacker to instantiate classes already present on the class path",
+      "aliases": [
+        "CVE-2026-1225"
+      ],
+      "published": "2026-01-22T12:31:22Z",
+      "modified": "2026-02-04T04:14:42.648926Z",
+      "withdrawn": null,
+      "severity": [
+        {
+          "type": "CVSS_V4",
+          "score": "CVSS:4.0/AV:L/AC:H/AT:P/PR:H/UI:N/VC:L/VI:L/VA:L/SC:L/SI:L/SA:L"
+        }
+      ],
+      "references": [
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1225"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/qos-ch/logback/issues/997"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/qos-ch/logback/commit/1f97ae1844b1be8486e4e9cade98d7123d3eded5"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/qos-ch/logback"
+        },
+        {
+          "type": "WEB",
+          "url": "https://logback.qos.ch/news.html#1.5.25"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "ch.qos.logback:logback-core",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/ch.qos.logback/logback-core"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "0"
+                },
+                {
+                  "fixed": "1.5.25"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "0.2.5",
+            "0.3",
+            "0.5",
+            "0.6",
+            "0.7",
+            "0.7.1",
+            "0.8",
+            "0.8.1",
+            "0.9",
+            "0.9.1",
+            "0.9.10",
+            "0.9.11",
+            "0.9.12",
+            "0.9.13",
+            "0.9.14",
+            "0.9.15",
+            "0.9.16",
+            "0.9.17",
+            "0.9.18",
+            "0.9.19",
+            "0.9.2",
+            "0.9.20",
+            "0.9.21",
+            "0.9.22",
+            "0.9.23",
+            "0.9.24",
+            "0.9.25",
+            "0.9.26",
+            "0.9.27",
+            "0.9.28",
+            "0.9.29",
+            "0.9.3",
+            "0.9.30",
+            "0.9.4",
+            "0.9.5",
+            "0.9.6",
+            "0.9.7",
+            "0.9.8",
+            "0.9.9",
+            "1.0.0",
+            "1.0.1",
+            "1.0.10",
+            "1.0.11",
+            "1.0.12",
+            "1.0.13",
+            "1.0.2",
+            "1.0.3",
+            "1.0.4",
+            "1.0.5",
+            "1.0.6",
+            "1.0.7",
+            "1.0.8",
+            "1.0.9",
+            "1.1.0",
+            "1.1.1",
+            "1.1.10",
+            "1.1.11",
+            "1.1.2",
+            "1.1.3",
+            "1.1.4",
+            "1.1.5",
+            "1.1.6",
+            "1.1.7",
+            "1.1.8",
+            "1.1.9",
+            "1.2.0",
+            "1.2.1",
+            "1.2.10",
+            "1.2.11",
+            "1.2.12",
+            "1.2.13",
+            "1.2.2",
+            "1.2.3",
+            "1.2.4",
+            "1.2.4-groovyless",
+            "1.2.5",
+            "1.2.6",
+            "1.2.7",
+            "1.2.8",
+            "1.2.9",
+            "1.3.0",
+            "1.3.0-alpha0",
+            "1.3.0-alpha1",
+            "1.3.0-alpha10",
+            "1.3.0-alpha11",
+            "1.3.0-alpha12",
+            "1.3.0-alpha13",
+            "1.3.0-alpha14",
+            "1.3.0-alpha15",
+            "1.3.0-alpha16",
+            "1.3.0-alpha2",
+            "1.3.0-alpha3",
+            "1.3.0-alpha4",
+            "1.3.0-alpha5",
+            "1.3.0-alpha6",
+            "1.3.0-alpha7",
+            "1.3.0-alpha8",
+            "1.3.0-alpha9",
+            "1.3.0-beta0",
+            "1.3.1",
+            "1.3.10",
+            "1.3.11",
+            "1.3.12",
+            "1.3.13",
+            "1.3.14",
+            "1.3.15",
+            "1.3.16",
+            "1.3.2",
+            "1.3.3",
+            "1.3.4",
+            "1.3.5",
+            "1.3.6",
+            "1.3.7",
+            "1.3.8",
+            "1.3.9",
+            "1.4.0",
+            "1.4.1",
+            "1.4.10",
+            "1.4.11",
+            "1.4.12",
+            "1.4.13",
+            "1.4.14",
+            "1.4.2",
+            "1.4.3",
+            "1.4.4",
+            "1.4.5",
+            "1.4.6",
+            "1.4.7",
+            "1.4.8",
+            "1.4.9",
+            "1.5.0",
+            "1.5.1",
+            "1.5.10",
+            "1.5.11",
+            "1.5.12",
+            "1.5.13",
+            "1.5.14",
+            "1.5.15",
+            "1.5.16",
+            "1.5.17",
+            "1.5.18",
+            "1.5.19",
+            "1.5.2",
+            "1.5.20",
+            "1.5.21",
+            "1.5.22",
+            "1.5.23",
+            "1.5.24",
+            "1.5.3",
+            "1.5.4",
+            "1.5.5",
+            "1.5.6",
+            "1.5.7",
+            "1.5.8",
+            "1.5.9"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/01/GHSA-qqpg-mvqg-649v/GHSA-qqpg-mvqg-649v.json"
+          }
+        }
+      ]
+    },
+    {
+      "id": "GHSA-r7wm-3cxj-wff9",
+      "summary": "jackson-core: Async parser maxNumberLength bypass via chunked digit accumulation (incomplete fix for GHSA-72hv-8253-57qq)",
+      "aliases": null,
+      "published": "2026-07-21T21:58:53Z",
+      "modified": "2026-08-05T03:41:57.338106514Z",
+      "withdrawn": null,
+      "severity": [
+        {
+          "type": "CVSS_V4",
+          "score": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N"
+        }
+      ],
+      "references": [
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-core/security/advisories/GHSA-r7wm-3cxj-wff9"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-core/pull/1611"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-core/commit/050b429804dce2a7e08f0be1b0b4c3d040fdb9cd"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-core/commit/4cdd529749da396cc7edf6d4a2aad41d47902641"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-core/commit/c5941e5aae7fd5aeac55d66933cfb82b9aabeef8"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/FasterXML/jackson-core"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "com.fasterxml.jackson.core:jackson-core",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-core"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "0"
+                },
+                {
+                  "fixed": "2.18.8"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "2.0.0",
+            "2.0.0-RC1",
+            "2.0.0-RC2",
+            "2.0.0-RC3",
+            "2.0.1",
+            "2.0.2",
+            "2.0.4",
+            "2.0.5",
+            "2.0.6",
+            "2.1.0",
+            "2.1.1",
+            "2.1.2",
+            "2.1.3",
+            "2.1.4",
+            "2.1.5",
+            "2.10.0",
+            "2.10.0.pr1",
+            "2.10.0.pr2",
+            "2.10.0.pr3",
+            "2.10.1",
+            "2.10.2",
+            "2.10.3",
+            "2.10.4",
+            "2.10.5",
+            "2.11.0",
+            "2.11.0.rc1",
+            "2.11.1",
+            "2.11.2",
+            "2.11.3",
+            "2.11.4",
+            "2.12.0",
+            "2.12.0-rc1",
+            "2.12.0-rc2",
+            "2.12.1",
+            "2.12.2",
+            "2.12.3",
+            "2.12.4",
+            "2.12.5",
+            "2.12.6",
+            "2.12.7",
+            "2.13.0",
+            "2.13.0-rc1",
+            "2.13.0-rc2",
+            "2.13.1",
+            "2.13.2",
+            "2.13.3",
+            "2.13.4",
+            "2.13.5",
+            "2.14.0",
+            "2.14.0-rc1",
+            "2.14.0-rc2",
+            "2.14.0-rc3",
+            "2.14.1",
+            "2.14.2",
+            "2.14.3",
+            "2.15.0",
+            "2.15.0-rc1",
+            "2.15.0-rc2",
+            "2.15.0-rc3",
+            "2.15.1",
+            "2.15.2",
+            "2.15.3",
+            "2.15.4",
+            "2.16.0",
+            "2.16.0-rc1",
+            "2.16.1",
+            "2.16.2",
+            "2.17.0",
+            "2.17.0-rc1",
+            "2.17.1",
+            "2.17.2",
+            "2.17.3",
+            "2.18.0",
+            "2.18.0-rc1",
+            "2.18.1",
+            "2.18.2",
+            "2.18.3",
+            "2.18.4",
+            "2.18.4.1",
+            "2.18.5",
+            "2.18.6",
+            "2.18.7",
+            "2.2.0",
+            "2.2.0-rc1",
+            "2.2.1",
+            "2.2.2",
+            "2.2.3",
+            "2.2.4",
+            "2.3.0",
+            "2.3.0-rc1",
+            "2.3.1",
+            "2.3.2",
+            "2.3.3",
+            "2.3.4",
+            "2.3.5",
+            "2.4.0",
+            "2.4.0-rc1",
+            "2.4.0-rc2",
+            "2.4.0-rc3",
+            "2.4.1",
+            "2.4.1.1",
+            "2.4.2",
+            "2.4.3",
+            "2.4.4",
+            "2.4.5",
+            "2.4.6",
+            "2.5.0",
+            "2.5.0-rc1",
+            "2.5.1",
+            "2.5.2",
+            "2.5.3",
+            "2.5.4",
+            "2.5.5",
+            "2.6.0",
+            "2.6.0-rc1",
+            "2.6.0-rc2",
+            "2.6.0-rc3",
+            "2.6.0-rc4",
+            "2.6.1",
+            "2.6.2",
+            "2.6.3",
+            "2.6.4",
+            "2.6.5",
+            "2.6.6",
+            "2.6.7",
+            "2.7.0",
+            "2.7.0-rc1",
+            "2.7.0-rc2",
+            "2.7.0-rc3",
+            "2.7.1",
+            "2.7.2",
+            "2.7.3",
+            "2.7.4",
+            "2.7.5",
+            "2.7.6",
+            "2.7.7",
+            "2.7.8",
+            "2.7.9",
+            "2.8.0",
+            "2.8.0.rc1",
+            "2.8.0.rc2",
+            "2.8.1",
+            "2.8.10",
+            "2.8.11",
+            "2.8.2",
+            "2.8.3",
+            "2.8.4",
+            "2.8.5",
+            "2.8.6",
+            "2.8.7",
+            "2.8.8",
+            "2.8.9",
+            "2.9.0",
+            "2.9.0.pr1",
+            "2.9.0.pr2",
+            "2.9.0.pr3",
+            "2.9.0.pr4",
+            "2.9.1",
+            "2.9.10",
+            "2.9.2",
+            "2.9.3",
+            "2.9.4",
+            "2.9.5",
+            "2.9.6",
+            "2.9.7",
+            "2.9.8",
+            "2.9.9"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/07/GHSA-r7wm-3cxj-wff9/GHSA-r7wm-3cxj-wff9.json"
+          }
+        },
+        {
+          "package": {
+            "name": "com.fasterxml.jackson.core:jackson-core",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-core"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "2.19.0"
+                },
+                {
+                  "fixed": "2.21.4"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "2.19.0",
+            "2.19.1",
+            "2.19.2",
+            "2.19.3",
+            "2.19.4",
+            "2.20.0",
+            "2.20.0-rc1",
+            "2.20.1",
+            "2.20.2",
+            "2.21.0",
+            "2.21.1",
+            "2.21.2",
+            "2.21.3"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/07/GHSA-r7wm-3cxj-wff9/GHSA-r7wm-3cxj-wff9.json"
+          }
+        },
+        {
+          "package": {
+            "name": "tools.jackson.core:jackson-core",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/tools.jackson.core/jackson-core"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "3.0.0"
+                },
+                {
+                  "fixed": "3.1.4"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "3.0.0",
+            "3.0.1",
+            "3.0.2",
+            "3.0.3",
+            "3.0.4",
+            "3.1.0",
+            "3.1.0-rc1",
+            "3.1.1",
+            "3.1.2",
+            "3.1.3"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/07/GHSA-r7wm-3cxj-wff9/GHSA-r7wm-3cxj-wff9.json"
+          }
+        }
+      ]
+    },
+    {
+      "id": "GHSA-rcqc-6cw3-h962",
+      "summary": "jackson-databind has a @JsonView bypass for unwrapped creator parameters",
+      "aliases": [
+        "CVE-2026-54518"
+      ],
+      "published": "2026-06-23T21:17:02Z",
+      "modified": "2026-07-20T21:30:42.517351683Z",
+      "withdrawn": null,
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N"
+        }
+      ],
+      "references": [
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/security/advisories/GHSA-rcqc-6cw3-h962"
+        },
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-54518"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/pull/5971"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/pull/5973"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/commit/721fa07ebbd4aab4a659a1a68940878315c3e341"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/commit/d633bc038f200c1397c07f1a2b46f58e72c91eea"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/FasterXML/jackson-databind"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "com.fasterxml.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "2.21.0"
+                },
+                {
+                  "fixed": "2.21.4"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "2.21.0",
+            "2.21.1",
+            "2.21.2",
+            "2.21.3"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-rcqc-6cw3-h962/GHSA-rcqc-6cw3-h962.json"
+          }
+        },
+        {
+          "package": {
+            "name": "tools.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/tools.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "3.0.0"
+                },
+                {
+                  "fixed": "3.1.4"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "3.0.0",
+            "3.0.1",
+            "3.0.2",
+            "3.0.3",
+            "3.0.4",
+            "3.1.0",
+            "3.1.0-rc1",
+            "3.1.1",
+            "3.1.2",
+            "3.1.3"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-rcqc-6cw3-h962/GHSA-rcqc-6cw3-h962.json"
+          }
+        }
+      ]
+    },
+    {
+      "id": "GHSA-rmj7-2vxq-3g9f",
+      "summary": "jackson-databind has an array subtype allowlist bypass in BasicPolymorphicTypeValidator (allowIfSubTypeIsArray)",
+      "aliases": [
+        "CVE-2026-54513"
+      ],
+      "published": "2026-06-23T21:22:15Z",
+      "modified": "2026-09-02T15:45:20.112407622Z",
+      "withdrawn": null,
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        }
+      ],
+      "references": [
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/security/advisories/GHSA-rmj7-2vxq-3g9f"
+        },
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-54513"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/issues/5983"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/issues/5981"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/pull/5984"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/commit/24529da29fdf46ff94ca38de9ebf31cd188f5e8e"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/FasterXML/jackson-databind/commit/01d1692c8d0ed03e51a0e3c4f8a9e6908e4931e5"
+        },
+        {
+          "type": "WEB",
+          "url": "https://security.access.redhat.com/data/csaf/v2/vex/2026/cve-2026-54513.json"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/FasterXML/jackson-databind"
+        },
+        {
+          "type": "WEB",
+          "url": "https://bugzilla.redhat.com/show_bug.cgi?id=2492010"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/security/cve/CVE-2026-54513"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:62260"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:54622"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:54435"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:50849"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:50848"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:50847"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:50846"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:48151"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:48095"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:44271"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:44066"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:44065"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:44064"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:44063"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:44062"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:44061"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:43400"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:43218"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:41951"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:40895"
+        },
+        {
+          "type": "WEB",
+          "url": "https://access.redhat.com/errata/RHSA-2026:36839"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "com.fasterxml.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "2.10.0"
+                },
+                {
+                  "fixed": "2.18.8"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "2.10.0",
+            "2.10.0.pr1",
+            "2.10.0.pr2",
+            "2.10.0.pr3",
+            "2.10.1",
+            "2.10.2",
+            "2.10.3",
+            "2.10.4",
+            "2.10.5",
+            "2.10.5.1",
+            "2.11.0",
+            "2.11.0.rc1",
+            "2.11.1",
+            "2.11.2",
+            "2.11.3",
+            "2.11.4",
+            "2.12.0",
+            "2.12.0-rc1",
+            "2.12.0-rc2",
+            "2.12.1",
+            "2.12.2",
+            "2.12.3",
+            "2.12.4",
+            "2.12.5",
+            "2.12.6",
+            "2.12.6.1",
+            "2.12.7",
+            "2.12.7.1",
+            "2.12.7.2",
+            "2.13.0",
+            "2.13.0-rc1",
+            "2.13.0-rc2",
+            "2.13.1",
+            "2.13.2",
+            "2.13.2.1",
+            "2.13.2.2",
+            "2.13.3",
+            "2.13.4",
+            "2.13.4.1",
+            "2.13.4.2",
+            "2.13.5",
+            "2.14.0",
+            "2.14.0-rc1",
+            "2.14.0-rc2",
+            "2.14.0-rc3",
+            "2.14.1",
+            "2.14.2",
+            "2.14.3",
+            "2.15.0",
+            "2.15.0-rc1",
+            "2.15.0-rc2",
+            "2.15.0-rc3",
+            "2.15.1",
+            "2.15.2",
+            "2.15.3",
+            "2.15.4",
+            "2.16.0",
+            "2.16.0-rc1",
+            "2.16.1",
+            "2.16.2",
+            "2.17.0",
+            "2.17.0-rc1",
+            "2.17.1",
+            "2.17.2",
+            "2.17.3",
+            "2.18.0",
+            "2.18.0-rc1",
+            "2.18.1",
+            "2.18.2",
+            "2.18.3",
+            "2.18.4",
+            "2.18.5",
+            "2.18.6",
+            "2.18.7"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-rmj7-2vxq-3g9f/GHSA-rmj7-2vxq-3g9f.json"
+          }
+        },
+        {
+          "package": {
+            "name": "com.fasterxml.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "2.19.0"
+                },
+                {
+                  "fixed": "2.21.4"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "2.19.0",
+            "2.19.1",
+            "2.19.2",
+            "2.19.3",
+            "2.19.4",
+            "2.20.0",
+            "2.20.0-rc1",
+            "2.20.1",
+            "2.20.2",
+            "2.21.0",
+            "2.21.1",
+            "2.21.2",
+            "2.21.3"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-rmj7-2vxq-3g9f/GHSA-rmj7-2vxq-3g9f.json"
+          }
+        },
+        {
+          "package": {
+            "name": "com.fasterxml.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/com.fasterxml.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "3.0.0"
+                },
+                {
+                  "fixed": "3.1.4"
+                }
+              ]
+            }
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-rmj7-2vxq-3g9f/GHSA-rmj7-2vxq-3g9f.json"
+          }
+        },
+        {
+          "package": {
+            "name": "tools.jackson.core:jackson-databind",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/tools.jackson.core/jackson-databind"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "3.0.0"
+                },
+                {
+                  "fixed": "3.1.4"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "3.0.0",
+            "3.0.1",
+            "3.0.2",
+            "3.0.3",
+            "3.0.4",
+            "3.1.0",
+            "3.1.0-rc1",
+            "3.1.1",
+            "3.1.2",
+            "3.1.3"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-rmj7-2vxq-3g9f/GHSA-rmj7-2vxq-3g9f.json"
+          }
+        }
+      ]
+    },
+    {
+      "id": "GHSA-v3jc-474w-2wm6",
+      "summary": "Apache HttpComponents Core: HPackDecoder Unlimited Header List Size Before SETTINGS ACK",
+      "aliases": [
+        "CVE-2026-54428"
+      ],
+      "published": "2026-07-01T18:31:56Z",
+      "modified": "2026-08-14T15:42:06.375163307Z",
+      "withdrawn": null,
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+        }
+      ],
+      "references": [
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-54428"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/apache/httpcomponents-core/commit/1ea1239bbbe3442a8382a87279c0a8119a7e358e"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/apache/httpcomponents-core/commit/cc30ee058a7b10cbf4ad3dd6270ab6d1f6a74c49"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/apache/httpcomponents-core"
+        },
+        {
+          "type": "WEB",
+          "url": "https://lists.apache.org/thread/5zjp8vczvxq19pw2rvhs21q446bhl0sd"
+        },
+        {
+          "type": "WEB",
+          "url": "http://www.openwall.com/lists/oss-security/2026/07/01/3"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "org.apache.httpcomponents.core5:httpcore5-h2",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/org.apache.httpcomponents.core5/httpcore5-h2"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "0"
+                },
+                {
+                  "fixed": "5.4.3"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "5.0",
+            "5.0-alpha2",
+            "5.0-alpha3",
+            "5.0-alpha4",
+            "5.0-beta1",
+            "5.0-beta10",
+            "5.0-beta11",
+            "5.0-beta2",
+            "5.0-beta3",
+            "5.0-beta4",
+            "5.0-beta5",
+            "5.0-beta6",
+            "5.0-beta7",
+            "5.0-beta8",
+            "5.0-beta9",
+            "5.0.1",
+            "5.0.2",
+            "5.0.3",
+            "5.0.4",
+            "5.1",
+            "5.1-beta1",
+            "5.1-beta2",
+            "5.1-beta3",
+            "5.1.1",
+            "5.1.2",
+            "5.1.3",
+            "5.1.4",
+            "5.1.5",
+            "5.2",
+            "5.2-alpha1",
+            "5.2-alpha2",
+            "5.2-beta1",
+            "5.2-beta2",
+            "5.2.1",
+            "5.2.2",
+            "5.2.3",
+            "5.2.4",
+            "5.2.5",
+            "5.3",
+            "5.3-alpha1",
+            "5.3-alpha2",
+            "5.3-beta1",
+            "5.3.1",
+            "5.3.2",
+            "5.3.3",
+            "5.3.4",
+            "5.3.5",
+            "5.3.6",
+            "5.4",
+            "5.4-alpha1",
+            "5.4.1",
+            "5.4.2"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/07/GHSA-v3jc-474w-2wm6/GHSA-v3jc-474w-2wm6.json"
+          }
+        },
+        {
+          "package": {
+            "name": "org.apache.httpcomponents.core5:httpcore5-h2",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/org.apache.httpcomponents.core5/httpcore5-h2"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "5.5-alpha1"
+                },
+                {
+                  "fixed": "5.5-beta2"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "5.5-alpha1",
+            "5.5-beta1"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/07/GHSA-v3jc-474w-2wm6/GHSA-v3jc-474w-2wm6.json"
+          }
+        }
+      ]
+    },
+    {
+      "id": "GHSA-x4gw-5cx5-pgmh",
+      "summary": "Netty: SNI handler pre-allocates up to 16 MiB from nine attacker bytes",
+      "aliases": [
+        "CVE-2026-45416"
+      ],
+      "published": "2026-06-08T23:01:04Z",
+      "modified": "2026-06-12T19:45:13.007385213Z",
+      "withdrawn": null,
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+        }
+      ],
+      "references": [
+        {
+          "type": "WEB",
+          "url": "https://github.com/netty/netty/security/advisories/GHSA-x4gw-5cx5-pgmh"
+        },
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-45416"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/netty/netty"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/netty/netty/releases/tag/netty-4.1.135.Final"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/netty/netty/releases/tag/netty-4.2.15.Final"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "io.netty:netty-handler",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/io.netty/netty-handler"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "4.2.0.Final"
+                },
+                {
+                  "fixed": "4.2.15.Final"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "4.2.0.Final",
+            "4.2.1.Final",
+            "4.2.10.Final",
+            "4.2.11.Final",
+            "4.2.12.Final",
+            "4.2.13.Final",
+            "4.2.14.Final",
+            "4.2.2.Final",
+            "4.2.3.Final",
+            "4.2.4.Final",
+            "4.2.5.Final",
+            "4.2.6.Final",
+            "4.2.7.Final",
+            "4.2.8.Final",
+            "4.2.9.Final"
+          ],
+          "database_specific": {
+            "last_known_affected_version_range": "<= 4.2.14.Final",
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-x4gw-5cx5-pgmh/GHSA-x4gw-5cx5-pgmh.json"
+          }
+        },
+        {
+          "package": {
+            "name": "io.netty:netty-handler",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/io.netty/netty-handler"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "0"
+                },
+                {
+                  "fixed": "4.1.135.Final"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "4.0.0.Alpha1",
+            "4.0.0.Alpha2",
+            "4.0.0.Alpha3",
+            "4.0.0.Alpha4",
+            "4.0.0.Alpha5",
+            "4.0.0.Alpha6",
+            "4.0.0.Alpha7",
+            "4.0.0.Alpha8",
+            "4.0.0.Beta1",
+            "4.0.0.Beta2",
+            "4.0.0.Beta3",
+            "4.0.0.CR1",
+            "4.0.0.CR2",
+            "4.0.0.CR3",
+            "4.0.0.CR4",
+            "4.0.0.CR5",
+            "4.0.0.CR6",
+            "4.0.0.CR7",
+            "4.0.0.CR8",
+            "4.0.0.CR9",
+            "4.0.0.Final",
+            "4.0.1.Final",
+            "4.0.10.Final",
+            "4.0.11.Final",
+            "4.0.12.Final",
+            "4.0.13.Final",
+            "4.0.14.Beta1",
+            "4.0.14.Final",
+            "4.0.15.Final",
+            "4.0.16.Final",
+            "4.0.17.Final",
+            "4.0.18.Final",
+            "4.0.19.Final",
+            "4.0.2.Final",
+            "4.0.20.Final",
+            "4.0.21.Final",
+            "4.0.22.Final",
+            "4.0.23.Final",
+            "4.0.24.Final",
+            "4.0.25.Final",
+            "4.0.26.Final",
+            "4.0.27.Final",
+            "4.0.28.Final",
+            "4.0.29.Final",
+            "4.0.3.Final",
+            "4.0.30.Final",
+            "4.0.31.Final",
+            "4.0.32.Final",
+            "4.0.33.Final",
+            "4.0.34.Final",
+            "4.0.35.Final",
+            "4.0.36.Final",
+            "4.0.37.Final",
+            "4.0.38.Final",
+            "4.0.39.Final",
+            "4.0.4.Final",
+            "4.0.40.Final",
+            "4.0.41.Final",
+            "4.0.42.Final",
+            "4.0.43.Final",
+            "4.0.44.Final",
+            "4.0.45.Final",
+            "4.0.46.Final",
+            "4.0.47.Final",
+            "4.0.48.Final",
+            "4.0.49.Final",
+            "4.0.5.Final",
+            "4.0.50.Final",
+            "4.0.51.Final",
+            "4.0.52.Final",
+            "4.0.53.Final",
+            "4.0.54.Final",
+            "4.0.55.Final",
+            "4.0.56.Final",
+            "4.0.6.Final",
+            "4.0.7.Final",
+            "4.0.8.Final",
+            "4.0.9.Final",
+            "4.1.0.Beta1",
+            "4.1.0.Beta2",
+            "4.1.0.Beta3",
+            "4.1.0.Beta4",
+            "4.1.0.Beta5",
+            "4.1.0.Beta6",
+            "4.1.0.Beta7",
+            "4.1.0.Beta8",
+            "4.1.0.CR1",
+            "4.1.0.CR2",
+            "4.1.0.CR3",
+            "4.1.0.CR4",
+            "4.1.0.CR5",
+            "4.1.0.CR6",
+            "4.1.0.CR7",
+            "4.1.0.Final",
+            "4.1.1.Final",
+            "4.1.10.Final",
+            "4.1.100.Final",
+            "4.1.101.Final",
+            "4.1.102.Final",
+            "4.1.103.Final",
+            "4.1.104.Final",
+            "4.1.105.Final",
+            "4.1.106.Final",
+            "4.1.107.Final",
+            "4.1.108.Final",
+            "4.1.109.Final",
+            "4.1.11.Final",
+            "4.1.110.Final",
+            "4.1.111.Final",
+            "4.1.112.Final",
+            "4.1.113.Final",
+            "4.1.114.Final",
+            "4.1.115.Final",
+            "4.1.116.Final",
+            "4.1.117.Final",
+            "4.1.118.Final",
+            "4.1.119.Final",
+            "4.1.12.Final",
+            "4.1.120.Final",
+            "4.1.121.Final",
+            "4.1.122.Final",
+            "4.1.123.Final",
+            "4.1.124.Final",
+            "4.1.125.Final",
+            "4.1.126.Final",
+            "4.1.127.Final",
+            "4.1.128.Final",
+            "4.1.129.Final",
+            "4.1.13.Final",
+            "4.1.130.Final",
+            "4.1.131.Final",
+            "4.1.132.Final",
+            "4.1.133.Final",
+            "4.1.134.Final",
+            "4.1.14.Final",
+            "4.1.15.Final",
+            "4.1.16.Final",
+            "4.1.17.Final",
+            "4.1.18.Final",
+            "4.1.19.Final",
+            "4.1.2.Final",
+            "4.1.20.Final",
+            "4.1.21.Final",
+            "4.1.22.Final",
+            "4.1.23.Final",
+            "4.1.24.Final",
+            "4.1.25.Final",
+            "4.1.26.Final",
+            "4.1.27.Final",
+            "4.1.28.Final",
+            "4.1.29.Final",
+            "4.1.3.Final",
+            "4.1.30.Final",
+            "4.1.31.Final",
+            "4.1.32.Final",
+            "4.1.33.Final",
+            "4.1.34.Final",
+            "4.1.35.Final",
+            "4.1.36.Final",
+            "4.1.37.Final",
+            "4.1.38.Final",
+            "4.1.39.Final",
+            "4.1.4.Final",
+            "4.1.40.Final",
+            "4.1.41.Final",
+            "4.1.42.Final",
+            "4.1.43.Final",
+            "4.1.44.Final",
+            "4.1.45.Final",
+            "4.1.46.Final",
+            "4.1.47.Final",
+            "4.1.48.Final",
+            "4.1.49.Final",
+            "4.1.5.Final",
+            "4.1.50.Final",
+            "4.1.51.Final",
+            "4.1.52.Final",
+            "4.1.53.Final",
+            "4.1.54.Final",
+            "4.1.55.Final",
+            "4.1.56.Final",
+            "4.1.57.Final",
+            "4.1.58.Final",
+            "4.1.59.Final",
+            "4.1.6.Final",
+            "4.1.60.Final",
+            "4.1.61.Final",
+            "4.1.62.Final",
+            "4.1.63.Final",
+            "4.1.64.Final",
+            "4.1.65.Final",
+            "4.1.66.Final",
+            "4.1.67.Final",
+            "4.1.68.Final",
+            "4.1.69.Final",
+            "4.1.7.Final",
+            "4.1.70.Final",
+            "4.1.71.Final",
+            "4.1.72.Final",
+            "4.1.73.Final",
+            "4.1.74.Final",
+            "4.1.75.Final",
+            "4.1.76.Final",
+            "4.1.77.Final",
+            "4.1.78.Final",
+            "4.1.79.Final",
+            "4.1.8.Final",
+            "4.1.80.Final",
+            "4.1.81.Final",
+            "4.1.82.Final",
+            "4.1.83.Final",
+            "4.1.84.Final",
+            "4.1.85.Final",
+            "4.1.86.Final",
+            "4.1.87.Final",
+            "4.1.88.Final",
+            "4.1.89.Final",
+            "4.1.9.Final",
+            "4.1.90.Final",
+            "4.1.91.Final",
+            "4.1.92.Final",
+            "4.1.93.Final",
+            "4.1.94.Final",
+            "4.1.95.Final",
+            "4.1.96.Final",
+            "4.1.97.Final",
+            "4.1.98.Final",
+            "4.1.99.Final"
+          ],
+          "database_specific": {
+            "last_known_affected_version_range": "<= 4.1.134.Final",
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-x4gw-5cx5-pgmh/GHSA-x4gw-5cx5-pgmh.json"
+          }
+        }
+      ]
+    },
+    {
+      "id": "GHSA-xmv7-r254-6q78",
+      "summary": "Netty: DNS Cache Poisoning due to Predictable PRNG and Default Static Source Port",
+      "aliases": [
+        "CVE-2026-45673"
+      ],
+      "published": "2026-06-08T23:02:05Z",
+      "modified": "2026-06-12T19:45:12.897371843Z",
+      "withdrawn": null,
+      "severity": [
+        {
+          "type": "CVSS_V3",
+          "score": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:N/I:H/A:N"
+        }
+      ],
+      "references": [
+        {
+          "type": "WEB",
+          "url": "https://github.com/netty/netty/security/advisories/GHSA-xmv7-r254-6q78"
+        },
+        {
+          "type": "ADVISORY",
+          "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-45673"
+        },
+        {
+          "type": "PACKAGE",
+          "url": "https://github.com/netty/netty"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/netty/netty/releases/tag/netty-4.1.135.Final"
+        },
+        {
+          "type": "WEB",
+          "url": "https://github.com/netty/netty/releases/tag/netty-4.2.15.Final"
+        }
+      ],
+      "affected": [
+        {
+          "package": {
+            "name": "io.netty:netty-resolver-dns",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/io.netty/netty-resolver-dns"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "4.2.0.Final"
+                },
+                {
+                  "fixed": "4.2.15.Final"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "4.2.0.Final",
+            "4.2.1.Final",
+            "4.2.10.Final",
+            "4.2.11.Final",
+            "4.2.12.Final",
+            "4.2.13.Final",
+            "4.2.14.Final",
+            "4.2.2.Final",
+            "4.2.3.Final",
+            "4.2.4.Final",
+            "4.2.5.Final",
+            "4.2.6.Final",
+            "4.2.7.Final",
+            "4.2.8.Final",
+            "4.2.9.Final"
+          ],
+          "database_specific": {
+            "last_known_affected_version_range": "<= 4.2.14.Final",
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-xmv7-r254-6q78/GHSA-xmv7-r254-6q78.json"
+          }
+        },
+        {
+          "package": {
+            "name": "io.netty:netty-resolver-dns",
+            "ecosystem": "Maven",
+            "purl": "pkg:maven/io.netty/netty-resolver-dns"
+          },
+          "ranges": [
+            {
+              "type": "ECOSYSTEM",
+              "events": [
+                {
+                  "introduced": "0"
+                },
+                {
+                  "fixed": "4.1.135.Final"
+                }
+              ]
+            }
+          ],
+          "versions": [
+            "4.1.0.Beta4",
+            "4.1.0.Beta5",
+            "4.1.0.Beta6",
+            "4.1.0.Beta7",
+            "4.1.0.Beta8",
+            "4.1.0.CR1",
+            "4.1.0.CR2",
+            "4.1.0.CR3",
+            "4.1.0.CR4",
+            "4.1.0.CR5",
+            "4.1.0.CR6",
+            "4.1.0.CR7",
+            "4.1.0.Final",
+            "4.1.1.Final",
+            "4.1.10.Final",
+            "4.1.100.Final",
+            "4.1.101.Final",
+            "4.1.102.Final",
+            "4.1.103.Final",
+            "4.1.104.Final",
+            "4.1.105.Final",
+            "4.1.106.Final",
+            "4.1.107.Final",
+            "4.1.108.Final",
+            "4.1.109.Final",
+            "4.1.11.Final",
+            "4.1.110.Final",
+            "4.1.111.Final",
+            "4.1.112.Final",
+            "4.1.113.Final",
+            "4.1.114.Final",
+            "4.1.115.Final",
+            "4.1.116.Final",
+            "4.1.117.Final",
+            "4.1.118.Final",
+            "4.1.119.Final",
+            "4.1.12.Final",
+            "4.1.120.Final",
+            "4.1.121.Final",
+            "4.1.122.Final",
+            "4.1.123.Final",
+            "4.1.124.Final",
+            "4.1.125.Final",
+            "4.1.126.Final",
+            "4.1.127.Final",
+            "4.1.128.Final",
+            "4.1.129.Final",
+            "4.1.13.Final",
+            "4.1.130.Final",
+            "4.1.131.Final",
+            "4.1.132.Final",
+            "4.1.133.Final",
+            "4.1.134.Final",
+            "4.1.14.Final",
+            "4.1.15.Final",
+            "4.1.16.Final",
+            "4.1.17.Final",
+            "4.1.18.Final",
+            "4.1.19.Final",
+            "4.1.2.Final",
+            "4.1.20.Final",
+            "4.1.21.Final",
+            "4.1.22.Final",
+            "4.1.23.Final",
+            "4.1.24.Final",
+            "4.1.25.Final",
+            "4.1.26.Final",
+            "4.1.27.Final",
+            "4.1.28.Final",
+            "4.1.29.Final",
+            "4.1.3.Final",
+            "4.1.30.Final",
+            "4.1.31.Final",
+            "4.1.32.Final",
+            "4.1.33.Final",
+            "4.1.34.Final",
+            "4.1.35.Final",
+            "4.1.36.Final",
+            "4.1.37.Final",
+            "4.1.38.Final",
+            "4.1.39.Final",
+            "4.1.4.Final",
+            "4.1.40.Final",
+            "4.1.41.Final",
+            "4.1.42.Final",
+            "4.1.43.Final",
+            "4.1.44.Final",
+            "4.1.45.Final",
+            "4.1.46.Final",
+            "4.1.47.Final",
+            "4.1.48.Final",
+            "4.1.49.Final",
+            "4.1.5.Final",
+            "4.1.50.Final",
+            "4.1.51.Final",
+            "4.1.52.Final",
+            "4.1.53.Final",
+            "4.1.54.Final",
+            "4.1.55.Final",
+            "4.1.56.Final",
+            "4.1.57.Final",
+            "4.1.58.Final",
+            "4.1.59.Final",
+            "4.1.6.Final",
+            "4.1.60.Final",
+            "4.1.61.Final",
+            "4.1.62.Final",
+            "4.1.63.Final",
+            "4.1.64.Final",
+            "4.1.65.Final",
+            "4.1.66.Final",
+            "4.1.67.Final",
+            "4.1.68.Final",
+            "4.1.69.Final",
+            "4.1.7.Final",
+            "4.1.70.Final",
+            "4.1.71.Final",
+            "4.1.72.Final",
+            "4.1.73.Final",
+            "4.1.74.Final",
+            "4.1.75.Final",
+            "4.1.76.Final",
+            "4.1.77.Final",
+            "4.1.78.Final",
+            "4.1.79.Final",
+            "4.1.8.Final",
+            "4.1.80.Final",
+            "4.1.81.Final",
+            "4.1.82.Final",
+            "4.1.83.Final",
+            "4.1.84.Final",
+            "4.1.85.Final",
+            "4.1.86.Final",
+            "4.1.87.Final",
+            "4.1.88.Final",
+            "4.1.89.Final",
+            "4.1.9.Final",
+            "4.1.90.Final",
+            "4.1.91.Final",
+            "4.1.92.Final",
+            "4.1.93.Final",
+            "4.1.94.Final",
+            "4.1.95.Final",
+            "4.1.96.Final",
+            "4.1.97.Final",
+            "4.1.98.Final",
+            "4.1.99.Final"
+          ],
+          "database_specific": {
+            "source": "https://github.com/github/advisory-database/blob/main/advisories/github-reviewed/2026/06/GHSA-xmv7-r254-6q78/GHSA-xmv7-r254-6q78.json",
+            "last_known_affected_version_range": "<= 4.1.134.Final"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -683,11 +683,13 @@ class PrometheClient(
     suspend fun respondToApproval(
         id: String,
         approved: Boolean,
+        scope: String = "ONCE",
     ): String =
         postJson(
             "/api/v1/approval/$id",
             buildJsonObject {
                 put("approved", approved)
+                put("scope", scope)
             }.toString(),
         )
 
@@ -874,16 +876,38 @@ class PrometheClient(
     suspend fun updateSkill(
         name: String,
         content: String,
-    ): dev.promethe.api.SkillDto = authenticatedPut("$baseUrl/api/v1/skills/$name", dev.promethe.api.UpdateSkillRequest(content = content))
+        expectedRevisionHash: String? = null,
+    ): dev.promethe.api.SkillDto = authenticatedPut("$baseUrl/api/v1/skills/$name", dev.promethe.api.UpdateSkillRequest(content, expectedRevisionHash))
 
     suspend fun updateSkillLifecycle(
         name: String,
         lifecycle: dev.promethe.api.SkillLifecycle,
+        expectedContentHash: String? = null,
+        reviewNote: String? = null,
+        expectedRevisionHash: String? = null,
     ): dev.promethe.api.SkillDto =
         authenticatedPut(
             "$baseUrl/api/v1/skills/$name/lifecycle",
-            dev.promethe.api.UpdateSkillLifecycleRequest(lifecycle),
+            dev.promethe.api.UpdateSkillLifecycleRequest(lifecycle, expectedContentHash, reviewNote, expectedRevisionHash),
         )
+
+    suspend fun getSkillValidation(name: String): dev.promethe.api.SkillValidationState = authenticatedGet("$baseUrl/api/v1/skills/$name/validation")
+
+    suspend fun configureSkillEvaluations(
+        name: String,
+        request: dev.promethe.api.ConfigureSkillEvaluationRequest,
+    ): dev.promethe.api.SkillDto = authenticatedPut("$baseUrl/api/v1/skills/$name/evaluation-suites", request)
+
+    suspend fun evaluateSkill(
+        name: String,
+        revisionHash: String,
+    ): dev.promethe.api.SkillEvaluationRun = authenticatedPost("$baseUrl/api/v1/skills/$name/evaluations", dev.promethe.api.EvaluateSkillRequest(revisionHash))
+
+    suspend fun restoreSkill(
+        name: String,
+        revisionHash: String,
+        versionId: String,
+    ): dev.promethe.api.SkillDto = authenticatedPost("$baseUrl/api/v1/skills/$name/restore", dev.promethe.api.RestoreSkillVersionRequest(revisionHash, versionId))
 
     suspend fun deleteSkill(name: String) {
         client.delete("$baseUrl/api/v1/skills/$name") {

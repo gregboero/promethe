@@ -12,6 +12,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDateTime
 import kotlin.time.Clock
@@ -36,7 +38,13 @@ class AIAgent(
     private val contextCompressor: ContextCompressor? = null,
     private val dryRun: Boolean = false,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val maxIterations: Int = 10,
+    private val completionValidator: AgentCompletionValidator? = null,
 ) {
+    init {
+        require(maxIterations in 1..32) { "Agent iteration limit must be between 1 and 32" }
+    }
+
     private val logger = Log.create("AIAgent")
 
     /**
@@ -66,6 +74,7 @@ class AIAgent(
         workspaceRelativePath: String? = null,
     ): Flow<ConversationTrajectory> =
         flow {
+            var completionValidated = false
             val now = Clock.System.now().toEpochMilliseconds()
             val currentRunId = llmRequestContext?.runId
 
@@ -115,9 +124,8 @@ class AIAgent(
             var isComplete = false
             var currentInput = userInput
             var iteration = 0
-            val maxIterations = 10
             val effectiveReasoningEffort = overrideReasoningEffort ?: config.reasoningEffort
-            var pendingToolTurn: PendingToolTurn? = null
+            val nativeToolHistory = NativeToolHistory()
             val privilegedController =
                 PrivilegedController(externalContextPresent = !externalContext.isNullOrBlank())
 
@@ -136,6 +144,7 @@ class AIAgent(
                         "$runId-step-${iteration.toString().padStart(4, '0')}"
                     }
                 val iterationLlmContext = llmRequestContext?.copy(stepId = iterationStepId)
+                actionExecutor.beginHarnessStep(sessionId, currentRunId, iterationStepId ?: "iteration-$iteration")
 
                 // Récupérer tout l'historique de la session
                 val history = database.getMessagesForSession(sessionId)
@@ -167,23 +176,16 @@ class AIAgent(
                     }
 
                 // Context compression: summarize middle turns if history is too long
-                val rawMessages =
+                val visibleHistory =
                     history
                         .filterNot { message -> isTrustStateMarker(message.content) }
                         .filter { message ->
                             message.dataTrust == PolicyDataTrust.TRUSTED ||
                                 (currentRunId != null && message.sourceRunId == currentRunId)
                         }
-                        .map { msg -> msg.role to msg.content }
-                        .toMutableList()
-                pendingToolTurn?.let { pending ->
-                    val observation = "Observation: ${pending.result}"
-                    val observationIndex = rawMessages.indexOfLast { (role, content) ->
-                        role == "system" && content == observation
-                    }
-                    if (observationIndex >= 0) rawMessages.removeAt(observationIndex)
+                val (messages, pendingToolTurn) = nativeToolHistory.prepare(visibleHistory) { prefix ->
+                    contextCompressor?.compress(systemPrompt, prefix) ?: prefix
                 }
-                val messages = contextCompressor?.compress(systemPrompt, rawMessages) ?: rawMessages
 
                 // Appeler le LLM (with escalation on failure)
                 val llmResult =
@@ -221,8 +223,6 @@ class AIAgent(
                             throw e
                         }
                     }
-                pendingToolTurn = null
-
                 val llmResponse = llmResult.content
 
                 // ── Emit fallback notification if a different model was used ──
@@ -341,7 +341,7 @@ class AIAgent(
 
                         val governedObservation = privilegedController.observe(toolName, observation)
                         val logTime = Clock.System.now().toEpochMilliseconds()
-                        database.insertMessage(
+                        val observationId = database.insertMessage(
                             sessionId = sessionId,
                             role = "system",
                             content = "Observation: ${governedObservation.promptContent}",
@@ -361,23 +361,39 @@ class AIAgent(
                                 )
                             }
                         }
+                        val clarification = clarificationResponse(toolName, args, observation)
                         val rawAssistantMessage = llmResult.rawMessage
-                        if (rawAssistantMessage != null && tc.id.isNotBlank()) {
-                            pendingToolTurn =
+                        if (clarification == null && rawAssistantMessage != null && tc.id.isNotBlank()) {
+                            nativeToolHistory.record(
+                                observationId,
                                 PendingToolTurn(
                                     assistantMessage = rawAssistantMessage,
                                     toolCallId = tc.id,
                                     toolName = toolName,
                                     result = governedObservation.promptContent,
-                                )
+                                ),
+                            )
+                        }
+                        if (clarification != null) {
+                            database.insertMessage(
+                                sessionId = sessionId,
+                                role = "assistant",
+                                content = clarification,
+                                timestamp = Clock.System.now().toEpochMilliseconds(),
+                                dataTrust = privilegedController.trust(),
+                                sourceRunId = currentRunId,
+                            )
+                            completionValidator?.validate(clarification)
+                            completionValidated = true
+                            isComplete = true
                         }
 
                         val trajObs = ConversationTrajectory(
                             inputs = mapOf("query" to currentInput),
-                            outputs = emptyMap(),
+                            outputs = clarification?.let { mapOf("response" to it) } ?: emptyMap(),
                             thought = null,
                             action = action,
-                            observation = observation,
+                            observation = clarification ?: observation,
                         )
                         emit(trajObs)
                         trajectoryLog.add(trajObs)
@@ -392,6 +408,17 @@ class AIAgent(
                     is EvaluationResult.Success -> {
                         val toolName = parsedResult.toolName
                         val args = parsedResult.arguments
+
+                        // Preserve the chosen JSON action, just as for native tool calls.
+                        // Otherwise subsequent turns see observations without what produced them.
+                        database.insertMessage(
+                            sessionId = sessionId,
+                            role = "assistant",
+                            content = llmResponse,
+                            timestamp = Clock.System.now().toEpochMilliseconds(),
+                            dataTrust = privilegedController.trust(),
+                            sourceRunId = currentRunId,
+                        )
 
                         val action = Action(toolName, args)
                         // Strip JSON from thought — only show the prose part
@@ -513,14 +540,28 @@ class AIAgent(
                                     )
                                 }
                             }
+                            val clarification = clarificationResponse(toolName, args, observation)
+                            if (clarification != null) {
+                                database.insertMessage(
+                                    sessionId = sessionId,
+                                    role = "assistant",
+                                    content = clarification,
+                                    timestamp = Clock.System.now().toEpochMilliseconds(),
+                                    dataTrust = privilegedController.trust(),
+                                    sourceRunId = currentRunId,
+                                )
+                                completionValidator?.validate(clarification)
+                                completionValidated = true
+                                isComplete = true
+                            }
 
                             val trajObs =
                                 ConversationTrajectory(
                                     inputs = mapOf("query" to currentInput),
-                                    outputs = emptyMap(),
+                                    outputs = clarification?.let { mapOf("response" to it) } ?: emptyMap(),
                                     thought = null,
                                     action = action,
-                                    observation = observation,
+                                    observation = clarification ?: observation,
                                 )
                             emit(trajObs)
                             trajectoryLog.add(trajObs)
@@ -539,6 +580,8 @@ class AIAgent(
                             sourceRunId = currentRunId,
                         )
 
+                        completionValidator?.validate(llmResponse)
+                        completionValidated = true
                         val trajFinal =
                             ConversationTrajectory(
                                 inputs = mapOf("query" to currentInput),
@@ -550,6 +593,10 @@ class AIAgent(
                         isComplete = true
                     }
                 }
+            }
+
+            if (completionValidator != null && !completionValidated) {
+                throw AgentExecutionException("task_no_validated_final_response", "Task ended without a validated final response")
             }
 
             // Closed-Loop Learning (gated by RewardSignal)
@@ -626,6 +673,8 @@ class AIAgent(
                     userMessage = userInput,
                 ),
             )
+        }.onCompletion {
+            withContext(NonCancellable) { actionExecutor.endHarnessSession(sessionId) }
         }
 
     private fun sanitizeFtsQuery(query: String): String {
@@ -849,46 +898,44 @@ class AIAgent(
         }
     }
 
+    private fun clarificationResponse(
+        toolName: String,
+        arguments: JsonObject,
+        observation: String,
+    ): String? {
+        if (toolName != "clarify" || observation.lineSequence().firstOrNull()?.trim() != "[CLARIFY]") {
+            return null
+        }
+        val question =
+            arguments["question"]
+                ?.jsonPrimitive
+                ?.contentOrNull
+                ?.trim()
+                ?.takeIf { it.isNotEmpty() }
+                ?: return null
+        val suggestions =
+            (arguments["suggestions"] as? JsonArray)
+                .orEmpty()
+                .mapNotNull { element ->
+                    (element as? JsonPrimitive)
+                        ?.contentOrNull
+                        ?.trim()
+                        ?.takeIf { it.isNotEmpty() }
+                }
+        return buildString {
+            append(question)
+            suggestions.forEachIndexed { index, suggestion ->
+                if (index == 0) append("\n")
+                append("\n${index + 1}. $suggestion")
+            }
+        }
+    }
+
     /**
      * Extract a JSON object containing "action" from LLM output.
      * Handles: pure JSON, ```json fences, or JSON embedded in prose text.
      */
-    private fun extractJsonFromResponse(text: String): String? {
-        val trimmed = text.trim()
-
-        // 1) Pure JSON — starts with {
-        if (trimmed.startsWith("{")) return trimmed
-
-        // 2) Markdown fenced JSON block: ```json ... ``` or ``` ... ```
-        val fencedRegex = Regex("""```(?:json)?\s*\n?(.*?)\n?\s*```""", RegexOption.DOT_MATCHES_ALL)
-        val fencedMatch = fencedRegex.find(trimmed)
-        if (fencedMatch != null) {
-            val content = fencedMatch.groupValues[1].trim()
-            if (content.startsWith("{") && content.contains("\"action\"")) return content
-        }
-
-        // 3) Find the outermost { ... } containing "action"
-        val firstBrace = trimmed.indexOf('{')
-        if (firstBrace >= 0 && trimmed.contains("\"action\"")) {
-            var depth = 0
-            for (i in firstBrace until trimmed.length) {
-                when (trimmed[i]) {
-                    '{' -> {
-                        depth++
-                    }
-
-                    '}' -> {
-                        depth--
-                        if (depth == 0) {
-                            return trimmed.substring(firstBrace, i + 1)
-                        }
-                    }
-                }
-            }
-        }
-
-        return null // No JSON action found — treat as text response
-    }
+    private fun extractJsonFromResponse(text: String): String? = AgentActionJson.extract(text)
 
     /**
      * Extract the prose text that appears before a JSON action block.

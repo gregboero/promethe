@@ -1,0 +1,4052 @@
+{
+    "project": ":gateway",
+    "configuration": "runtimeClasspath",
+    "modules": [
+        {
+            "group": "ai.koog",
+            "artifact": "a2a-client",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:agents-features-a2a-client-jvm:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "a2a-client-jvm",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:a2a-client:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "a2a-core",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:a2a-client-jvm:1.1.1-beta",
+                "ai.koog:a2a-server-jvm:1.1.1-beta",
+                "ai.koog:a2a-transport-core-jsonrpc-jvm:1.1.1-beta",
+                "ai.koog:agents-features-a2a-core-jvm:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "a2a-core-jvm",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:a2a-core:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "a2a-server",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:agents-features-a2a-server-jvm:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "a2a-server-jvm",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:a2a-server:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "a2a-transport-client-jsonrpc-http",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "project :gateway",
+                "project :shared"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "a2a-transport-client-jsonrpc-http-jvm",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:a2a-transport-client-jsonrpc-http:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "a2a-transport-core-jsonrpc",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:a2a-transport-client-jsonrpc-http-jvm:1.1.1-beta",
+                "ai.koog:a2a-transport-server-jsonrpc-http-jvm:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "a2a-transport-core-jsonrpc-jvm",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:a2a-transport-core-jsonrpc:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "a2a-transport-server-jsonrpc-http",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "project :gateway",
+                "project :shared"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "a2a-transport-server-jsonrpc-http-jvm",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:a2a-transport-server-jsonrpc-http:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-cli",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:koog-agents-additions-jvm:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-cli-jvm",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:agents-cli:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-core",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-cli-jvm:1.1.1-beta",
+                "ai.koog:agents-features-a2a-client-jvm:1.1.1-beta",
+                "ai.koog:agents-features-a2a-server-jvm:1.1.1-beta",
+                "ai.koog:agents-features-event-handler-jvm:1.1.1",
+                "ai.koog:agents-features-longterm-memory-jvm:1.1.1-beta",
+                "ai.koog:agents-features-memory-jvm:1.1.1",
+                "ai.koog:agents-features-opentelemetry-jvm:1.1.1",
+                "ai.koog:agents-features-snapshot-jvm:1.1.1",
+                "ai.koog:agents-features-tokenizer-jvm:1.1.1",
+                "ai.koog:agents-features-trace-jvm:1.1.1",
+                "ai.koog:agents-mcp-jvm:1.1.1-beta",
+                "ai.koog:agents-planner-jvm:1.1.1-beta",
+                "ai.koog:koog-agents-jvm:1.1.1",
+                "ai.koog:prompt-executor-llms-all-jvm:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-core-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-core:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-features-a2a-client",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "project :gateway",
+                "project :shared"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-features-a2a-client-jvm",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:agents-features-a2a-client:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-features-a2a-core",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:agents-features-a2a-client-jvm:1.1.1-beta",
+                "ai.koog:agents-features-a2a-server-jvm:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-features-a2a-core-jvm",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:agents-features-a2a-core:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-features-a2a-server",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "project :gateway",
+                "project :shared"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-features-a2a-server-jvm",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:agents-features-a2a-server:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-features-event-handler",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:koog-agents-jvm:1.1.1",
+                "ai.koog:prompt-executor-llms-all-jvm:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-features-event-handler-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-features-event-handler:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-features-longterm-memory",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:koog-agents-additions-jvm:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-features-longterm-memory-jvm",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:agents-features-longterm-memory:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-features-memory",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:koog-agents-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-features-memory-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-features-memory:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-features-opentelemetry",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:koog-agents-additions-jvm:1.1.1-beta",
+                "ai.koog:koog-agents-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-features-opentelemetry-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-features-opentelemetry:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-features-snapshot",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:koog-agents-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-features-snapshot-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-features-snapshot:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-features-tokenizer",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:koog-agents-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-features-tokenizer-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-features-tokenizer:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-features-trace",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:koog-agents-jvm:1.1.1",
+                "ai.koog:prompt-executor-llms-all-jvm:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-features-trace-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-features-trace:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-mcp",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:koog-agents-additions-jvm:1.1.1-beta",
+                "ai.koog:koog-ktor-jvm:1.1.1-beta",
+                "project :gateway",
+                "project :shared"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-mcp-jvm",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:agents-mcp:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-mcp-metadata",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-features-opentelemetry-jvm:1.1.1",
+                "ai.koog:agents-mcp-jvm:1.1.1-beta",
+                "ai.koog:koog-agents-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-mcp-metadata-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-mcp-metadata:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-planner",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:koog-agents-additions-jvm:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-planner-jvm",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:agents-planner:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-tools",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-core-jvm:1.1.1",
+                "ai.koog:agents-mcp-jvm:1.1.1-beta",
+                "ai.koog:koog-agents-jvm:1.1.1",
+                "ai.koog:prompt-cache-model-jvm:1.1.1",
+                "ai.koog:prompt-executor-anthropic-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-bedrock-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-clients-jvm:1.1.1",
+                "ai.koog:prompt-executor-google-client-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-llms-all-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-model-jvm:1.1.1",
+                "ai.koog:prompt-structure-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-tools-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-tools:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-utils",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:a2a-core-jvm:1.1.1-beta",
+                "ai.koog:a2a-server-jvm:1.1.1-beta",
+                "ai.koog:agents-core-jvm:1.1.1",
+                "ai.koog:agents-features-opentelemetry-jvm:1.1.1",
+                "ai.koog:koog-agents-jvm:1.1.1",
+                "ai.koog:prompt-cache-redis-jvm:1.1.1-beta",
+                "ai.koog:prompt-llm-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-utils-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-utils:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "embeddings-base",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:embeddings-llm-jvm:1.1.1",
+                "ai.koog:koog-agents-jvm:1.1.1",
+                "ai.koog:prompt-executor-ollama-client-jvm:1.1.1",
+                "ai.koog:rag-vector-jvm:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "embeddings-base-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:embeddings-base:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "embeddings-llm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:koog-agents-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "embeddings-llm-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:embeddings-llm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "http-client-core",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:http-client-ktor-jvm:1.1.1",
+                "ai.koog:koog-agents-jvm:1.1.1",
+                "ai.koog:prompt-executor-anthropic-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-google-client-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-ollama-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-openai-client-base-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "http-client-core-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:http-client-core:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "http-client-ktor",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:koog-agents-jvm:1.1.1",
+                "ai.koog:koog-ktor-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-llms-all-jvm:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "http-client-ktor-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:http-client-ktor:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "koog-agents",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:koog-ktor-jvm:1.1.1-beta",
+                "project :gateway",
+                "project :shared"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "koog-agents-additions",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:koog-ktor-jvm:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "koog-agents-additions-jvm",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:koog-agents-additions:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "koog-agents-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:koog-agents:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "koog-ktor",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "project :gateway",
+                "project :shared"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "koog-ktor-jvm",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:koog-ktor:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-cache-files",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:koog-agents-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-cache-files-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-cache-files:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-cache-model",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:koog-agents-jvm:1.1.1",
+                "ai.koog:prompt-cache-files-jvm:1.1.1",
+                "ai.koog:prompt-cache-redis-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-cached-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-cache-model-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-cache-model:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-cache-redis",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:koog-agents-additions-jvm:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-cache-redis-jvm",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:prompt-cache-redis:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-anthropic-client",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:koog-agents-jvm:1.1.1",
+                "ai.koog:prompt-executor-bedrock-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-llms-all-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-model-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-anthropic-client-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-executor-anthropic-client:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-bedrock-client",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:koog-agents-jvm:1.1.1",
+                "ai.koog:prompt-executor-llms-all-jvm:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-bedrock-client-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-executor-bedrock-client:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-cached",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:koog-agents-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-cached-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-executor-cached:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-clients",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:embeddings-llm-jvm:1.1.1",
+                "ai.koog:koog-agents-jvm:1.1.1",
+                "ai.koog:prompt-executor-anthropic-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-bedrock-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-google-client-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-model-jvm:1.1.1",
+                "ai.koog:prompt-executor-ollama-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-openai-client-base-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-clients-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-executor-clients:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-dashscope-client",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:koog-agents-additions-jvm:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-dashscope-client-jvm",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:prompt-executor-dashscope-client:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-deepseek-client",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:koog-agents-additions-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-llms-all-jvm:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-deepseek-client-jvm",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:prompt-executor-deepseek-client:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-google-client",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:koog-agents-additions-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-llms-all-jvm:1.1.1-beta",
+                "project :gateway",
+                "project :shared"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-google-client-jvm",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:prompt-executor-google-client:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-litert-client",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:koog-agents-additions-jvm:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-litert-client-jvm",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:prompt-executor-litert-client:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-llms-all",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:agents-mcp-jvm:1.1.1-beta",
+                "ai.koog:koog-agents-additions-jvm:1.1.1-beta",
+                "project :gateway",
+                "project :shared"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-llms-all-jvm",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:prompt-executor-llms-all:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-mistralai-client",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:koog-agents-additions-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-llms-all-jvm:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-mistralai-client-jvm",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:prompt-executor-mistralai-client:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-model",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-core-jvm:1.1.1",
+                "ai.koog:agents-mcp-jvm:1.1.1-beta",
+                "ai.koog:koog-agents-jvm:1.1.1",
+                "ai.koog:prompt-executor-cached-jvm:1.1.1",
+                "ai.koog:prompt-executor-llms-all-jvm:1.1.1-beta",
+                "ai.koog:prompt-processor-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-model-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-executor-model:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-ollama-client",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:koog-agents-jvm:1.1.1",
+                "ai.koog:prompt-executor-llms-all-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-model-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-ollama-client-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-executor-ollama-client:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-openai-client",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-core-jvm:1.1.1",
+                "ai.koog:agents-features-tokenizer-jvm:1.1.1",
+                "ai.koog:agents-features-trace-jvm:1.1.1",
+                "ai.koog:agents-mcp-jvm:1.1.1-beta",
+                "ai.koog:koog-agents-jvm:1.1.1",
+                "ai.koog:prompt-executor-llms-all-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-model-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-openai-client-base",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:koog-agents-jvm:1.1.1",
+                "ai.koog:prompt-executor-dashscope-client-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-deepseek-client-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-mistralai-client-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-model-jvm:1.1.1",
+                "ai.koog:prompt-executor-openai-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-openrouter-client-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-openai-client-base-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-executor-openai-client-base:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-openai-client-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-executor-openai-client:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-openrouter-client",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:koog-agents-additions-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-llms-all-jvm:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-openrouter-client-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-executor-openrouter-client:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-llm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-core-jvm:1.1.1",
+                "ai.koog:embeddings-llm-jvm:1.1.1",
+                "ai.koog:koog-agents-jvm:1.1.1",
+                "ai.koog:prompt-executor-anthropic-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-bedrock-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-google-client-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-llms-all-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-model-jvm:1.1.1",
+                "ai.koog:prompt-executor-ollama-client-jvm:1.1.1",
+                "ai.koog:prompt-model-jvm:1.1.1",
+                "ai.koog:prompt-tokenizer-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-llm-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-llm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-markdown",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-core-jvm:1.1.1",
+                "ai.koog:agents-features-longterm-memory-jvm:1.1.1-beta",
+                "ai.koog:agents-features-memory-jvm:1.1.1",
+                "ai.koog:koog-agents-jvm:1.1.1",
+                "ai.koog:prompt-processor-jvm:1.1.1",
+                "ai.koog:prompt-structure-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-markdown-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-markdown:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-model",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-features-a2a-core-jvm:1.1.1-beta",
+                "ai.koog:agents-mcp-jvm:1.1.1-beta",
+                "ai.koog:agents-tools-jvm:1.1.1",
+                "ai.koog:koog-agents-jvm:1.1.1",
+                "ai.koog:prompt-cache-model-jvm:1.1.1",
+                "ai.koog:prompt-executor-anthropic-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-bedrock-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-clients-jvm:1.1.1",
+                "ai.koog:prompt-executor-google-client-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-llms-all-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-model-jvm:1.1.1",
+                "ai.koog:prompt-executor-ollama-client-jvm:1.1.1",
+                "ai.koog:prompt-markdown-jvm:1.1.1",
+                "ai.koog:prompt-tokenizer-jvm:1.1.1",
+                "ai.koog:prompt-xml-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-model-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-model:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-processor",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-core-jvm:1.1.1",
+                "ai.koog:koog-agents-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-processor-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-processor:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-structure",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-core-jvm:1.1.1",
+                "ai.koog:koog-agents-jvm:1.1.1",
+                "ai.koog:prompt-executor-clients-jvm:1.1.1",
+                "ai.koog:prompt-executor-google-client-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-model-jvm:1.1.1",
+                "ai.koog:prompt-executor-ollama-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-openai-client-base-jvm:1.1.1",
+                "ai.koog:prompt-executor-openai-client-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-structure-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-structure:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-tokenizer",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-features-tokenizer-jvm:1.1.1",
+                "ai.koog:koog-agents-jvm:1.1.1",
+                "ai.koog:prompt-executor-ollama-client-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-tokenizer-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-tokenizer:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-xml",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:koog-agents-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-xml-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-xml:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "rag-base",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-features-longterm-memory-jvm:1.1.1-beta",
+                "ai.koog:agents-features-snapshot-jvm:1.1.1",
+                "ai.koog:koog-agents-jvm:1.1.1",
+                "ai.koog:rag-vector-jvm:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "rag-base-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:rag-base:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "rag-vector",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:koog-agents-additions-jvm:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "rag-vector-jvm",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:rag-vector:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "serialization-core",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-tools-jvm:1.1.1",
+                "ai.koog:koog-agents-jvm:1.1.1",
+                "ai.koog:serialization-jackson:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "serialization-core-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:serialization-core:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "serialization-jackson",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-core-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "utils",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-core-jvm:1.1.1",
+                "ai.koog:agents-mcp-jvm:1.1.1-beta",
+                "ai.koog:http-client-ktor-jvm:1.1.1",
+                "ai.koog:koog-agents-jvm:1.1.1",
+                "ai.koog:koog-ktor-jvm:1.1.1-beta",
+                "ai.koog:prompt-cache-redis-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-anthropic-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-bedrock-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-google-client-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-openai-client-base-jvm:1.1.1",
+                "ai.koog:prompt-model-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "utils-jvm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:utils:1.1.1"
+            ]
+        },
+        {
+            "group": "aws.sdk.kotlin",
+            "artifact": "aws-config",
+            "version": "1.6.72",
+            "requiredBy": [
+                "aws.sdk.kotlin:bedrockruntime-jvm:1.6.72"
+            ]
+        },
+        {
+            "group": "aws.sdk.kotlin",
+            "artifact": "aws-config-jvm",
+            "version": "1.6.72",
+            "requiredBy": [
+                "aws.sdk.kotlin:aws-config:1.6.72"
+            ]
+        },
+        {
+            "group": "aws.sdk.kotlin",
+            "artifact": "aws-core",
+            "version": "1.6.72",
+            "requiredBy": [
+                "aws.sdk.kotlin:aws-config-jvm:1.6.72",
+                "aws.sdk.kotlin:aws-endpoint-jvm:1.6.72",
+                "aws.sdk.kotlin:aws-http-jvm:1.6.72",
+                "aws.sdk.kotlin:bedrockruntime-jvm:1.6.72"
+            ]
+        },
+        {
+            "group": "aws.sdk.kotlin",
+            "artifact": "aws-core-jvm",
+            "version": "1.6.72",
+            "requiredBy": [
+                "aws.sdk.kotlin:aws-core:1.6.72"
+            ]
+        },
+        {
+            "group": "aws.sdk.kotlin",
+            "artifact": "aws-endpoint",
+            "version": "1.6.72",
+            "requiredBy": [
+                "aws.sdk.kotlin:aws-config-jvm:1.6.72",
+                "aws.sdk.kotlin:aws-http-jvm:1.6.72",
+                "aws.sdk.kotlin:bedrockruntime-jvm:1.6.72"
+            ]
+        },
+        {
+            "group": "aws.sdk.kotlin",
+            "artifact": "aws-endpoint-jvm",
+            "version": "1.6.72",
+            "requiredBy": [
+                "aws.sdk.kotlin:aws-endpoint:1.6.72"
+            ]
+        },
+        {
+            "group": "aws.sdk.kotlin",
+            "artifact": "aws-http",
+            "version": "1.6.72",
+            "requiredBy": [
+                "aws.sdk.kotlin:aws-config-jvm:1.6.72",
+                "aws.sdk.kotlin:bedrockruntime-jvm:1.6.72"
+            ]
+        },
+        {
+            "group": "aws.sdk.kotlin",
+            "artifact": "aws-http-jvm",
+            "version": "1.6.72",
+            "requiredBy": [
+                "aws.sdk.kotlin:aws-http:1.6.72"
+            ]
+        },
+        {
+            "group": "aws.sdk.kotlin",
+            "artifact": "bedrockruntime",
+            "version": "1.6.72",
+            "requiredBy": [
+                "ai.koog:prompt-executor-bedrock-client-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "aws.sdk.kotlin",
+            "artifact": "bedrockruntime-jvm",
+            "version": "1.6.72",
+            "requiredBy": [
+                "aws.sdk.kotlin:bedrockruntime:1.6.72"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "aws-credentials",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.sdk.kotlin:aws-config-jvm:1.6.72",
+                "aws.sdk.kotlin:bedrockruntime-jvm:1.6.72",
+                "aws.smithy.kotlin:aws-signing-common-jvm:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "aws-credentials-jvm",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.smithy.kotlin:aws-credentials:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "aws-event-stream",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.sdk.kotlin:bedrockruntime-jvm:1.6.72"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "aws-event-stream-jvm",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.smithy.kotlin:aws-event-stream:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "aws-json-protocols",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.sdk.kotlin:aws-config-jvm:1.6.72",
+                "aws.sdk.kotlin:bedrockruntime-jvm:1.6.72"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "aws-json-protocols-jvm",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.smithy.kotlin:aws-json-protocols:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "aws-protocol-core",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.sdk.kotlin:aws-config-jvm:1.6.72",
+                "aws.sdk.kotlin:bedrockruntime-jvm:1.6.72",
+                "aws.smithy.kotlin:aws-json-protocols-jvm:1.6.12",
+                "aws.smithy.kotlin:aws-xml-protocols-jvm:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "aws-protocol-core-jvm",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.smithy.kotlin:aws-protocol-core:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "aws-signing-common",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.sdk.kotlin:aws-config-jvm:1.6.72",
+                "aws.sdk.kotlin:aws-endpoint-jvm:1.6.72",
+                "aws.sdk.kotlin:aws-http-jvm:1.6.72",
+                "aws.sdk.kotlin:bedrockruntime-jvm:1.6.72",
+                "aws.smithy.kotlin:aws-event-stream-jvm:1.6.12",
+                "aws.smithy.kotlin:aws-signing-default-jvm:1.6.12",
+                "aws.smithy.kotlin:http-auth-aws-jvm:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "aws-signing-common-jvm",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.smithy.kotlin:aws-signing-common:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "aws-signing-default",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.sdk.kotlin:aws-config-jvm:1.6.72",
+                "aws.sdk.kotlin:bedrockruntime-jvm:1.6.72"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "aws-signing-default-jvm",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.smithy.kotlin:aws-signing-default:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "aws-xml-protocols",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.sdk.kotlin:aws-config-jvm:1.6.72"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "aws-xml-protocols-jvm",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.smithy.kotlin:aws-xml-protocols:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "http",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.sdk.kotlin:aws-config-jvm:1.6.72",
+                "aws.sdk.kotlin:bedrockruntime-jvm:1.6.72",
+                "aws.smithy.kotlin:aws-protocol-core-jvm:1.6.12",
+                "aws.smithy.kotlin:aws-signing-common-jvm:1.6.12",
+                "aws.smithy.kotlin:aws-xml-protocols-jvm:1.6.12",
+                "aws.smithy.kotlin:http-auth-api-jvm:1.6.12",
+                "aws.smithy.kotlin:http-auth-aws-jvm:1.6.12",
+                "aws.smithy.kotlin:http-auth-jvm:1.6.12",
+                "aws.smithy.kotlin:http-client-jvm:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "http-auth",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.sdk.kotlin:aws-config-jvm:1.6.72",
+                "aws.sdk.kotlin:bedrockruntime-jvm:1.6.72",
+                "aws.smithy.kotlin:aws-signing-common-jvm:1.6.12",
+                "aws.smithy.kotlin:http-client-jvm:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "http-auth-api",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.smithy.kotlin:http-auth-aws-jvm:1.6.12",
+                "aws.smithy.kotlin:http-auth-jvm:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "http-auth-api-jvm",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.smithy.kotlin:http-auth-api:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "http-auth-aws",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.sdk.kotlin:aws-config-jvm:1.6.72",
+                "aws.sdk.kotlin:aws-http-jvm:1.6.72",
+                "aws.sdk.kotlin:bedrockruntime-jvm:1.6.72"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "http-auth-aws-jvm",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.smithy.kotlin:http-auth-aws:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "http-auth-jvm",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.smithy.kotlin:http-auth:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "http-client",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.sdk.kotlin:aws-config-jvm:1.6.72",
+                "aws.sdk.kotlin:aws-endpoint-jvm:1.6.72",
+                "aws.sdk.kotlin:aws-http-jvm:1.6.72",
+                "aws.sdk.kotlin:bedrockruntime-jvm:1.6.72",
+                "aws.smithy.kotlin:aws-json-protocols-jvm:1.6.12",
+                "aws.smithy.kotlin:aws-protocol-core-jvm:1.6.12",
+                "aws.smithy.kotlin:aws-signing-common-jvm:1.6.12",
+                "aws.smithy.kotlin:http-client-engine-default-jvm:1.6.12",
+                "aws.smithy.kotlin:http-client-engine-okhttp-jvm:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "http-client-engine-default",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.sdk.kotlin:aws-config-jvm:1.6.72",
+                "aws.sdk.kotlin:bedrockruntime-jvm:1.6.72"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "http-client-engine-default-jvm",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.smithy.kotlin:http-client-engine-default:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "http-client-engine-okhttp",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.smithy.kotlin:http-client-engine-default-jvm:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "http-client-engine-okhttp-jvm",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.smithy.kotlin:http-client-engine-okhttp:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "http-client-jvm",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.smithy.kotlin:http-client:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "http-jvm",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.smithy.kotlin:http:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "identity-api",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.sdk.kotlin:aws-config-jvm:1.6.72",
+                "aws.sdk.kotlin:bedrockruntime-jvm:1.6.72",
+                "aws.smithy.kotlin:aws-credentials-jvm:1.6.12",
+                "aws.smithy.kotlin:http-auth-api-jvm:1.6.12",
+                "aws.smithy.kotlin:smithy-client-jvm:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "identity-api-jvm",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.smithy.kotlin:identity-api:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "logging-slf4j2",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.smithy.kotlin:telemetry-defaults-jvm:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "logging-slf4j2-jvm",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.smithy.kotlin:logging-slf4j2:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "runtime-core",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.sdk.kotlin:aws-config-jvm:1.6.72",
+                "aws.sdk.kotlin:aws-core-jvm:1.6.72",
+                "aws.sdk.kotlin:bedrockruntime-jvm:1.6.72",
+                "aws.smithy.kotlin:aws-credentials-jvm:1.6.12",
+                "aws.smithy.kotlin:aws-event-stream-jvm:1.6.12",
+                "aws.smithy.kotlin:aws-json-protocols-jvm:1.6.12",
+                "aws.smithy.kotlin:aws-protocol-core-jvm:1.6.12",
+                "aws.smithy.kotlin:aws-xml-protocols-jvm:1.6.12",
+                "aws.smithy.kotlin:http-auth-aws-jvm:1.6.12",
+                "aws.smithy.kotlin:http-auth-jvm:1.6.12",
+                "aws.smithy.kotlin:http-client-engine-default-jvm:1.6.12",
+                "aws.smithy.kotlin:http-client-engine-okhttp-jvm:1.6.12",
+                "aws.smithy.kotlin:http-client-jvm:1.6.12",
+                "aws.smithy.kotlin:http-jvm:1.6.12",
+                "aws.smithy.kotlin:identity-api-jvm:1.6.12",
+                "aws.smithy.kotlin:serde-jvm:1.6.12",
+                "aws.smithy.kotlin:smithy-client-jvm:1.6.12",
+                "aws.smithy.kotlin:telemetry-api-jvm:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "runtime-core-jvm",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.smithy.kotlin:runtime-core:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "serde",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.sdk.kotlin:aws-config-jvm:1.6.72",
+                "aws.sdk.kotlin:bedrockruntime-jvm:1.6.72",
+                "aws.smithy.kotlin:aws-json-protocols-jvm:1.6.12",
+                "aws.smithy.kotlin:aws-xml-protocols-jvm:1.6.12",
+                "aws.smithy.kotlin:serde-form-url-jvm:1.6.12",
+                "aws.smithy.kotlin:serde-json-jvm:1.6.12",
+                "aws.smithy.kotlin:serde-xml-jvm:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "serde-form-url",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.sdk.kotlin:aws-config-jvm:1.6.72"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "serde-form-url-jvm",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.smithy.kotlin:serde-form-url:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "serde-json",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.sdk.kotlin:aws-config-jvm:1.6.72",
+                "aws.sdk.kotlin:bedrockruntime-jvm:1.6.72",
+                "aws.smithy.kotlin:aws-json-protocols-jvm:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "serde-json-jvm",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.smithy.kotlin:serde-json:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "serde-jvm",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.smithy.kotlin:serde:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "serde-xml",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.sdk.kotlin:aws-config-jvm:1.6.72",
+                "aws.smithy.kotlin:aws-xml-protocols-jvm:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "serde-xml-jvm",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.smithy.kotlin:serde-xml:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "smithy-client",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.sdk.kotlin:aws-config-jvm:1.6.72",
+                "aws.sdk.kotlin:aws-core-jvm:1.6.72",
+                "aws.sdk.kotlin:bedrockruntime-jvm:1.6.72",
+                "aws.smithy.kotlin:aws-json-protocols-jvm:1.6.12",
+                "aws.smithy.kotlin:aws-protocol-core-jvm:1.6.12",
+                "aws.smithy.kotlin:http-client-jvm:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "smithy-client-jvm",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.smithy.kotlin:smithy-client:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "telemetry-api",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.sdk.kotlin:aws-config-jvm:1.6.72",
+                "aws.sdk.kotlin:bedrockruntime-jvm:1.6.72",
+                "aws.smithy.kotlin:aws-credentials-jvm:1.6.12",
+                "aws.smithy.kotlin:aws-event-stream-jvm:1.6.12",
+                "aws.smithy.kotlin:http-client-jvm:1.6.12",
+                "aws.smithy.kotlin:http-jvm:1.6.12",
+                "aws.smithy.kotlin:identity-api-jvm:1.6.12",
+                "aws.smithy.kotlin:logging-slf4j2-jvm:1.6.12",
+                "aws.smithy.kotlin:telemetry-defaults-jvm:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "telemetry-api-jvm",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.smithy.kotlin:telemetry-api:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "telemetry-defaults",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.sdk.kotlin:aws-config-jvm:1.6.72",
+                "aws.sdk.kotlin:bedrockruntime-jvm:1.6.72",
+                "aws.smithy.kotlin:http-client-engine-okhttp-jvm:1.6.12"
+            ]
+        },
+        {
+            "group": "aws.smithy.kotlin",
+            "artifact": "telemetry-defaults-jvm",
+            "version": "1.6.12",
+            "requiredBy": [
+                "aws.smithy.kotlin:telemetry-defaults:1.6.12"
+            ]
+        },
+        {
+            "group": "ch.qos.logback",
+            "artifact": "logback-classic",
+            "version": "1.5.18",
+            "requiredBy": [
+                "project :gateway"
+            ]
+        },
+        {
+            "group": "ch.qos.logback",
+            "artifact": "logback-core",
+            "version": "1.5.18",
+            "requiredBy": [
+                "ch.qos.logback:logback-classic:1.5.18"
+            ]
+        },
+        {
+            "group": "club.minnced",
+            "artifact": "opus-java",
+            "version": "1.1.1",
+            "requiredBy": [
+                "net.dv8tion:JDA:6.4.1"
+            ]
+        },
+        {
+            "group": "club.minnced",
+            "artifact": "opus-java-api",
+            "version": "1.1.1",
+            "requiredBy": [
+                "club.minnced:opus-java:1.1.1"
+            ]
+        },
+        {
+            "group": "club.minnced",
+            "artifact": "opus-java-natives",
+            "version": "1.1.1",
+            "requiredBy": [
+                "club.minnced:opus-java:1.1.1"
+            ]
+        },
+        {
+            "group": "co.touchlab",
+            "artifact": "stately-concurrency",
+            "version": "2.1.0",
+            "requiredBy": [
+                "co.touchlab:stately-concurrent-collections-jvm:2.1.0",
+                "io.insert-koin:koin-core-jvm:4.2.1"
+            ]
+        },
+        {
+            "group": "co.touchlab",
+            "artifact": "stately-concurrency-jvm",
+            "version": "2.1.0",
+            "requiredBy": [
+                "co.touchlab:stately-concurrency:2.1.0"
+            ]
+        },
+        {
+            "group": "co.touchlab",
+            "artifact": "stately-concurrent-collections",
+            "version": "2.1.0",
+            "requiredBy": [
+                "io.insert-koin:koin-core-jvm:4.2.1"
+            ]
+        },
+        {
+            "group": "co.touchlab",
+            "artifact": "stately-concurrent-collections-jvm",
+            "version": "2.1.0",
+            "requiredBy": [
+                "co.touchlab:stately-concurrent-collections:2.1.0"
+            ]
+        },
+        {
+            "group": "co.touchlab",
+            "artifact": "stately-strict",
+            "version": "2.1.0",
+            "requiredBy": [
+                "co.touchlab:stately-concurrency-jvm:2.1.0"
+            ]
+        },
+        {
+            "group": "co.touchlab",
+            "artifact": "stately-strict-jvm",
+            "version": "2.1.0",
+            "requiredBy": [
+                "co.touchlab:stately-strict:2.1.0"
+            ]
+        },
+        {
+            "group": "com.auth0",
+            "artifact": "java-jwt",
+            "version": "4.4.0",
+            "requiredBy": [
+                "com.twilio.sdk:twilio:12.1.1"
+            ]
+        },
+        {
+            "group": "com.fasterxml.jackson.core",
+            "artifact": "jackson-annotations",
+            "version": "2.21",
+            "requiredBy": [
+                "com.fasterxml.jackson.core:jackson-databind:2.21.3",
+                "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.21.3",
+                "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.3",
+                "com.fasterxml.jackson.module:jackson-module-kotlin:2.21.3",
+                "com.fasterxml.jackson:jackson-bom:2.21.3",
+                "com.twilio.sdk:twilio:12.1.1",
+                "tools.jackson.core:jackson-databind:3.1.1",
+                "tools.jackson:jackson-bom:3.1.1"
+            ]
+        },
+        {
+            "group": "com.fasterxml.jackson.core",
+            "artifact": "jackson-core",
+            "version": "2.21.3",
+            "requiredBy": [
+                "com.fasterxml.jackson.core:jackson-databind:2.21.3",
+                "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.21.3",
+                "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.3",
+                "com.fasterxml.jackson:jackson-bom:2.21.3",
+                "com.twilio.sdk:twilio:12.1.1",
+                "net.dv8tion:JDA:6.4.1"
+            ]
+        },
+        {
+            "group": "com.fasterxml.jackson.core",
+            "artifact": "jackson-databind",
+            "version": "2.21.3",
+            "requiredBy": [
+                "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.21.3",
+                "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.3",
+                "com.fasterxml.jackson.module:jackson-module-kotlin:2.21.3",
+                "com.fasterxml.jackson:jackson-bom:2.21.3",
+                "com.twilio.sdk:twilio:12.1.1",
+                "net.dv8tion:JDA:6.4.1"
+            ]
+        },
+        {
+            "group": "com.fasterxml.jackson.dataformat",
+            "artifact": "jackson-dataformat-xml",
+            "version": "2.21.3",
+            "requiredBy": [
+                "com.fasterxml.jackson:jackson-bom:2.21.3",
+                "com.twilio.sdk:twilio:12.1.1"
+            ]
+        },
+        {
+            "group": "com.fasterxml.jackson.datatype",
+            "artifact": "jackson-datatype-jsr310",
+            "version": "2.21.3",
+            "requiredBy": [
+                "com.fasterxml.jackson:jackson-bom:2.21.3",
+                "com.twilio.sdk:twilio:12.1.1"
+            ]
+        },
+        {
+            "group": "com.fasterxml.jackson.module",
+            "artifact": "jackson-module-kotlin",
+            "version": "2.21.3",
+            "requiredBy": [
+                "ai.koog:serialization-jackson:1.1.1",
+                "com.fasterxml.jackson:jackson-bom:2.21.3"
+            ]
+        },
+        {
+            "group": "com.fasterxml.jackson",
+            "artifact": "jackson-bom",
+            "version": "2.21.3",
+            "requiredBy": [
+                "com.fasterxml.jackson.core:jackson-core:2.21.3",
+                "com.fasterxml.jackson.core:jackson-databind:2.21.3",
+                "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.21.3",
+                "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.3",
+                "com.fasterxml.jackson.module:jackson-module-kotlin:2.21.3"
+            ]
+        },
+        {
+            "group": "com.fasterxml.woodstox",
+            "artifact": "woodstox-core",
+            "version": "7.1.1",
+            "requiredBy": [
+                "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.21.3"
+            ]
+        },
+        {
+            "group": "com.google.code.findbugs",
+            "artifact": "jsr305",
+            "version": "3.0.2",
+            "requiredBy": [
+                "com.google.crypto.tink:tink:1.18.0"
+            ]
+        },
+        {
+            "group": "com.google.code.gson",
+            "artifact": "gson",
+            "version": "2.10.1",
+            "requiredBy": [
+                "com.google.crypto.tink:tink:1.18.0",
+                "com.twilio.sdk:twilio:12.1.1"
+            ]
+        },
+        {
+            "group": "com.google.crypto.tink",
+            "artifact": "tink",
+            "version": "1.18.0",
+            "requiredBy": [
+                "net.dv8tion:JDA:6.4.1"
+            ]
+        },
+        {
+            "group": "com.google.errorprone",
+            "artifact": "error_prone_annotations",
+            "version": "2.22.0",
+            "requiredBy": [
+                "com.google.crypto.tink:tink:1.18.0"
+            ]
+        },
+        {
+            "group": "com.google.protobuf",
+            "artifact": "protobuf-java",
+            "version": "4.28.2",
+            "requiredBy": [
+                "com.google.crypto.tink:tink:1.18.0"
+            ]
+        },
+        {
+            "group": "com.neovisionaries",
+            "artifact": "nv-websocket-client",
+            "version": "2.14",
+            "requiredBy": [
+                "net.dv8tion:JDA:6.4.1"
+            ]
+        },
+        {
+            "group": "com.squareup.okhttp3",
+            "artifact": "okhttp",
+            "version": "5.4.0",
+            "requiredBy": [
+                "aws.smithy.kotlin:http-client-engine-okhttp-jvm:1.6.12",
+                "com.squareup.okhttp3:okhttp-coroutines:5.3.2",
+                "io.opentelemetry:opentelemetry-exporter-sender-okhttp:1.64.0"
+            ]
+        },
+        {
+            "group": "com.squareup.okhttp3",
+            "artifact": "okhttp-coroutines",
+            "version": "5.3.2",
+            "requiredBy": [
+                "aws.smithy.kotlin:http-client-engine-okhttp-jvm:1.6.12"
+            ]
+        },
+        {
+            "group": "com.squareup.okhttp3",
+            "artifact": "okhttp-jvm",
+            "version": "5.4.0",
+            "requiredBy": [
+                "com.squareup.okhttp3:okhttp:5.4.0",
+                "net.dv8tion:JDA:6.4.1"
+            ]
+        },
+        {
+            "group": "com.squareup.okio",
+            "artifact": "okio",
+            "version": "3.17.0",
+            "requiredBy": [
+                "aws.smithy.kotlin:runtime-core-jvm:1.6.12",
+                "com.squareup.okhttp3:okhttp-coroutines:5.3.2",
+                "com.squareup.okhttp3:okhttp-jvm:5.4.0",
+                "project :gateway",
+                "project :shared"
+            ]
+        },
+        {
+            "group": "com.squareup.okio",
+            "artifact": "okio-jvm",
+            "version": "3.17.0",
+            "requiredBy": [
+                "com.squareup.okio:okio:3.17.0"
+            ]
+        },
+        {
+            "group": "com.twilio.sdk",
+            "artifact": "twilio",
+            "version": "12.1.1",
+            "requiredBy": [
+                "project :gateway"
+            ]
+        },
+        {
+            "group": "com.typesafe",
+            "artifact": "config",
+            "version": "1.4.8",
+            "requiredBy": [
+                "io.ktor:ktor-server-core-jvm:3.5.0"
+            ]
+        },
+        {
+            "group": "commons-codec",
+            "artifact": "commons-codec",
+            "version": "1.15",
+            "requiredBy": [
+                "com.twilio.sdk:twilio:12.1.1"
+            ]
+        },
+        {
+            "group": "commons-io",
+            "artifact": "commons-io",
+            "version": "2.14.0",
+            "requiredBy": [
+                "com.twilio.sdk:twilio:12.1.1"
+            ]
+        },
+        {
+            "group": "io.github.oshai",
+            "artifact": "kotlin-logging",
+            "version": "8.0.01",
+            "requiredBy": [
+                "ai.koog:a2a-server-jvm:1.1.1-beta",
+                "ai.koog:a2a-transport-client-jsonrpc-http-jvm:1.1.1-beta",
+                "ai.koog:a2a-transport-core-jsonrpc-jvm:1.1.1-beta",
+                "ai.koog:agents-cli-jvm:1.1.1-beta",
+                "ai.koog:agents-core-jvm:1.1.1",
+                "ai.koog:agents-mcp-jvm:1.1.1-beta",
+                "ai.koog:agents-planner-jvm:1.1.1-beta",
+                "ai.koog:agents-utils-jvm:1.1.1",
+                "ai.koog:http-client-ktor-jvm:1.1.1",
+                "ai.koog:prompt-cache-redis-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-anthropic-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-bedrock-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-clients-jvm:1.1.1",
+                "ai.koog:prompt-executor-dashscope-client-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-deepseek-client-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-google-client-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-mistralai-client-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-model-jvm:1.1.1",
+                "ai.koog:prompt-executor-ollama-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-openai-client-base-jvm:1.1.1",
+                "ai.koog:prompt-executor-openai-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-openrouter-client-jvm:1.1.1",
+                "ai.koog:prompt-model-jvm:1.1.1",
+                "ai.koog:prompt-processor-jvm:1.1.1",
+                "ai.koog:prompt-structure-jvm:1.1.1",
+                "ai.koog:utils-jvm:1.1.1",
+                "io.modelcontextprotocol:kotlin-sdk-client-jvm:0.11.1",
+                "io.modelcontextprotocol:kotlin-sdk-core-jvm:0.11.1",
+                "org.jetbrains.kotlinx:kotlinx-schema-generator-core-jvm:0.4.4",
+                "project :gateway",
+                "project :shared"
+            ]
+        },
+        {
+            "group": "io.github.oshai",
+            "artifact": "kotlin-logging-jvm",
+            "version": "8.0.01",
+            "requiredBy": [
+                "io.github.oshai:kotlin-logging:8.0.01"
+            ]
+        },
+        {
+            "group": "io.insert-koin",
+            "artifact": "koin-core",
+            "version": "4.2.1",
+            "requiredBy": [
+                "io.insert-koin:koin-ktor-jvm:4.2.1",
+                "io.insert-koin:koin-logger-slf4j:4.2.1",
+                "project :gateway",
+                "project :shared"
+            ]
+        },
+        {
+            "group": "io.insert-koin",
+            "artifact": "koin-core-jvm",
+            "version": "4.2.1",
+            "requiredBy": [
+                "io.insert-koin:koin-core:4.2.1"
+            ]
+        },
+        {
+            "group": "io.insert-koin",
+            "artifact": "koin-ktor",
+            "version": "4.2.1",
+            "requiredBy": [
+                "project :gateway"
+            ]
+        },
+        {
+            "group": "io.insert-koin",
+            "artifact": "koin-ktor-jvm",
+            "version": "4.2.1",
+            "requiredBy": [
+                "io.insert-koin:koin-ktor:4.2.1"
+            ]
+        },
+        {
+            "group": "io.insert-koin",
+            "artifact": "koin-logger-slf4j",
+            "version": "4.2.1",
+            "requiredBy": [
+                "project :gateway"
+            ]
+        },
+        {
+            "group": "io.jsonwebtoken",
+            "artifact": "jjwt-api",
+            "version": "0.12.6",
+            "requiredBy": [
+                "com.twilio.sdk:twilio:12.1.1",
+                "io.jsonwebtoken:jjwt-impl:0.12.6",
+                "io.jsonwebtoken:jjwt-jackson:0.12.6"
+            ]
+        },
+        {
+            "group": "io.jsonwebtoken",
+            "artifact": "jjwt-impl",
+            "version": "0.12.6",
+            "requiredBy": [
+                "com.twilio.sdk:twilio:12.1.1"
+            ]
+        },
+        {
+            "group": "io.jsonwebtoken",
+            "artifact": "jjwt-jackson",
+            "version": "0.12.6",
+            "requiredBy": [
+                "com.twilio.sdk:twilio:12.1.1"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-client-apache5",
+            "version": "3.3.3",
+            "requiredBy": [
+                "ai.koog:koog-agents-additions-jvm:1.1.1-beta",
+                "ai.koog:koog-agents-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-client-apache5-jvm",
+            "version": "3.3.3",
+            "requiredBy": [
+                "io.ktor:ktor-client-apache5:3.3.3"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-client-cio",
+            "version": "3.5.0",
+            "requiredBy": [
+                "ai.koog:prompt-executor-model-jvm:1.1.1",
+                "project :shared"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-client-cio-jvm",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-client-cio:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-client-content-negotiation",
+            "version": "3.5.0",
+            "requiredBy": [
+                "ai.koog:a2a-client-jvm:1.1.1-beta",
+                "ai.koog:a2a-server-jvm:1.1.1-beta",
+                "ai.koog:a2a-transport-client-jsonrpc-http-jvm:1.1.1-beta",
+                "ai.koog:agents-core-jvm:1.1.1",
+                "ai.koog:agents-features-longterm-memory-jvm:1.1.1-beta",
+                "ai.koog:agents-features-memory-jvm:1.1.1",
+                "ai.koog:agents-features-opentelemetry-jvm:1.1.1",
+                "ai.koog:agents-features-tokenizer-jvm:1.1.1",
+                "ai.koog:agents-features-trace-jvm:1.1.1",
+                "ai.koog:embeddings-llm-jvm:1.1.1",
+                "ai.koog:http-client-ktor-jvm:1.1.1",
+                "ai.koog:prompt-executor-bedrock-client-jvm:1.1.1",
+                "project :shared"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-client-content-negotiation-jvm",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-client-content-negotiation:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-client-core",
+            "version": "3.5.0",
+            "requiredBy": [
+                "ai.koog:a2a-client-jvm:1.1.1-beta",
+                "ai.koog:a2a-server-jvm:1.1.1-beta",
+                "ai.koog:a2a-transport-client-jsonrpc-http-jvm:1.1.1-beta",
+                "ai.koog:agents-features-opentelemetry-jvm:1.1.1",
+                "ai.koog:http-client-ktor-jvm:1.1.1",
+                "io.ktor:ktor-client-apache5-jvm:3.3.3",
+                "io.ktor:ktor-client-cio-jvm:3.5.0",
+                "io.ktor:ktor-client-content-negotiation-jvm:3.5.0",
+                "io.ktor:ktor-client-logging-jvm:3.3.3",
+                "io.modelcontextprotocol:kotlin-sdk-client-jvm:0.11.1",
+                "project :gateway",
+                "project :shared"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-client-core-jvm",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-client-core:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-client-logging",
+            "version": "3.3.3",
+            "requiredBy": [
+                "ai.koog:agents-core-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-client-logging-jvm",
+            "version": "3.3.3",
+            "requiredBy": [
+                "io.ktor:ktor-client-logging:3.3.3"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-events",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-client-core-jvm:3.5.0",
+                "io.ktor:ktor-server-core-jvm:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-events-jvm",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-events:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-http",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-client-core-jvm:3.5.0",
+                "io.ktor:ktor-http-cio-jvm:3.5.0",
+                "io.ktor:ktor-network-tls-jvm:3.5.0",
+                "io.ktor:ktor-server-core-jvm:3.5.0",
+                "io.ktor:ktor-websockets-jvm:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-http-cio",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-client-cio-jvm:3.5.0",
+                "io.ktor:ktor-client-core-jvm:3.5.0",
+                "io.ktor:ktor-server-cio-jvm:3.5.0",
+                "io.ktor:ktor-server-core-jvm:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-http-cio-jvm",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-http-cio:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-http-jvm",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-http:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-io",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-http-cio-jvm:3.5.0",
+                "io.ktor:ktor-utils-jvm:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-io-jvm",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-io:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-network",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-http-cio-jvm:3.5.0",
+                "io.ktor:ktor-network-tls-jvm:3.5.0",
+                "io.ktor:ktor-server-cio-jvm:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-network-jvm",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-network:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-network-tls",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-client-cio-jvm:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-network-tls-jvm",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-network-tls:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-serialization",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-client-content-negotiation-jvm:3.5.0",
+                "io.ktor:ktor-serialization-kotlinx-jvm:3.5.0",
+                "io.ktor:ktor-server-core-jvm:3.5.0",
+                "io.ktor:ktor-websocket-serialization-jvm:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-serialization-jvm",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-serialization:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-serialization-kotlinx",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-serialization-kotlinx-json-jvm:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-serialization-kotlinx-json",
+            "version": "3.5.0",
+            "requiredBy": [
+                "ai.koog:a2a-client-jvm:1.1.1-beta",
+                "ai.koog:a2a-server-jvm:1.1.1-beta",
+                "ai.koog:a2a-transport-client-jsonrpc-http-jvm:1.1.1-beta",
+                "ai.koog:a2a-transport-server-jsonrpc-http-jvm:1.1.1-beta",
+                "ai.koog:agents-core-jvm:1.1.1",
+                "ai.koog:agents-features-longterm-memory-jvm:1.1.1-beta",
+                "ai.koog:agents-features-memory-jvm:1.1.1",
+                "ai.koog:agents-features-opentelemetry-jvm:1.1.1",
+                "ai.koog:agents-features-snapshot-jvm:1.1.1",
+                "ai.koog:agents-features-tokenizer-jvm:1.1.1",
+                "ai.koog:agents-features-trace-jvm:1.1.1",
+                "ai.koog:embeddings-llm-jvm:1.1.1",
+                "ai.koog:http-client-ktor-jvm:1.1.1",
+                "ai.koog:prompt-executor-bedrock-client-jvm:1.1.1",
+                "project :gateway",
+                "project :shared"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-serialization-kotlinx-json-jvm",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-serialization-kotlinx-json:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-serialization-kotlinx-jvm",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-serialization-kotlinx:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-server-cio",
+            "version": "3.5.0",
+            "requiredBy": [
+                "ai.koog:agents-core-jvm:1.1.1",
+                "project :gateway"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-server-cio-jvm",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-server-cio:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-server-content-negotiation",
+            "version": "3.5.0",
+            "requiredBy": [
+                "ai.koog:a2a-transport-server-jsonrpc-http-jvm:1.1.1-beta",
+                "project :gateway"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-server-content-negotiation-jvm",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-server-content-negotiation:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-server-core",
+            "version": "3.5.0",
+            "requiredBy": [
+                "ai.koog:a2a-transport-server-jsonrpc-http-jvm:1.1.1-beta",
+                "ai.koog:koog-ktor-jvm:1.1.1-beta",
+                "io.insert-koin:koin-ktor-jvm:4.2.1",
+                "io.ktor:ktor-server-cio-jvm:3.5.0",
+                "io.ktor:ktor-server-content-negotiation-jvm:3.5.0",
+                "io.ktor:ktor-server-cors-jvm:3.5.0",
+                "io.ktor:ktor-server-di-jvm:3.4.0",
+                "io.ktor:ktor-server-sse-jvm:3.5.0",
+                "io.ktor:ktor-server-status-pages-jvm:3.5.0",
+                "io.ktor:ktor-server-websockets-jvm:3.5.0",
+                "project :gateway"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-server-core-jvm",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-server-core:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-server-cors",
+            "version": "3.5.0",
+            "requiredBy": [
+                "ai.koog:a2a-transport-server-jsonrpc-http-jvm:1.1.1-beta",
+                "project :gateway"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-server-cors-jvm",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-server-cors:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-server-di",
+            "version": "3.4.0",
+            "requiredBy": [
+                "io.insert-koin:koin-ktor-jvm:4.2.1"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-server-di-jvm",
+            "version": "3.4.0",
+            "requiredBy": [
+                "io.ktor:ktor-server-di:3.4.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-server-sse",
+            "version": "3.5.0",
+            "requiredBy": [
+                "ai.koog:a2a-transport-server-jsonrpc-http-jvm:1.1.1-beta",
+                "ai.koog:agents-core-jvm:1.1.1",
+                "project :gateway"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-server-sse-jvm",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-server-sse:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-server-status-pages",
+            "version": "3.5.0",
+            "requiredBy": [
+                "project :gateway"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-server-status-pages-jvm",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-server-status-pages:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-server-websockets",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.modelcontextprotocol:kotlin-sdk-core-jvm:0.11.1",
+                "project :gateway"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-server-websockets-jvm",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-server-websockets:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-sse",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-client-core-jvm:3.5.0",
+                "io.ktor:ktor-server-sse-jvm:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-sse-jvm",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-sse:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-utils",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-events-jvm:3.5.0",
+                "io.ktor:ktor-http-jvm:3.5.0",
+                "io.ktor:ktor-network-jvm:3.5.0",
+                "io.ktor:ktor-network-tls-jvm:3.5.0",
+                "io.ktor:ktor-server-core-jvm:3.5.0",
+                "io.ktor:ktor-sse-jvm:3.5.0",
+                "io.ktor:ktor-websockets-jvm:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-utils-jvm",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-utils:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-websocket-serialization",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-client-core-jvm:3.5.0",
+                "io.ktor:ktor-server-websockets-jvm:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-websocket-serialization-jvm",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-websocket-serialization:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-websockets",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-client-cio-jvm:3.5.0",
+                "io.ktor:ktor-serialization-jvm:3.5.0",
+                "io.ktor:ktor-server-cio-jvm:3.5.0",
+                "io.ktor:ktor-server-core-jvm:3.5.0",
+                "io.ktor:ktor-server-websockets-jvm:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-websockets-jvm",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-websockets:3.5.0"
+            ]
+        },
+        {
+            "group": "io.lettuce",
+            "artifact": "lettuce-core",
+            "version": "7.2.1.RELEASE",
+            "requiredBy": [
+                "ai.koog:prompt-cache-redis-jvm:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "io.modelcontextprotocol",
+            "artifact": "kotlin-sdk-client",
+            "version": "0.11.1",
+            "requiredBy": [
+                "ai.koog:agents-mcp-jvm:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "io.modelcontextprotocol",
+            "artifact": "kotlin-sdk-client-jvm",
+            "version": "0.11.1",
+            "requiredBy": [
+                "io.modelcontextprotocol:kotlin-sdk-client:0.11.1"
+            ]
+        },
+        {
+            "group": "io.modelcontextprotocol",
+            "artifact": "kotlin-sdk-core",
+            "version": "0.11.1",
+            "requiredBy": [
+                "io.modelcontextprotocol:kotlin-sdk-client-jvm:0.11.1"
+            ]
+        },
+        {
+            "group": "io.modelcontextprotocol",
+            "artifact": "kotlin-sdk-core-jvm",
+            "version": "0.11.1",
+            "requiredBy": [
+                "io.modelcontextprotocol:kotlin-sdk-core:0.11.1"
+            ]
+        },
+        {
+            "group": "io.netty",
+            "artifact": "netty-buffer",
+            "version": "4.2.5.Final",
+            "requiredBy": [
+                "io.netty:netty-codec-base:4.2.5.Final",
+                "io.netty:netty-codec-dns:4.2.5.Final",
+                "io.netty:netty-handler:4.2.5.Final",
+                "io.netty:netty-resolver-dns:4.2.5.Final",
+                "io.netty:netty-transport-native-unix-common:4.2.5.Final",
+                "io.netty:netty-transport:4.2.5.Final"
+            ]
+        },
+        {
+            "group": "io.netty",
+            "artifact": "netty-codec-base",
+            "version": "4.2.5.Final",
+            "requiredBy": [
+                "io.netty:netty-codec-dns:4.2.5.Final",
+                "io.netty:netty-handler:4.2.5.Final",
+                "io.netty:netty-resolver-dns:4.2.5.Final"
+            ]
+        },
+        {
+            "group": "io.netty",
+            "artifact": "netty-codec-dns",
+            "version": "4.2.5.Final",
+            "requiredBy": [
+                "io.netty:netty-resolver-dns:4.2.5.Final"
+            ]
+        },
+        {
+            "group": "io.netty",
+            "artifact": "netty-common",
+            "version": "4.2.5.Final",
+            "requiredBy": [
+                "io.lettuce:lettuce-core:7.2.1.RELEASE",
+                "io.netty:netty-buffer:4.2.5.Final",
+                "io.netty:netty-codec-base:4.2.5.Final",
+                "io.netty:netty-codec-dns:4.2.5.Final",
+                "io.netty:netty-handler:4.2.5.Final",
+                "io.netty:netty-resolver-dns:4.2.5.Final",
+                "io.netty:netty-resolver:4.2.5.Final",
+                "io.netty:netty-transport-native-unix-common:4.2.5.Final",
+                "io.netty:netty-transport:4.2.5.Final"
+            ]
+        },
+        {
+            "group": "io.netty",
+            "artifact": "netty-handler",
+            "version": "4.2.5.Final",
+            "requiredBy": [
+                "io.lettuce:lettuce-core:7.2.1.RELEASE",
+                "io.netty:netty-resolver-dns:4.2.5.Final"
+            ]
+        },
+        {
+            "group": "io.netty",
+            "artifact": "netty-resolver",
+            "version": "4.2.5.Final",
+            "requiredBy": [
+                "io.netty:netty-handler:4.2.5.Final",
+                "io.netty:netty-resolver-dns:4.2.5.Final",
+                "io.netty:netty-transport:4.2.5.Final"
+            ]
+        },
+        {
+            "group": "io.netty",
+            "artifact": "netty-resolver-dns",
+            "version": "4.2.5.Final",
+            "requiredBy": [
+                "io.lettuce:lettuce-core:7.2.1.RELEASE"
+            ]
+        },
+        {
+            "group": "io.netty",
+            "artifact": "netty-transport",
+            "version": "4.2.5.Final",
+            "requiredBy": [
+                "io.lettuce:lettuce-core:7.2.1.RELEASE",
+                "io.netty:netty-codec-base:4.2.5.Final",
+                "io.netty:netty-codec-dns:4.2.5.Final",
+                "io.netty:netty-handler:4.2.5.Final",
+                "io.netty:netty-resolver-dns:4.2.5.Final",
+                "io.netty:netty-transport-native-unix-common:4.2.5.Final"
+            ]
+        },
+        {
+            "group": "io.netty",
+            "artifact": "netty-transport-native-unix-common",
+            "version": "4.2.5.Final",
+            "requiredBy": [
+                "io.netty:netty-handler:4.2.5.Final"
+            ]
+        },
+        {
+            "group": "io.opentelemetry.kotlin",
+            "artifact": "api",
+            "version": "0.3.0",
+            "requiredBy": [
+                "io.opentelemetry.kotlin:api-ext-jvm:0.3.0",
+                "io.opentelemetry.kotlin:sdk-api-jvm:0.3.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry.kotlin",
+            "artifact": "api-ext",
+            "version": "0.3.0",
+            "requiredBy": [
+                "io.opentelemetry.kotlin:core-jvm:0.3.0",
+                "io.opentelemetry.kotlin:implementation-jvm:0.3.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry.kotlin",
+            "artifact": "api-ext-jvm",
+            "version": "0.3.0",
+            "requiredBy": [
+                "io.opentelemetry.kotlin:api-ext:0.3.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry.kotlin",
+            "artifact": "api-jvm",
+            "version": "0.3.0",
+            "requiredBy": [
+                "io.opentelemetry.kotlin:api:0.3.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry.kotlin",
+            "artifact": "compat",
+            "version": "0.3.0",
+            "requiredBy": [
+                "ai.koog:agents-features-opentelemetry-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "io.opentelemetry.kotlin",
+            "artifact": "compat-jvm",
+            "version": "0.3.0",
+            "requiredBy": [
+                "io.opentelemetry.kotlin:compat:0.3.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry.kotlin",
+            "artifact": "core",
+            "version": "0.3.0",
+            "requiredBy": [
+                "ai.koog:agents-features-opentelemetry-jvm:1.1.1",
+                "io.opentelemetry.kotlin:compat-jvm:0.3.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry.kotlin",
+            "artifact": "core-jvm",
+            "version": "0.3.0",
+            "requiredBy": [
+                "io.opentelemetry.kotlin:core:0.3.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry.kotlin",
+            "artifact": "exporters-core",
+            "version": "0.3.0",
+            "requiredBy": [
+                "ai.koog:agents-features-opentelemetry-jvm:1.1.1",
+                "io.opentelemetry.kotlin:core-jvm:0.3.0",
+                "io.opentelemetry.kotlin:implementation-jvm:0.3.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry.kotlin",
+            "artifact": "exporters-core-jvm",
+            "version": "0.3.0",
+            "requiredBy": [
+                "io.opentelemetry.kotlin:exporters-core:0.3.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry.kotlin",
+            "artifact": "implementation",
+            "version": "0.3.0",
+            "requiredBy": [
+                "ai.koog:agents-features-opentelemetry-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "io.opentelemetry.kotlin",
+            "artifact": "implementation-jvm",
+            "version": "0.3.0",
+            "requiredBy": [
+                "io.opentelemetry.kotlin:implementation:0.3.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry.kotlin",
+            "artifact": "java-typealiases",
+            "version": "0.3.0",
+            "requiredBy": [
+                "io.opentelemetry.kotlin:compat-jvm:0.3.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry.kotlin",
+            "artifact": "java-typealiases-jvm",
+            "version": "0.3.0",
+            "requiredBy": [
+                "io.opentelemetry.kotlin:java-typealiases:0.3.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry.kotlin",
+            "artifact": "model",
+            "version": "0.3.0",
+            "requiredBy": [
+                "io.opentelemetry.kotlin:compat-jvm:0.3.0",
+                "io.opentelemetry.kotlin:core-jvm:0.3.0",
+                "io.opentelemetry.kotlin:implementation-jvm:0.3.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry.kotlin",
+            "artifact": "model-jvm",
+            "version": "0.3.0",
+            "requiredBy": [
+                "io.opentelemetry.kotlin:model:0.3.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry.kotlin",
+            "artifact": "noop",
+            "version": "0.3.0",
+            "requiredBy": [
+                "io.opentelemetry.kotlin:core-jvm:0.3.0",
+                "io.opentelemetry.kotlin:implementation-jvm:0.3.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry.kotlin",
+            "artifact": "noop-jvm",
+            "version": "0.3.0",
+            "requiredBy": [
+                "io.opentelemetry.kotlin:noop:0.3.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry.kotlin",
+            "artifact": "platform-implementations",
+            "version": "0.3.0",
+            "requiredBy": [
+                "io.opentelemetry.kotlin:api-ext-jvm:0.3.0",
+                "io.opentelemetry.kotlin:exporters-core-jvm:0.3.0",
+                "io.opentelemetry.kotlin:implementation-jvm:0.3.0",
+                "io.opentelemetry.kotlin:sdk-common-jvm:0.3.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry.kotlin",
+            "artifact": "platform-implementations-jvm",
+            "version": "0.3.0",
+            "requiredBy": [
+                "io.opentelemetry.kotlin:platform-implementations:0.3.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry.kotlin",
+            "artifact": "sdk-api",
+            "version": "0.3.0",
+            "requiredBy": [
+                "ai.koog:agents-features-opentelemetry-jvm:1.1.1",
+                "io.opentelemetry.kotlin:compat-jvm:0.3.0",
+                "io.opentelemetry.kotlin:core-jvm:0.3.0",
+                "io.opentelemetry.kotlin:exporters-core-jvm:0.3.0",
+                "io.opentelemetry.kotlin:implementation-jvm:0.3.0",
+                "io.opentelemetry.kotlin:model-jvm:0.3.0",
+                "io.opentelemetry.kotlin:noop-jvm:0.3.0",
+                "io.opentelemetry.kotlin:platform-implementations-jvm:0.3.0",
+                "io.opentelemetry.kotlin:sdk-common-jvm:0.3.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry.kotlin",
+            "artifact": "sdk-api-jvm",
+            "version": "0.3.0",
+            "requiredBy": [
+                "io.opentelemetry.kotlin:sdk-api:0.3.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry.kotlin",
+            "artifact": "sdk-common",
+            "version": "0.3.0",
+            "requiredBy": [
+                "io.opentelemetry.kotlin:compat-jvm:0.3.0",
+                "io.opentelemetry.kotlin:exporters-core-jvm:0.3.0",
+                "io.opentelemetry.kotlin:implementation-jvm:0.3.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry.kotlin",
+            "artifact": "sdk-common-jvm",
+            "version": "0.3.0",
+            "requiredBy": [
+                "io.opentelemetry.kotlin:sdk-common:0.3.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry.kotlin",
+            "artifact": "semconv",
+            "version": "0.3.0",
+            "requiredBy": [
+                "ai.koog:agents-features-opentelemetry-jvm:1.1.1",
+                "io.opentelemetry.kotlin:core-jvm:0.3.0",
+                "io.opentelemetry.kotlin:implementation-jvm:0.3.0",
+                "io.opentelemetry.kotlin:sdk-common-jvm:0.3.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry.kotlin",
+            "artifact": "semconv-jvm",
+            "version": "0.3.0",
+            "requiredBy": [
+                "io.opentelemetry.kotlin:semconv:0.3.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry",
+            "artifact": "opentelemetry-api",
+            "version": "1.64.0",
+            "requiredBy": [
+                "io.opentelemetry.kotlin:compat-jvm:0.3.0",
+                "io.opentelemetry.kotlin:java-typealiases-jvm:0.3.0",
+                "io.opentelemetry:opentelemetry-bom:1.61.0",
+                "io.opentelemetry:opentelemetry-exporter-common:1.64.0",
+                "io.opentelemetry:opentelemetry-extension-kotlin:1.64.0",
+                "io.opentelemetry:opentelemetry-sdk-common:1.64.0",
+                "io.opentelemetry:opentelemetry-sdk-logs:1.64.0",
+                "io.opentelemetry:opentelemetry-sdk-metrics:1.64.0",
+                "io.opentelemetry:opentelemetry-sdk-trace:1.64.0",
+                "io.opentelemetry:opentelemetry-sdk:1.64.0",
+                "project :shared"
+            ]
+        },
+        {
+            "group": "io.opentelemetry",
+            "artifact": "opentelemetry-bom",
+            "version": "1.61.0",
+            "requiredBy": [
+                "ai.koog:agents-features-opentelemetry-jvm:1.1.1",
+                "io.opentelemetry.kotlin:compat-jvm:0.3.0",
+                "io.opentelemetry.kotlin:java-typealiases-jvm:0.3.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry",
+            "artifact": "opentelemetry-common",
+            "version": "1.64.0",
+            "requiredBy": [
+                "io.opentelemetry:opentelemetry-bom:1.61.0",
+                "io.opentelemetry:opentelemetry-context:1.64.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry",
+            "artifact": "opentelemetry-context",
+            "version": "1.64.0",
+            "requiredBy": [
+                "io.opentelemetry:opentelemetry-api:1.64.0",
+                "io.opentelemetry:opentelemetry-bom:1.61.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry",
+            "artifact": "opentelemetry-exporter-common",
+            "version": "1.64.0",
+            "requiredBy": [
+                "io.opentelemetry:opentelemetry-bom:1.61.0",
+                "io.opentelemetry:opentelemetry-exporter-otlp-common:1.64.0",
+                "io.opentelemetry:opentelemetry-exporter-sender-okhttp:1.64.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry",
+            "artifact": "opentelemetry-exporter-logging",
+            "version": "1.64.0",
+            "requiredBy": [
+                "io.opentelemetry:opentelemetry-bom:1.61.0",
+                "project :shared"
+            ]
+        },
+        {
+            "group": "io.opentelemetry",
+            "artifact": "opentelemetry-exporter-otlp",
+            "version": "1.64.0",
+            "requiredBy": [
+                "io.opentelemetry:opentelemetry-bom:1.61.0",
+                "project :shared"
+            ]
+        },
+        {
+            "group": "io.opentelemetry",
+            "artifact": "opentelemetry-exporter-otlp-common",
+            "version": "1.64.0",
+            "requiredBy": [
+                "io.opentelemetry:opentelemetry-bom:1.61.0",
+                "io.opentelemetry:opentelemetry-exporter-otlp:1.64.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry",
+            "artifact": "opentelemetry-exporter-sender-okhttp",
+            "version": "1.64.0",
+            "requiredBy": [
+                "io.opentelemetry:opentelemetry-bom:1.61.0",
+                "io.opentelemetry:opentelemetry-exporter-otlp:1.64.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry",
+            "artifact": "opentelemetry-extension-kotlin",
+            "version": "1.64.0",
+            "requiredBy": [
+                "io.opentelemetry:opentelemetry-bom:1.61.0",
+                "project :shared"
+            ]
+        },
+        {
+            "group": "io.opentelemetry",
+            "artifact": "opentelemetry-sdk",
+            "version": "1.64.0",
+            "requiredBy": [
+                "ai.koog:agents-features-opentelemetry-jvm:1.1.1",
+                "io.opentelemetry.kotlin:compat-jvm:0.3.0",
+                "io.opentelemetry.kotlin:java-typealiases-jvm:0.3.0",
+                "io.opentelemetry:opentelemetry-bom:1.61.0",
+                "io.opentelemetry:opentelemetry-exporter-logging:1.64.0",
+                "io.opentelemetry:opentelemetry-sdk-extension-autoconfigure-spi:1.64.0",
+                "io.opentelemetry:opentelemetry-sdk-extension-autoconfigure:1.64.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry",
+            "artifact": "opentelemetry-sdk-common",
+            "version": "1.64.0",
+            "requiredBy": [
+                "io.opentelemetry:opentelemetry-bom:1.61.0",
+                "io.opentelemetry:opentelemetry-exporter-sender-okhttp:1.64.0",
+                "io.opentelemetry:opentelemetry-sdk-logs:1.64.0",
+                "io.opentelemetry:opentelemetry-sdk-metrics:1.64.0",
+                "io.opentelemetry:opentelemetry-sdk-trace:1.64.0",
+                "io.opentelemetry:opentelemetry-sdk:1.64.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry",
+            "artifact": "opentelemetry-sdk-extension-autoconfigure",
+            "version": "1.64.0",
+            "requiredBy": [
+                "io.opentelemetry:opentelemetry-bom:1.61.0",
+                "project :shared"
+            ]
+        },
+        {
+            "group": "io.opentelemetry",
+            "artifact": "opentelemetry-sdk-extension-autoconfigure-spi",
+            "version": "1.64.0",
+            "requiredBy": [
+                "io.opentelemetry:opentelemetry-bom:1.61.0",
+                "io.opentelemetry:opentelemetry-sdk-extension-autoconfigure:1.64.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry",
+            "artifact": "opentelemetry-sdk-logs",
+            "version": "1.64.0",
+            "requiredBy": [
+                "io.opentelemetry:opentelemetry-bom:1.61.0",
+                "io.opentelemetry:opentelemetry-exporter-otlp:1.64.0",
+                "io.opentelemetry:opentelemetry-sdk:1.64.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry",
+            "artifact": "opentelemetry-sdk-metrics",
+            "version": "1.64.0",
+            "requiredBy": [
+                "io.opentelemetry:opentelemetry-bom:1.61.0",
+                "io.opentelemetry:opentelemetry-exporter-otlp:1.64.0",
+                "io.opentelemetry:opentelemetry-sdk:1.64.0"
+            ]
+        },
+        {
+            "group": "io.opentelemetry",
+            "artifact": "opentelemetry-sdk-trace",
+            "version": "1.64.0",
+            "requiredBy": [
+                "io.opentelemetry:opentelemetry-bom:1.61.0",
+                "io.opentelemetry:opentelemetry-exporter-otlp:1.64.0",
+                "io.opentelemetry:opentelemetry-sdk:1.64.0"
+            ]
+        },
+        {
+            "group": "io.projectreactor",
+            "artifact": "reactor-core",
+            "version": "3.6.6",
+            "requiredBy": [
+                "io.lettuce:lettuce-core:7.2.1.RELEASE"
+            ]
+        },
+        {
+            "group": "net.dv8tion",
+            "artifact": "JDA",
+            "version": "6.4.1",
+            "requiredBy": [
+                "project :gateway"
+            ]
+        },
+        {
+            "group": "net.java.dev.jna",
+            "artifact": "jna",
+            "version": "4.4.0",
+            "requiredBy": [
+                "club.minnced:opus-java-api:1.1.1"
+            ]
+        },
+        {
+            "group": "net.sf.trove4j",
+            "artifact": "core",
+            "version": "3.1.0",
+            "requiredBy": [
+                "net.dv8tion:JDA:6.4.1"
+            ]
+        },
+        {
+            "group": "org.apache.commons",
+            "artifact": "commons-collections4",
+            "version": "4.5.0",
+            "requiredBy": [
+                "net.dv8tion:JDA:6.4.1"
+            ]
+        },
+        {
+            "group": "org.apache.httpcomponents.client5",
+            "artifact": "httpclient5",
+            "version": "5.5.1",
+            "requiredBy": [
+                "com.twilio.sdk:twilio:12.1.1",
+                "io.ktor:ktor-client-apache5-jvm:3.3.3"
+            ]
+        },
+        {
+            "group": "org.apache.httpcomponents.core5",
+            "artifact": "httpcore5",
+            "version": "5.3.6",
+            "requiredBy": [
+                "com.twilio.sdk:twilio:12.1.1",
+                "org.apache.httpcomponents.client5:httpclient5:5.5.1",
+                "org.apache.httpcomponents.core5:httpcore5-h2:5.3.6"
+            ]
+        },
+        {
+            "group": "org.apache.httpcomponents.core5",
+            "artifact": "httpcore5-h2",
+            "version": "5.3.6",
+            "requiredBy": [
+                "org.apache.httpcomponents.client5:httpclient5:5.5.1"
+            ]
+        },
+        {
+            "group": "org.bouncycastle",
+            "artifact": "bcprov-jdk18on",
+            "version": "1.84",
+            "requiredBy": [
+                "project :gateway",
+                "project :shared"
+            ]
+        },
+        {
+            "group": "org.codehaus.woodstox",
+            "artifact": "stax2-api",
+            "version": "4.2.2",
+            "requiredBy": [
+                "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.21.3",
+                "com.fasterxml.woodstox:woodstox-core:7.1.1"
+            ]
+        },
+        {
+            "group": "org.flywaydb",
+            "artifact": "flyway-core",
+            "version": "12.8.1",
+            "requiredBy": [
+                "project :shared"
+            ]
+        },
+        {
+            "group": "org.jetbrains.exposed",
+            "artifact": "exposed-core",
+            "version": "1.3.0",
+            "requiredBy": [
+                "org.jetbrains.exposed:exposed-dao:1.3.0",
+                "org.jetbrains.exposed:exposed-jdbc:1.3.0",
+                "org.jetbrains.exposed:exposed-kotlin-datetime:1.3.0",
+                "project :shared"
+            ]
+        },
+        {
+            "group": "org.jetbrains.exposed",
+            "artifact": "exposed-dao",
+            "version": "1.3.0",
+            "requiredBy": [
+                "project :shared"
+            ]
+        },
+        {
+            "group": "org.jetbrains.exposed",
+            "artifact": "exposed-jdbc",
+            "version": "1.3.0",
+            "requiredBy": [
+                "org.jetbrains.exposed:exposed-dao:1.3.0",
+                "project :shared"
+            ]
+        },
+        {
+            "group": "org.jetbrains.exposed",
+            "artifact": "exposed-kotlin-datetime",
+            "version": "1.3.0",
+            "requiredBy": [
+                "project :shared"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlin",
+            "artifact": "kotlin-bom",
+            "version": "2.4.0",
+            "requiredBy": [
+                "ai.koog:a2a-client-jvm:1.1.1-beta",
+                "ai.koog:a2a-core-jvm:1.1.1-beta",
+                "ai.koog:a2a-server-jvm:1.1.1-beta",
+                "ai.koog:a2a-transport-client-jsonrpc-http-jvm:1.1.1-beta",
+                "ai.koog:a2a-transport-core-jsonrpc-jvm:1.1.1-beta",
+                "ai.koog:a2a-transport-server-jsonrpc-http-jvm:1.1.1-beta",
+                "ai.koog:agents-cli-jvm:1.1.1-beta",
+                "ai.koog:agents-core-jvm:1.1.1",
+                "ai.koog:agents-features-a2a-client-jvm:1.1.1-beta",
+                "ai.koog:agents-features-a2a-core-jvm:1.1.1-beta",
+                "ai.koog:agents-features-a2a-server-jvm:1.1.1-beta",
+                "ai.koog:agents-features-event-handler-jvm:1.1.1",
+                "ai.koog:agents-features-longterm-memory-jvm:1.1.1-beta",
+                "ai.koog:agents-features-memory-jvm:1.1.1",
+                "ai.koog:agents-features-opentelemetry-jvm:1.1.1",
+                "ai.koog:agents-features-snapshot-jvm:1.1.1",
+                "ai.koog:agents-features-tokenizer-jvm:1.1.1",
+                "ai.koog:agents-features-trace-jvm:1.1.1",
+                "ai.koog:agents-mcp-jvm:1.1.1-beta",
+                "ai.koog:agents-mcp-metadata-jvm:1.1.1",
+                "ai.koog:agents-planner-jvm:1.1.1-beta",
+                "ai.koog:agents-tools-jvm:1.1.1",
+                "ai.koog:agents-utils-jvm:1.1.1",
+                "ai.koog:embeddings-base-jvm:1.1.1",
+                "ai.koog:embeddings-llm-jvm:1.1.1",
+                "ai.koog:http-client-core-jvm:1.1.1",
+                "ai.koog:http-client-ktor-jvm:1.1.1",
+                "ai.koog:koog-agents-additions-jvm:1.1.1-beta",
+                "ai.koog:koog-agents-jvm:1.1.1",
+                "ai.koog:koog-ktor-jvm:1.1.1-beta",
+                "ai.koog:prompt-cache-files-jvm:1.1.1",
+                "ai.koog:prompt-cache-model-jvm:1.1.1",
+                "ai.koog:prompt-cache-redis-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-anthropic-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-bedrock-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-cached-jvm:1.1.1",
+                "ai.koog:prompt-executor-clients-jvm:1.1.1",
+                "ai.koog:prompt-executor-dashscope-client-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-deepseek-client-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-google-client-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-litert-client-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-llms-all-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-mistralai-client-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-model-jvm:1.1.1",
+                "ai.koog:prompt-executor-ollama-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-openai-client-base-jvm:1.1.1",
+                "ai.koog:prompt-executor-openai-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-openrouter-client-jvm:1.1.1",
+                "ai.koog:prompt-llm-jvm:1.1.1",
+                "ai.koog:prompt-markdown-jvm:1.1.1",
+                "ai.koog:prompt-model-jvm:1.1.1",
+                "ai.koog:prompt-processor-jvm:1.1.1",
+                "ai.koog:prompt-structure-jvm:1.1.1",
+                "ai.koog:prompt-tokenizer-jvm:1.1.1",
+                "ai.koog:prompt-xml-jvm:1.1.1",
+                "ai.koog:rag-base-jvm:1.1.1",
+                "ai.koog:rag-vector-jvm:1.1.1-beta",
+                "ai.koog:serialization-core-jvm:1.1.1",
+                "ai.koog:serialization-jackson:1.1.1",
+                "ai.koog:utils-jvm:1.1.1",
+                "io.opentelemetry:opentelemetry-extension-kotlin:1.64.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlin",
+            "artifact": "kotlin-reflect",
+            "version": "2.4.0",
+            "requiredBy": [
+                "ai.koog:agents-tools-jvm:1.1.1",
+                "ai.koog:prompt-executor-clients-jvm:1.1.1",
+                "com.fasterxml.jackson.module:jackson-module-kotlin:2.21.3",
+                "io.ktor:ktor-server-core-jvm:3.5.0",
+                "org.jetbrains.exposed:exposed-core:1.3.0",
+                "org.jetbrains.kotlin:kotlin-bom:2.4.0",
+                "org.jetbrains.kotlinx:kotlinx-schema-generator-core-jvm:0.4.4"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlin",
+            "artifact": "kotlin-stdlib",
+            "version": "2.4.0",
+            "requiredBy": [
+                "ai.koog:a2a-client-jvm:1.1.1-beta",
+                "ai.koog:a2a-core-jvm:1.1.1-beta",
+                "ai.koog:a2a-server-jvm:1.1.1-beta",
+                "ai.koog:a2a-transport-client-jsonrpc-http-jvm:1.1.1-beta",
+                "ai.koog:a2a-transport-core-jsonrpc-jvm:1.1.1-beta",
+                "ai.koog:a2a-transport-server-jsonrpc-http-jvm:1.1.1-beta",
+                "ai.koog:agents-cli-jvm:1.1.1-beta",
+                "ai.koog:agents-core-jvm:1.1.1",
+                "ai.koog:agents-features-a2a-client-jvm:1.1.1-beta",
+                "ai.koog:agents-features-a2a-core-jvm:1.1.1-beta",
+                "ai.koog:agents-features-a2a-server-jvm:1.1.1-beta",
+                "ai.koog:agents-features-event-handler-jvm:1.1.1",
+                "ai.koog:agents-features-longterm-memory-jvm:1.1.1-beta",
+                "ai.koog:agents-features-memory-jvm:1.1.1",
+                "ai.koog:agents-features-opentelemetry-jvm:1.1.1",
+                "ai.koog:agents-features-snapshot-jvm:1.1.1",
+                "ai.koog:agents-features-tokenizer-jvm:1.1.1",
+                "ai.koog:agents-features-trace-jvm:1.1.1",
+                "ai.koog:agents-mcp-jvm:1.1.1-beta",
+                "ai.koog:agents-mcp-metadata-jvm:1.1.1",
+                "ai.koog:agents-planner-jvm:1.1.1-beta",
+                "ai.koog:agents-tools-jvm:1.1.1",
+                "ai.koog:agents-utils-jvm:1.1.1",
+                "ai.koog:embeddings-base-jvm:1.1.1",
+                "ai.koog:embeddings-llm-jvm:1.1.1",
+                "ai.koog:http-client-core-jvm:1.1.1",
+                "ai.koog:http-client-ktor-jvm:1.1.1",
+                "ai.koog:koog-agents-additions-jvm:1.1.1-beta",
+                "ai.koog:koog-agents-jvm:1.1.1",
+                "ai.koog:koog-ktor-jvm:1.1.1-beta",
+                "ai.koog:prompt-cache-files-jvm:1.1.1",
+                "ai.koog:prompt-cache-model-jvm:1.1.1",
+                "ai.koog:prompt-cache-redis-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-anthropic-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-bedrock-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-cached-jvm:1.1.1",
+                "ai.koog:prompt-executor-clients-jvm:1.1.1",
+                "ai.koog:prompt-executor-dashscope-client-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-deepseek-client-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-google-client-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-litert-client-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-llms-all-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-mistralai-client-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-model-jvm:1.1.1",
+                "ai.koog:prompt-executor-ollama-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-openai-client-base-jvm:1.1.1",
+                "ai.koog:prompt-executor-openai-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-openrouter-client-jvm:1.1.1",
+                "ai.koog:prompt-llm-jvm:1.1.1",
+                "ai.koog:prompt-markdown-jvm:1.1.1",
+                "ai.koog:prompt-model-jvm:1.1.1",
+                "ai.koog:prompt-processor-jvm:1.1.1",
+                "ai.koog:prompt-structure-jvm:1.1.1",
+                "ai.koog:prompt-tokenizer-jvm:1.1.1",
+                "ai.koog:prompt-xml-jvm:1.1.1",
+                "ai.koog:rag-base-jvm:1.1.1",
+                "ai.koog:rag-vector-jvm:1.1.1-beta",
+                "ai.koog:serialization-core-jvm:1.1.1",
+                "ai.koog:serialization-jackson:1.1.1",
+                "ai.koog:utils-jvm:1.1.1",
+                "aws.sdk.kotlin:aws-config-jvm:1.6.72",
+                "aws.sdk.kotlin:aws-core-jvm:1.6.72",
+                "aws.sdk.kotlin:aws-endpoint-jvm:1.6.72",
+                "aws.sdk.kotlin:aws-http-jvm:1.6.72",
+                "aws.sdk.kotlin:bedrockruntime-jvm:1.6.72",
+                "aws.smithy.kotlin:aws-credentials-jvm:1.6.12",
+                "aws.smithy.kotlin:aws-event-stream-jvm:1.6.12",
+                "aws.smithy.kotlin:aws-json-protocols-jvm:1.6.12",
+                "aws.smithy.kotlin:aws-protocol-core-jvm:1.6.12",
+                "aws.smithy.kotlin:aws-signing-common-jvm:1.6.12",
+                "aws.smithy.kotlin:aws-signing-default-jvm:1.6.12",
+                "aws.smithy.kotlin:aws-xml-protocols-jvm:1.6.12",
+                "aws.smithy.kotlin:http-auth-api-jvm:1.6.12",
+                "aws.smithy.kotlin:http-auth-aws-jvm:1.6.12",
+                "aws.smithy.kotlin:http-auth-jvm:1.6.12",
+                "aws.smithy.kotlin:http-client-engine-default-jvm:1.6.12",
+                "aws.smithy.kotlin:http-client-engine-okhttp-jvm:1.6.12",
+                "aws.smithy.kotlin:http-client-jvm:1.6.12",
+                "aws.smithy.kotlin:http-jvm:1.6.12",
+                "aws.smithy.kotlin:identity-api-jvm:1.6.12",
+                "aws.smithy.kotlin:logging-slf4j2-jvm:1.6.12",
+                "aws.smithy.kotlin:runtime-core-jvm:1.6.12",
+                "aws.smithy.kotlin:serde-form-url-jvm:1.6.12",
+                "aws.smithy.kotlin:serde-json-jvm:1.6.12",
+                "aws.smithy.kotlin:serde-jvm:1.6.12",
+                "aws.smithy.kotlin:serde-xml-jvm:1.6.12",
+                "aws.smithy.kotlin:smithy-client-jvm:1.6.12",
+                "aws.smithy.kotlin:telemetry-api-jvm:1.6.12",
+                "aws.smithy.kotlin:telemetry-defaults-jvm:1.6.12",
+                "co.touchlab:stately-concurrency-jvm:2.1.0",
+                "co.touchlab:stately-concurrent-collections-jvm:2.1.0",
+                "co.touchlab:stately-strict-jvm:2.1.0",
+                "com.squareup.okhttp3:okhttp-coroutines:5.3.2",
+                "com.squareup.okhttp3:okhttp-jvm:5.4.0",
+                "com.squareup.okio:okio-jvm:3.17.0",
+                "io.github.oshai:kotlin-logging-jvm:8.0.01",
+                "io.insert-koin:koin-core-jvm:4.2.1",
+                "io.insert-koin:koin-ktor-jvm:4.2.1",
+                "io.insert-koin:koin-logger-slf4j:4.2.1",
+                "io.ktor:ktor-client-apache5-jvm:3.3.3",
+                "io.ktor:ktor-client-cio-jvm:3.5.0",
+                "io.ktor:ktor-client-content-negotiation-jvm:3.5.0",
+                "io.ktor:ktor-client-core-jvm:3.5.0",
+                "io.ktor:ktor-client-logging-jvm:3.3.3",
+                "io.ktor:ktor-events-jvm:3.5.0",
+                "io.ktor:ktor-http-cio-jvm:3.5.0",
+                "io.ktor:ktor-http-jvm:3.5.0",
+                "io.ktor:ktor-io-jvm:3.5.0",
+                "io.ktor:ktor-network-jvm:3.5.0",
+                "io.ktor:ktor-network-tls-jvm:3.5.0",
+                "io.ktor:ktor-serialization-jvm:3.5.0",
+                "io.ktor:ktor-serialization-kotlinx-json-jvm:3.5.0",
+                "io.ktor:ktor-serialization-kotlinx-jvm:3.5.0",
+                "io.ktor:ktor-server-cio-jvm:3.5.0",
+                "io.ktor:ktor-server-content-negotiation-jvm:3.5.0",
+                "io.ktor:ktor-server-core-jvm:3.5.0",
+                "io.ktor:ktor-server-cors-jvm:3.5.0",
+                "io.ktor:ktor-server-di-jvm:3.4.0",
+                "io.ktor:ktor-server-sse-jvm:3.5.0",
+                "io.ktor:ktor-server-status-pages-jvm:3.5.0",
+                "io.ktor:ktor-server-websockets-jvm:3.5.0",
+                "io.ktor:ktor-sse-jvm:3.5.0",
+                "io.ktor:ktor-utils-jvm:3.5.0",
+                "io.ktor:ktor-websocket-serialization-jvm:3.5.0",
+                "io.ktor:ktor-websockets-jvm:3.5.0",
+                "io.modelcontextprotocol:kotlin-sdk-client-jvm:0.11.1",
+                "io.modelcontextprotocol:kotlin-sdk-core-jvm:0.11.1",
+                "io.opentelemetry.kotlin:api-ext-jvm:0.3.0",
+                "io.opentelemetry.kotlin:api-jvm:0.3.0",
+                "io.opentelemetry.kotlin:compat-jvm:0.3.0",
+                "io.opentelemetry.kotlin:core-jvm:0.3.0",
+                "io.opentelemetry.kotlin:exporters-core-jvm:0.3.0",
+                "io.opentelemetry.kotlin:implementation-jvm:0.3.0",
+                "io.opentelemetry.kotlin:java-typealiases-jvm:0.3.0",
+                "io.opentelemetry.kotlin:model-jvm:0.3.0",
+                "io.opentelemetry.kotlin:noop-jvm:0.3.0",
+                "io.opentelemetry.kotlin:platform-implementations-jvm:0.3.0",
+                "io.opentelemetry.kotlin:sdk-api-jvm:0.3.0",
+                "io.opentelemetry.kotlin:sdk-common-jvm:0.3.0",
+                "io.opentelemetry.kotlin:semconv-jvm:0.3.0",
+                "io.opentelemetry:opentelemetry-extension-kotlin:1.64.0",
+                "org.jetbrains.exposed:exposed-core:1.3.0",
+                "org.jetbrains.exposed:exposed-dao:1.3.0",
+                "org.jetbrains.exposed:exposed-jdbc:1.3.0",
+                "org.jetbrains.exposed:exposed-kotlin-datetime:1.3.0",
+                "org.jetbrains.kotlin:kotlin-bom:2.4.0",
+                "org.jetbrains.kotlin:kotlin-reflect:2.4.0",
+                "org.jetbrains.kotlinx:kotlinx-collections-immutable-jvm:0.4.0",
+                "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-coroutines-jdk9:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.8.0",
+                "org.jetbrains.kotlinx:kotlinx-io-bytestring-jvm:0.9.0",
+                "org.jetbrains.kotlinx:kotlinx-io-core-jvm:0.9.0",
+                "org.jetbrains.kotlinx:kotlinx-schema-annotations-jvm:0.4.4",
+                "org.jetbrains.kotlinx:kotlinx-schema-generator-core-jvm:0.4.4",
+                "org.jetbrains.kotlinx:kotlinx-schema-generator-json-jvm:0.4.4",
+                "org.jetbrains.kotlinx:kotlinx-schema-json-jvm:0.4.4",
+                "org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-serialization-json-io-jvm:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-serialization-protobuf-jvm:1.11.0",
+                "project :api",
+                "project :gateway",
+                "project :shared"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-collections-immutable",
+            "version": "0.4.0",
+            "requiredBy": [
+                "io.modelcontextprotocol:kotlin-sdk-core-jvm:0.11.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-collections-immutable-jvm",
+            "version": "0.4.0",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-collections-immutable:0.4.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-coroutines-bom",
+            "version": "1.11.0",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-coroutines-jdk9:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.11.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-coroutines-core",
+            "version": "1.11.0",
+            "requiredBy": [
+                "ai.koog:a2a-client-jvm:1.1.1-beta",
+                "ai.koog:a2a-core-jvm:1.1.1-beta",
+                "ai.koog:a2a-server-jvm:1.1.1-beta",
+                "ai.koog:a2a-transport-client-jsonrpc-http-jvm:1.1.1-beta",
+                "ai.koog:a2a-transport-core-jsonrpc-jvm:1.1.1-beta",
+                "ai.koog:a2a-transport-server-jsonrpc-http-jvm:1.1.1-beta",
+                "ai.koog:agents-mcp-jvm:1.1.1-beta",
+                "ai.koog:agents-tools-jvm:1.1.1",
+                "ai.koog:agents-utils-jvm:1.1.1",
+                "ai.koog:embeddings-llm-jvm:1.1.1",
+                "ai.koog:http-client-core-jvm:1.1.1",
+                "ai.koog:koog-ktor-jvm:1.1.1-beta",
+                "ai.koog:prompt-cache-files-jvm:1.1.1",
+                "ai.koog:prompt-cache-redis-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-anthropic-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-bedrock-client-jvm:1.1.1",
+                "ai.koog:prompt-executor-cached-jvm:1.1.1",
+                "ai.koog:prompt-executor-clients-jvm:1.1.1",
+                "ai.koog:prompt-executor-google-client-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-llms-all-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-model-jvm:1.1.1",
+                "ai.koog:prompt-executor-ollama-client-jvm:1.1.1",
+                "ai.koog:prompt-model-jvm:1.1.1",
+                "ai.koog:prompt-structure-jvm:1.1.1",
+                "ai.koog:rag-base-jvm:1.1.1",
+                "ai.koog:rag-vector-jvm:1.1.1-beta",
+                "ai.koog:utils-jvm:1.1.1",
+                "aws.sdk.kotlin:aws-config-jvm:1.6.72",
+                "aws.smithy.kotlin:aws-credentials-jvm:1.6.12",
+                "aws.smithy.kotlin:aws-event-stream-jvm:1.6.12",
+                "aws.smithy.kotlin:aws-json-protocols-jvm:1.6.12",
+                "aws.smithy.kotlin:aws-protocol-core-jvm:1.6.12",
+                "aws.smithy.kotlin:aws-signing-common-jvm:1.6.12",
+                "aws.smithy.kotlin:aws-signing-default-jvm:1.6.12",
+                "aws.smithy.kotlin:aws-xml-protocols-jvm:1.6.12",
+                "aws.smithy.kotlin:http-auth-api-jvm:1.6.12",
+                "aws.smithy.kotlin:http-auth-aws-jvm:1.6.12",
+                "aws.smithy.kotlin:http-auth-jvm:1.6.12",
+                "aws.smithy.kotlin:http-client-engine-default-jvm:1.6.12",
+                "aws.smithy.kotlin:http-client-engine-okhttp-jvm:1.6.12",
+                "aws.smithy.kotlin:http-client-jvm:1.6.12",
+                "aws.smithy.kotlin:http-jvm:1.6.12",
+                "aws.smithy.kotlin:identity-api-jvm:1.6.12",
+                "aws.smithy.kotlin:logging-slf4j2-jvm:1.6.12",
+                "aws.smithy.kotlin:runtime-core-jvm:1.6.12",
+                "aws.smithy.kotlin:serde-form-url-jvm:1.6.12",
+                "aws.smithy.kotlin:serde-json-jvm:1.6.12",
+                "aws.smithy.kotlin:serde-jvm:1.6.12",
+                "aws.smithy.kotlin:serde-xml-jvm:1.6.12",
+                "aws.smithy.kotlin:smithy-client-jvm:1.6.12",
+                "aws.smithy.kotlin:telemetry-api-jvm:1.6.12",
+                "aws.smithy.kotlin:telemetry-defaults-jvm:1.6.12",
+                "com.squareup.okhttp3:okhttp-coroutines:5.3.2",
+                "io.insert-koin:koin-ktor-jvm:4.2.1",
+                "io.ktor:ktor-client-apache5-jvm:3.3.3",
+                "io.ktor:ktor-client-cio-jvm:3.5.0",
+                "io.ktor:ktor-client-content-negotiation-jvm:3.5.0",
+                "io.ktor:ktor-client-core-jvm:3.5.0",
+                "io.ktor:ktor-client-logging-jvm:3.3.3",
+                "io.ktor:ktor-events-jvm:3.5.0",
+                "io.ktor:ktor-http-cio-jvm:3.5.0",
+                "io.ktor:ktor-http-jvm:3.5.0",
+                "io.ktor:ktor-io-jvm:3.5.0",
+                "io.ktor:ktor-network-jvm:3.5.0",
+                "io.ktor:ktor-network-tls-jvm:3.5.0",
+                "io.ktor:ktor-serialization-jvm:3.5.0",
+                "io.ktor:ktor-serialization-kotlinx-json-jvm:3.5.0",
+                "io.ktor:ktor-serialization-kotlinx-jvm:3.5.0",
+                "io.ktor:ktor-server-cio-jvm:3.5.0",
+                "io.ktor:ktor-server-content-negotiation-jvm:3.5.0",
+                "io.ktor:ktor-server-core-jvm:3.5.0",
+                "io.ktor:ktor-server-cors-jvm:3.5.0",
+                "io.ktor:ktor-server-di-jvm:3.4.0",
+                "io.ktor:ktor-server-sse-jvm:3.5.0",
+                "io.ktor:ktor-server-status-pages-jvm:3.5.0",
+                "io.ktor:ktor-server-websockets-jvm:3.5.0",
+                "io.ktor:ktor-sse-jvm:3.5.0",
+                "io.ktor:ktor-utils-jvm:3.5.0",
+                "io.ktor:ktor-websocket-serialization-jvm:3.5.0",
+                "io.ktor:ktor-websockets-jvm:3.5.0",
+                "io.modelcontextprotocol:kotlin-sdk-core-jvm:0.11.1",
+                "io.opentelemetry.kotlin:exporters-core-jvm:0.3.0",
+                "io.opentelemetry.kotlin:implementation-jvm:0.3.0",
+                "io.opentelemetry.kotlin:sdk-common-jvm:0.3.0",
+                "org.jetbrains.exposed:exposed-core:1.3.0",
+                "org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-coroutines-jdk9:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.11.0",
+                "project :shared"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-coroutines-core-jvm",
+            "version": "1.11.0",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-coroutines-jdk9",
+            "version": "1.11.0",
+            "requiredBy": [
+                "ai.koog:agents-core-jvm:1.1.1",
+                "ai.koog:prompt-cache-redis-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-clients-jvm:1.1.1",
+                "ai.koog:prompt-executor-model-jvm:1.1.1",
+                "org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.11.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-coroutines-reactive",
+            "version": "1.11.0",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-coroutines-jdk9:1.11.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-coroutines-slf4j",
+            "version": "1.11.0",
+            "requiredBy": [
+                "io.ktor:ktor-client-core-jvm:3.5.0",
+                "io.ktor:ktor-client-logging-jvm:3.3.3",
+                "org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.11.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-datetime",
+            "version": "0.8.0",
+            "requiredBy": [
+                "aws.smithy.kotlin:runtime-core-jvm:1.6.12",
+                "project :shared"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-datetime-jvm",
+            "version": "0.8.0",
+            "requiredBy": [
+                "org.jetbrains.exposed:exposed-core:1.3.0",
+                "org.jetbrains.kotlinx:kotlinx-datetime:0.8.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-io-bytestring",
+            "version": "0.9.0",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-io-core-jvm:0.9.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-io-bytestring-jvm",
+            "version": "0.9.0",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-io-bytestring:0.9.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-io-core",
+            "version": "0.9.0",
+            "requiredBy": [
+                "ai.koog:agents-core-jvm:1.1.1",
+                "ai.koog:agents-mcp-jvm:1.1.1-beta",
+                "ai.koog:prompt-model-jvm:1.1.1",
+                "ai.koog:rag-base-jvm:1.1.1",
+                "aws.smithy.kotlin:runtime-core-jvm:1.6.12",
+                "io.ktor:ktor-io-jvm:3.5.0",
+                "io.modelcontextprotocol:kotlin-sdk-core-jvm:0.11.1",
+                "org.jetbrains.kotlinx:kotlinx-serialization-json-io-jvm:1.11.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-io-core-jvm",
+            "version": "0.9.0",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-io-core:0.9.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-schema-annotations",
+            "version": "0.4.4",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-schema-generator-core-jvm:0.4.4",
+                "org.jetbrains.kotlinx:kotlinx-schema-generator-json-jvm:0.4.4"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-schema-annotations-jvm",
+            "version": "0.4.4",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-schema-annotations:0.4.4"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-schema-generator-core",
+            "version": "0.4.4",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-schema-generator-json-jvm:0.4.4"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-schema-generator-core-jvm",
+            "version": "0.4.4",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-schema-generator-core:0.4.4"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-schema-generator-json",
+            "version": "0.4.4",
+            "requiredBy": [
+                "ai.koog:agents-tools-jvm:1.1.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-schema-generator-json-jvm",
+            "version": "0.4.4",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-schema-generator-json:0.4.4"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-schema-json",
+            "version": "0.4.4",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-schema-generator-json-jvm:0.4.4"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-schema-json-jvm",
+            "version": "0.4.4",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-schema-json:0.4.4"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-serialization-bom",
+            "version": "1.11.0",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-serialization-json-io-jvm:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-serialization-protobuf-jvm:1.11.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-serialization-core",
+            "version": "1.11.0",
+            "requiredBy": [
+                "ai.koog:prompt-llm-jvm:1.1.1",
+                "io.ktor:ktor-http-jvm:3.5.0",
+                "io.ktor:ktor-serialization-kotlinx-jvm:3.5.0",
+                "io.ktor:ktor-utils-jvm:3.5.0",
+                "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-serialization-json-io-jvm:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-serialization-protobuf-jvm:1.11.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-serialization-core-jvm",
+            "version": "1.11.0",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-serialization-core:1.11.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-serialization-json",
+            "version": "1.11.0",
+            "requiredBy": [
+                "ai.koog:a2a-client-jvm:1.1.1-beta",
+                "ai.koog:a2a-core-jvm:1.1.1-beta",
+                "ai.koog:a2a-server-jvm:1.1.1-beta",
+                "ai.koog:a2a-transport-client-jsonrpc-http-jvm:1.1.1-beta",
+                "ai.koog:a2a-transport-core-jsonrpc-jvm:1.1.1-beta",
+                "ai.koog:a2a-transport-server-jsonrpc-http-jvm:1.1.1-beta",
+                "ai.koog:agents-core-jvm:1.1.1",
+                "ai.koog:agents-features-a2a-client-jvm:1.1.1-beta",
+                "ai.koog:agents-features-a2a-core-jvm:1.1.1-beta",
+                "ai.koog:agents-features-a2a-server-jvm:1.1.1-beta",
+                "ai.koog:agents-features-longterm-memory-jvm:1.1.1-beta",
+                "ai.koog:agents-features-memory-jvm:1.1.1",
+                "ai.koog:agents-features-opentelemetry-jvm:1.1.1",
+                "ai.koog:agents-features-snapshot-jvm:1.1.1",
+                "ai.koog:agents-features-tokenizer-jvm:1.1.1",
+                "ai.koog:agents-features-trace-jvm:1.1.1",
+                "ai.koog:agents-mcp-jvm:1.1.1-beta",
+                "ai.koog:agents-mcp-metadata-jvm:1.1.1",
+                "ai.koog:agents-planner-jvm:1.1.1-beta",
+                "ai.koog:agents-tools-jvm:1.1.1",
+                "ai.koog:agents-utils-jvm:1.1.1",
+                "ai.koog:embeddings-base-jvm:1.1.1",
+                "ai.koog:embeddings-llm-jvm:1.1.1",
+                "ai.koog:http-client-core-jvm:1.1.1",
+                "ai.koog:koog-ktor-jvm:1.1.1-beta",
+                "ai.koog:prompt-cache-files-jvm:1.1.1",
+                "ai.koog:prompt-cache-redis-jvm:1.1.1-beta",
+                "ai.koog:prompt-executor-cached-jvm:1.1.1",
+                "ai.koog:prompt-executor-llms-all-jvm:1.1.1-beta",
+                "ai.koog:prompt-model-jvm:1.1.1",
+                "ai.koog:prompt-processor-jvm:1.1.1",
+                "ai.koog:prompt-structure-jvm:1.1.1",
+                "ai.koog:prompt-tokenizer-jvm:1.1.1",
+                "ai.koog:rag-base-jvm:1.1.1",
+                "ai.koog:rag-vector-jvm:1.1.1-beta",
+                "ai.koog:serialization-core-jvm:1.1.1",
+                "ai.koog:utils-jvm:1.1.1",
+                "io.ktor:ktor-serialization-kotlinx-json-jvm:3.5.0",
+                "io.modelcontextprotocol:kotlin-sdk-core-jvm:0.11.1",
+                "org.jetbrains.kotlinx:kotlinx-schema-generator-core-jvm:0.4.4",
+                "org.jetbrains.kotlinx:kotlinx-schema-generator-json-jvm:0.4.4",
+                "org.jetbrains.kotlinx:kotlinx-schema-json-jvm:0.4.4",
+                "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-serialization-json-io-jvm:1.11.0",
+                "project :api",
+                "project :shared"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-serialization-json-io",
+            "version": "1.11.0",
+            "requiredBy": [
+                "io.ktor:ktor-serialization-kotlinx-json-jvm:3.5.0",
+                "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.11.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-serialization-json-io-jvm",
+            "version": "1.11.0",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-serialization-json-io:1.11.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-serialization-json-jvm",
+            "version": "1.11.0",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-serialization-protobuf",
+            "version": "1.11.0",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.11.0",
+                "project :api"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-serialization-protobuf-jvm",
+            "version": "1.11.0",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-serialization-bom:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.11.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains",
+            "artifact": "annotations",
+            "version": "26.0.2-1",
+            "requiredBy": [
+                "ai.koog:http-client-core-jvm:1.1.1",
+                "ai.koog:prompt-executor-openai-client-jvm:1.1.1",
+                "ai.koog:prompt-llm-jvm:1.1.1",
+                "ai.koog:utils-jvm:1.1.1",
+                "org.jetbrains.kotlin:kotlin-stdlib:2.4.0",
+                "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.11.0"
+            ]
+        },
+        {
+            "group": "org.json",
+            "artifact": "json",
+            "version": "20240303",
+            "requiredBy": [
+                "com.twilio.sdk:twilio:12.1.1"
+            ]
+        },
+        {
+            "group": "org.reactivestreams",
+            "artifact": "reactive-streams",
+            "version": "1.0.4",
+            "requiredBy": [
+                "io.projectreactor:reactor-core:3.6.6",
+                "org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.11.0"
+            ]
+        },
+        {
+            "group": "org.slf4j",
+            "artifact": "slf4j-api",
+            "version": "2.0.18",
+            "requiredBy": [
+                "aws.smithy.kotlin:logging-slf4j2-jvm:1.6.12",
+                "ch.qos.logback:logback-classic:1.5.18",
+                "com.twilio.sdk:twilio:12.1.1",
+                "io.insert-koin:koin-logger-slf4j:4.2.1",
+                "io.ktor:ktor-client-apache5-jvm:3.3.3",
+                "io.ktor:ktor-client-cio-jvm:3.5.0",
+                "io.ktor:ktor-client-content-negotiation-jvm:3.5.0",
+                "io.ktor:ktor-client-core-jvm:3.5.0",
+                "io.ktor:ktor-client-logging-jvm:3.3.3",
+                "io.ktor:ktor-events-jvm:3.5.0",
+                "io.ktor:ktor-http-cio-jvm:3.5.0",
+                "io.ktor:ktor-http-jvm:3.5.0",
+                "io.ktor:ktor-io-jvm:3.5.0",
+                "io.ktor:ktor-network-jvm:3.5.0",
+                "io.ktor:ktor-network-tls-jvm:3.5.0",
+                "io.ktor:ktor-serialization-jvm:3.5.0",
+                "io.ktor:ktor-serialization-kotlinx-json-jvm:3.5.0",
+                "io.ktor:ktor-serialization-kotlinx-jvm:3.5.0",
+                "io.ktor:ktor-server-cio-jvm:3.5.0",
+                "io.ktor:ktor-server-content-negotiation-jvm:3.5.0",
+                "io.ktor:ktor-server-core-jvm:3.5.0",
+                "io.ktor:ktor-server-cors-jvm:3.5.0",
+                "io.ktor:ktor-server-di-jvm:3.4.0",
+                "io.ktor:ktor-server-sse-jvm:3.5.0",
+                "io.ktor:ktor-server-status-pages-jvm:3.5.0",
+                "io.ktor:ktor-server-websockets-jvm:3.5.0",
+                "io.ktor:ktor-sse-jvm:3.5.0",
+                "io.ktor:ktor-utils-jvm:3.5.0",
+                "io.ktor:ktor-websocket-serialization-jvm:3.5.0",
+                "io.ktor:ktor-websockets-jvm:3.5.0",
+                "net.dv8tion:JDA:6.4.1",
+                "org.apache.httpcomponents.client5:httpclient5:5.5.1",
+                "org.jetbrains.exposed:exposed-core:1.3.0",
+                "org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.11.0",
+                "redis.clients.authentication:redis-authx-core:0.1.1-beta2"
+            ]
+        },
+        {
+            "group": "org.xerial",
+            "artifact": "sqlite-jdbc",
+            "version": "3.53.2.0",
+            "requiredBy": [
+                "project :gateway",
+                "project :shared"
+            ]
+        },
+        {
+            "group": "redis.clients.authentication",
+            "artifact": "redis-authx-core",
+            "version": "0.1.1-beta2",
+            "requiredBy": [
+                "io.lettuce:lettuce-core:7.2.1.RELEASE"
+            ]
+        },
+        {
+            "group": "tools.jackson.core",
+            "artifact": "jackson-core",
+            "version": "3.1.1",
+            "requiredBy": [
+                "tools.jackson.core:jackson-databind:3.1.1",
+                "tools.jackson:jackson-bom:3.1.1"
+            ]
+        },
+        {
+            "group": "tools.jackson.core",
+            "artifact": "jackson-databind",
+            "version": "3.1.1",
+            "requiredBy": [
+                "org.flywaydb:flyway-core:12.8.1",
+                "tools.jackson:jackson-bom:3.1.1"
+            ]
+        },
+        {
+            "group": "tools.jackson",
+            "artifact": "jackson-bom",
+            "version": "3.1.1",
+            "requiredBy": [
+                "tools.jackson.core:jackson-core:3.1.1",
+                "tools.jackson.core:jackson-databind:3.1.1"
+            ]
+        }
+    ]
+}

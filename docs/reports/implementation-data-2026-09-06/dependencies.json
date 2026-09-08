@@ -1,0 +1,1448 @@
+{
+  "checked_at": "2026-09-07T02:01:32.606676+00:00",
+  "scope": "Declared Maven dependencies/plugins and locked Cargo packages; not a resolved JVM SBOM or CVE scan",
+  "dependencies": [
+    {
+      "name": "logback-classic",
+      "ecosystem": "maven",
+      "module": "ch.qos.logback:logback-classic",
+      "declared": "1.6.3",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/ch/qos/logback/logback-classic/maven-metadata.xml",
+      "latest_stable": "1.6.3",
+      "latest_published": "1.6.3",
+      "declared_published": true
+    },
+    {
+      "name": "jline",
+      "ecosystem": "maven",
+      "module": "org.jline:jline",
+      "declared": "4.4.2",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/org/jline/jline/maven-metadata.xml",
+      "latest_stable": "4.4.2",
+      "latest_published": "4.4.2",
+      "declared_published": true
+    },
+    {
+      "name": "activity-compose",
+      "ecosystem": "maven",
+      "module": "androidx.activity:activity-compose",
+      "declared": "1.13.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://dl.google.com/dl/android/maven2/androidx/activity/activity-compose/maven-metadata.xml",
+      "latest_stable": "1.13.0",
+      "latest_published": "1.14.0-alpha01",
+      "declared_published": true
+    },
+    {
+      "name": "netty-bom",
+      "ecosystem": "maven",
+      "module": "io.netty:netty-bom",
+      "declared": "4.2.17.Final",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/netty/netty-bom/maven-metadata.xml",
+      "latest_stable": null,
+      "latest_published": "4.2.17.Final",
+      "declared_published": true
+    },
+    {
+      "name": "jackson2-bom",
+      "ecosystem": "maven",
+      "module": "com.fasterxml.jackson:jackson-bom",
+      "declared": "2.22.2",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/com/fasterxml/jackson/jackson-bom/maven-metadata.xml",
+      "latest_stable": "2.22.2",
+      "latest_published": "2.22.2",
+      "declared_published": true
+    },
+    {
+      "name": "jackson3-bom",
+      "ecosystem": "maven",
+      "module": "tools.jackson:jackson-bom",
+      "declared": "3.1.6",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/tools/jackson/jackson-bom/maven-metadata.xml",
+      "latest_stable": "3.2.2",
+      "latest_published": "3.2.2",
+      "declared_published": true
+    },
+    {
+      "name": "httpclient5",
+      "ecosystem": "maven",
+      "module": "org.apache.httpcomponents.client5:httpclient5",
+      "declared": "5.6.3",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/org/apache/httpcomponents/client5/httpclient5/maven-metadata.xml",
+      "latest_stable": "5.6.4",
+      "latest_published": "5.7-alpha1",
+      "declared_published": true
+    },
+    {
+      "name": "httpcore5-core",
+      "ecosystem": "maven",
+      "module": "org.apache.httpcomponents.core5:httpcore5",
+      "declared": "5.4.3",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/org/apache/httpcomponents/core5/httpcore5/maven-metadata.xml",
+      "latest_stable": "5.4.3",
+      "latest_published": "5.5-beta2",
+      "declared_published": true
+    },
+    {
+      "name": "httpcore5-h2",
+      "ecosystem": "maven",
+      "module": "org.apache.httpcomponents.core5:httpcore5-h2",
+      "declared": "5.4.3",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/org/apache/httpcomponents/core5/httpcore5-h2/maven-metadata.xml",
+      "latest_stable": "5.4.3",
+      "latest_published": "5.5-beta2",
+      "declared_published": true
+    },
+    {
+      "name": "koog-agents",
+      "ecosystem": "maven",
+      "module": "ai.koog:koog-agents",
+      "declared": "1.2.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/ai/koog/koog-agents/maven-metadata.xml",
+      "latest_stable": "1.2.0",
+      "latest_published": "1.2.0",
+      "declared_published": true,
+      "versions_1_2": [
+        "1.2.0"
+      ]
+    },
+    {
+      "name": "koog-skills",
+      "ecosystem": "maven",
+      "module": "ai.koog:skills",
+      "declared": "1.2.0-beta",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/ai/koog/skills/maven-metadata.xml",
+      "latest_stable": null,
+      "latest_published": "1.2.0-beta",
+      "declared_published": true,
+      "versions_1_2": [
+        "1.2.0-beta"
+      ]
+    },
+    {
+      "name": "koog-google-client",
+      "ecosystem": "maven",
+      "module": "ai.koog:prompt-executor-google-client",
+      "declared": "1.2.0-beta",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/ai/koog/prompt-executor-google-client/maven-metadata.xml",
+      "latest_stable": "0.8.0",
+      "latest_published": "1.2.0-beta",
+      "declared_published": true,
+      "versions_1_2": [
+        "1.2.0-beta"
+      ]
+    },
+    {
+      "name": "koog-llms-all",
+      "ecosystem": "maven",
+      "module": "ai.koog:prompt-executor-llms-all",
+      "declared": "1.2.0-beta",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/ai/koog/prompt-executor-llms-all/maven-metadata.xml",
+      "latest_stable": "0.8.0",
+      "latest_published": "1.2.0-beta",
+      "declared_published": true,
+      "versions_1_2": [
+        "1.2.0-beta"
+      ]
+    },
+    {
+      "name": "koog-mcp",
+      "ecosystem": "maven",
+      "module": "ai.koog:agents-mcp",
+      "declared": "1.2.0-beta",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/ai/koog/agents-mcp/maven-metadata.xml",
+      "latest_stable": "0.8.0",
+      "latest_published": "1.2.0-beta",
+      "declared_published": true,
+      "versions_1_2": [
+        "1.2.0-beta"
+      ]
+    },
+    {
+      "name": "koog-ktor",
+      "ecosystem": "maven",
+      "module": "ai.koog:koog-ktor",
+      "declared": "1.2.0-beta",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/ai/koog/koog-ktor/maven-metadata.xml",
+      "latest_stable": "0.8.0",
+      "latest_published": "1.2.0-beta",
+      "declared_published": true,
+      "versions_1_2": [
+        "1.2.0-beta"
+      ]
+    },
+    {
+      "name": "koog-a2a-server",
+      "ecosystem": "maven",
+      "module": "ai.koog:agents-features-a2a-server",
+      "declared": "1.2.0-beta",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/ai/koog/agents-features-a2a-server/maven-metadata.xml",
+      "latest_stable": "0.8.0",
+      "latest_published": "1.2.0-beta",
+      "declared_published": true,
+      "versions_1_2": [
+        "1.2.0-beta"
+      ]
+    },
+    {
+      "name": "koog-a2a-client",
+      "ecosystem": "maven",
+      "module": "ai.koog:agents-features-a2a-client",
+      "declared": "1.2.0-beta",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/ai/koog/agents-features-a2a-client/maven-metadata.xml",
+      "latest_stable": "0.8.0",
+      "latest_published": "1.2.0-beta",
+      "declared_published": true,
+      "versions_1_2": [
+        "1.2.0-beta"
+      ]
+    },
+    {
+      "name": "koog-a2a-transport",
+      "ecosystem": "maven",
+      "module": "ai.koog:a2a-transport-server-jsonrpc-http",
+      "declared": "1.2.0-beta",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/ai/koog/a2a-transport-server-jsonrpc-http/maven-metadata.xml",
+      "latest_stable": "0.8.0",
+      "latest_published": "1.2.0-beta",
+      "declared_published": true,
+      "versions_1_2": [
+        "1.2.0-beta"
+      ]
+    },
+    {
+      "name": "koog-a2a-transport-client",
+      "ecosystem": "maven",
+      "module": "ai.koog:a2a-transport-client-jsonrpc-http",
+      "declared": "1.2.0-beta",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/ai/koog/a2a-transport-client-jsonrpc-http/maven-metadata.xml",
+      "latest_stable": "0.8.0",
+      "latest_published": "1.2.0-beta",
+      "declared_published": true,
+      "versions_1_2": [
+        "1.2.0-beta"
+      ]
+    },
+    {
+      "name": "ktor-client-core",
+      "ecosystem": "maven",
+      "module": "io.ktor:ktor-client-core",
+      "declared": "3.5.2",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/ktor/ktor-client-core/maven-metadata.xml",
+      "latest_stable": "3.5.2",
+      "latest_published": "3.5.2",
+      "declared_published": true
+    },
+    {
+      "name": "ktor-client-content-negotiation",
+      "ecosystem": "maven",
+      "module": "io.ktor:ktor-client-content-negotiation",
+      "declared": "3.5.2",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/ktor/ktor-client-content-negotiation/maven-metadata.xml",
+      "latest_stable": "3.5.2",
+      "latest_published": "3.5.2",
+      "declared_published": true
+    },
+    {
+      "name": "ktor-client-cio",
+      "ecosystem": "maven",
+      "module": "io.ktor:ktor-client-cio",
+      "declared": "3.5.2",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/ktor/ktor-client-cio/maven-metadata.xml",
+      "latest_stable": "3.5.2",
+      "latest_published": "3.5.2",
+      "declared_published": true
+    },
+    {
+      "name": "ktor-client-js",
+      "ecosystem": "maven",
+      "module": "io.ktor:ktor-client-js",
+      "declared": "3.5.2",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/ktor/ktor-client-js/maven-metadata.xml",
+      "latest_stable": "3.5.2",
+      "latest_published": "3.5.2",
+      "declared_published": true
+    },
+    {
+      "name": "ktor-client-okhttp",
+      "ecosystem": "maven",
+      "module": "io.ktor:ktor-client-okhttp",
+      "declared": "3.5.2",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/ktor/ktor-client-okhttp/maven-metadata.xml",
+      "latest_stable": "3.5.2",
+      "latest_published": "3.5.2",
+      "declared_published": true
+    },
+    {
+      "name": "ktor-client-darwin",
+      "ecosystem": "maven",
+      "module": "io.ktor:ktor-client-darwin",
+      "declared": "3.5.2",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/ktor/ktor-client-darwin/maven-metadata.xml",
+      "latest_stable": "3.5.2",
+      "latest_published": "3.5.2",
+      "declared_published": true
+    },
+    {
+      "name": "ktor-client-websockets",
+      "ecosystem": "maven",
+      "module": "io.ktor:ktor-client-websockets",
+      "declared": "3.5.2",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/ktor/ktor-client-websockets/maven-metadata.xml",
+      "latest_stable": "3.5.2",
+      "latest_published": "3.5.2",
+      "declared_published": true
+    },
+    {
+      "name": "ktor-client-mock",
+      "ecosystem": "maven",
+      "module": "io.ktor:ktor-client-mock",
+      "declared": "3.5.2",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/ktor/ktor-client-mock/maven-metadata.xml",
+      "latest_stable": "3.5.2",
+      "latest_published": "3.5.2",
+      "declared_published": true
+    },
+    {
+      "name": "ktor-server-core",
+      "ecosystem": "maven",
+      "module": "io.ktor:ktor-server-core",
+      "declared": "3.5.2",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/ktor/ktor-server-core/maven-metadata.xml",
+      "latest_stable": "3.5.2",
+      "latest_published": "3.5.2",
+      "declared_published": true
+    },
+    {
+      "name": "ktor-server-cio",
+      "ecosystem": "maven",
+      "module": "io.ktor:ktor-server-cio",
+      "declared": "3.5.2",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/ktor/ktor-server-cio/maven-metadata.xml",
+      "latest_stable": "3.5.2",
+      "latest_published": "3.5.2",
+      "declared_published": true
+    },
+    {
+      "name": "ktor-server-content-negotiation",
+      "ecosystem": "maven",
+      "module": "io.ktor:ktor-server-content-negotiation",
+      "declared": "3.5.2",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/ktor/ktor-server-content-negotiation/maven-metadata.xml",
+      "latest_stable": "3.5.2",
+      "latest_published": "3.5.2",
+      "declared_published": true
+    },
+    {
+      "name": "ktor-server-websockets",
+      "ecosystem": "maven",
+      "module": "io.ktor:ktor-server-websockets",
+      "declared": "3.5.2",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/ktor/ktor-server-websockets/maven-metadata.xml",
+      "latest_stable": "3.5.2",
+      "latest_published": "3.5.2",
+      "declared_published": true
+    },
+    {
+      "name": "ktor-server-cors",
+      "ecosystem": "maven",
+      "module": "io.ktor:ktor-server-cors",
+      "declared": "3.5.2",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/ktor/ktor-server-cors/maven-metadata.xml",
+      "latest_stable": "3.5.2",
+      "latest_published": "3.5.2",
+      "declared_published": true
+    },
+    {
+      "name": "ktor-server-status-pages",
+      "ecosystem": "maven",
+      "module": "io.ktor:ktor-server-status-pages",
+      "declared": "3.5.2",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/ktor/ktor-server-status-pages/maven-metadata.xml",
+      "latest_stable": "3.5.2",
+      "latest_published": "3.5.2",
+      "declared_published": true
+    },
+    {
+      "name": "ktor-server-sse",
+      "ecosystem": "maven",
+      "module": "io.ktor:ktor-server-sse",
+      "declared": "3.5.2",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/ktor/ktor-server-sse/maven-metadata.xml",
+      "latest_stable": "3.5.2",
+      "latest_published": "3.5.2",
+      "declared_published": true
+    },
+    {
+      "name": "ktor-serialization-json",
+      "ecosystem": "maven",
+      "module": "io.ktor:ktor-serialization-kotlinx-json",
+      "declared": "3.5.2",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/ktor/ktor-serialization-kotlinx-json/maven-metadata.xml",
+      "latest_stable": "3.5.2",
+      "latest_published": "3.5.2",
+      "declared_published": true
+    },
+    {
+      "name": "ktor-server-test-host",
+      "ecosystem": "maven",
+      "module": "io.ktor:ktor-server-test-host",
+      "declared": "3.5.2",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/ktor/ktor-server-test-host/maven-metadata.xml",
+      "latest_stable": "3.5.2",
+      "latest_published": "3.5.2",
+      "declared_published": true
+    },
+    {
+      "name": "kotlin-test",
+      "ecosystem": "maven",
+      "module": "org.jetbrains.kotlin:kotlin-test",
+      "declared": "2.4.10",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-test/maven-metadata.xml",
+      "latest_stable": "2.4.10",
+      "latest_published": "2.4.20-RC3",
+      "declared_published": true
+    },
+    {
+      "name": "kotlin-logging",
+      "ecosystem": "maven",
+      "module": "io.github.oshai:kotlin-logging",
+      "declared": "8.0.4",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/github/oshai/kotlin-logging/maven-metadata.xml",
+      "latest_stable": "8.0.4",
+      "latest_published": "8.0.4",
+      "declared_published": true
+    },
+    {
+      "name": "kotlinx-serialization-json",
+      "ecosystem": "maven",
+      "module": "org.jetbrains.kotlinx:kotlinx-serialization-json",
+      "declared": "1.11.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kotlinx-serialization-json/maven-metadata.xml",
+      "latest_stable": "1.11.0",
+      "latest_published": "1.12.0-RC",
+      "declared_published": true
+    },
+    {
+      "name": "kotlinx-serialization-protobuf",
+      "ecosystem": "maven",
+      "module": "org.jetbrains.kotlinx:kotlinx-serialization-protobuf",
+      "declared": "1.11.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kotlinx-serialization-protobuf/maven-metadata.xml",
+      "latest_stable": "1.11.0",
+      "latest_published": "1.12.0-RC",
+      "declared_published": true
+    },
+    {
+      "name": "kotlinx-coroutines-core",
+      "ecosystem": "maven",
+      "module": "org.jetbrains.kotlinx:kotlinx-coroutines-core",
+      "declared": "1.11.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kotlinx-coroutines-core/maven-metadata.xml",
+      "latest_stable": "1.11.0",
+      "latest_published": "1.11.0",
+      "declared_published": true
+    },
+    {
+      "name": "kotlinx-coroutines-swing",
+      "ecosystem": "maven",
+      "module": "org.jetbrains.kotlinx:kotlinx-coroutines-swing",
+      "declared": "1.11.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kotlinx-coroutines-swing/maven-metadata.xml",
+      "latest_stable": "1.11.0",
+      "latest_published": "1.11.0",
+      "declared_published": true
+    },
+    {
+      "name": "kotlinx-coroutines-test",
+      "ecosystem": "maven",
+      "module": "org.jetbrains.kotlinx:kotlinx-coroutines-test",
+      "declared": "1.11.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kotlinx-coroutines-test/maven-metadata.xml",
+      "latest_stable": "1.11.0",
+      "latest_published": "1.11.0",
+      "declared_published": true
+    },
+    {
+      "name": "kotlinx-datetime",
+      "ecosystem": "maven",
+      "module": "org.jetbrains.kotlinx:kotlinx-datetime",
+      "declared": "0.8.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlinx/kotlinx-datetime/maven-metadata.xml",
+      "latest_stable": "0.8.0",
+      "latest_published": "0.8.0-0.6.x-compat",
+      "declared_published": true
+    },
+    {
+      "name": "okio",
+      "ecosystem": "maven",
+      "module": "com.squareup.okio:okio",
+      "declared": "3.18.2",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/com/squareup/okio/okio/maven-metadata.xml",
+      "latest_stable": "3.18.2",
+      "latest_published": "3.18.2",
+      "declared_published": true
+    },
+    {
+      "name": "okio-fakefilesystem",
+      "ecosystem": "maven",
+      "module": "com.squareup.okio:okio-fakefilesystem",
+      "declared": "3.18.2",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/com/squareup/okio/okio-fakefilesystem/maven-metadata.xml",
+      "latest_stable": "3.18.2",
+      "latest_published": "3.18.2",
+      "declared_published": true
+    },
+    {
+      "name": "exposed-core",
+      "ecosystem": "maven",
+      "module": "org.jetbrains.exposed:exposed-core",
+      "declared": "1.5.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/org/jetbrains/exposed/exposed-core/maven-metadata.xml",
+      "latest_stable": "1.5.0",
+      "latest_published": "1.5.0",
+      "declared_published": true
+    },
+    {
+      "name": "exposed-dao",
+      "ecosystem": "maven",
+      "module": "org.jetbrains.exposed:exposed-dao",
+      "declared": "1.5.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/org/jetbrains/exposed/exposed-dao/maven-metadata.xml",
+      "latest_stable": "1.5.0",
+      "latest_published": "1.5.0",
+      "declared_published": true
+    },
+    {
+      "name": "exposed-jdbc",
+      "ecosystem": "maven",
+      "module": "org.jetbrains.exposed:exposed-jdbc",
+      "declared": "1.5.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/org/jetbrains/exposed/exposed-jdbc/maven-metadata.xml",
+      "latest_stable": "1.5.0",
+      "latest_published": "1.5.0",
+      "declared_published": true
+    },
+    {
+      "name": "exposed-kotlin-datetime",
+      "ecosystem": "maven",
+      "module": "org.jetbrains.exposed:exposed-kotlin-datetime",
+      "declared": "1.5.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/org/jetbrains/exposed/exposed-kotlin-datetime/maven-metadata.xml",
+      "latest_stable": "1.5.0",
+      "latest_published": "1.5.0",
+      "declared_published": true
+    },
+    {
+      "name": "sqlite-jdbc",
+      "ecosystem": "maven",
+      "module": "org.xerial:sqlite-jdbc",
+      "declared": "3.53.4.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/org/xerial/sqlite-jdbc/maven-metadata.xml",
+      "latest_stable": "3.53.4.0",
+      "latest_published": "3.53.4.0",
+      "declared_published": true
+    },
+    {
+      "name": "flyway-core",
+      "ecosystem": "maven",
+      "module": "org.flywaydb:flyway-core",
+      "declared": "13.5.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/org/flywaydb/flyway-core/maven-metadata.xml",
+      "latest_stable": "13.5.0",
+      "latest_published": "13.5.0",
+      "declared_published": true
+    },
+    {
+      "name": "bouncycastle",
+      "ecosystem": "maven",
+      "module": "org.bouncycastle:bcprov-jdk18on",
+      "declared": "1.85.2",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/org/bouncycastle/bcprov-jdk18on/maven-metadata.xml",
+      "latest_stable": "1.85.2",
+      "latest_published": "1.85.2",
+      "declared_published": true
+    },
+    {
+      "name": "jda",
+      "ecosystem": "maven",
+      "module": "net.dv8tion:JDA",
+      "declared": "6.6.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/net/dv8tion/JDA/maven-metadata.xml",
+      "latest_stable": "6.6.0",
+      "latest_published": "6.6.0",
+      "declared_published": true
+    },
+    {
+      "name": "twilio",
+      "ecosystem": "maven",
+      "module": "com.twilio.sdk:twilio",
+      "declared": "13.0.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/com/twilio/sdk/twilio/maven-metadata.xml",
+      "latest_stable": "13.0.0",
+      "latest_published": "13.0.0",
+      "declared_published": true
+    },
+    {
+      "name": "tracy-core",
+      "ecosystem": "maven",
+      "module": "org.jetbrains.ai.tracy:tracy-core",
+      "declared": "0.1.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/org/jetbrains/ai/tracy/tracy-core/maven-metadata.xml",
+      "latest_stable": "0.1.0",
+      "latest_published": "0.1.0",
+      "declared_published": true
+    },
+    {
+      "name": "tracy-ktor",
+      "ecosystem": "maven",
+      "module": "org.jetbrains.ai.tracy:tracy-ktor",
+      "declared": "0.1.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/org/jetbrains/ai/tracy/tracy-ktor/maven-metadata.xml",
+      "latest_stable": "0.1.0",
+      "latest_published": "0.1.0",
+      "declared_published": true
+    },
+    {
+      "name": "opentelemetry-api",
+      "ecosystem": "maven",
+      "module": "io.opentelemetry:opentelemetry-api",
+      "declared": "1.65.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/opentelemetry/opentelemetry-api/maven-metadata.xml",
+      "latest_stable": "1.65.0",
+      "latest_published": "1.65.0",
+      "declared_published": true
+    },
+    {
+      "name": "opentelemetry-extension-kotlin",
+      "ecosystem": "maven",
+      "module": "io.opentelemetry:opentelemetry-extension-kotlin",
+      "declared": "1.65.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/opentelemetry/opentelemetry-extension-kotlin/maven-metadata.xml",
+      "latest_stable": "1.65.0",
+      "latest_published": "1.65.0",
+      "declared_published": true
+    },
+    {
+      "name": "opentelemetry-sdk-autoconfigure",
+      "ecosystem": "maven",
+      "module": "io.opentelemetry:opentelemetry-sdk-extension-autoconfigure",
+      "declared": "1.65.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/opentelemetry/opentelemetry-sdk-extension-autoconfigure/maven-metadata.xml",
+      "latest_stable": "1.65.0",
+      "latest_published": "1.65.0",
+      "declared_published": true
+    },
+    {
+      "name": "opentelemetry-exporter-otlp",
+      "ecosystem": "maven",
+      "module": "io.opentelemetry:opentelemetry-exporter-otlp",
+      "declared": "1.65.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/opentelemetry/opentelemetry-exporter-otlp/maven-metadata.xml",
+      "latest_stable": "1.65.0",
+      "latest_published": "1.65.0",
+      "declared_published": true
+    },
+    {
+      "name": "opentelemetry-exporter-logging",
+      "ecosystem": "maven",
+      "module": "io.opentelemetry:opentelemetry-exporter-logging",
+      "declared": "1.65.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/opentelemetry/opentelemetry-exporter-logging/maven-metadata.xml",
+      "latest_stable": "1.65.0",
+      "latest_published": "1.65.0",
+      "declared_published": true
+    },
+    {
+      "name": "opentelemetry-sdk-testing",
+      "ecosystem": "maven",
+      "module": "io.opentelemetry:opentelemetry-sdk-testing",
+      "declared": "1.65.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/opentelemetry/opentelemetry-sdk-testing/maven-metadata.xml",
+      "latest_stable": "1.65.0",
+      "latest_published": "1.65.0",
+      "declared_published": true
+    },
+    {
+      "name": "mordant",
+      "ecosystem": "maven",
+      "module": "com.github.ajalt.mordant:mordant",
+      "declared": "3.1.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/com/github/ajalt/mordant/mordant/maven-metadata.xml",
+      "latest_stable": "3.1.0",
+      "latest_published": "3.1.0",
+      "declared_published": true
+    },
+    {
+      "name": "mordant-markdown",
+      "ecosystem": "maven",
+      "module": "com.github.ajalt.mordant:mordant-markdown",
+      "declared": "3.1.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/com/github/ajalt/mordant/mordant-markdown/maven-metadata.xml",
+      "latest_stable": "3.1.0",
+      "latest_published": "3.1.0",
+      "declared_published": true
+    },
+    {
+      "name": "markdown-renderer-m3",
+      "ecosystem": "maven",
+      "module": "com.mikepenz:multiplatform-markdown-renderer-m3",
+      "declared": "0.45.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/com/mikepenz/multiplatform-markdown-renderer-m3/maven-metadata.xml",
+      "latest_stable": "0.45.0",
+      "latest_published": "0.45.0",
+      "declared_published": true
+    },
+    {
+      "name": "markdown-renderer-coil3",
+      "ecosystem": "maven",
+      "module": "com.mikepenz:multiplatform-markdown-renderer-coil3",
+      "declared": "0.45.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/com/mikepenz/multiplatform-markdown-renderer-coil3/maven-metadata.xml",
+      "latest_stable": "0.45.0",
+      "latest_published": "0.45.0",
+      "declared_published": true
+    },
+    {
+      "name": "compose-runtime",
+      "ecosystem": "maven",
+      "module": "org.jetbrains.compose.runtime:runtime",
+      "declared": "1.12.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/org/jetbrains/compose/runtime/runtime/maven-metadata.xml",
+      "latest_stable": "1.12.0",
+      "latest_published": "1.12.0",
+      "declared_published": true
+    },
+    {
+      "name": "compose-foundation",
+      "ecosystem": "maven",
+      "module": "org.jetbrains.compose.foundation:foundation",
+      "declared": "1.12.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/org/jetbrains/compose/foundation/foundation/maven-metadata.xml",
+      "latest_stable": "1.12.0",
+      "latest_published": "1.12.0",
+      "declared_published": true
+    },
+    {
+      "name": "compose-components-resources",
+      "ecosystem": "maven",
+      "module": "org.jetbrains.compose.components:components-resources",
+      "declared": "1.12.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/org/jetbrains/compose/components/components-resources/maven-metadata.xml",
+      "latest_stable": "1.12.0",
+      "latest_published": "1.12.0",
+      "declared_published": true
+    },
+    {
+      "name": "navigation3-ui",
+      "ecosystem": "maven",
+      "module": "org.jetbrains.androidx.navigation3:navigation3-ui",
+      "declared": "1.1.1",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/org/jetbrains/androidx/navigation3/navigation3-ui/maven-metadata.xml",
+      "latest_stable": "1.1.1",
+      "latest_published": "1.2.0-alpha02",
+      "declared_published": true
+    },
+    {
+      "name": "koin-bom",
+      "ecosystem": "maven",
+      "module": "io.insert-koin:koin-bom",
+      "declared": "4.2.2",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/insert-koin/koin-bom/maven-metadata.xml",
+      "latest_stable": "4.2.2",
+      "latest_published": "4.2.2",
+      "declared_published": true
+    },
+    {
+      "name": "koin-core",
+      "ecosystem": "maven",
+      "module": "io.insert-koin:koin-core",
+      "declared": "4.2.2",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/insert-koin/koin-core/maven-metadata.xml",
+      "latest_stable": "4.2.2",
+      "latest_published": "4.2.2",
+      "declared_published": true
+    },
+    {
+      "name": "koin-compose",
+      "ecosystem": "maven",
+      "module": "io.insert-koin:koin-compose",
+      "declared": "4.2.2",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/insert-koin/koin-compose/maven-metadata.xml",
+      "latest_stable": "4.2.2",
+      "latest_published": "4.2.2",
+      "declared_published": true
+    },
+    {
+      "name": "koin-compose-viewmodel",
+      "ecosystem": "maven",
+      "module": "io.insert-koin:koin-compose-viewmodel",
+      "declared": "4.2.2",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/insert-koin/koin-compose-viewmodel/maven-metadata.xml",
+      "latest_stable": "4.2.2",
+      "latest_published": "4.2.2",
+      "declared_published": true
+    },
+    {
+      "name": "koin-ktor",
+      "ecosystem": "maven",
+      "module": "io.insert-koin:koin-ktor",
+      "declared": "4.2.2",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/insert-koin/koin-ktor/maven-metadata.xml",
+      "latest_stable": "4.2.2",
+      "latest_published": "4.2.2",
+      "declared_published": true
+    },
+    {
+      "name": "koin-logger-slf4j",
+      "ecosystem": "maven",
+      "module": "io.insert-koin:koin-logger-slf4j",
+      "declared": "4.2.2",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/insert-koin/koin-logger-slf4j/maven-metadata.xml",
+      "latest_stable": "4.2.2",
+      "latest_published": "4.2.2",
+      "declared_published": true
+    },
+    {
+      "name": "koin-test",
+      "ecosystem": "maven",
+      "module": "io.insert-koin:koin-test",
+      "declared": "4.2.2",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://repo.maven.apache.org/maven2/io/insert-koin/koin-test/maven-metadata.xml",
+      "latest_stable": "4.2.2",
+      "latest_published": "4.2.2",
+      "declared_published": true
+    },
+    {
+      "name": "Kotlin Gradle plugin",
+      "ecosystem": "maven",
+      "module": "org.jetbrains.kotlin:kotlin-gradle-plugin",
+      "declared": "2.4.10",
+      "origin": "build.gradle.kts",
+      "source": "https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-gradle-plugin/maven-metadata.xml",
+      "latest_stable": "2.4.10",
+      "latest_published": "2.4.20-RC3",
+      "declared_published": true
+    },
+    {
+      "name": "Compose Gradle plugin",
+      "ecosystem": "maven",
+      "module": "org.jetbrains.compose:compose-gradle-plugin",
+      "declared": "1.12.0",
+      "origin": "build.gradle.kts",
+      "source": "https://repo.maven.apache.org/maven2/org/jetbrains/compose/compose-gradle-plugin/maven-metadata.xml",
+      "latest_stable": "1.12.0",
+      "latest_published": "1.12.0",
+      "declared_published": true
+    },
+    {
+      "name": "Android Gradle plugin",
+      "ecosystem": "maven",
+      "module": "com.android.tools.build:gradle",
+      "declared": "9.1.1",
+      "origin": "build.gradle.kts",
+      "source": "https://dl.google.com/dl/android/maven2/com/android/tools/build/gradle/maven-metadata.xml",
+      "latest_stable": "9.4.0",
+      "latest_published": "9.5.0-alpha04",
+      "declared_published": true
+    },
+    {
+      "name": "ktlint Gradle plugin",
+      "ecosystem": "maven",
+      "module": "org.jlleitschuh.gradle.ktlint:org.jlleitschuh.gradle.ktlint.gradle.plugin",
+      "declared": "14.2.0",
+      "origin": "build.gradle.kts",
+      "source": "https://plugins.gradle.org/m2/org/jlleitschuh/gradle/ktlint/org.jlleitschuh.gradle.ktlint.gradle.plugin/maven-metadata.xml",
+      "latest_stable": "14.2.0",
+      "latest_published": "14.2.0",
+      "declared_published": true
+    },
+    {
+      "name": "ktlint engine",
+      "ecosystem": "maven",
+      "module": "com.pinterest.ktlint:ktlint-cli",
+      "declared": "1.8.0",
+      "origin": "build.gradle.kts",
+      "source": "https://repo.maven.apache.org/maven2/com/pinterest/ktlint/ktlint-cli/maven-metadata.xml",
+      "latest_stable": "1.8.0",
+      "latest_published": "1.8.0",
+      "declared_published": true
+    },
+    {
+      "name": "plugin:kotlin-multiplatform",
+      "ecosystem": "maven",
+      "module": "org.jetbrains.kotlin.multiplatform:org.jetbrains.kotlin.multiplatform.gradle.plugin",
+      "declared": "2.4.10",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://plugins.gradle.org/m2/org/jetbrains/kotlin/multiplatform/org.jetbrains.kotlin.multiplatform.gradle.plugin/maven-metadata.xml",
+      "latest_stable": "2.4.10",
+      "latest_published": "2.4.20-RC3",
+      "declared_published": true
+    },
+    {
+      "name": "plugin:kotlin-compose",
+      "ecosystem": "maven",
+      "module": "org.jetbrains.kotlin.plugin.compose:org.jetbrains.kotlin.plugin.compose.gradle.plugin",
+      "declared": "2.4.10",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://plugins.gradle.org/m2/org/jetbrains/kotlin/plugin/compose/org.jetbrains.kotlin.plugin.compose.gradle.plugin/maven-metadata.xml",
+      "latest_stable": "2.4.10",
+      "latest_published": "2.4.20-RC3",
+      "declared_published": true
+    },
+    {
+      "name": "plugin:compose",
+      "ecosystem": "maven",
+      "module": "org.jetbrains.compose:org.jetbrains.compose.gradle.plugin",
+      "declared": "1.12.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://plugins.gradle.org/m2/org/jetbrains/compose/org.jetbrains.compose.gradle.plugin/maven-metadata.xml",
+      "latest_stable": "1.12.0",
+      "latest_published": "1.12.0",
+      "declared_published": true
+    },
+    {
+      "name": "plugin:android-application",
+      "ecosystem": "maven",
+      "module": "com.android.application:com.android.application.gradle.plugin",
+      "declared": "9.1.1",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://dl.google.com/dl/android/maven2/com/android/application/com.android.application.gradle.plugin/maven-metadata.xml",
+      "latest_stable": "9.4.0",
+      "latest_published": "9.5.0-alpha04",
+      "declared_published": true
+    },
+    {
+      "name": "plugin:android-kmp-library",
+      "ecosystem": "maven",
+      "module": "com.android.kotlin.multiplatform.library:com.android.kotlin.multiplatform.library.gradle.plugin",
+      "declared": "9.1.1",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://dl.google.com/dl/android/maven2/com/android/kotlin/multiplatform/library/com.android.kotlin.multiplatform.library.gradle.plugin/maven-metadata.xml",
+      "latest_stable": "9.4.0",
+      "latest_published": "9.5.0-alpha04",
+      "declared_published": true
+    },
+    {
+      "name": "plugin:ktlint",
+      "ecosystem": "maven",
+      "module": "org.jlleitschuh.gradle.ktlint:org.jlleitschuh.gradle.ktlint.gradle.plugin",
+      "declared": "14.2.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://plugins.gradle.org/m2/org/jlleitschuh/gradle/ktlint/org.jlleitschuh.gradle.ktlint.gradle.plugin/maven-metadata.xml",
+      "latest_stable": "14.2.0",
+      "latest_published": "14.2.0",
+      "declared_published": true
+    },
+    {
+      "name": "plugin:kotlin-jvm",
+      "ecosystem": "maven",
+      "module": "org.jetbrains.kotlin.jvm:org.jetbrains.kotlin.jvm.gradle.plugin",
+      "declared": "2.4.10",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://plugins.gradle.org/m2/org/jetbrains/kotlin/jvm/org.jetbrains.kotlin.jvm.gradle.plugin/maven-metadata.xml",
+      "latest_stable": "2.4.10",
+      "latest_published": "2.4.20-RC3",
+      "declared_published": true
+    },
+    {
+      "name": "plugin:kotlin-serialization",
+      "ecosystem": "maven",
+      "module": "org.jetbrains.kotlin.plugin.serialization:org.jetbrains.kotlin.plugin.serialization.gradle.plugin",
+      "declared": "2.4.10",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://plugins.gradle.org/m2/org/jetbrains/kotlin/plugin/serialization/org.jetbrains.kotlin.plugin.serialization.gradle.plugin/maven-metadata.xml",
+      "latest_stable": "2.4.10",
+      "latest_published": "2.4.20-RC3",
+      "declared_published": true
+    },
+    {
+      "name": "plugin:shadow",
+      "ecosystem": "maven",
+      "module": "com.gradleup.shadow:com.gradleup.shadow.gradle.plugin",
+      "declared": "9.6.1",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://plugins.gradle.org/m2/com/gradleup/shadow/com.gradleup.shadow.gradle.plugin/maven-metadata.xml",
+      "latest_stable": "9.6.1",
+      "latest_published": "9.6.1",
+      "declared_published": true
+    },
+    {
+      "name": "plugin:tracy",
+      "ecosystem": "maven",
+      "module": "org.jetbrains.ai.tracy:org.jetbrains.ai.tracy.gradle.plugin",
+      "declared": "0.1.0",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://plugins.gradle.org/m2/org/jetbrains/ai/tracy/org.jetbrains.ai.tracy.gradle.plugin/maven-metadata.xml",
+      "latest_stable": "0.1.0",
+      "latest_published": "0.1.0",
+      "declared_published": true
+    },
+    {
+      "name": "plugin:kover",
+      "ecosystem": "maven",
+      "module": "org.jetbrains.kotlinx.kover:org.jetbrains.kotlinx.kover.gradle.plugin",
+      "declared": "0.9.9",
+      "origin": "gradle/libs.versions.toml",
+      "source": "https://plugins.gradle.org/m2/org/jetbrains/kotlinx/kover/org.jetbrains.kotlinx.kover.gradle.plugin/maven-metadata.xml",
+      "latest_stable": "0.9.9",
+      "latest_published": "0.9.9",
+      "declared_published": true
+    },
+    {
+      "name": "bumpalo",
+      "ecosystem": "cargo",
+      "module": "bumpalo",
+      "declared": "3.20.3",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/bumpalo",
+      "latest_stable": "3.20.3"
+    },
+    {
+      "name": "cfg-if",
+      "ecosystem": "cargo",
+      "module": "cfg-if",
+      "declared": "1.0.4",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/cfg-if",
+      "latest_stable": "1.0.4"
+    },
+    {
+      "name": "futures-core",
+      "ecosystem": "cargo",
+      "module": "futures-core",
+      "declared": "0.3.33",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/futures-core",
+      "latest_stable": "0.3.34"
+    },
+    {
+      "name": "futures-task",
+      "ecosystem": "cargo",
+      "module": "futures-task",
+      "declared": "0.3.33",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/futures-task",
+      "latest_stable": "0.3.34"
+    },
+    {
+      "name": "futures-util",
+      "ecosystem": "cargo",
+      "module": "futures-util",
+      "declared": "0.3.33",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/futures-util",
+      "latest_stable": "0.3.34"
+    },
+    {
+      "name": "getrandom",
+      "ecosystem": "cargo",
+      "module": "getrandom",
+      "declared": "0.4.3",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/getrandom",
+      "latest_stable": "0.4.3"
+    },
+    {
+      "name": "itoa",
+      "ecosystem": "cargo",
+      "module": "itoa",
+      "declared": "1.0.18",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/itoa",
+      "latest_stable": "1.0.18"
+    },
+    {
+      "name": "js-sys",
+      "ecosystem": "cargo",
+      "module": "js-sys",
+      "declared": "0.3.103",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/js-sys",
+      "latest_stable": "0.3.105"
+    },
+    {
+      "name": "libc",
+      "ecosystem": "cargo",
+      "module": "libc",
+      "declared": "0.2.189",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/libc",
+      "latest_stable": "0.2.189"
+    },
+    {
+      "name": "memchr",
+      "ecosystem": "cargo",
+      "module": "memchr",
+      "declared": "2.8.3",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/memchr",
+      "latest_stable": "2.8.3"
+    },
+    {
+      "name": "once_cell",
+      "ecosystem": "cargo",
+      "module": "once_cell",
+      "declared": "1.21.4",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/once_cell",
+      "latest_stable": "1.21.4"
+    },
+    {
+      "name": "pin-project-lite",
+      "ecosystem": "cargo",
+      "module": "pin-project-lite",
+      "declared": "0.2.17",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/pin-project-lite",
+      "latest_stable": "0.2.17"
+    },
+    {
+      "name": "proc-macro2",
+      "ecosystem": "cargo",
+      "module": "proc-macro2",
+      "declared": "1.0.107",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/proc-macro2",
+      "latest_stable": "1.0.107"
+    },
+    {
+      "name": "quote",
+      "ecosystem": "cargo",
+      "module": "quote",
+      "declared": "1.0.47",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/quote",
+      "latest_stable": "1.0.47"
+    },
+    {
+      "name": "r-efi",
+      "ecosystem": "cargo",
+      "module": "r-efi",
+      "declared": "6.0.0",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/r-efi",
+      "latest_stable": "7.1.0"
+    },
+    {
+      "name": "rustversion",
+      "ecosystem": "cargo",
+      "module": "rustversion",
+      "declared": "1.0.23",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/rustversion",
+      "latest_stable": "1.0.23"
+    },
+    {
+      "name": "serde",
+      "ecosystem": "cargo",
+      "module": "serde",
+      "declared": "1.0.229",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/serde",
+      "latest_stable": "1.0.229"
+    },
+    {
+      "name": "serde_core",
+      "ecosystem": "cargo",
+      "module": "serde_core",
+      "declared": "1.0.229",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/serde_core",
+      "latest_stable": "1.0.229"
+    },
+    {
+      "name": "serde_derive",
+      "ecosystem": "cargo",
+      "module": "serde_derive",
+      "declared": "1.0.229",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/serde_derive",
+      "latest_stable": "1.0.229"
+    },
+    {
+      "name": "serde_json",
+      "ecosystem": "cargo",
+      "module": "serde_json",
+      "declared": "1.0.151",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/serde_json",
+      "latest_stable": "1.0.151"
+    },
+    {
+      "name": "slab",
+      "ecosystem": "cargo",
+      "module": "slab",
+      "declared": "0.4.12",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/slab",
+      "latest_stable": "0.4.12"
+    },
+    {
+      "name": "syn",
+      "ecosystem": "cargo",
+      "module": "syn",
+      "declared": "2.0.119",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/syn",
+      "latest_stable": "3.0.5"
+    },
+    {
+      "name": "syn",
+      "ecosystem": "cargo",
+      "module": "syn",
+      "declared": "3.0.3",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/syn",
+      "latest_stable": "3.0.5"
+    },
+    {
+      "name": "thiserror",
+      "ecosystem": "cargo",
+      "module": "thiserror",
+      "declared": "2.0.20",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/thiserror",
+      "latest_stable": "2.0.20"
+    },
+    {
+      "name": "thiserror-impl",
+      "ecosystem": "cargo",
+      "module": "thiserror-impl",
+      "declared": "2.0.20",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/thiserror-impl",
+      "latest_stable": "2.0.20"
+    },
+    {
+      "name": "unicode-ident",
+      "ecosystem": "cargo",
+      "module": "unicode-ident",
+      "declared": "1.0.24",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/unicode-ident",
+      "latest_stable": "1.0.24"
+    },
+    {
+      "name": "uuid",
+      "ecosystem": "cargo",
+      "module": "uuid",
+      "declared": "1.26.0",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/uuid",
+      "latest_stable": "1.26.0"
+    },
+    {
+      "name": "wasm-bindgen",
+      "ecosystem": "cargo",
+      "module": "wasm-bindgen",
+      "declared": "0.2.126",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/wasm-bindgen",
+      "latest_stable": "0.2.128"
+    },
+    {
+      "name": "wasm-bindgen-macro",
+      "ecosystem": "cargo",
+      "module": "wasm-bindgen-macro",
+      "declared": "0.2.126",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/wasm-bindgen-macro",
+      "latest_stable": "0.2.128"
+    },
+    {
+      "name": "wasm-bindgen-macro-support",
+      "ecosystem": "cargo",
+      "module": "wasm-bindgen-macro-support",
+      "declared": "0.2.126",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/wasm-bindgen-macro-support",
+      "latest_stable": "0.2.128"
+    },
+    {
+      "name": "wasm-bindgen-shared",
+      "ecosystem": "cargo",
+      "module": "wasm-bindgen-shared",
+      "declared": "0.2.126",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/wasm-bindgen-shared",
+      "latest_stable": "0.2.128"
+    },
+    {
+      "name": "windows-sys",
+      "ecosystem": "cargo",
+      "module": "windows-sys",
+      "declared": "0.59.0",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/windows-sys",
+      "latest_stable": "0.61.2"
+    },
+    {
+      "name": "windows-targets",
+      "ecosystem": "cargo",
+      "module": "windows-targets",
+      "declared": "0.52.6",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/windows-targets",
+      "latest_stable": "0.53.5"
+    },
+    {
+      "name": "windows_aarch64_gnullvm",
+      "ecosystem": "cargo",
+      "module": "windows_aarch64_gnullvm",
+      "declared": "0.52.6",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/windows_aarch64_gnullvm",
+      "latest_stable": "0.53.1"
+    },
+    {
+      "name": "windows_aarch64_msvc",
+      "ecosystem": "cargo",
+      "module": "windows_aarch64_msvc",
+      "declared": "0.52.6",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/windows_aarch64_msvc",
+      "latest_stable": "0.53.1"
+    },
+    {
+      "name": "windows_i686_gnu",
+      "ecosystem": "cargo",
+      "module": "windows_i686_gnu",
+      "declared": "0.52.6",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/windows_i686_gnu",
+      "latest_stable": "0.53.1"
+    },
+    {
+      "name": "windows_i686_gnullvm",
+      "ecosystem": "cargo",
+      "module": "windows_i686_gnullvm",
+      "declared": "0.52.6",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/windows_i686_gnullvm",
+      "latest_stable": "0.53.1"
+    },
+    {
+      "name": "windows_i686_msvc",
+      "ecosystem": "cargo",
+      "module": "windows_i686_msvc",
+      "declared": "0.52.6",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/windows_i686_msvc",
+      "latest_stable": "0.53.1"
+    },
+    {
+      "name": "windows_x86_64_gnu",
+      "ecosystem": "cargo",
+      "module": "windows_x86_64_gnu",
+      "declared": "0.52.6",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/windows_x86_64_gnu",
+      "latest_stable": "0.53.1"
+    },
+    {
+      "name": "windows_x86_64_gnullvm",
+      "ecosystem": "cargo",
+      "module": "windows_x86_64_gnullvm",
+      "declared": "0.52.6",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/windows_x86_64_gnullvm",
+      "latest_stable": "0.53.1"
+    },
+    {
+      "name": "windows_x86_64_msvc",
+      "ecosystem": "cargo",
+      "module": "windows_x86_64_msvc",
+      "declared": "0.52.6",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/windows_x86_64_msvc",
+      "latest_stable": "0.53.1"
+    },
+    {
+      "name": "zmij",
+      "ecosystem": "cargo",
+      "module": "zmij",
+      "declared": "1.0.23",
+      "origin": "sandbox-native/Cargo.lock",
+      "source": "https://crates.io/api/v1/crates/zmij",
+      "latest_stable": "1.0.23"
+    }
+  ]
+}

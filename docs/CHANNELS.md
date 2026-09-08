@@ -1,5 +1,7 @@
 # Messaging Channels Guide
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 > Detailed configuration for the 19 messaging channels supported by Prométhé.
 
 ## Overview
@@ -76,6 +78,7 @@ curl http://localhost:8080/api/v1/channels
 DISCORD_BOT_TOKEN=MTI...xyz
 DISCORD_MESSAGE_CONTENT_ENABLED=false
 DISCORD_ALLOWED_USER_IDS=123456789012345678,234567890123456789
+DISCORD_APPROVER_USER_IDS=123456789012345678
 DISCORD_KNOWLEDGE_CHANNEL_IDS=345678901234567890
 ```
 
@@ -86,6 +89,13 @@ Enable Discord **Developer Mode**, then use **Copy User ID** and **Copy Channel 
 numeric values. Leave `DISCORD_ALLOWED_USER_IDS` empty to preserve the existing behavior. When it is
 set, only listed users may trigger the agent through mentions, replies, direct messages, or slash
 commands. Invalid entries are ignored; a non-empty list containing no valid ID denies everyone.
+
+Set `DISCORD_APPROVER_USER_IDS` to the owner or integration managers who should receive private
+authorization requests when a Discord conversation reaches an effectful tool. Approvers must share a
+server with the bot and permit direct messages. Button actions are accepted only from IDs in this list;
+local coding-agent actions remain restricted to the local Desktop owner. Exact `CONFIG_CHANGE` requests
+also provide an Always allow action. That grant is stored in SQLite, survives restarts and can be revoked
+by the local owner; no process, file or arbitrary tool execution can receive that scope.
 
 `DISCORD_KNOWLEDGE_CHANNEL_IDS` is an explicit opt-in archive. Every new human message received in a
 listed channel, including messages from users who cannot invoke the agent, and every Promethe reply is
@@ -107,6 +117,8 @@ The authenticated owner can update Discord rules from a normal Promethe conversa
 Promethe maps these requests to the `discord_policy` tool. Listing is read-only; every mutation is a
 `CONFIG_CHANGE` requiring owner approval. The tool is rejected when invoked from Discord, webhooks,
 ACP, MCP, voice, schedules or autonomous goals, so a Discord participant cannot change their own rule.
+The approval card appears directly in the initiating local chat and offers Always allow for the exact
+configuration fingerprint.
 
 Runtime rules are persisted in SQLite and applied immediately to Gateway messages and signed Discord
 interactions. An `ALLOW` rule with subjects accepts a message only when it contains one of those
