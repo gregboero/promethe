@@ -3,6 +3,8 @@ package dev.promethe.gateway
 import dev.promethe.api.DiscordInteraction
 import dev.promethe.api.DiscordInteractionMember
 import dev.promethe.api.DiscordInteractionUser
+import dev.promethe.core.ApprovalGate
+import dev.promethe.core.ToolApprovalGate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -192,4 +194,42 @@ class DiscordGatewayManagerTest {
         assertEquals(response, chunks.joinToString(separator = ""))
         assertTrue(chunks.all { it.length <= 2_000 })
     }
+
+    @Test
+    fun `approval component identifiers round trip without carrying arguments`() {
+        val customId =
+            discordApprovalActionId(
+                requestId = "approval-random-id",
+                approved = true,
+                scope = ApprovalGate.ApprovalScope.PERSISTENT,
+            )
+
+        assertEquals(
+            DiscordApprovalAction("approval-random-id", true, ApprovalGate.ApprovalScope.PERSISTENT),
+            parseDiscordApprovalAction(customId),
+        )
+        assertNull(parseDiscordApprovalAction("promethe:approval:allow:UNKNOWN:request"))
+        assertFalse(customId.contains("targetId"))
+    }
+
+    @Test
+    fun `permanent Discord approval button is limited to configuration changes`() {
+        val ordinary = approvalRequest(persistentAllowed = false)
+        val configuration = approvalRequest(persistentAllowed = true)
+
+        assertEquals(3, discordApprovalButtons(ordinary).size)
+        assertEquals(4, discordApprovalButtons(configuration).size)
+        assertTrue(discordApprovalMessage(configuration).length < 2_000)
+    }
+
+    private fun approvalRequest(persistentAllowed: Boolean) =
+        ToolApprovalGate.ApprovalRequest(
+            id = "approval-random-id",
+            toolName = "discord_policy",
+            args = """{"action":"listen_channel","targetId":"123"}""",
+            argsDigest = "digest",
+            fingerprint = "fingerprint",
+            sessionId = "discord-1-2",
+            persistentAllowed = persistentAllowed,
+        )
 }

@@ -1,0 +1,581 @@
+[
+  {
+    "session": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-long_json-1-free",
+    "family": "long_json",
+    "repeat": 1,
+    "mode": "free",
+    "correct": false,
+    "completed": false,
+    "failure": "AgentExecutionException",
+    "failureCode": "campaign_empty_content",
+    "completion": {
+      "complete": false,
+      "reason": "empty_final_response",
+      "missingPages": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "answerCount": null
+    },
+    "readPages": [],
+    "expected": [
+      7327,
+      2264,
+      6104,
+      2637,
+      2342,
+      4187,
+      6008,
+      8879
+    ],
+    "final": "",
+    "modelCalls": 1,
+    "exposedAfterReads": 0,
+    "harnessPromptCalls": 1,
+    "exposureCalls": [
+      {
+        "call": 1,
+        "stepId": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-long_json-1-free-step-0001",
+        "harnessPrompt": true,
+        "registeredHarnessTools": 6
+      }
+    ],
+    "toolRegistryCleaned": true,
+    "nativeCalls": 0,
+    "nativeMillis": 0,
+    "cacheHits": 0,
+    "compilations": 0,
+    "workerProcesses": 0,
+    "compilationMillis": 0,
+    "evaluationMillis": 0,
+    "cacheCleaned": true,
+    "totalMillis": 2647,
+    "pagesRead": 0,
+    "distinctPagesRead": 0,
+    "rawLedgerPreserved": false,
+    "sessionCleaned": true,
+    "proposals": 0,
+    "activations": 0,
+    "processed": 0,
+    "bypassedSmall": 0,
+    "bypassedNoSaving": 0,
+    "events": [
+      "session_closed",
+      "session_closed"
+    ],
+    "receiptAccounting": {
+      "attemptedCalls": 1,
+      "settledCalls": 1,
+      "uncertainCalls": 0,
+      "unknownUsageCalls": 0,
+      "usageComplete": true,
+      "inputTokens": 1215,
+      "outputTokens": 3,
+      "costUpperBoundMicroUsd": 3074,
+      "uncertainReservationMicroUsd": 0
+    },
+    "responseErrors": {
+      "campaign_empty_content": 1
+    }
+  },
+  {
+    "session": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-long_json-1-conditional",
+    "family": "long_json",
+    "repeat": 1,
+    "mode": "conditional",
+    "correct": true,
+    "completed": true,
+    "failure": null,
+    "failureCode": null,
+    "completion": {
+      "complete": true,
+      "reason": "complete",
+      "missingPages": [],
+      "answerCount": 8
+    },
+    "readPages": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "expected": [
+      7327,
+      2264,
+      6104,
+      2637,
+      2342,
+      4187,
+      6008,
+      8879
+    ],
+    "final": "[7327,2264,6104,2637,2342,4187,6008,8879]",
+    "modelCalls": 10,
+    "exposedAfterReads": 2,
+    "harnessPromptCalls": 7,
+    "exposureCalls": [
+      {
+        "call": 1,
+        "stepId": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-long_json-1-conditional-step-0001",
+        "harnessPrompt": false,
+        "registeredHarnessTools": 0
+      },
+      {
+        "call": 2,
+        "stepId": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-long_json-1-conditional-step-0002",
+        "harnessPrompt": false,
+        "registeredHarnessTools": 0
+      },
+      {
+        "call": 3,
+        "stepId": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-long_json-1-conditional-step-0003",
+        "harnessPrompt": true,
+        "registeredHarnessTools": 6
+      },
+      {
+        "call": 4,
+        "stepId": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-long_json-1-conditional-step-0004",
+        "harnessPrompt": true,
+        "registeredHarnessTools": 6
+      },
+      {
+        "call": 5,
+        "stepId": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-long_json-1-conditional-step-0005",
+        "harnessPrompt": true,
+        "registeredHarnessTools": 6
+      },
+      {
+        "call": 6,
+        "stepId": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-long_json-1-conditional-step-0006",
+        "harnessPrompt": true,
+        "registeredHarnessTools": 6
+      },
+      {
+        "call": 7,
+        "stepId": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-long_json-1-conditional-step-0007",
+        "harnessPrompt": true,
+        "registeredHarnessTools": 6
+      },
+      {
+        "call": 8,
+        "stepId": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-long_json-1-conditional-step-0008",
+        "harnessPrompt": true,
+        "registeredHarnessTools": 6
+      },
+      {
+        "call": 9,
+        "stepId": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-long_json-1-conditional-step-0009",
+        "harnessPrompt": true,
+        "registeredHarnessTools": 6
+      },
+      {
+        "call": 10,
+        "stepId": null,
+        "harnessPrompt": false,
+        "registeredHarnessTools": 6
+      }
+    ],
+    "toolRegistryCleaned": true,
+    "nativeCalls": 0,
+    "nativeMillis": 0,
+    "cacheHits": 0,
+    "compilations": 0,
+    "workerProcesses": 0,
+    "compilationMillis": 0,
+    "evaluationMillis": 0,
+    "cacheCleaned": true,
+    "totalMillis": 17848,
+    "pagesRead": 8,
+    "distinctPagesRead": 8,
+    "rawLedgerPreserved": true,
+    "sessionCleaned": true,
+    "proposals": 0,
+    "activations": 0,
+    "processed": 0,
+    "bypassedSmall": 0,
+    "bypassedNoSaving": 0,
+    "events": [
+      "session_closed",
+      "session_closed"
+    ],
+    "receiptAccounting": {
+      "attemptedCalls": 10,
+      "settledCalls": 10,
+      "uncertainCalls": 0,
+      "unknownUsageCalls": 0,
+      "usageComplete": true,
+      "inputTokens": 39113,
+      "outputTokens": 540,
+      "costUpperBoundMicroUsd": 104265,
+      "uncertainReservationMicroUsd": 0
+    },
+    "responseErrors": {}
+  },
+  {
+    "session": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-long_json-1-original",
+    "family": "long_json",
+    "repeat": 1,
+    "mode": "original",
+    "correct": true,
+    "completed": true,
+    "failure": null,
+    "failureCode": null,
+    "completion": {
+      "complete": true,
+      "reason": "complete",
+      "missingPages": [],
+      "answerCount": 8
+    },
+    "readPages": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "expected": [
+      7327,
+      2264,
+      6104,
+      2637,
+      2342,
+      4187,
+      6008,
+      8879
+    ],
+    "final": "[7327,2264,6104,2637,2342,4187,6008,8879]",
+    "modelCalls": 10,
+    "exposedAfterReads": null,
+    "harnessPromptCalls": 0,
+    "exposureCalls": [
+      {
+        "call": 1,
+        "stepId": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-long_json-1-original-step-0001",
+        "harnessPrompt": false,
+        "registeredHarnessTools": 0
+      },
+      {
+        "call": 2,
+        "stepId": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-long_json-1-original-step-0002",
+        "harnessPrompt": false,
+        "registeredHarnessTools": 0
+      },
+      {
+        "call": 3,
+        "stepId": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-long_json-1-original-step-0003",
+        "harnessPrompt": false,
+        "registeredHarnessTools": 0
+      },
+      {
+        "call": 4,
+        "stepId": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-long_json-1-original-step-0004",
+        "harnessPrompt": false,
+        "registeredHarnessTools": 0
+      },
+      {
+        "call": 5,
+        "stepId": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-long_json-1-original-step-0005",
+        "harnessPrompt": false,
+        "registeredHarnessTools": 0
+      },
+      {
+        "call": 6,
+        "stepId": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-long_json-1-original-step-0006",
+        "harnessPrompt": false,
+        "registeredHarnessTools": 0
+      },
+      {
+        "call": 7,
+        "stepId": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-long_json-1-original-step-0007",
+        "harnessPrompt": false,
+        "registeredHarnessTools": 0
+      },
+      {
+        "call": 8,
+        "stepId": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-long_json-1-original-step-0008",
+        "harnessPrompt": false,
+        "registeredHarnessTools": 0
+      },
+      {
+        "call": 9,
+        "stepId": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-long_json-1-original-step-0009",
+        "harnessPrompt": false,
+        "registeredHarnessTools": 0
+      },
+      {
+        "call": 10,
+        "stepId": null,
+        "harnessPrompt": false,
+        "registeredHarnessTools": 0
+      }
+    ],
+    "toolRegistryCleaned": true,
+    "nativeCalls": 0,
+    "nativeMillis": 0,
+    "cacheHits": 0,
+    "compilations": 0,
+    "workerProcesses": 0,
+    "compilationMillis": 0,
+    "evaluationMillis": 0,
+    "cacheCleaned": true,
+    "totalMillis": 13948,
+    "pagesRead": 8,
+    "distinctPagesRead": 8,
+    "rawLedgerPreserved": true,
+    "sessionCleaned": true,
+    "proposals": 0,
+    "activations": 0,
+    "processed": 0,
+    "bypassedSmall": 0,
+    "bypassedNoSaving": 0,
+    "events": [
+      "session_closed"
+    ],
+    "receiptAccounting": {
+      "attemptedCalls": 10,
+      "settledCalls": 10,
+      "uncertainCalls": 0,
+      "unknownUsageCalls": 0,
+      "usageComplete": true,
+      "inputTokens": 34010,
+      "outputTokens": 560,
+      "costUpperBoundMicroUsd": 91746,
+      "uncertainReservationMicroUsd": 0
+    },
+    "responseErrors": {}
+  },
+  {
+    "session": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-small_mixed-1-conditional",
+    "family": "small_mixed",
+    "repeat": 1,
+    "mode": "conditional",
+    "correct": true,
+    "completed": true,
+    "failure": null,
+    "failureCode": null,
+    "completion": {
+      "complete": true,
+      "reason": "complete",
+      "missingPages": [],
+      "answerCount": 8
+    },
+    "readPages": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "expected": [
+      3758,
+      8168,
+      4497,
+      5156,
+      8675,
+      8063,
+      8480,
+      3801
+    ],
+    "final": "[3758,8168,4497,5156,8675,8063,8480,3801]",
+    "modelCalls": 10,
+    "exposedAfterReads": null,
+    "harnessPromptCalls": 0,
+    "exposureCalls": [
+      {
+        "call": 1,
+        "stepId": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-small_mixed-1-conditional-step-0001",
+        "harnessPrompt": false,
+        "registeredHarnessTools": 0
+      },
+      {
+        "call": 2,
+        "stepId": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-small_mixed-1-conditional-step-0002",
+        "harnessPrompt": false,
+        "registeredHarnessTools": 0
+      },
+      {
+        "call": 3,
+        "stepId": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-small_mixed-1-conditional-step-0003",
+        "harnessPrompt": false,
+        "registeredHarnessTools": 0
+      },
+      {
+        "call": 4,
+        "stepId": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-small_mixed-1-conditional-step-0004",
+        "harnessPrompt": false,
+        "registeredHarnessTools": 0
+      },
+      {
+        "call": 5,
+        "stepId": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-small_mixed-1-conditional-step-0005",
+        "harnessPrompt": false,
+        "registeredHarnessTools": 0
+      },
+      {
+        "call": 6,
+        "stepId": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-small_mixed-1-conditional-step-0006",
+        "harnessPrompt": false,
+        "registeredHarnessTools": 0
+      },
+      {
+        "call": 7,
+        "stepId": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-small_mixed-1-conditional-step-0007",
+        "harnessPrompt": false,
+        "registeredHarnessTools": 0
+      },
+      {
+        "call": 8,
+        "stepId": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-small_mixed-1-conditional-step-0008",
+        "harnessPrompt": false,
+        "registeredHarnessTools": 0
+      },
+      {
+        "call": 9,
+        "stepId": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-small_mixed-1-conditional-step-0009",
+        "harnessPrompt": false,
+        "registeredHarnessTools": 0
+      },
+      {
+        "call": 10,
+        "stepId": null,
+        "harnessPrompt": false,
+        "registeredHarnessTools": 0
+      }
+    ],
+    "toolRegistryCleaned": true,
+    "nativeCalls": 0,
+    "nativeMillis": 0,
+    "cacheHits": 0,
+    "compilations": 0,
+    "workerProcesses": 0,
+    "compilationMillis": 0,
+    "evaluationMillis": 0,
+    "cacheCleaned": true,
+    "totalMillis": 15140,
+    "pagesRead": 8,
+    "distinctPagesRead": 8,
+    "rawLedgerPreserved": true,
+    "sessionCleaned": true,
+    "proposals": 0,
+    "activations": 0,
+    "processed": 0,
+    "bypassedSmall": 0,
+    "bypassedNoSaving": 0,
+    "events": [
+      "session_closed",
+      "session_closed"
+    ],
+    "receiptAccounting": {
+      "attemptedCalls": 10,
+      "settledCalls": 10,
+      "uncertainCalls": 0,
+      "unknownUsageCalls": 0,
+      "usageComplete": true,
+      "inputTokens": 6444,
+      "outputTokens": 623,
+      "costUpperBoundMicroUsd": 23589,
+      "uncertainReservationMicroUsd": 0
+    },
+    "responseErrors": {}
+  },
+  {
+    "session": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-small_mixed-1-original",
+    "family": "small_mixed",
+    "repeat": 1,
+    "mode": "original",
+    "correct": false,
+    "completed": false,
+    "failure": "AgentExecutionException",
+    "failureCode": "campaign_empty_content",
+    "completion": {
+      "complete": false,
+      "reason": "empty_final_response",
+      "missingPages": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "answerCount": null
+    },
+    "readPages": [],
+    "expected": [
+      3758,
+      8168,
+      4497,
+      5156,
+      8675,
+      8063,
+      8480,
+      3801
+    ],
+    "final": "",
+    "modelCalls": 1,
+    "exposedAfterReads": null,
+    "harnessPromptCalls": 0,
+    "exposureCalls": [
+      {
+        "call": 1,
+        "stepId": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-small_mixed-1-original-step-0001",
+        "harnessPrompt": false,
+        "registeredHarnessTools": 0
+      }
+    ],
+    "toolRegistryCleaned": true,
+    "nativeCalls": 0,
+    "nativeMillis": 0,
+    "cacheHits": 0,
+    "compilations": 0,
+    "workerProcesses": 0,
+    "compilationMillis": 0,
+    "evaluationMillis": 0,
+    "cacheCleaned": true,
+    "totalMillis": 977,
+    "pagesRead": 0,
+    "distinctPagesRead": 0,
+    "rawLedgerPreserved": false,
+    "sessionCleaned": true,
+    "proposals": 0,
+    "activations": 0,
+    "processed": 0,
+    "bypassedSmall": 0,
+    "bypassedNoSaving": 0,
+    "events": [
+      "session_closed"
+    ],
+    "receiptAccounting": {
+      "attemptedCalls": 1,
+      "settledCalls": 1,
+      "uncertainCalls": 0,
+      "unknownUsageCalls": 0,
+      "usageComplete": true,
+      "inputTokens": 486,
+      "outputTokens": 9,
+      "costUpperBoundMicroUsd": 1323,
+      "uncertainReservationMicroUsd": 0
+    },
+    "responseErrors": {
+      "campaign_empty_content": 1
+    }
+  }
+]

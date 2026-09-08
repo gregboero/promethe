@@ -1,0 +1,50 @@
+[
+  {
+    "family": "json",
+    "cases": 3,
+    "baselineCorrect": 3,
+    "mutationCorrect": 3,
+    "medianRawBytes": 7726,
+    "medianPresentedBytes": 167,
+    "medianBaselineInputTokens": 727,
+    "medianMutationInputTokens": 95,
+    "baselineCostUpperBoundMicroUsd": 5634,
+    "mutationAndGenerationCostUpperBoundMicroUsd": 8527,
+    "medianBaselineApiMillis": 1602,
+    "medianMutationApiMillis": 1130,
+    "medianGenerationApiMillis": 2338,
+    "medianValidationActivationProcessingMillis": 9784
+  },
+  {
+    "family": "csv",
+    "cases": 3,
+    "baselineCorrect": 3,
+    "mutationCorrect": 3,
+    "medianRawBytes": 16,
+    "medianPresentedBytes": 167,
+    "medianBaselineInputTokens": 25,
+    "medianMutationInputTokens": 92,
+    "baselineCostUpperBoundMicroUsd": 369,
+    "mutationAndGenerationCostUpperBoundMicroUsd": 8123,
+    "medianBaselineApiMillis": 622,
+    "medianMutationApiMillis": 774,
+    "medianGenerationApiMillis": 2317,
+    "medianValidationActivationProcessingMillis": 10448
+  },
+  {
+    "family": "log",
+    "cases": 3,
+    "baselineCorrect": 3,
+    "mutationCorrect": 3,
+    "medianRawBytes": 16,
+    "medianPresentedBytes": 167,
+    "medianBaselineInputTokens": 22,
+    "medianMutationInputTokens": 95,
+    "baselineCostUpperBoundMicroUsd": 345,
+    "mutationAndGenerationCostUpperBoundMicroUsd": 7617,
+    "medianBaselineApiMillis": 685,
+    "medianMutationApiMillis": 630,
+    "medianGenerationApiMillis": 2114,
+    "medianValidationActivationProcessingMillis": 10389
+  }
+]

@@ -1,5 +1,7 @@
 # GEPA — Genetic-Pareto Prompt Evolution
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 > Self-evolution system that mutates and evaluates prompts/skills to improve agent performance over time.
 
 ## Overview

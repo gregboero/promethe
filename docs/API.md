@@ -1,5 +1,7 @@
 # API Reference
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 > Complete reference for the Prométhé gateway REST and WebSocket API.
 
 **Base URL**: `http://localhost:8080`
@@ -29,9 +31,9 @@ When `CORS_ALLOWED_ORIGINS` is empty, browser cross-origin access is denied. Whe
 an explicit comma-separated list of HTTP(S) origins; wildcard origins are not supported. The same allow-list
 is applied to the MCP HTTP endpoint.
 
-The gateway also applies a bounded in-memory rate limiter: **60 requests/minute per IP** by default,
+The gateway also applies a bounded in-memory rate limiter: **600 requests/minute per remote IP** by default,
 with a separate **120 requests/minute** bucket for signed webhooks (`RateLimiter.kt`; exempt: `/health`
-and `/.well-known/*`). Responses include
+and `/.well-known/*`, plus authenticated local API-key calls from loopback). Responses include
 `X-RateLimit-Limit` / `X-RateLimit-Remaining` / `X-RateLimit-Reset` headers; exceeding the limit returns
 `429 Too Many Requests`.
 
@@ -708,55 +710,70 @@ curl -X DELETE http://localhost:8080/api/v1/config/env/GITHUB_TOKEN
 
 Tool calls in `DANGEROUS_TOOLS` (`execute_code`, `write_file`, `browser_eval`, `send_email`, `twilio`) require human
 approval by default (`APPROVAL_MODE=dangerous`, the secure-by-default setting — do not loosen to `auto` without an
-explicit ask). All approval routes below are mounted at **root** (`Route.approvalRoutes` in `SystemAndAuthRoutes.kt`,
-called outside `route("api")`) — there is no `/api/approval/*` variant.
+explicit ask). All approval management routes below are versioned under `/api/v1`.
 
-### GET /approval/pending
+### GET /api/v1/approval/pending
 
 ```bash
-curl http://localhost:8080/approval/pending
+curl http://localhost:8080/api/v1/approval/pending
 ```
 
 **Response**:
 ```json
-[
-  {
+{
+  "pending": [{
     "id": "appr-001",
     "toolName": "execute_command",
-    "args": {"command": "rm -rf /tmp/old"},
+    "args": "{\"executable\":\"git\",\"arguments\":[\"status\"]}",
+    "argsDigest": "sha256-digest",
+    "fingerprint": "exact-invocation-fingerprint",
+    "sessionId": "session-001",
+    "persistentAllowed": false,
     "createdAt": 1718000000000
-  }
-]
+  }]
+}
 ```
 
-### POST /approval/{id}
+### POST /api/v1/approval/{id}
 
 ```bash
 # Approve
-curl -X POST http://localhost:8080/approval/appr-001 \
+curl -X POST http://localhost:8080/api/v1/approval/appr-001 \
   -H "Content-Type: application/json" \
   -d '{"approved": true}'
 
 # Reject
-curl -X POST http://localhost:8080/approval/appr-001 \
+curl -X POST http://localhost:8080/api/v1/approval/appr-001 \
   -H "Content-Type: application/json" \
   -d '{"approved": false}'
+
+# Permanently allow this exact configuration change until it is revoked.
+# PERSISTENT is rejected for non-CONFIG_CHANGE operations.
+curl -X POST http://localhost:8080/api/v1/approval/appr-config-001 \
+  -H "Content-Type: application/json" \
+  -d '{"approved": true, "scope": "PERSISTENT"}'
 ```
 
-### GET /approval/providers/pending
+The local chat renders pending requests inline with `ONCE`, `SESSION`, and, when
+`persistentAllowed=true`, `PERSISTENT` choices. Persistent grants are stored in SQLite using only the
+exact invocation fingerprint, survive gateway restarts, and remain active until the local owner revokes
+them through `DELETE /api/v1/approval/grants/{id}`. Discord can deliver the same request to explicitly configured
+integration approvers; local coding-agent operations remain local-owner-only.
+
+### GET /api/v1/approval/providers/pending
 
 List pending *provider choice* requests (e.g. when a capability like image generation could route to more than one configured provider).
 
 ```bash
-curl http://localhost:8080/approval/providers/pending
+curl http://localhost:8080/api/v1/approval/providers/pending
 ```
 
-### POST /approval/providers/{id}
+### POST /api/v1/approval/providers/{id}
 
 Respond to a provider choice request.
 
 ```bash
-curl -X POST http://localhost:8080/approval/providers/req-002 \
+curl -X POST http://localhost:8080/api/v1/approval/providers/req-002 \
   -H "Content-Type: application/json" \
   -d '{"approved": true, "selectedProviderId": "openai"}'
 ```
@@ -1097,7 +1114,7 @@ curl -X POST http://localhost:8080/api/v1/skills \
 
 ### PUT /api/v1/skills/{name}
 
-Update an existing skill. Non-system skills are moved to `QUARANTINED` and stop being available to agents.
+Update an existing skill. The edited revision moves to `QUARANTINED` and stops being available to agents, including for system skills. Its previous evaluation and review cannot authorize the changed revision.
 
 ```bash
 curl -X PUT http://localhost:8080/api/v1/skills/data_analysis \
@@ -1108,13 +1125,51 @@ curl -X PUT http://localhost:8080/api/v1/skills/data_analysis \
 ### PUT /api/v1/skills/{name}/lifecycle
 
 Apply an owner-reviewed lifecycle transition. Direct `DRAFT → ACTIVE` activation is refused; the promotion
-path is `DRAFT → QUARANTINED → CANDIDATE → ACTIVE`. System skill lifecycle cannot be changed.
+path is `DRAFT → QUARANTINED → CANDIDATE → ACTIVE`. Edited or reconfigured system skills follow the same evaluation/review cycle; unchanged legacy and bundled skills remain active for backward compatibility without new evidence.
+
+Promotion to `CANDIDATE` or `ACTIVE` requires `expectedContentHash` from a fresh skill response, `expectedRevisionHash` from validation state, a nonempty `reviewNote` (at most 2,000 characters), and the latest evaluation run marked `PASSED` for that exact revision. Missing or stale evidence returns `409`. The saved review and passing run are separate requirements; this endpoint does not itself execute evaluations. The revision hash covers body, metadata, revision nonce and suites. Edits, suite configuration and restoration require new evidence; a later failed or interrupted evaluation cannot reuse an older pass.
 
 ```bash
 curl -X PUT http://localhost:8080/api/v1/skills/data_analysis/lifecycle \
   -H "Content-Type: application/json" \
   -d '{"lifecycle": "QUARANTINED"}'
 ```
+
+### Skill evaluation and version history
+
+These endpoints are implemented and [locally validated](reports/SKILL_EVALUATION_LIFECYCLE_2026-09-08.md). The existing authentication requirements apply. Evaluation uses the gateway's configured model through Koog, with a fresh text-only request per case, no tools and no expected answers in the request. **Launching evaluations can incur provider charges.** The implementation validation used deterministic providers without paid calls.
+
+| Method | Route | Request body |
+|---|---|---|
+| `GET` | `/api/v1/skills/{name}/validation` | None |
+| `PUT` | `/api/v1/skills/{name}/evaluation-suites` | `expectedRevisionHash`, `suites` |
+| `POST` | `/api/v1/skills/{name}/evaluations` | `expectedRevisionHash` |
+| `POST` | `/api/v1/skills/{name}/restore` | `expectedRevisionHash`, `versionId` |
+
+Validation state contains `revisionHash`, `suites`, `latestRun`, `canPromote`, `versions` and `runs`. Run statuses are `RUNNING`, `PASSED`, `FAILED`, `ERROR` or `CANCELLED`; case results carry their suite/case IDs, status, optional output hash and reason. Version entries expose their ID, revision hash, capture time, content and lifecycle. Promotion still requires the owner review even when evaluation evidence is ready.
+
+Example body for `PUT .../evaluation-suites`, using the revision hash just read from validation state:
+
+```json
+{
+  "expectedRevisionHash": "<current-revision-hash>",
+  "suites": [
+    {
+      "id": "uppercase",
+      "cases": [
+        {"id": "first", "input": "alpha", "expectedOutput": "ALPHA"},
+        {"id": "second", "input": "beta", "expectedOutput": "BETA"}
+      ]
+    }
+  ]
+}
+```
+
+This example requires a skill whose instruction is to uppercase the input. Limits: 1–8 suites, at least two distinct inputs per suite, at most 20 total cases, texts at most 16,384 characters, and 60 seconds per case. The oracle is exact equality after trimming surrounding whitespace. Read validation state again after configuration, since it changes the revision and quarantines the skill, including system skills.
+
+Use `{"expectedRevisionHash":"<current-revision-hash>"}` for evaluation. `latest.json` is marked `RUNNING` before calls; only the latest passing run for the current revision authorizes the evaluation part of promotion. To restore, send `{"expectedRevisionHash":"<current-revision-hash>","versionId":"<saved-version-id>"}`. Restoration produces a quarantined revision and requires fresh evaluation and review before activation.
+
+Evidence lives locally under `.skillops/{slug}/` in the skills directory. Version snapshots are captured before publication, not a transactional commit journal. History is unsigned and does not resist local owner file modification. Writers and evaluations are serialized within one process, without a cross-process writer guarantee. These evaluations do not validate tool execution, ancillary scripts or persistent memory; the revision fingerprint does not hash transitive dependency contents. The loader rereads content and evidence at each use. See [SKILLS.md](SKILLS.md) for the user workflow.
 
 ### DELETE /api/v1/skills/{name}
 
@@ -1317,7 +1372,7 @@ The former raw HTTP command endpoint and the legacy remote setup route were remo
 
 ### Approval Gate
 
-See the [Tool Approval](#tool-approval) section above — `GET/POST /approval/...` (root, no `/api` prefix).
+See the [Tool Approval](#tool-approval) section above — `GET/POST /api/v1/approval/...`.
 
 ---
 

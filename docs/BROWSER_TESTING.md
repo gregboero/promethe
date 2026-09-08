@@ -1,5 +1,7 @@
 # Browser Agent Testing Guide
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 How to navigate and test the Promethe WASM app with a browser agent (Playwright, Puppeteer,
 Chrome DevTools Protocol, etc.).
 

@@ -1,0 +1,42 @@
+[
+  {
+    "id": "abd0df9e-cef8-4e5c-8a08-f7e8a57a8df5",
+    "sessionId": "decision-9d9704b3-0b02-43a9-b33d-37b06ccacfed-large_json-1-fixed",
+    "baseRevision": null,
+    "source": "const t = observation.text;\ntry { const v = JSON.parse(t); if (v && Object.prototype.hasOwnProperty.call(v, 'answer')) return String(v.answer); } catch (_) {}\nif (t.startsWith('id,answer\\n')) return t.split('\\n')[1].split(',')[1];\nif (t.startsWith('DATA answer=')) return t.slice('DATA answer='.length);\nreturn t;",
+    "hash": "860b4979aeaf49b5d8f4bceda7a0ec1222a1848a10fb1f9eda441f07f411273e",
+    "toolName": "json_query",
+    "createdAt": 1788760584470,
+    "validated": true
+  },
+  {
+    "id": "87522c33-346f-48c4-9e7c-6b65e7d21bff",
+    "sessionId": "decision-9d9704b3-0b02-43a9-b33d-37b06ccacfed-small_mixed-1-fixed",
+    "baseRevision": null,
+    "source": "const t = observation.text;\ntry { const v = JSON.parse(t); if (v && Object.prototype.hasOwnProperty.call(v, 'answer')) return String(v.answer); } catch (_) {}\nif (t.startsWith('id,answer\\n')) return t.split('\\n')[1].split(',')[1];\nif (t.startsWith('DATA answer=')) return t.slice('DATA answer='.length);\nreturn t;",
+    "hash": "860b4979aeaf49b5d8f4bceda7a0ec1222a1848a10fb1f9eda441f07f411273e",
+    "toolName": "json_query",
+    "createdAt": 1788760643379,
+    "validated": true
+  },
+  {
+    "id": "6f76f8bf-675d-4a3c-89c2-1b5698548c38",
+    "sessionId": "decision-9d9704b3-0b02-43a9-b33d-37b06ccacfed-schema_shift-1-fixed",
+    "baseRevision": null,
+    "source": "const t = observation.text;\ntry { const v = JSON.parse(t); if (v && Object.prototype.hasOwnProperty.call(v, 'answer')) return String(v.answer); } catch (_) {}\nif (t.startsWith('id,answer\\n')) return t.split('\\n')[1].split(',')[1];\nif (t.startsWith('DATA answer=')) return t.slice('DATA answer='.length);\nreturn t;",
+    "hash": "860b4979aeaf49b5d8f4bceda7a0ec1222a1848a10fb1f9eda441f07f411273e",
+    "toolName": "json_query",
+    "createdAt": 1788760680152,
+    "validated": true
+  },
+  {
+    "id": "5ea4aa64-a2a8-4dec-bcd6-c7f07fdd1708",
+    "sessionId": "decision-9d9704b3-0b02-43a9-b33d-37b06ccacfed-large_json-2-fixed",
+    "baseRevision": null,
+    "source": "const t = observation.text;\ntry { const v = JSON.parse(t); if (v && Object.prototype.hasOwnProperty.call(v, 'answer')) return String(v.answer); } catch (_) {}\nif (t.startsWith('id,answer\\n')) return t.split('\\n')[1].split(',')[1];\nif (t.startsWith('DATA answer=')) return t.slice('DATA answer='.length);\nreturn t;",
+    "hash": "860b4979aeaf49b5d8f4bceda7a0ec1222a1848a10fb1f9eda441f07f411273e",
+    "toolName": "json_query",
+    "createdAt": 1788760729156,
+    "validated": true
+  }
+]

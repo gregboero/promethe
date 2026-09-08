@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="HarnessTaskCompletionTest[jvm]" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-09-07T17:02:04.020Z" hostname="BUREAU" time="0.001">
+  <properties/>
+  <testcase name="completion does not pretend to establish answer correctness[jvm]" classname="dev.promethe.core.HarnessTaskCompletionTest" time="0.001"/>
+  <testcase name="completion requires observed pages and exact integer array shape[jvm]" classname="dev.promethe.core.HarnessTaskCompletionTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

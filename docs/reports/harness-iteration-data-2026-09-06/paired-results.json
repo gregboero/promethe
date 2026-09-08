@@ -1,0 +1,92 @@
+[
+  {
+    "family": "json",
+    "repeat": 1,
+    "revision": "8d0e3731-8eb1-41f1-9add-a278dd927d8c",
+    "baselineCorrect": true,
+    "mutationCorrect": true,
+    "evaluation": "revision=8d0e3731-8eb1-41f1-9add-a278dd927d8c; passed=true",
+    "rawBytes": 7726,
+    "presentedBytes": 167
+  },
+  {
+    "family": "json",
+    "repeat": 2,
+    "revision": "2aac2570-ccf8-4755-995e-3d174d05dad1",
+    "baselineCorrect": true,
+    "mutationCorrect": true,
+    "evaluation": "revision=2aac2570-ccf8-4755-995e-3d174d05dad1; passed=true",
+    "rawBytes": 7726,
+    "presentedBytes": 167
+  },
+  {
+    "family": "json",
+    "repeat": 3,
+    "revision": "b82dd8f2-0c28-4148-a79b-17d2ec2fbccb",
+    "baselineCorrect": true,
+    "mutationCorrect": true,
+    "evaluation": "revision=b82dd8f2-0c28-4148-a79b-17d2ec2fbccb; passed=true",
+    "rawBytes": 7726,
+    "presentedBytes": 167
+  },
+  {
+    "family": "csv",
+    "repeat": 1,
+    "revision": "9f519753-f0ff-49b6-8705-497401743d15",
+    "baselineCorrect": true,
+    "mutationCorrect": true,
+    "evaluation": "revision=9f519753-f0ff-49b6-8705-497401743d15; passed=true",
+    "rawBytes": 16,
+    "presentedBytes": 167
+  },
+  {
+    "family": "csv",
+    "repeat": 2,
+    "revision": "9c75b344-2696-4171-b9cd-a5bc99926b77",
+    "baselineCorrect": true,
+    "mutationCorrect": true,
+    "evaluation": "revision=9c75b344-2696-4171-b9cd-a5bc99926b77; passed=true",
+    "rawBytes": 16,
+    "presentedBytes": 167
+  },
+  {
+    "family": "csv",
+    "repeat": 3,
+    "revision": "0ebc6232-5eaf-4979-b545-fdf31c9d0ff7",
+    "baselineCorrect": true,
+    "mutationCorrect": true,
+    "evaluation": "revision=0ebc6232-5eaf-4979-b545-fdf31c9d0ff7; passed=true",
+    "rawBytes": 16,
+    "presentedBytes": 167
+  },
+  {
+    "family": "log",
+    "repeat": 1,
+    "revision": "dd229d05-bc6b-49e2-8769-85d5c50c3e27",
+    "baselineCorrect": true,
+    "mutationCorrect": true,
+    "evaluation": "revision=dd229d05-bc6b-49e2-8769-85d5c50c3e27; passed=true",
+    "rawBytes": 16,
+    "presentedBytes": 167
+  },
+  {
+    "family": "log",
+    "repeat": 2,
+    "revision": "ede446b4-44df-4bdb-ad44-860198235489",
+    "baselineCorrect": true,
+    "mutationCorrect": true,
+    "evaluation": "revision=ede446b4-44df-4bdb-ad44-860198235489; passed=true",
+    "rawBytes": 16,
+    "presentedBytes": 167
+  },
+  {
+    "family": "log",
+    "repeat": 3,
+    "revision": "5ff2b44b-5e4a-46c9-9348-0990d5f6cfac",
+    "baselineCorrect": true,
+    "mutationCorrect": true,
+    "evaluation": "revision=5ff2b44b-5e4a-46c9-9348-0990d5f6cfac; passed=true",
+    "rawBytes": 16,
+    "presentedBytes": 167
+  }
+]

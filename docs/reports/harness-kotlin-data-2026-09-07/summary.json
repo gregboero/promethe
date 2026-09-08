@@ -1,0 +1,75 @@
+{
+  "languages": {
+    "JAVASCRIPT": {
+      "batches": 3,
+      "observationsPerBatch": 5,
+      "correctBatches": 3,
+      "medianWallMillis": 867
+    },
+    "KOTLIN": {
+      "batches": 3,
+      "observationsPerBatch": 5,
+      "correctBatches": 3,
+      "medianWallMillis": 3690
+    }
+  },
+  "iterationRequests": 7,
+  "iterationCostUpperBoundMicroUsd": 44830,
+  "campaignCapMicroUsd": 5000000,
+  "campaignRequests": 276,
+  "campaignSettledCostUpperBoundMicroUsd": 1583122,
+  "campaignUncertainReservationMicroUsd": 0,
+  "tests": {
+    "api:jvmTest": {
+      "tests": 76,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared:jvmTest": {
+      "tests": 652,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "gateway:test": {
+      "tests": 213,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "evals:test": {
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "composeApp:desktopTest": {
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared:harnessKotlinNativeTest": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared:harnessLiveTest": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "sourceSha256": {
+    "harness-kotlin/native/build-windows.cmd": "692853d515a6bcf7b3b7717ab3c5f3b6449d8e1d2a1dc43b2c1191611b65823d",
+    "harness-kotlin/native/windows-launcher.c": "856075ef645b5e1fabdc08a4f8f92b307c5d6b40501209f83a63717208ac5055",
+    "harness-kotlin/src/main/kotlin/dev/promethe/harness/kotlin/Main.kt": "972f7a68103dd9e18777b440e105fee4e6ab78c580f52361fc8a29280ff0297b",
+    "harness-kotlin/build.gradle.kts": "f7e179d721ab7521b220145b22fd45702ffbaf90e2559de2b778bb6591483e5c",
+    "harness-kotlin/gradle.lockfile": "68a9b2a84a2762e0ac6a102705e51b163f6b1a8bdaf7831bd89c2f21f494316e",
+    "shared/src/jvmMain/kotlin/dev/promethe/core/HarnessKotlinRunner.kt": "fbca1a4ca6b048862c3901c79766a0df9615e4c89cc42a999e3be04d1fedd2ac",
+    "shared/src/jvmMain/kotlin/dev/promethe/core/HarnessNodeRunner.kt": "b224a731f72f1f854707a2b3e64495277fd19c6fec5344f35ab07b898279050a"
+  }
+}

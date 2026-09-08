@@ -27,7 +27,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import dev.promethe.api.SessionInfo
 import dev.promethe.api.ProjectInfo
-import dev.promethe.app.network.PrometheClient
 import dev.promethe.app.util.formatDateTime
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -38,11 +37,10 @@ private val logger = io.github.oshai.kotlinlogging.KotlinLogging.logger {}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SessionsScreen(
-    client: PrometheClient,
+    viewModel: SessionsViewModel,
     onSessionSelected: (String) -> Unit,
     onManageProjects: () -> Unit = {},
 ) {
-    val viewModel = remember { SessionsViewModel(client) }
     val state by viewModel.state.collectAsState()
     val colors = MaterialTheme.colorScheme
 

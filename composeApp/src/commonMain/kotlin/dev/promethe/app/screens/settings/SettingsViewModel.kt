@@ -117,6 +117,7 @@ private fun integrationRemoteConfigValues(state: SettingsState): Map<String, Str
         "DISCORD_PUBLIC_KEY" to state.intDiscordPublicKey,
         "DISCORD_MESSAGE_CONTENT_ENABLED" to state.intDiscordMessageContentEnabled.toString(),
         "DISCORD_ALLOWED_USER_IDS" to state.intDiscordAllowedUserIds,
+        "DISCORD_APPROVER_USER_IDS" to state.intDiscordApproverUserIds,
         "DISCORD_KNOWLEDGE_CHANNEL_IDS" to state.intDiscordKnowledgeChannelIds,
         "SLACK_BOT_TOKEN" to state.intSlackBotToken,
         "SLACK_SIGNING_SECRET" to state.intSlackSigningSecret,
@@ -522,6 +523,7 @@ class SettingsViewModel(
                         intDiscordMessageContentEnabled =
                             env["DISCORD_MESSAGE_CONTENT_ENABLED"]?.jsonPrimitive?.content?.toBooleanStrictOrNull() ?: false,
                         intDiscordAllowedUserIds = env["DISCORD_ALLOWED_USER_IDS"]?.jsonPrimitive?.content ?: "",
+                        intDiscordApproverUserIds = env["DISCORD_APPROVER_USER_IDS"]?.jsonPrimitive?.content ?: "",
                         intDiscordKnowledgeChannelIds = env["DISCORD_KNOWLEDGE_CHANNEL_IDS"]?.jsonPrimitive?.content ?: "",
                         intSlackBotToken = env["SLACK_BOT_TOKEN"]?.jsonPrimitive?.content ?: "",
                         intSlackSigningSecret = env["SLACK_SIGNING_SECRET"]?.jsonPrimitive?.content ?: "",

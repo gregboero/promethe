@@ -742,6 +742,7 @@ private fun ProfileEditorDialog(
 private fun ReasoningEffort.displayName(): String =
     when (this) {
         ReasoningEffort.AUTO -> stringResource(Res.string.agents_reasoning_effort_auto)
+        ReasoningEffort.NONE -> stringResource(Res.string.agents_reasoning_effort_none)
         ReasoningEffort.LOW -> stringResource(Res.string.agents_reasoning_effort_low)
         ReasoningEffort.MEDIUM -> stringResource(Res.string.agents_reasoning_effort_medium)
         ReasoningEffort.HIGH -> stringResource(Res.string.agents_reasoning_effort_high)

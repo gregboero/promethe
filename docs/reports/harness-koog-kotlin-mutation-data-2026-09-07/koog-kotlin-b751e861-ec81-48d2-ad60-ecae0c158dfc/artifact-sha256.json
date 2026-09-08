@@ -1,0 +1,18 @@
+{
+  "baseline-draft-0.md": "915c5d3a14fbc494fc81a2608d023d0e06c0ffe74f2923ba692ee23e5e361df0",
+  "candidates.json": "a5338d955b09046ec0b16f3a9625b7955c763aae07dc722e474e6078745f932f",
+  "corpus.json": "267c09e4370879fa46b5189df1a0c2676cbde1de4b3feca6e9ee0bd30e998d20",
+  "docs-validation.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "drafts.json": "66549120a127c37fbf4a76182316e65848069b6d34c488040a833fce31484a47",
+  "free-draft-0.md": "e73e78354ca433764661fb780084ea5d9afad9e8a8e7bde40b9d8196b744f4b1",
+  "harness-koog-kotlin-final-validation.log": "767e3eceb12b237d2df55ad77b2ce525ce267d587b787a1cfbe4eaea44494121",
+  "harness-koog-kotlin-live.log": "cb634aa4fa62de0192536eb3b56945f219bcdcb2636b5718fb3a27471dd11c1f",
+  "koog-kotlin-b751e861-ec81-48d2-ad60-ecae0c158dfc-baseline-transcript.json": "5c65f06fb0c61746975d7853de8989a6588eb1407a936aac84429799fe5fca4f",
+  "koog-kotlin-b751e861-ec81-48d2-ad60-ecae0c158dfc-free-transcript.json": "5c65f06fb0c61746975d7853de8989a6588eb1407a936aac84429799fe5fca4f",
+  "live-test.xml": "c16073a565ef77faa80605a3255dcec6dec6d1479e706903aaeebd3263b988cf",
+  "preflight.json": "d62a608038b7f84fb2b400d8e9244704acae90da4cea44240f4563fb02e0777f",
+  "protocol.json": "9c5b2fd267e1cf6b7a4d38b7876701a6829e653c586b07ef08ae64f7abee7f89",
+  "requests.json": "68346dfe64120dbc84035ac41d8a4484af381a75f0919937952bcb0427c14f60",
+  "results.json": "9f9b28f6fe674e6e3ed9182b2c69ad2cc2762a6056af563177c8ca38a1f58e20",
+  "summary.json": "0f03ad86936342fbd01d085ee2ce0fb84833d9e6a664eae4686cd364b6962058"
+}

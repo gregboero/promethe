@@ -1,0 +1,111 @@
+{
+  "batch": "koog-protocol-4324cd8e-a67c-49ae-931e-1577b6be3aa3",
+  "plannedRuns": 6,
+  "recordedRuns": 3,
+  "completeCohort": false,
+  "correctRuns": 3,
+  "completedRuns": 2,
+  "failureCodes": {
+    "task_duplicate_page_read": 1
+  },
+  "accounting": {
+    "attemptedCalls": 11,
+    "settledCalls": 11,
+    "uncertainCalls": 0,
+    "unknownUsageCalls": 0,
+    "usageComplete": true,
+    "inputTokens": 5527,
+    "outputTokens": 200,
+    "costUpperBoundMicroUsd": 16221,
+    "uncertainReservationMicroUsd": 0
+  },
+  "initialInputHashesIdentical": true,
+  "modelEndpointEffortBoundsVerified": true,
+  "httpStatuses": {
+    "200": 11
+  },
+  "responseStatuses": {
+    "completed": 11
+  },
+  "nativeFunctionCalls": 6,
+  "functionResultInputs": 6,
+  "allRegistriesCleaned": true,
+  "campaignBefore": {
+    "requests": 638,
+    "settledMicroUsd": 3851939
+  },
+  "campaignAfter": {
+    "requests": 649,
+    "settledMicroUsd": 3868160,
+    "uncertainReservations": 0,
+    "remainingMicroUsd": 1131840
+  },
+  "priorBudgetRowsUnchanged": true,
+  "validation": {
+    "api:jvmTest": {
+      "tests": 76,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared:jvmTest": {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "gateway:test": {
+      "tests": 213,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "evals:test": {
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "composeApp:desktopTest": {
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared:harnessLiveTest": {
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "sourceSha256": {
+    "api/src/commonMain/kotlin/dev/promethe/api/ReasoningEffort.kt": "45ee224aed2eb2415cd398240c6cf99b95400f83f10d68c45963b86f6436caac",
+    "shared/src/commonMain/kotlin/dev/promethe/core/KoogLlmAdapter.kt": "a310701e6b022d5549c562850cb8151e34ebdc3712bb24a60c76452a76eb9809",
+    "shared/src/commonMain/kotlin/dev/promethe/core/OpenAiCompatibleProviderPolicy.kt": "ca06e66af3511bf427eaf0998d2bc502c1c213f72dba27d7a61ee3087150fb30",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/CampaignKoogRelay.kt": "cf00bd07b0aa3f262c1739f77ccc65a1abb9d8a07c7d4699da8d97cddc6feac0",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/HarnessKoogProtocolFixture.kt": "dff448966b476032e4e858a98b4d97580376e6d7fe94cdb8c004ad374aaf1b2e",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/HarnessKoogProtocolLiveTest.kt": "7d9f882e30c67907f61ceade7f5b6b03e158a33e3d96203fc7237dbf4a432c08",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/KoogProtocolRelayTest.kt": "c9450e610942b2281068b4ceabba0dc067ae93f81e85fef64a714692100544bb",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/KoogRelayBudgetTest.kt": "9c6672561120c142a02f23d80badda5b5f99e6bfe9bd3e49c1b0b2035a1298c9",
+    "scripts/report-harness-koog-protocol.py": "72b7bf5e6c0736a5e6797fd362979d2bd6563bcc0a9eeb9a0f7483921e10c414"
+  },
+  "measurementInputSha256": {
+    "build/reports/harness-iteration/live/koog-protocol-4324cd8e-a67c-49ae-931e-1577b6be3aa3/koog-protocol-4324cd8e-a67c-49ae-931e-1577b6be3aa3-1-structured-transcript.json": "ef315050b8c7027d511023c9c8219943b8a511f091e70f5119a3e3ae7e914e1c",
+    "build/reports/harness-iteration/live/koog-protocol-4324cd8e-a67c-49ae-931e-1577b6be3aa3/koog-protocol-4324cd8e-a67c-49ae-931e-1577b6be3aa3-1-text-transcript.json": "6dc5fc6901c2a5cf4a9e3a5a3fabd94396b8e1a8f93f859bd65182d83ef5a116",
+    "build/reports/harness-iteration/live/koog-protocol-4324cd8e-a67c-49ae-931e-1577b6be3aa3/koog-protocol-4324cd8e-a67c-49ae-931e-1577b6be3aa3-2-structured-transcript.json": "f3e6a8711a574f3e75cd840f055b5775528d0ba1d057b435aabd71866d34f66f",
+    "build/reports/harness-iteration/live/koog-protocol-4324cd8e-a67c-49ae-931e-1577b6be3aa3/protocol.json": "565b212ec7c5f3a6c094fcbbbac9b98451480ecad8f867ec6acd9d243e7ea7a2",
+    "build/reports/harness-iteration/live/koog-protocol-4324cd8e-a67c-49ae-931e-1577b6be3aa3/results.json": "e55a82fb04032f0c12a46d8c93d188cfd0879eba4cd127caa27f501640ee3c99",
+    "build/reports/harness-iteration/live/request-23f8f179-f3d6-4f2a-aeee-1b420df7aca9.json": "1f5f3b430233014ca6b797bac4c8faa699f00644e23cf155cc4a39c1110d7ef4",
+    "build/reports/harness-iteration/live/request-3a21345f-d20a-435e-9ea9-a69366b57a41.json": "1be45478f7bf800019584f1f8b323f183785cdafd4432cf3a8ecacf752d1424b",
+    "build/reports/harness-iteration/live/request-55a4dee4-59d3-485d-a2a0-b9ce03b3119a.json": "6837f5ef617c035e4a0aa8d25c39d481335fd895fae2cfc93db32593da56865d",
+    "build/reports/harness-iteration/live/request-6925f70b-d515-411d-a79c-4ed7899f4f01.json": "95ee0fbf6fd495b9509d0697b2be06b288a17c5181e5575f631997dbadb63518",
+    "build/reports/harness-iteration/live/request-712f9a94-50bc-402a-a9b5-a8306ce1cfc3.json": "f5465a5308c9c2c9cb0dc55e98d5abd897ab3a0cf45bc825c174a7a05ec74a4f",
+    "build/reports/harness-iteration/live/request-7d2474ee-efaf-48de-9c4d-dd7b96a2138f.json": "7af9d1cd45e405459f9943beb19b3edbf2b8e6dda2df2248806a6255426a918e",
+    "build/reports/harness-iteration/live/request-80fab5e9-4574-4570-b016-651516690fcf.json": "dae0d0ed76e44683ae4d76ca5c75e1b700e453c4cf5636b7a2068713f70f1569",
+    "build/reports/harness-iteration/live/request-8f19160a-73aa-4d50-8696-4e1664cb16d6.json": "85c4b58b49d03b347ac2bd32dc4ba0fa1459b397eebd3553489ca8d068700b14",
+    "build/reports/harness-iteration/live/request-b2f3ea76-23e2-4102-ac6d-faaecc079bf4.json": "6f4642ab54a6b072343de571d8a01d80296285ecd78af08a5e388c51ce385043",
+    "build/reports/harness-iteration/live/request-da7045b3-6d0f-41c5-824b-80c3614f5828.json": "74bd0c85c8c1f1d9141e156a894ab65b527197e230b9b82252af91ce983298b8",
+    "build/reports/harness-iteration/live/request-dfcb8049-80c6-48e0-83b5-298dda78b951.json": "6a9d4195033de726648e9067d2a7efb46056c18fa664004013546d6a87df4c8d"
+  }
+}

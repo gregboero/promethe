@@ -1,5 +1,7 @@
 # Memory System (4 tiers)
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 ## Overview
 
 Prométhé persists facts about the user beyond a single conversation via a

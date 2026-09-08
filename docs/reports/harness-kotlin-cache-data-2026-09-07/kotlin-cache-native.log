@@ -1,0 +1,70 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.5.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :harness-kotlin:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :shared:kmpPartiallyResolvedDependenciesChecker
+> Task :api:kmpPartiallyResolvedDependenciesChecker
+> Task :shared:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :api:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :shared:buildSandboxNative UP-TO-DATE
+> Task :shared:syncSandboxNative UP-TO-DATE
+> Task :shared:jvmProcessResources UP-TO-DATE
+> Task :shared:processJvmMainResources SKIPPED
+> Task :shared:jvmTestProcessResources NO-SOURCE
+> Task :shared:processJvmTestResources SKIPPED
+> Task :api:compileKotlinJvm UP-TO-DATE
+> Task :harness-kotlin:compileKotlin UP-TO-DATE
+> Task :api:compileJvmMainJava NO-SOURCE
+> Task :harness-kotlin:compileJava NO-SOURCE
+> Task :api:jvmProcessResources NO-SOURCE
+> Task :api:processJvmMainResources SKIPPED
+> Task :api:jvmMainClasses UP-TO-DATE
+> Task :harness-kotlin:processResources NO-SOURCE
+> Task :harness-kotlin:classes UP-TO-DATE
+> Task :harness-kotlin:jar UP-TO-DATE
+> Task :api:jvmJar UP-TO-DATE
+> Task :harness-kotlin:startScripts UP-TO-DATE
+> Task :harness-kotlin:windowsLauncher UP-TO-DATE
+> Task :harness-kotlin:installDist UP-TO-DATE
+> Task :harness-kotlin:prepareRuntime UP-TO-DATE
+> Task :shared:compileKotlinJvm UP-TO-DATE
+> Task :shared:compileJvmMainJava NO-SOURCE
+> Task :shared:jvmMainClasses UP-TO-DATE
+> Task :shared:jvmJar UP-TO-DATE
+
+> Task :shared:compileTestKotlinJvm
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:57:13 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:71:13 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:83:13 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:95:13 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:113:13 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:121:13 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:134:13 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:149:17 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:163:13 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:172:13 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:191:13 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:201:13 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:219:13 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:244:17 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:267:17 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:292:17 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:307:17 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:322:17 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/hooks/HookManagerTest.kt:92:53 No cast needed.
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/providers/CapabilityRouterTest.kt:16:29 No cast needed.
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/providers/CapabilityRouterTest.kt:28:32 No cast needed.
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/providers/CapabilityRouterTest.kt:46:32 No cast needed.
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/providers/CapabilityRouterTest.kt:82:52 No cast needed.
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/tools/media/MediaToolsMultiProviderTest.kt:98:61 No cast needed.
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/tools/media/MediaToolsMultiProviderTest.kt:114:37 No cast needed.
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/db/DatabaseBackupServiceTest.kt:26:89 Unnecessary non-null assertion (!!) on a non-null receiver of type 'File'.
+
+> Task :shared:compileJvmTestJava NO-SOURCE
+> Task :shared:jvmTestClasses
+> Task :shared:harnessKotlinNativeTest
+
+[Incubating] Problems report is available at: file:///E:/workspace/perso/projectRandD/promethe/build/reports/problems/problems-report.html
+
+BUILD SUCCESSFUL in 3m 54s
+17 actionable tasks: 4 executed, 13 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.5.1/userguide/configuration_cache_enabling.html

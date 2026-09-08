@@ -2,8 +2,15 @@
 .gradle
 .idea
 **/build
+web-tooling/node_modules/
 sandbox-native/target
 *.db
 *.log
 .env
+.env.*
+!.env.example
+local.properties
+profiles/
+plugins/
+docs/reports/audit-data-*/
 credentials.json

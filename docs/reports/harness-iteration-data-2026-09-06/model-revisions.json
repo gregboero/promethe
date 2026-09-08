@@ -1,0 +1,112 @@
+[
+  {
+    "id": "8d0e3731-8eb1-41f1-9add-a278dd927d8c",
+    "sessionId": "927bd485-e0ab-4b6e-9e0c-eb0db1715c71-json-1",
+    "baseRevision": null,
+    "source": "const text = observation && typeof observation.text === \"string\" ? observation.text : String(observation?.text ?? \"\");\nconst trimmed = text.trim();\n\ntry {\n  const value = JSON.parse(trimmed);\n  if (value && typeof value === \"object\" && !Array.isArray(value) && Object.prototype.hasOwnProperty.call(value, \"answer\")) {\n    return String(value.answer);\n  }\n} catch {}\n\nconst csv = trimmed.match(/^(?:id,answer\\r?\\n)?[^,\\r\\n]+,([^\\r\\n]+)$/i);\nif (csv) return csv[1].trim();\n\nconst data = trimmed.match(/^DATA\\s+answer=(.*)$/is);\nif (data) return data[1].trim();\n\nreturn text;",
+    "hash": "f79f73faca4e06beaabb39e41715b8233ce33017c11bb769af219b46b903956b",
+    "toolName": "read_file",
+    "createdAt": 1788754086521,
+    "validated": true,
+    "validationActivationProcessingMillis": 9641
+  },
+  {
+    "id": "2aac2570-ccf8-4755-995e-3d174d05dad1",
+    "sessionId": "fe195def-7e32-415a-8cb4-cf8af0eb3adf-json-2",
+    "baseRevision": null,
+    "source": "const text = observation && typeof observation.text === \"string\" ? observation.text : String(observation?.text ?? \"\");\nconst toolName = observation?.toolName;\n\ntry {\n  const parsed = JSON.parse(text);\n  if (parsed && typeof parsed === \"object\" && !Array.isArray(parsed) && Object.prototype.hasOwnProperty.call(parsed, \"answer\")) {\n    return String(parsed.answer);\n  }\n} catch {}\n\nconst csvLines = text.split(/\\r?\\n/).filter(line => line.trim() !== \"\");\nif (csvLines.length >= 2 && /^\\s*id\\s*,\\s*answer\\s*$/i.test(csvLines[0])) {\n  const row = csvLines[1];\n  const comma = row.indexOf(\",\");\n  if (comma >= 0) return row.slice(comma + 1).trim().replace(/^\"|\"$/g, \"\");\n}\n\nconst dataMatch = text.match(/^\\s*DATA\\s+answer\\s*=\\s*(.*)\\s*$/i);\nif (dataMatch) return dataMatch[1];\n\nreturn text;",
+    "hash": "c877a2ebf503cc81d780d6764e256f9200aaac32a93f0069e32a5bb6a77c831a",
+    "toolName": "read_file",
+    "createdAt": 1788754102184,
+    "validated": true,
+    "validationActivationProcessingMillis": 9784
+  },
+  {
+    "id": "b82dd8f2-0c28-4148-a79b-17d2ec2fbccb",
+    "sessionId": "e4882f29-21c9-4012-baab-4a92636df1d7-json-3",
+    "baseRevision": null,
+    "source": "const text = observation && observation.text;\nif (typeof text !== \"string\") return text;\n\ntry {\n  const parsed = JSON.parse(text);\n  if (parsed && typeof parsed === \"object\" && !Array.isArray(parsed) && Object.prototype.hasOwnProperty.call(parsed, \"answer\")) {\n    return String(parsed.answer);\n  }\n} catch {}\n\nconst csvLines = text.split(/\\r?\\n/);\nif (csvLines.length >= 2 && /^id\\s*,\\s*answer\\s*$/i.test(csvLines[0])) {\n  const row = csvLines[1];\n  const comma = row.indexOf(\",\");\n  if (comma >= 0) return row.slice(comma + 1).trim().replace(/^\"|\"$/g, \"\");\n}\n\nconst dataMatch = text.match(/^DATA\\s+answer\\s*=\\s*(.*)$/is);\nif (dataMatch) return dataMatch[1].trim();\n\nreturn text;",
+    "hash": "b5bf7e355fa6f41ecdf1a074f65cd9b7bf0634159e25c8dda338f219e7cbb5dd",
+    "toolName": "read_file",
+    "createdAt": 1788754116657,
+    "validated": true,
+    "validationActivationProcessingMillis": 10015
+  },
+  {
+    "id": "9f519753-f0ff-49b6-8705-497401743d15",
+    "sessionId": "42424b09-0a14-4372-98de-e7a347073643-csv-1",
+    "baseRevision": null,
+    "source": "const text = observation && typeof observation.text === \"string\" ? observation.text : \"\";\nconst trimmed = text.trim();\n\ntry {\n  const value = JSON.parse(trimmed);\n  if (value && typeof value === \"object\" && !Array.isArray(value) && Object.prototype.hasOwnProperty.call(value, \"answer\")) {\n    return String(value.answer);\n  }\n} catch (_) {}\n\nconst lines = trimmed.split(/\\r?\\n/);\nif (lines.length >= 2 && /^\\s*id\\s*,\\s*answer\\s*$/i.test(lines[0])) {\n  const row = lines[1];\n  const comma = row.indexOf(\",\");\n  if (comma !== -1) return row.slice(comma + 1).trim();\n}\n\nconst dataMatch = trimmed.match(/^DATA\\s+answer\\s*=\\s*(.*)$/is);\nif (dataMatch) return dataMatch[1].trim();\n\nreturn text;",
+    "hash": "7561336a194e3ebd61ddd7349dbe72219054372366b33b59168a96dc9e419a61",
+    "toolName": "read_file",
+    "createdAt": 1788754130257,
+    "validated": true,
+    "validationActivationProcessingMillis": 18970
+  },
+  {
+    "id": "9c75b344-2696-4171-b9cd-a5bc99926b77",
+    "sessionId": "6a628e6c-d119-4dd7-9d15-bbf6f119d54b-csv-2",
+    "baseRevision": null,
+    "source": "const text = observation && observation.text;\nif (typeof text !== \"string\") return text;\n\ntry {\n  const value = JSON.parse(text);\n  if (value && typeof value === \"object\" && Object.prototype.hasOwnProperty.call(value, \"answer\")) {\n    return String(value.answer);\n  }\n} catch {}\n\nconst csv = text.match(/^(?:id,answer|answer,id)\\s*\\r?\\n([^\\r\\n,]*)(?:,([^\\r\\n]*))?\\s*$/i);\nif (csv) return csv[2] !== undefined ? csv[2] : csv[1];\n\nconst data = text.match(/^DATA\\s+answer=(.*)$/is);\nif (data) return data[1];\n\nreturn text;",
+    "hash": "e51011cfda74b8148d3458df3c22ae6401876d0ddfcab06e9d8b08854f7c23e9",
+    "toolName": "read_file",
+    "createdAt": 1788754153356,
+    "validated": true,
+    "validationActivationProcessingMillis": 10116
+  },
+  {
+    "id": "0ebc6232-5eaf-4979-b545-fdf31c9d0ff7",
+    "sessionId": "30db3371-15cb-48c9-b12e-b769e893f20f-csv-3",
+    "baseRevision": null,
+    "source": "const text = observation && typeof observation.text === \"string\" ? observation.text : \"\";\n\ntry {\n  const value = JSON.parse(text);\n  if (value && typeof value === \"object\" && !Array.isArray(value) && Object.prototype.hasOwnProperty.call(value, \"answer\")) {\n    return String(value.answer);\n  }\n} catch (_) {}\n\nconst lines = text.split(/\\r?\\n/);\nif (lines.length >= 2 && /^\\s*id\\s*,\\s*answer\\s*$/i.test(lines[0])) {\n  const row = lines[1].trim();\n  const comma = row.indexOf(\",\");\n  if (comma >= 0) return row.slice(comma + 1).trim();\n}\n\nconst dataMatch = text.match(/^\\s*DATA\\s+answer\\s*=\\s*([\\s\\S]*)$/i);\nif (dataMatch) return dataMatch[1].trim();\n\nreturn text;",
+    "hash": "a6ca181f0cdf7eed396edb0641449968cdf1d551e173b21cb8ff025d959a6413",
+    "toolName": "read_file",
+    "createdAt": 1788754167217,
+    "validated": true,
+    "validationActivationProcessingMillis": 10448
+  },
+  {
+    "id": "dd229d05-bc6b-49e2-8769-85d5c50c3e27",
+    "sessionId": "2de6a317-1a7a-44eb-9db5-33fed966a90a-log-1",
+    "baseRevision": null,
+    "source": "const { text } = observation;\nif (typeof text !== \"string\") return text;\n\ntry {\n  const value = JSON.parse(text);\n  if (\n    value &&\n    typeof value === \"object\" &&\n    !Array.isArray(value) &&\n    Object.prototype.hasOwnProperty.call(value, \"answer\")\n  ) {\n    return String(value.answer);\n  }\n} catch {}\n\nconst csv = text.match(/^(?:id,answer)\\r?\\n[^\\r\\n]*?,([^\\r\\n]*)$/);\nif (csv) return csv[1];\n\nconst data = text.match(/^DATA\\s+answer=(.*)$/s);\nif (data) return data[1];\n\nreturn text;",
+    "hash": "288a5d8b9ae49110cdc445b4fca0ecac925f9d3035da9721565a3a38a13ae2c5",
+    "toolName": "read_file",
+    "createdAt": 1788754181138,
+    "validated": true,
+    "validationActivationProcessingMillis": 10389
+  },
+  {
+    "id": "ede446b4-44df-4bdb-ad44-860198235489",
+    "sessionId": "7d96416d-6ff6-4d4c-87c3-d0ec3ac0153a-log-2",
+    "baseRevision": null,
+    "source": "const { toolName, text } = observation;\nvoid toolName;\n\nif (typeof text !== \"string\") return text;\n\ntry {\n  const value = JSON.parse(text);\n  if (value && typeof value === \"object\" && !Array.isArray(value) && \"answer\" in value) {\n    return String(value.answer);\n  }\n} catch {}\n\nconst csv = text.match(/^(?:id\\s*,\\s*answer\\s*\\r?\\n)?[^,\\r\\n]*\\s*,\\s*([^\\r\\n]*)\\s*$/i);\nif (csv && /^id\\s*,\\s*answer\\s*\\r?\\n/i.test(text)) return csv[1];\n\nconst data = text.match(/^DATA\\s+answer\\s*=\\s*(.*)$/is);\nif (data) return data[1];\n\nreturn text;",
+    "hash": "7c224964b7a4296cdce8e409b938334bed9f4c8d5542a4dd9b50b0be58547ec9",
+    "toolName": "read_file",
+    "createdAt": 1788754195099,
+    "validated": true,
+    "validationActivationProcessingMillis": 10315
+  },
+  {
+    "id": "5ff2b44b-5e4a-46c9-9348-0990d5f6cfac",
+    "sessionId": "293ba683-5ea6-4f64-8754-ac7a6d6896ee-log-3",
+    "baseRevision": null,
+    "source": "const { toolName, text } = observation;\nvoid toolName;\n\nif (typeof text !== \"string\") return text;\n\ntry {\n  const parsed = JSON.parse(text);\n  if (\n    parsed &&\n    typeof parsed === \"object\" &&\n    !Array.isArray(parsed) &&\n    Object.prototype.hasOwnProperty.call(parsed, \"answer\")\n  ) {\n    return String(parsed.answer);\n  }\n} catch {}\n\nconst csv = text.match(/^\\s*id\\s*,\\s*answer\\s*\\r?\\n\\s*[^,\\r\\n]*\\s*,\\s*([^\\r\\n]*)\\s*$/i);\nif (csv) return csv[1].trim();\n\nconst data = text.match(/^\\s*DATA\\s+answer\\s*=\\s*(.*?)\\s*$/is);\nif (data) return data[1];\n\nreturn text;",
+    "hash": "aa4ae9c0ff249a87c3d6d641c76e1b0544e8f8892390feed4d48b1c339d0db1a",
+    "toolName": "read_file",
+    "createdAt": 1788754208841,
+    "validated": true,
+    "validationActivationProcessingMillis": 19243
+  },
+  {
+    "id": "e34572d7-6adc-4489-a82e-f67abc0a586c",
+    "sessionId": "agent-live-c9c39d5e-7c48-4b31-ac72-4af28d66855d",
+    "baseRevision": null,
+    "source": "const t = observation.text;\ntry {\n  const o = JSON.parse(t);\n  if (o && Object.prototype.hasOwnProperty.call(o, 'answer')) return String(o.answer);\n} catch (_) {}\nconst csv = t.match(/(?:^|\\n)\\s*[^,\\n]*,answer\\s*\\n\\s*[^,\\n]*,([^\\n\\r]*)/i);\nif (csv) return csv[1].trim();\nconst kv = t.match(/\\banswer\\s*=\\s*([^\\s,;]+)/i);\nif (kv) return kv[1];\nreturn t;",
+    "hash": "a41522d2e351f753163edd5c1246ce28fee8eb6949eeb1c00d13a83bbc77000b",
+    "toolName": "json_query",
+    "createdAt": 1788755644264,
+    "validated": true,
+    "validationActivationProcessingMillis": 13233
+  }
+]

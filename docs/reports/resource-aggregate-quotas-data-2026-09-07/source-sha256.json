@@ -1,0 +1,13 @@
+{
+  "scripts/report-resource-quotas.py": "1f2991f905c86838fdf98b09d958b6a9d86dfd17102dc85343e5a6f95c9349d0",
+  "shared/src/commonMain/kotlin/dev/promethe/core/ResourceQuotas.kt": "d407ec530f2defa85b23462d691e881912119b3069ef32ecae60e3486ac2e81e",
+  "shared/src/commonMain/kotlin/dev/promethe/core/ResourceGovernor.kt": "c3fafff9bc0f0c42088d998543211056e4d8883a2c1ed58c3fec9471564d0c58",
+  "shared/src/commonMain/kotlin/dev/promethe/core/KoogLlmAdapter.kt": "57c0b7cbfc00eae860ea214671d5f97c019f65ec07c9dad6f2c766e24a4024d3",
+  "shared/src/commonMain/kotlin/dev/promethe/core/ActionExecutor.kt": "83055b331a656e0279b30d002cbbf1a9ed964a60909701ac2f175ddbdd4b4b6c",
+  "shared/src/commonMain/kotlin/dev/promethe/core/tools/builtin/IntrospectionTools.kt": "99b2bbb8c0be76afc6ceba5a2da4b9cd6b98ad5805b4996634b7a22c616b1526",
+  "shared/src/jvmMain/kotlin/dev/promethe/core/PersistentResourceQuotaBank.kt": "ee781aaf7f16f3737f720ad996f934b9ddbd72b283734510fbb5dbb751b29992",
+  "shared/src/jvmMain/kotlin/dev/promethe/core/PersistentResourceGovernorRegistry.kt": "17186569daab398af7a71612012e94b444d42e684ddecdcde4f2179968ed339d",
+  "shared/src/jvmMain/kotlin/dev/promethe/core/AgentBootstrap.kt": "858fbcd735b02186f8a2162aaaa5a7ef80c068a4edbb2aede11a1b9f98882964",
+  "shared/src/jvmTest/kotlin/dev/promethe/core/PersistentResourceQuotaBankTest.kt": "1bcb0ebc7d7865a19abb851ca19b77a12ffbfa69a5c87077444d79bd2bfe003e",
+  "shared/src/jvmTest/kotlin/dev/promethe/core/ResourceQuotaIntegrationTest.kt": "7529c97fe62f24dffbd52ac0f1dd0687c8f2912c003c4035ab5a2d8300b5ac80"
+}

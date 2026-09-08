@@ -1,5 +1,7 @@
 # Security
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 ## Secure Defaults
 
 Promethe is a single-owner personal gateway. A normal installation listens only on
@@ -113,6 +115,13 @@ limit an allowed user to deterministic subject phrases, opt a channel into Open 
 that channel to a Promethe project. Dynamic `DENY` rules override static access. Policy mutations are
 classified as `CONFIG_CHANGE`, require human approval when requested conversationally and are blocked for
 all channel, webhook, MCP, ACP, voice, scheduler and autonomous origins.
+
+Effectful requests originating from Discord can be routed to the explicit
+`DISCORD_APPROVER_USER_IDS` list as private messages. Arguments are redacted before delivery and the
+clicking Discord user is checked against the live list. Persistent approval is offered only for exact
+`CONFIG_CHANGE` fingerprints; process and local coding-agent approvals cannot be made persistent from
+Discord. These grants store only fingerprints in SQLite, survive gateway restarts and remain revocable by
+the local loopback owner.
 
 ## Public Surface
 

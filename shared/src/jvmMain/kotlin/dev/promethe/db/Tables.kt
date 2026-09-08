@@ -96,6 +96,47 @@ object AgentRunEvents : Table("agent_run_events") {
     }
 }
 
+/** resource_governors - durable budget definition and consumption for a root run tree. */
+object ResourceGovernors : Table("resource_governors") {
+    val rootRunId = varchar("root_run_id", 160)
+    val maxTokens = long("max_tokens")
+    val maxCostDollars = double("max_cost_dollars")
+    val maxLlmCalls = integer("max_llm_calls")
+    val maxToolStarts = integer("max_tool_starts")
+    val maxSubAgents = integer("max_sub_agents")
+    val maxDurationMs = long("max_duration_ms")
+    val startedAt = long("started_at")
+    val tokensUsed = long("tokens_used").default(0)
+    val costDollars = double("cost_dollars").default(0.0)
+    val llmCallsStarted = integer("llm_calls_started").default(0)
+    val toolsStarted = integer("tools_started").default(0)
+    val subAgentsStarted = integer("sub_agents_started").default(0)
+    val version = long("version").default(0)
+    val updatedAt = long("updated_at")
+
+    override val primaryKey = PrimaryKey(rootRunId)
+
+    init {
+        index(isUnique = false, updatedAt)
+    }
+}
+
+/** resource_governor_bindings - active root and child sessions sharing one budget. */
+object ResourceGovernorBindings : Table("resource_governor_bindings") {
+    val sessionId = varchar("session_id", 255)
+    val rootRunId = varchar("root_run_id", 160)
+    val runId = varchar("run_id", 160).nullable()
+    val createdAt = long("created_at")
+    val updatedAt = long("updated_at")
+
+    override val primaryKey = PrimaryKey(sessionId)
+
+    init {
+        index(isUnique = false, rootRunId)
+        uniqueIndex(runId)
+    }
+}
+
 /** mcp_tasks - durable state for the MCP Tasks extension. */
 object McpTasks : Table("mcp_tasks") {
     val taskId = varchar("task_id", 160)
@@ -287,6 +328,22 @@ object Settings : Table("settings") {
     val updatedAt = long("updated_at")
 
     override val primaryKey = PrimaryKey(key)
+}
+
+/** approval_grants — durable, revocable grants for exact configuration-change fingerprints. */
+object ApprovalGrants : Table("approval_grants") {
+    val id = varchar("id", 160)
+    val fingerprint = varchar("fingerprint", 64)
+    val allowed = bool("allowed")
+    val createdAt = long("created_at")
+    val expiresAt = long("expires_at")
+
+    override val primaryKey = PrimaryKey(id)
+
+    init {
+        index(isUnique = false, fingerprint)
+        index(isUnique = false, expiresAt)
+    }
 }
 
 /** llm_usage_logs — per-request LLM usage for persistent stats */

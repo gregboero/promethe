@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="skills_evaluations">Skill evaluations</string>
+    <string name="skills_evaluations_passed">This revision passed its declared cases. Owner review is still required for promotion.</string>
+    <string name="skills_evaluations_required">Current passing evaluations are required before promotion.</string>
+    <string name="skills_test_cases">Test cases</string>
+    <string name="skills_run_evaluations">Run tests</string>
+    <string name="skills_version_history">History</string>
+    <string name="skills_evaluation_cost">Tests use the configured model and may incur costs. Up to 20 text cases, without tools.</string>
+    <string name="skills_test_cases_help">Provide at least two different tasks and exact expected answers. Saving cases puts this skill in quarantine.</string>
+    <string name="skills_case_input">Task</string>
+    <string name="skills_expected_answer">Exact expected answer</string>
+    <string name="skills_add_case">Add a case</string>
+    <string name="skills_restore_help">Restoring creates a quarantined revision. Run its tests and review it before activation.</string>
+    <string name="skills_restore_version">Restore this version</string>
+    <string name="skills_review_note">Review evidence and observations</string>
+    <string name="skills_review_scope">Describe the checks you performed on this version. This owner review does not run automated evaluations.</string>
     <!-- ═══════════════════════════════════════════════════════════════
          Promethe — English strings (default locale)
          Generated for v0.1.0 release
@@ -94,6 +109,14 @@
     <string name="chat_keyboard_hint">Enter to send · Shift+Enter for new line</string>
     <string name="chat_scroll_to_bottom">Scroll to bottom</string>
     <string name="chat_connection_error">Connection error: %1$s</string>
+    <string name="chat_approval_required">Authorization required</string>
+    <string name="chat_approval_tool">Tool: %1$s</string>
+    <string name="chat_approval_arguments">Arguments</string>
+    <string name="chat_approval_reject">Reject</string>
+    <string name="chat_approval_allow_once">Allow once</string>
+    <string name="chat_approval_allow_session">Allow for session</string>
+    <string name="chat_approval_allow_persistent">Always allow this exact configuration</string>
+    <string name="chat_approval_resolution_error">Could not resolve this request: %1$s</string>
 
     <!-- ── components/ (MessageBubble, AgentReasoningBlock) ── -->
     <string name="component_message_bubble_copy_a11y">Copy message</string>
@@ -192,6 +215,8 @@
     <string name="settings_integrations_discord_message_content_label">Listen for messages addressed to the bot (Message Content)</string>
     <string name="settings_integrations_discord_allowed_users_label">Allowed user IDs (optional)</string>
     <string name="settings_integrations_discord_allowed_users_hint">Comma-separated Discord user IDs. Empty allows every user who can reach the bot.</string>
+    <string name="settings_integrations_discord_approvers_label">Approval manager user IDs</string>
+    <string name="settings_integrations_discord_approvers_hint">Discord user IDs that receive private authorization requests. They must share a server with the bot and allow direct messages.</string>
     <string name="settings_integrations_discord_knowledge_channels_label">Knowledge channel IDs (optional)</string>
     <string name="settings_integrations_discord_knowledge_channels_hint">Messages in these channels are archived as JSON-LD and used as untrusted conversation context.</string>
     <string name="settings_integrations_app_public_key_label">Application Public Key (slash commands only)</string>
@@ -459,6 +484,7 @@
     <string name="agents_reasoning_effort_low">Low</string>
     <string name="agents_reasoning_effort_medium">Medium</string>
     <string name="agents_reasoning_effort_high">High</string>
+    <string name="agents_reasoning_effort_none">None</string>
     <string name="agents_max_iterations_label">Max iterations</string>
     <string name="agents_selected_count">%1$d selected</string>
     <string name="agents_no_items_selected">No items selected</string>

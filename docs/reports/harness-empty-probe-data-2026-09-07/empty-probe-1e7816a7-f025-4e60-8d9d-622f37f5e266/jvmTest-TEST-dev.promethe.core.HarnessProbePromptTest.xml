@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="HarnessProbePromptTest[jvm]" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-09-07T17:24:02.844Z" hostname="BUREAU" time="0.824">
+  <properties/>
+  <testcase name="capture uses one fake model call with no tool execution or personal profile[jvm]" classname="dev.promethe.core.HarnessProbePromptTest" time="0.824"/>
+  <system-out><![CDATA[kotlin-logging: initializing... active logger factory: Slf4jLoggerFactory
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

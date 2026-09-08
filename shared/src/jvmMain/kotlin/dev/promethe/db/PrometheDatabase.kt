@@ -40,6 +40,8 @@ class PrometheDatabase(
                 AgentRuns,
                 ToolIntents,
                 AgentRunEvents,
+                ResourceGovernors,
+                ResourceGovernorBindings,
                 McpTasks,
                 Projects,
                 Sessions,
@@ -51,6 +53,7 @@ class PrometheDatabase(
                 ScheduledTasks,
                 WebhookChannels,
                 Settings,
+                ApprovalGrants,
                 LlmUsageLogs,
                 RemoteOwners,
                 AuthSessions,
@@ -262,6 +265,127 @@ class PrometheDatabase(
                 .where { AgentRunEvents.runId eq runId }
                 .orderBy(AgentRunEvents.sequence, SortOrder.ASC)
                 .map { it.toAgentRunEventRecord() }
+        }
+
+    // ===== RESOURCE GOVERNORS =====
+
+    override suspend fun insertResourceGovernorState(state: ResourceGovernorStateRow): Boolean =
+        dbQuery {
+            ResourceGovernors
+                .insertIgnore {
+                    it[rootRunId] = state.rootRunId
+                    it[maxTokens] = state.maxTokens
+                    it[maxCostDollars] = state.maxCostDollars
+                    it[maxLlmCalls] = state.maxLlmCalls
+                    it[maxToolStarts] = state.maxToolStarts
+                    it[maxSubAgents] = state.maxSubAgents
+                    it[maxDurationMs] = state.maxDurationMs
+                    it[startedAt] = state.startedAt
+                    it[tokensUsed] = state.tokensUsed
+                    it[costDollars] = state.costDollars
+                    it[llmCallsStarted] = state.llmCallsStarted
+                    it[toolsStarted] = state.toolsStarted
+                    it[subAgentsStarted] = state.subAgentsStarted
+                    it[version] = state.version
+                    it[updatedAt] = state.updatedAt
+                }.insertedCount > 0
+        }
+
+    override suspend fun updateResourceGovernorState(
+        expectedVersion: Long,
+        state: ResourceGovernorStateRow,
+    ): Boolean =
+        dbQuery {
+            ResourceGovernors.update(
+                where = {
+                    (ResourceGovernors.rootRunId eq state.rootRunId) and
+                        (ResourceGovernors.version eq expectedVersion)
+                },
+            ) {
+                it[tokensUsed] = state.tokensUsed
+                it[costDollars] = state.costDollars
+                it[llmCallsStarted] = state.llmCallsStarted
+                it[toolsStarted] = state.toolsStarted
+                it[subAgentsStarted] = state.subAgentsStarted
+                it[version] = state.version
+                it[updatedAt] = state.updatedAt
+            } > 0
+        }
+
+    override suspend fun getResourceGovernorState(rootRunId: String): ResourceGovernorStateRow? =
+        dbQuery {
+            ResourceGovernors
+                .selectAll()
+                .where { ResourceGovernors.rootRunId eq rootRunId }
+                .singleOrNull()
+                ?.toResourceGovernorStateRow()
+        }
+
+    override suspend fun insertResourceGovernorBinding(binding: ResourceGovernorBindingRow): Boolean =
+        dbQuery {
+            ResourceGovernorBindings
+                .insertIgnore {
+                    it[sessionId] = binding.sessionId
+                    it[rootRunId] = binding.rootRunId
+                    it[runId] = binding.runId
+                    it[createdAt] = binding.createdAt
+                    it[updatedAt] = binding.updatedAt
+                }.insertedCount > 0
+        }
+
+    override suspend fun claimResourceGovernorBinding(
+        sessionId: String,
+        expectedRunId: String?,
+        runId: String,
+        updatedAt: Long,
+    ): Boolean =
+        dbQuery {
+            ResourceGovernorBindings.update(
+                where = {
+                    (ResourceGovernorBindings.sessionId eq sessionId) and
+                        if (expectedRunId == null) {
+                            ResourceGovernorBindings.runId.isNull()
+                        } else {
+                            ResourceGovernorBindings.runId eq expectedRunId
+                        }
+                },
+            ) {
+                it[ResourceGovernorBindings.runId] = runId
+                it[ResourceGovernorBindings.updatedAt] = updatedAt
+            } > 0
+        }
+
+    override suspend fun getResourceGovernorBinding(sessionId: String): ResourceGovernorBindingRow? =
+        dbQuery {
+            ResourceGovernorBindings
+                .selectAll()
+                .where { ResourceGovernorBindings.sessionId eq sessionId }
+                .singleOrNull()
+                ?.toResourceGovernorBindingRow()
+        }
+
+    override suspend fun getResourceGovernorBindingForRun(runId: String): ResourceGovernorBindingRow? =
+        dbQuery {
+            ResourceGovernorBindings
+                .selectAll()
+                .where { ResourceGovernorBindings.runId eq runId }
+                .singleOrNull()
+                ?.toResourceGovernorBindingRow()
+        }
+
+    override suspend fun deleteResourceGovernorBinding(
+        sessionId: String,
+        runId: String?,
+    ): Boolean =
+        dbQuery {
+            ResourceGovernorBindings.deleteWhere {
+                (ResourceGovernorBindings.sessionId eq sessionId) and
+                    if (runId == null) {
+                        ResourceGovernorBindings.runId.isNull()
+                    } else {
+                        ResourceGovernorBindings.runId eq runId
+                    }
+            } > 0
         }
 
     // ===== MCP TASKS =====
@@ -1106,6 +1230,44 @@ class PrometheDatabase(
             }
         }
 
+    // ===== DURABLE APPROVAL GRANTS =====
+
+    override suspend fun getPersistentApprovalGrants(now: Long): List<PersistentApprovalGrantRow> =
+        dbQuery {
+            ApprovalGrants.deleteWhere { ApprovalGrants.expiresAt lessEq now }
+            ApprovalGrants.selectAll().map { row ->
+                PersistentApprovalGrantRow(
+                    id = row[ApprovalGrants.id],
+                    fingerprint = row[ApprovalGrants.fingerprint],
+                    allowed = row[ApprovalGrants.allowed],
+                    createdAt = row[ApprovalGrants.createdAt],
+                    expiresAt = row[ApprovalGrants.expiresAt],
+                )
+            }
+        }
+
+    override suspend fun replacePersistentApprovalGrant(grant: PersistentApprovalGrantRow) {
+        dbQuery {
+            ApprovalGrants.deleteWhere {
+                (ApprovalGrants.fingerprint eq grant.fingerprint) and
+                    (ApprovalGrants.allowed eq grant.allowed)
+            }
+            ApprovalGrants.insert {
+                it[id] = grant.id
+                it[fingerprint] = grant.fingerprint
+                it[allowed] = grant.allowed
+                it[createdAt] = grant.createdAt
+                it[expiresAt] = grant.expiresAt
+            }
+        }
+    }
+
+    override suspend fun deletePersistentApprovalGrant(id: String) {
+        dbQuery {
+            ApprovalGrants.deleteWhere { ApprovalGrants.id eq id }
+        }
+    }
+
     // ===== GATEWAY SECURITY =====
 
     override suspend fun getRemoteOwner(): RemoteOwnerRow? =
@@ -1495,6 +1657,34 @@ private fun ResultRow.toAgentRunRecord() =
         startedAt = this[AgentRuns.startedAt],
         finishedAt = this[AgentRuns.finishedAt],
         updatedAt = this[AgentRuns.updatedAt],
+    )
+
+private fun ResultRow.toResourceGovernorStateRow() =
+    ResourceGovernorStateRow(
+        rootRunId = this[ResourceGovernors.rootRunId],
+        maxTokens = this[ResourceGovernors.maxTokens],
+        maxCostDollars = this[ResourceGovernors.maxCostDollars],
+        maxLlmCalls = this[ResourceGovernors.maxLlmCalls],
+        maxToolStarts = this[ResourceGovernors.maxToolStarts],
+        maxSubAgents = this[ResourceGovernors.maxSubAgents],
+        maxDurationMs = this[ResourceGovernors.maxDurationMs],
+        startedAt = this[ResourceGovernors.startedAt],
+        tokensUsed = this[ResourceGovernors.tokensUsed],
+        costDollars = this[ResourceGovernors.costDollars],
+        llmCallsStarted = this[ResourceGovernors.llmCallsStarted],
+        toolsStarted = this[ResourceGovernors.toolsStarted],
+        subAgentsStarted = this[ResourceGovernors.subAgentsStarted],
+        version = this[ResourceGovernors.version],
+        updatedAt = this[ResourceGovernors.updatedAt],
+    )
+
+private fun ResultRow.toResourceGovernorBindingRow() =
+    ResourceGovernorBindingRow(
+        sessionId = this[ResourceGovernorBindings.sessionId],
+        rootRunId = this[ResourceGovernorBindings.rootRunId],
+        runId = this[ResourceGovernorBindings.runId],
+        createdAt = this[ResourceGovernorBindings.createdAt],
+        updatedAt = this[ResourceGovernorBindings.updatedAt],
     )
 
 private fun ResultRow.toMcpTaskRecord() =

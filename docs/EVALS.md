@@ -1,5 +1,7 @@
 # Evals-as-code
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 Promethe treats evaluation suites as versioned code. A suite describes inputs and deterministic assertions; an `EvalSubject` connects those cases to a component under test. The default CI run never calls a paid provider.
 
 ## Source of truth

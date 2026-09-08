@@ -1,0 +1,30 @@
+{
+    "id": "runtime-provider-errors",
+    "suiteId": "provider-errors",
+    "suiteVersion": 1,
+    "startedAt": 1000,
+    "finishedAt": 1003,
+    "status": "PASSED",
+    "results": [
+        {
+            "caseId": "provider-invalid-request",
+            "status": "PASSED",
+            "durationMs": 1,
+            "assertions": [
+                {
+                    "assertionId": "code",
+                    "passed": true,
+                    "actual": "provider_invalid_request",
+                    "message": null
+                },
+                {
+                    "assertionId": "retry",
+                    "passed": true,
+                    "actual": "false",
+                    "message": null
+                }
+            ],
+            "error": null
+        }
+    ]
+}

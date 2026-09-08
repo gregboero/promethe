@@ -17,7 +17,7 @@ graph TB
             REST["/api/v1/sessions GET/POST<br/>/api/v1/agents CRUD<br/>/api/v1/status GET<br/>/api/v1/feedback GET/POST<br/>/api/v1/mcp/servers CRUD<br/>/api/v1/skills CRUD<br/>/api/v1/goals<br/>/health GET"]
             MemRoutes["/api/v1/memory/facts GET/DELETE<br/>/api/v1/memory/status GET"]
             ConfigRoutes["/api/v1/config/env GET/PUT/DELETE<br/>/api/v1/channels GET/PUT/POST<br/>/api/v1/scheduler/tasks CRUD"]
-            ApprovalRoutes["/approval/pending GET<br/>/approval/{id} POST"]
+            ApprovalRoutes["/api/v1/approval/pending GET<br/>/api/v1/approval/{id} POST"]
             WS["/ws/agents WebSocket (monitor)"]            A2ARoute["/agents/ JSON-RPC POST<br/>/.well-known/agent.json GET"]
             Webhooks["/webhook/telegram POST<br/>/webhook/discord POST<br/>/webhook/slack POST"]
             Export["/api/v1/sessions/{id}/export GET"]

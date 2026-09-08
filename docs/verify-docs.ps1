@@ -85,7 +85,7 @@ $versionChecks = @(
     @{ Key = "ktor"; Regex = 'Ktor\s+(\d+\.\d+\.\d+)'; Label = "Ktor" },
     @{ Key = "exposed"; Regex = 'Exposed\s+(\d+\.\d+\.\d+)'; Label = "Exposed" },
     @{ Key = "kotlin"; Regex = 'Kotlin\s+(\d+\.\d+\.\d+)'; Label = "Kotlin" },
-    @{ Key = "koog"; Regex = 'Koog\s+(?:SDK\s+)?([\d\.]+(?:-[\w]+)?)'; Label = "Koog SDK" },
+    @{ Key = "koog-stable"; Regex = '(?m)^\|\s*Koog SDK\s*\|\s*([\d\.]+(?:-[\w]+)?)'; Label = "Koog SDK" },
     @{ Key = "sqlite-jdbc"; Regex = 'SQLite.*?(\d+\.\d+\.\d+\.\d+)'; Label = "SQLite JDBC" },
     @{ Key = "compose-multiplatform"; Regex = 'Compose\s+(?:Multiplatform\s+)?(\d+\.\d+\.\d+)'; Label = "Compose" }
 )
@@ -113,6 +113,41 @@ foreach ($vc in $versionChecks) {
         }
         return $true
     }
+}
+
+Test-Check "Koog version page matches both declared release lines" {
+    $koogPage = Get-Content "$root/docs/KOOG_VERSIONS.md" -Raw -Encoding UTF8
+    foreach ($line in @(@{ Label = 'Stable'; Key = 'koog-stable' }, @{ Label = 'Beta'; Key = 'koog-beta' })) {
+        $expected = $versions[$line.Key]
+        $pattern = '\|\s*' + $line.Label + '\s*\|\s*`' + [regex]::Escape($expected) + '`\s*\|'
+        if (-not $expected -or $koogPage -notmatch $pattern) {
+            Add-Error "KOOG_VERSIONS.md does not declare $($line.Label) as $expected"
+            return $false
+        }
+    }
+    return $true
+}
+
+Test-Check "README Gradle prerequisite matches the wrapper" {
+    $wrapper = Get-Content "$root/gradle/wrapper/gradle-wrapper.properties" -Raw
+    $wrapperVersion = [regex]::Match($wrapper, 'gradle-([\d.]+)-bin').Groups[1].Value
+    $readme = Get-Content "$root/README.md" -Raw -Encoding UTF8
+    if (-not $wrapperVersion -or $readme -notmatch ('\| \*\*Gradle\*\* \| ' + [regex]::Escape($wrapperVersion) + ' \|')) {
+        Add-Error "README Gradle prerequisite does not match the pinned wrapper"
+        return $false
+    }
+    return $true
+}
+
+Test-Check "Public README explicitly identifies a non-production sandbox" {
+    $readme = Get-Content "$root/README.md" -Raw -Encoding UTF8
+    if ($readme -notmatch 'not intended for production use' -or
+        $readme -notmatch 'docs/EXPERIMENTAL_STATUS.md' -or
+        $readme -match 'Recommended for normal use and production|Docker mode \(production\)') {
+        Add-Error "README must identify the experimental scope without recommending production use"
+        return $false
+    }
+    return $true
 }
 
 # Check for historically false stack references
@@ -297,6 +332,8 @@ Test-RouteContract -Name "Wasm bridge documents cookie-backed login without a pe
 Test-RouteContract -Name "Persistent MCP management is documented and mounted" -Documentation @("$root/docs/API.md", "$root/docs/MCP.md") -RequiredDocumentation @("PUT /api/v1/mcp/servers/{id}", "DELETE /api/v1/mcp/servers/{id}", "MCP_SERVERS") -Sources @("$root/gateway/src/jvmMain/kotlin/dev/promethe/gateway/McpManagementRoutes.kt", "$root/shared/src/jvmMain/kotlin/dev/promethe/core/mcp/McpConfigurationStore.kt") -RequiredSource @('put("/mcp/servers/{id}")', 'delete("/mcp/servers/{id}")', 'encryptedSecrets')
 
 Test-RouteContract -Name "MCP elicitation is documented and mounted" -Documentation @("$root/docs/API.md", "$root/docs/MCP.md") -RequiredDocumentation @("GET /api/v1/approval/mcp/pending", "POST /api/v1/approval/mcp/{id}") -Sources @("$root/gateway/src/jvmMain/kotlin/dev/promethe/gateway/McpElicitationRoutes.kt", "$root/gateway/src/jvmMain/kotlin/dev/promethe/gateway/OmnichannelGateway.kt", "$root/shared/src/jvmMain/kotlin/dev/promethe/core/JvmMcpTransportFactory.kt") -RequiredSource @('get("/approval/mcp/pending")', 'post("/approval/mcp/{id}")', 'mcpElicitationRoutes(mcpElicitationBroker)', 'mapOf("elicitation/create"')
+
+Test-RouteContract -Name "Tool approval management is documented and mounted" -Documentation @("$root/README.md", "$root/docs/API.md") -RequiredDocumentation @("GET /api/v1/approval/pending", "POST /api/v1/approval/{id}", "DELETE /api/v1/approval/grants/{id}") -Sources @("$root/gateway/src/jvmMain/kotlin/dev/promethe/gateway/SystemAndAuthRoutes.kt", "$root/gateway/src/jvmMain/kotlin/dev/promethe/gateway/OmnichannelGateway.kt") -RequiredSource @('get("/approval/pending")', 'post("/approval/{id}")', 'delete("/approval/grants/{id}")', 'approvalRoutes(approvalGate)')
 
 Test-RouteContract -Name "Discord live policy is documented and mounted" -Documentation @("$root/docs/API.md", "$root/docs/CHANNELS.md", "$root/docs/SECURITY.md") -RequiredDocumentation @("GET /api/v1/channels/discord/policy", "PUT /api/v1/channels/discord/policy/users/{userId}", "discord_policy") -Sources @("$root/gateway/src/jvmMain/kotlin/dev/promethe/gateway/DiscordPolicyRoutes.kt", "$root/gateway/src/jvmMain/kotlin/dev/promethe/gateway/OmnichannelGateway.kt") -RequiredSource @('get("/channels/discord/policy")', 'put("/channels/discord/policy/users/{userId}")', 'discordPolicyRoutes(discordPolicyService)')
 

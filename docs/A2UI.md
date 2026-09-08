@@ -1,5 +1,7 @@
 # A2UI — Agent-to-UI Protocol
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 ## Overview
 
 A2UI lets the agent render interactive UI — forms, tables, buttons, cards — directly in the

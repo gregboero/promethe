@@ -1,0 +1,50 @@
+> Task :harness-kotlin:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :api:kmpPartiallyResolvedDependenciesChecker
+> Task :api:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :shared:loadKtlintReporters UP-TO-DATE
+> Task :shared:runKtlintCheckOverCommonMainSourceSet UP-TO-DATE
+> Task :shared:ktlintCommonMainSourceSetCheck UP-TO-DATE
+> Task :shared:runKtlintCheckOverCommonTestSourceSet UP-TO-DATE
+> Task :shared:ktlintCommonTestSourceSetCheck UP-TO-DATE
+> Task :shared:runKtlintCheckOverJvmMainSourceSet UP-TO-DATE
+> Task :shared:ktlintJvmMainSourceSetCheck UP-TO-DATE
+> Task :harness-kotlin:compileKotlin UP-TO-DATE
+> Task :api:compileKotlinJvm UP-TO-DATE
+> Task :api:compileJvmMainJava NO-SOURCE
+> Task :harness-kotlin:compileJava NO-SOURCE
+> Task :api:jvmProcessResources NO-SOURCE
+> Task :harness-kotlin:processResources NO-SOURCE
+> Task :api:processJvmMainResources SKIPPED
+> Task :harness-kotlin:classes UP-TO-DATE
+> Task :api:jvmMainClasses UP-TO-DATE
+> Task :harness-kotlin:jar UP-TO-DATE
+> Task :api:jvmJar UP-TO-DATE
+> Task :shared:runKtlintCheckOverKotlinScripts UP-TO-DATE
+> Task :shared:ktlintKotlinScriptCheck UP-TO-DATE
+> Task :harness-kotlin:startScripts UP-TO-DATE
+> Task :shared:kmpPartiallyResolvedDependenciesChecker
+> Task :shared:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :harness-kotlin:windowsLauncher UP-TO-DATE
+> Task :harness-kotlin:installDist UP-TO-DATE
+> Task :harness-kotlin:prepareRuntime UP-TO-DATE
+> Task :shared:compileKotlinJvm UP-TO-DATE
+> Task :shared:compileJvmMainJava NO-SOURCE
+> Task :shared:buildSandboxNative UP-TO-DATE
+> Task :shared:syncSandboxNative UP-TO-DATE
+> Task :shared:jvmProcessResources UP-TO-DATE
+> Task :shared:processJvmMainResources SKIPPED
+> Task :shared:jvmMainClasses UP-TO-DATE
+> Task :shared:jvmJar UP-TO-DATE
+> Task :shared:jvmTestProcessResources NO-SOURCE
+> Task :shared:processJvmTestResources SKIPPED
+> Task :shared:runKtlintCheckOverJvmTestSourceSet
+> Task :shared:ktlintJvmTestSourceSetCheck
+> Task :shared:ktlintCheck
+> Task :shared:compileTestKotlinJvm
+> Task :shared:compileJvmTestJava NO-SOURCE
+> Task :shared:jvmTestClasses
+> Task :shared:jvmTest
+
+BUILD SUCCESSFUL in 1m
+28 actionable tasks: 6 executed, 22 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.5.1/userguide/configuration_cache_enabling.html

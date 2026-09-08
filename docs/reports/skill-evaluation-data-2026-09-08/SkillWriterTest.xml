@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="SkillWriterTest[jvm]" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-09-08T02:15:34.431Z" hostname="BUREAU" time="0.029">
+  <properties/>
+  <testcase name="writer persists contract and atomically updates lifecycle[jvm]" classname="dev.promethe.core.SkillWriterTest" time="0.01"/>
+  <testcase name="testWriteAndDedup[jvm]" classname="dev.promethe.core.SkillWriterTest" time="0.005"/>
+  <testcase name="frontmatter values cannot bypass draft lifecycle[jvm]" classname="dev.promethe.core.SkillWriterTest" time="0.006"/>
+  <testcase name="writer does not nest caller supplied frontmatter[jvm]" classname="dev.promethe.core.SkillWriterTest" time="0.007"/>
+  <testcase name="writer rejects path traversal names[jvm]" classname="dev.promethe.core.SkillWriterTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

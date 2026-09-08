@@ -1,5 +1,7 @@
 # Deployment Guide
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 > Deploy Prométhé locally, on Docker, a VPS, or the cloud.
 
 ## 1. Local development
@@ -31,7 +33,7 @@ docker build -t promethe-gateway .
 ```bash
 docker run -d \
   --name promethe \
-  -p 8080:8080 \
+  -p 127.0.0.1:8080:8080 \
   -e LLM_PROVIDER=openrouter \
   -e OPENROUTER_API_KEY=sk-or-... \
   -e LLM_MODEL=provider/exact-model-id \
@@ -82,18 +84,23 @@ docker compose -f docker-compose.yml -f compose.litellm.yaml -f compose.honcho.y
 | Overlay | Services added | Key env vars |
 |---|---|---|
 | *(base)* | promethe-core:8080 | `LLM_PROVIDER`, `MEMORY_PROVIDER=embedded` |
-| `compose.litellm.yaml` | litellm:4000 | `LLM_PROVIDER=litellm`, `LLM_BASE_URL=http://litellm:4000` |
-| `compose.honcho.yaml` | honcho:8001, honcho-db | `MEMORY_PROVIDER=honcho`, `HONCHO_URL=http://honcho:8001` |
-| `compose.tencent.yaml` | tencent-memory:8420 | `MEMORY_PROVIDER=tencent`, `TENCENT_MEMORY_URL=http://tencent-memory:8420` |
+| `compose.litellm.yaml` | litellm on host `127.0.0.1:4000` | Required `LITELLM_MASTER_KEY`, `LITELLM_MODEL` alias |
+| `compose.honcho.yaml` | None: connect to an existing compatible service | Required `HONCHO_URL`, `HONCHO_API_KEY` |
+| `compose.tencent.yaml` | None: connect to an existing compatible service | Required `TENCENT_MEMORY_URL`, `TENCENT_MEMORY_API_KEY` |
 | `compose.remote.yaml` | Caddy TLS reverse proxy | `PROMETHE_DOMAIN`, `PUBLIC_BASE_URL`, `CORS_ALLOWED_ORIGINS`, `PROMETHE_MASTER_KEY` |
 
-All overlays are combinable — use multiple `-f` flags to mix LLM proxy with memory providers.
+LiteLLM can be combined with one memory overlay. The two memory overlays select different providers; choose one.
+
+LiteLLM `v1.100.0`, Caddy and the Temurin base images are pinned by OCI digest. LiteLLM mounts its configuration read-only and has no default master key. Its master key and the upstream provider key are distinct settings. The Docker build excludes the Android target with `-PenableAndroid=false`; Desktop/Web builds do not require an Android SDK.
+
+Honcho and Tencent overlays no longer start guessed third-party stacks. Their adapters use historical contracts: current upstream Honcho uses `/v3`, Tencent `/api/v3`, while the Tencent adapter calls `/api/v1/memories`. Compatibility must be established for the exact external service version. Configuration validation does not demonstrate interoperability. The full image build remains unverified while the local Docker engine is unresponsive; see the implementation report.
 
 ### Validate overlay merges
 
 ```bash
 # Check resolved config without starting services
-docker compose -f docker-compose.yml -f compose.litellm.yaml config
+LITELLM_MASTER_KEY=sk-configuration-check-only LITELLM_MODEL=test-alias \
+  docker compose -f docker-compose.yml -f compose.litellm.yaml config --quiet
 ```
 
 ### Opt-in remote HTTPS profile
@@ -115,7 +122,7 @@ docker compose -f docker-compose.yml -f compose.remote.yaml up --build -d
 The base gateway port remains published on host loopback only. Caddy is the sole public listener and obtains
 the TLS certificate automatically. Never publish port 8080 directly for a remote installation.
 
-## 4. VPS deployment (production)
+## 4. VPS deployment (experimental)
 
 ### systemd service
 
@@ -282,7 +289,7 @@ TRACING_BACKEND=otlp
 OTLP_ENDPOINT=http://jaeger:4317
 ```
 
-## 8. Production security checklist
+## 8. Remote experiment security checklist
 
 - [ ] Run as a non-root user
 - [ ] TLS enabled (HTTPS)
@@ -295,12 +302,12 @@ OTLP_ENDPOINT=http://jaeger:4317
 - [ ] `/health` monitoring configured
 - [ ] Centralized logs
 
-## 9. Scaling
+## 9. Load experiments
 
-Prométhé is designed to run as a **single instance** (SQLite). To scale:
+Prométhé runs as one owner and one instance with SQLite. Measure queueing, latency, memory and cancellation on disposable data before changing concurrency. Multiple gateway instances, high availability and database replication are not implemented or validated deployment modes.
 
-| Need | Solution |
-|---|---|
-| More requests | Increase `-Xmx` and the Ktor workers |
-| High availability | 2 instances + load balancer + PostgreSQL (migration required) |
-| Multi-region | Docker Compose per region + DB sync |
+## 10. Android build experiment
+
+The Android host lives in `androidApp`; `composeApp` uses the Android KMP library plugin and retains its platform implementations. Build with `./gradlew :androidApp:assembleDebug`. AGP 9.1.1 supports compile SDK 37, which Compose 1.12 requires; the application keeps min SDK 35 and target SDK 36. The compiler/Gradle patch combination is locally tested, not a claim of complete upstream certification. See the [official migration guide](https://kotlinlang.org/docs/multiplatform/multiplatform-project-agp-9-migration.html) and [AGP compatibility](https://developer.android.com/build/releases/agp-9-1-0-release-notes).
+
+Server/Web builds may use `-PenableAndroid=false`. Android APK assembly is a build check; device behavior, installation and release signing remain unverified.

@@ -1,0 +1,41 @@
+{
+  "tests": {
+    "api": {
+      "tests": 76,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared": {
+      "tests": 685,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "gateway": {
+      "tests": 213,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "evals": {
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "composeApp": {
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "budget": {
+    "requests": 638,
+    "consumedMicroUsd": 3851939,
+    "uncertainReservations": 0,
+    "remainingMicroUsd": 1148061
+  },
+  "liveExecuted": false
+}

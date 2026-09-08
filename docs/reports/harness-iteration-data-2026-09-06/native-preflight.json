@@ -1,0 +1,8 @@
+{
+  "available": true,
+  "backend": "WINDOWS_ELEVATED",
+  "mode": "WORKSPACE_WRITE",
+  "networkMode": "OFF",
+  "selfTestPassed": true,
+  "message": "Windows elevated sandbox self-test passed."
+}

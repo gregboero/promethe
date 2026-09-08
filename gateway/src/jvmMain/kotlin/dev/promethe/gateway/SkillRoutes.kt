@@ -6,6 +6,8 @@ import dev.promethe.core.SkillEntry
 import dev.promethe.core.SkillLoader
 import dev.promethe.core.SkillWriter
 import dev.promethe.core.SkillCurator
+import dev.promethe.core.SkillEvaluationService
+import dev.promethe.core.SkillEvaluationSubject
 import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
@@ -31,7 +33,59 @@ fun Route.skillRoutes(
     skillCurator: SkillCurator,
     fs: FileSystem,
     skillsDir: Path,
+    evaluationSubject: SkillEvaluationSubject = SkillEvaluationSubject { _, _ -> error("Skill evaluator is not configured") },
+    evaluatorId: String = "unconfigured",
 ) {
+    val evaluations = SkillEvaluationService(skillLoader, skillWriter.governance, evaluationSubject, evaluatorId)
+
+    get("/skills/{name}/validation") {
+        val skill = skillLoader.listSkills().find { it.name == call.parameters["name"] || it.slug == call.parameters["name"] }
+            ?: return@get call.respond(HttpStatusCode.NotFound, ErrorResponse("Skill not found"))
+        call.respond(skillWriter.governance.state(skill))
+    }
+
+    put("/skills/{name}/evaluation-suites") {
+        try {
+            val request = call.receive<ConfigureSkillEvaluationRequest>()
+            val skill = skillLoader.listSkills().find { it.name == call.parameters["name"] || it.slug == call.parameters["name"] }
+                ?: return@put call.respond(HttpStatusCode.NotFound, ErrorResponse("Skill not found"))
+            skillWriter.configureEvaluations(skill.slug.ifBlank { skill.name }, request.expectedRevisionHash, request.suites)
+            skillLoader.invalidateCache()
+            call.respond(skillLoader.listSkills().first { it.slug == skill.slug }.toDto())
+        } catch (error: IllegalArgumentException) {
+            call.respond(HttpStatusCode.BadRequest, ErrorResponse(error.message ?: "Invalid suite"))
+        } catch (error: IllegalStateException) {
+            call.respond(HttpStatusCode.Conflict, ErrorResponse(error.message ?: "Skill changed"))
+        }
+    }
+
+    post("/skills/{name}/evaluations") {
+        try {
+            val request = call.receive<EvaluateSkillRequest>()
+            val skill = skillLoader.listSkills().find { it.name == call.parameters["name"] || it.slug == call.parameters["name"] }
+                ?: return@post call.respond(HttpStatusCode.NotFound, ErrorResponse("Skill not found"))
+            call.respond(evaluations.evaluate(skill.slug.ifBlank { skill.name }, request.expectedRevisionHash))
+        } catch (error: IllegalArgumentException) {
+            call.respond(HttpStatusCode.BadRequest, ErrorResponse(error.message ?: "Invalid evaluation suite"))
+        } catch (error: IllegalStateException) {
+            call.respond(HttpStatusCode.Conflict, ErrorResponse(error.message ?: "Skill changed"))
+        }
+    }
+
+    post("/skills/{name}/restore") {
+        try {
+            val request = call.receive<RestoreSkillVersionRequest>()
+            val skill = skillLoader.listSkills().find { it.name == call.parameters["name"] || it.slug == call.parameters["name"] }
+                ?: return@post call.respond(HttpStatusCode.NotFound, ErrorResponse("Skill not found"))
+            skillWriter.restore(skill.slug.ifBlank { skill.name }, request.expectedRevisionHash, request.versionId)
+            skillLoader.invalidateCache()
+            call.respond(skillLoader.listSkills().first { it.slug == skill.slug }.toDto())
+        } catch (error: IllegalArgumentException) {
+            call.respond(HttpStatusCode.BadRequest, ErrorResponse(error.message ?: "Invalid version"))
+        } catch (error: IllegalStateException) {
+            call.respond(HttpStatusCode.Conflict, ErrorResponse(error.message ?: "Skill changed"))
+        }
+    }
     // ── List all skills ──────────────────────────────────────────
     get("/skills") {
         try {
@@ -132,30 +186,15 @@ fun Route.skillRoutes(
                 req.content
             }
 
-            if (req.content.isBlank() && isSystemSkill) {
-                val dirPath = skillsDir / skillSlug / "SKILL.md"
-                val flatPath = skillsDir / "$skillSlug.md"
-                val targetPath =
-                    when {
-                        fs.exists(dirPath) -> dirPath
-                        fs.exists(flatPath) -> flatPath
-                        else -> return@put call.respond(HttpStatusCode.NotFound, ErrorResponse("Skill '$name' not found"))
-                    }
-                fs.sink(targetPath).buffer().use { sink -> sink.writeUtf8(targetContent) }
-            } else {
-                val nextLifecycle =
-                    if (isSystemSkill) {
-                        SkillLifecycle.ACTIVE
-                    } else {
-                        SkillLifecycle.QUARANTINED
-                    }
+            run {
+                val nextLifecycle = SkillLifecycle.QUARANTINED
                 val updated =
                     existing.copy(
                         content = targetContent,
                         contract = existing.contract.copy(lifecycle = nextLifecycle, contentHash = null),
                     )
-                if (skillWriter.update(updated) == null) {
-                    return@put call.respond(HttpStatusCode.InternalServerError, ErrorResponse("Failed to update skill '$name'"))
+                if (skillWriter.update(updated, expectedRevisionHash = req.expectedRevisionHash ?: existing.contract.revisionHash) == null) {
+                    return@put call.respond(HttpStatusCode.Conflict, ErrorResponse("Skill changed or could not be updated"))
                 }
             }
             skillLoader.invalidateCache()
@@ -176,8 +215,8 @@ fun Route.skillRoutes(
             val existing =
                 skillLoader.listSkills().find { skill -> skill.name == name || skill.slug == name }
                     ?: return@put call.respond(HttpStatusCode.NotFound, ErrorResponse("Skill '$name' not found"))
-            if (SkillSeeder.isSystemSkill(existing.slug.ifBlank { existing.name })) {
-                return@put call.respond(HttpStatusCode.Forbidden, ErrorResponse("System skill lifecycle cannot be changed"))
+            if (SkillSeeder.isSystemSkill(existing.slug.ifBlank { existing.name }) && !existing.contract.validationRequired) {
+                return@put call.respond(HttpStatusCode.Forbidden, ErrorResponse("Configure evaluations or edit the bundled skill before changing its lifecycle"))
             }
             if (!existing.contract.lifecycle.canTransitionTo(request.lifecycle)) {
                 return@put call.respond(
@@ -185,9 +224,34 @@ fun Route.skillRoutes(
                     ErrorResponse("Invalid lifecycle transition: ${existing.contract.lifecycle} -> ${request.lifecycle}"),
                 )
             }
-            val updated = existing.copy(contract = existing.contract.copy(lifecycle = request.lifecycle))
-            if (skillWriter.update(updated) == null) {
-                return@put call.respond(HttpStatusCode.InternalServerError, ErrorResponse("Failed to update skill '$name'"))
+            val promotion = request.lifecycle in setOf(SkillLifecycle.CANDIDATE, SkillLifecycle.ACTIVE) &&
+                request.lifecycle != existing.contract.lifecycle
+            val run = if (promotion) runCatching { skillWriter.governance.validRun(existing) }.getOrNull() else null
+            if (promotion && (request.expectedRevisionHash != existing.contract.revisionHash || request.expectedRevisionHash == null || run == null)) {
+                return@put call.respond(HttpStatusCode.Conflict, ErrorResponse("Promotion requires passed evaluations for the current revision"))
+            }
+            if (promotion && (
+                    request.expectedContentHash != existing.contract.contentHash ||
+                        request.expectedContentHash == null || request.reviewNote.isNullOrBlank()
+                )
+            ) {
+                return@put call.respond(HttpStatusCode.Conflict, ErrorResponse("Promotion requires the current content hash and an owner review note"))
+            }
+            if ((request.reviewNote?.length ?: 0) > 2_000) {
+                return@put call.respond(HttpStatusCode.BadRequest, ErrorResponse("Review note exceeds 2000 characters"))
+            }
+            val updated = existing.copy(
+                contract = existing.contract.copy(
+                    lifecycle = request.lifecycle,
+                    reviewedContentHash = if (promotion) request.expectedContentHash else existing.contract.reviewedContentHash,
+                    reviewNote = if (promotion) request.reviewNote?.trim() else existing.contract.reviewNote,
+                    reviewedAt = if (promotion) java.time.Instant.now().toString() else existing.contract.reviewedAt,
+                    evaluatedRunId = if (promotion) run?.id else existing.contract.evaluatedRunId,
+                    reviewedRevisionHash = if (promotion) request.expectedRevisionHash else existing.contract.reviewedRevisionHash,
+                ),
+            )
+            if (skillWriter.update(updated, existing.contract.contentHash, request.expectedRevisionHash ?: existing.contract.revisionHash) == null) {
+                return@put call.respond(HttpStatusCode.Conflict, ErrorResponse("Skill changed or could not be saved; reload before reviewing"))
             }
             skillLoader.invalidateCache()
             val saved = skillLoader.listSkills().first { skill -> skill.name == existing.name }

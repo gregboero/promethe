@@ -1,0 +1,31 @@
+{
+  "status": "offline-preview-only-no-provider-calls",
+  "destination": "https://api.openai.com/v1/responses",
+  "model": "gpt-5.6-terra",
+  "tasks": [
+    [
+      3471,
+      8063
+    ],
+    [
+      5192,
+      2847
+    ],
+    [
+      6904,
+      1358
+    ]
+  ],
+  "plannedRuns": 6,
+  "expectedRequestsIfThreeCallsPerRun": 18,
+  "maximumRequests": 36,
+  "campaignCapMicroUsd": 5000000,
+  "remainingMicroUsd": 1148061,
+  "firstRequestInputsIdentical": true,
+  "laterRequests": "Same prompt plus model responses and synthetic page tool results. Exact later text depends on model responses.",
+  "credentialHandling": "Existing OpenAI API key is used only in upstream Authorization header; not included in preview JSON.",
+  "firstRequestSha256": {
+    "first-request-structured.json": "6f69125e8324402bd07a978e4a279db0e8bd38bd7893f1280949d0c1783d27f6",
+    "first-request-text.json": "67242d623e51a496930e4cac88d3e29af9e182857200d02fb62bb07708ed1c28"
+  }
+}

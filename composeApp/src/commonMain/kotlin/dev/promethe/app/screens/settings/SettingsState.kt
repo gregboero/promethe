@@ -103,6 +103,7 @@ data class SettingsState(
     val intDiscordPublicKey: String = "",
     val intDiscordMessageContentEnabled: Boolean = false,
     val intDiscordAllowedUserIds: String = "",
+    val intDiscordApproverUserIds: String = "",
     val intDiscordKnowledgeChannelIds: String = "",
     val intSlackBotToken: String = "",
     val intSlackSigningSecret: String = "",

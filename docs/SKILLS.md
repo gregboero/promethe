@@ -1,8 +1,10 @@
 # Skill System
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 ## Overview
 
-Skills are reusable blocks of knowledge that Promethe accumulates over the course of conversations. Each skill captures validated know-how (code pattern, procedure, convention) and can be automatically injected into an agent's context when it handles a similar request.
+Skills are reusable instructions, procedures or conventions that Promethe can inject into an agent's context when relevant. A synthesized skill starts as a draft; its existence does not establish useful or validated knowledge. Managed promotion requires evaluation evidence for the exact revision and an owner review. The [evaluation lifecycle](reports/SKILL_EVALUATION_LIFECYCLE_2026-09-08.md) is implemented and locally validated: 1,071 tests pass, including reuse through the real agent loop with a deterministic provider, without a paid model call.
 
 **Directory**: `~/.promethe/skills/`
 
@@ -10,9 +12,11 @@ Skills are reusable blocks of knowledge that Promethe accumulates over the cours
 
 | Component | Role |
 |---|---|
-| `SkillLoader.kt` | Loads skills, builds a keyword index, manages the cache |
+| `SkillLoader.kt` | Indexes skills and rereads content and evidence at each use; no retained `SKILL.md` content cache |
 | `SkillWriter.kt` | Synthesizes new skills from successful trajectories |
 | `SkillCurator.kt` | Scores skills and emits non-destructive review proposals |
+| `SkillEvaluationService.kt` | Runs declared text cases and records exact-output results |
+| `SkillGovernanceStore.kt` | Stores evaluation suites, revision evidence and version snapshots |
 
 ---
 
@@ -54,17 +58,18 @@ Use `supervisorScope` to isolate child failures…
 | `content_hash` | written by Promethe | SHA-256 of the normalized Markdown body |
 | `triggers`, `anti_triggers` | optional | Declarative matching contract; matching still derives its index from description and body in this phase |
 | `required_tools`, `required_skills` | optional | Declared dependencies |
-| `eval_suite` | optional | Evaluation suite identifiers required by future automated promotion |
+| `eval_suite` | optional metadata | Declared evaluation references; executable cases are configured through the evaluation-suites API or skill screen |
 | `provenance`, `owner` | optional | Origin and owner metadata |
 
-Files without lifecycle metadata remain `ACTIVE` for backward compatibility. A declared hash mismatch forces
-the skill to `QUARANTINED`. Only `ACTIVE` skills are searchable, loadable, or injected into an agent prompt.
+Unchanged legacy and bundled skills remain `ACTIVE` for explicit backward compatibility, without newly generated evaluation evidence. Editing or configuring their suites enters the managed evaluation cycle, including system skills. A declared body-hash mismatch forces quarantine. Only `ACTIVE` skills are searchable, loadable, or injected into an agent prompt.
+
+`content_hash` identifies the normalized Markdown body. The separate validation `revisionHash` covers the body, metadata, revision nonce and evaluation suites. An old passing run cannot authorize an edited or restored revision merely because its body matches an earlier one.
 
 ---
 
 ## Automatic synthesis
 
-`SkillWriter` analyzes conversation trajectories that resulted in a user-validated outcome. The process:
+`SkillWriter` analyzes trajectories marked successful by the application. This signal is not necessarily a user review or a skill-specific test. The process:
 
 1. **Detection** — A trajectory is marked as successful (positive feedback or error-free completion).
 2. **Extraction** — The writer isolates the key steps, decisions, and code produced.
@@ -72,9 +77,24 @@ the skill to `QUARANTINED`. Only `ACTIVE` skills are searchable, loadable, or in
 4. **Deduplication** — Checked against existing skills via the keyword index.
 5. **Writing** — The file is saved to `~/.promethe/skills/` as `DRAFT`.
 
-The owner promotes a skill through `DRAFT → QUARANTINED → CANDIDATE → ACTIVE`. Content edited by an
-agent or through the management API is quarantined; a GEPA result is stored as a candidate. Deprecation
-removes a skill from agent-side discovery without deleting its file.
+The owner promotes a skill through `DRAFT → QUARANTINED → CANDIDATE → ACTIVE`. Edits, evaluation-suite configuration and restoration quarantine the resulting revision, including system skills. GEPA produces `DRAFT` for a new skill and `QUARANTINED` for a modified one; it does not bypass evaluations by creating a promotable candidate. Deprecation removes a skill from agent-side discovery without deleting its file.
+
+Promotions to `CANDIDATE` and `ACTIVE` require current `expectedContentHash` and `expectedRevisionHash`, a nonempty owner `reviewNote` (maximum 2,000 characters), and the **latest evaluation run marked `PASSED` for that exact revision**. A stale review or evaluation cannot authorize promotion. An interrupted run is not promotable; a new failing run invalidates an earlier pass. Tests and owner review are separate requirements.
+
+## Evaluate, review and restore
+
+The skill screen provides **Cas de test**, **Lancer tests**, and **Historique et restauration**, with a visible cost notice. Configure between one and eight suites, at least two distinct inputs per suite, and at most 20 cases overall. Each case has `id`, `input` and `expectedOutput`; texts are limited to 16,384 characters. The oracle compares output and expected output **exactly after trimming surrounding whitespace**.
+
+Each case sends a fresh text-only request through Koog using the gateway's configured model, without tools and without the expected answer. Each case has a 60-second timeout. Running tests in the application can therefore incur provider charges; the local implementation tests use simulated providers. This evaluates the declared text task, not tool execution, ancillary scripts or persistent memory.
+
+1. Edit the skill and configure meaningful cases, including distinct inputs; the revision enters quarantine.
+2. Launch tests and inspect the latest run for the current `revisionHash`.
+3. If all required cases pass, review the exact revision and provide the owner note before promotion.
+4. To restore, select a saved version. Restoration creates a quarantined revision that requires **new tests and review**, without silently restoring active status.
+
+Local evidence is stored under the skills directory in `.skillops/{slug}/`: `suites.json`, `latest.json`, `runs/` and `versions/`. `latest.json` records `RUNNING` before evaluation calls. Version entries are snapshots captured before publication, not a transactional commit journal. The local history is unsigned and does not prove the owner's identity cryptographically or protect against the owner modifying files on disk. Writers and evaluations are serialized within one process; no cross-process writer guarantee is established.
+
+Content and evidence are reread at every skill use, including to detect direct same-size file edits. The revision fingerprint does not hash the transitive contents of declared dependencies. Tests cover the declared text cases, not every dependency, tool effect or memory behavior. The Desktop code and test suite pass, but the new dialog has not been exercised manually on a running desktop.
 
 ---
 
@@ -102,6 +122,10 @@ Base: `/api/v1/skills`
 | `POST` | `/api/v1/skills` | Creates a new skill |
 | `PUT` | `/api/v1/skills/:name` | Updates an existing skill |
 | `PUT` | `/api/v1/skills/:name/lifecycle` | Applies one valid lifecycle transition |
+| `GET` | `/api/v1/skills/:name/validation` | Current revision hash, suites, latest run, promotion readiness, versions and runs |
+| `PUT` | `/api/v1/skills/:name/evaluation-suites` | Configures cases against `expectedRevisionHash`; quarantines the resulting revision |
+| `POST` | `/api/v1/skills/:name/evaluations` | Evaluates the current revision; may call the configured provider |
+| `POST` | `/api/v1/skills/:name/restore` | Restores a version as quarantined; requires new tests and review |
 | `DELETE` | `/api/v1/skills/:name` | Deletes a skill |
 | `GET` | `/api/v1/skills/search?q=…` | Searches by keywords |
 | `POST` | `/api/v1/skills/curate` | Scores skills and returns quarantined review proposals |

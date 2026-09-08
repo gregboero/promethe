@@ -5,6 +5,7 @@ import dev.promethe.core.*
 import dev.promethe.core.MemoryLayer
 import dev.promethe.db.PrometheDatabaseApi
 import dev.promethe.gateway.mcp.McpTaskManager
+import dev.promethe.gateway.mcp.McpRoundTripManager
 import dev.promethe.gateway.mcp.mcpServerRoutes
 import dev.promethe.gateway.voice.AudioSessionManager
 import dev.promethe.gateway.voice.VoiceProviderRegistry
@@ -40,6 +41,7 @@ private val logger = io.github.oshai.kotlinlogging.KotlinLogging.logger {}
 class OmnichannelGateway(
     private val agent: AIAgent,
     private val database: PrometheDatabaseApi,
+    private val resourceGovernors: ResourceGovernorRegistry = GlobalResourceGovernorRegistry,
     private val llmAdapter: KoogLlmAdapter,
     private val feedbackCollector: FeedbackCollector,
     private val mcpBridge: McpBridge,
@@ -67,8 +69,9 @@ class OmnichannelGateway(
 ) {
     private var server: EmbeddedServer<*, *>? = null
     private var discordGateway: DiscordGatewayManager? = null
-    private val mcpTaskScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-    private val mcpTaskManager = McpTaskManager(database, mcpTaskScope)
+    private val mcpExecutionScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private val mcpTaskManager = McpTaskManager(database, mcpExecutionScope)
+    private val mcpRoundTripManager = McpRoundTripManager(mcpExecutionScope)
     private val startTime = System.currentTimeMillis()
 
     fun start() {
@@ -95,7 +98,7 @@ class OmnichannelGateway(
             skillWriter = effectiveSkillWriter,
             database = database,
         )
-        val agentExecutionService = AgentExecutionService(agent, database)
+        val agentExecutionService = AgentExecutionService(agent, database, resourceGovernors = resourceGovernors)
         val a2aClient = A2AInternalClient(agentExecutionService)
         val providerCatalogSource = DefaultProviderCatalogSource.instance
         val discordKnowledgeArchive = DiscordKnowledgeArchive()
@@ -115,6 +118,7 @@ class OmnichannelGateway(
                 },
                 policyService = discordPolicyService,
                 knowledgeArchive = discordKnowledgeArchive,
+                approvalGate = approvalGate,
             )
         kotlinx.coroutines.runBlocking {
             dev.promethe.core.ToolRegistry.register(
@@ -140,7 +144,7 @@ class OmnichannelGateway(
 //                }
                 AuthMiddleware.install(this, apiKey, securityConfig, ownerAuthService)
 
-                // Rate limiter — 60 requests/min per IP
+                // Remote rate limiter; authenticated loopback desktop calls are exempt.
                 RateLimiter.install(this)
 
                 routing {
@@ -168,6 +172,7 @@ class OmnichannelGateway(
                             allowedOrigins = securityConfig.allowedOrigins.map { it.value }.toSet(),
                             secureToolExecutor = actionExecutor,
                             taskManager = mcpTaskManager,
+                            roundTripManager = mcpRoundTripManager,
                         )
 
                         capabilityRoutes(providerCatalogSource, localCodingAgentService)
@@ -234,6 +239,16 @@ class OmnichannelGateway(
                                     skillCurator = effectiveSkillCurator,
                                     fs = okio.FileSystem.SYSTEM,
                                     skillsDir = effectiveSkillsDir,
+                                    evaluationSubject = SkillEvaluationSubject { skill, input ->
+                                        llmAdapter.completeWithProfile(
+                                            systemPrompt = "Follow this skill to answer the user's task. Return only the requested answer. No tools are available.\n\n${skill.content}",
+                                            messages = listOf("user" to input),
+                                            provider = (config ?: AgentConfig()).provider,
+                                            model = (config ?: AgentConfig()).modelName,
+                                            temperature = 0.0,
+                                        ).content
+                                    },
+                                    evaluatorId = "koog-text-exact-v1; requested=${(config ?: AgentConfig()).provider}/${(config ?: AgentConfig()).modelName}",
                                 )
 
                                 // ── Orchestrator Routes ──
@@ -392,7 +407,7 @@ class OmnichannelGateway(
     fun stop() {
         discordGateway?.close()
         discordGateway = null
-        mcpTaskScope.cancel()
+        mcpExecutionScope.cancel()
         server?.stop(1000, 2000)
         logger.info { "Promethe Gateway stopped" }
     }

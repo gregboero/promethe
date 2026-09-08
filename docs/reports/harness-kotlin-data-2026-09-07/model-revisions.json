@@ -1,0 +1,13 @@
+[
+  {
+    "id": "8f8a1b34-4ce6-4cfc-aae9-a6c0aa1bde90",
+    "sessionId": "agent-live-a39982d6-7671-44db-bad8-3df2a7cd5407",
+    "baseRevision": null,
+    "source": "val text = observation.text\nval result = try {\n    val json = Json.parseToJsonElement(text)\n    val obj = json as? JsonObject\n    obj?.get(\"answer\")?.let { element ->\n        when (element) {\n            is JsonPrimitive -> element.content\n            else -> null\n        }\n    } ?: text\n} catch (_: Exception) {\n    val csv = Regex(\"(?m)^id,answer\\\\s*\\\\r?\\\\n[^,\\\\r\\\\n]*,([^\\\\r\\\\n]+)\").find(text)\n    val kv = Regex(\"(?:^|\\\\s)answer=([^\\\\s]+)\").find(text)\n    csv?.groupValues?.get(1) ?: kv?.groupValues?.get(1) ?: text\n}\nresult",
+    "hash": "7e466deb50d86e87f70f89ffe81d3cc384311b40ecc648749eab1d52291daef7",
+    "toolName": "json_query",
+    "createdAt": 1788770902920,
+    "language": "KOTLIN",
+    "validated": true
+  }
+]

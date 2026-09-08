@@ -31,6 +31,7 @@ object KoinBootstrap {
             single<AgentConfig> { stack.config }
             single<PrometheDatabaseApi> { stack.database }
             single<HttpClient> { stack.httpClient }
+            single<ResourceGovernorRegistry> { stack.resourceGovernors }
 
             // ── Agent ──
             single<AIAgent> { stack.agent }

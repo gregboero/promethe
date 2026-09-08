@@ -110,6 +110,7 @@ data class TokenBudgetArgs(
 
 class TokenBudgetTool(
     private val llmAdapter: KoogLlmAdapter,
+    private val resourceGovernors: dev.promethe.core.ResourceGovernorRegistry = dev.promethe.core.GlobalResourceGovernorRegistry,
 ) : SimpleTool<TokenBudgetArgs>(
         argsType = typeToken<TokenBudgetArgs>(),
         name = "token_budget",
@@ -124,6 +125,7 @@ class TokenBudgetTool(
         val total = stats.promptTokens + stats.completionTokens
         val cacheTotal = stats.cacheHits + stats.cacheMisses
         val hitRate = if (cacheTotal > 0) (stats.cacheHits * 100.0 / cacheTotal) else 0.0
+        val quotas = resourceGovernors.quotaSnapshot()
 
         return buildString {
             appendLine("[Token Budget]")
@@ -137,6 +139,15 @@ class TokenBudgetTool(
             appendLine("  Stable prefix reuse: ${stats.prefixReuseHits} reused / ${stats.prefixReuseMisses} new")
             if (stats.totalRequests > 0) {
                 appendLine("  Avg tokens/request: ${total / stats.totalRequests}")
+            }
+            appendLine("  Aggregate start quotas (local profile; not USD limits):")
+            val policies = resourceGovernors.quotaPolicies()
+            if (policies.isEmpty()) appendLine("    Disabled")
+            policies.forEach { policy ->
+                appendLine("    Policy ${policy.id}: ${policy.dimension}/${policy.selector} ${policy.resource}, max=${policy.maxStarts} per ${policy.windowSeconds}s; wildcard is per subject")
+            }
+            quotas.forEach { quota ->
+                appendLine("    ${quota.ruleId}: ${quota.dimension}/${quota.subject} ${quota.resource} ${quota.used}/${quota.maxStarts}, resetsAt=${quota.resetsAt}")
             }
         }
     }

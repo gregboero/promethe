@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="KoogProtocolRelayTest[jvm]" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-09-07T17:59:02.377Z" hostname="BUREAU" time="2.057">
+  <properties/>
+  <testcase name="same adapter without formal tools uses JSON text[jvm]" classname="dev.promethe.core.KoogProtocolRelayTest" time="1.665"/>
+  <testcase name="real Koog serializes none bounded Responses and preserves native tool results[jvm]" classname="dev.promethe.core.KoogProtocolRelayTest" time="0.386"/>
+  <system-out><![CDATA[kotlin-logging: initializing... active logger factory: Slf4jLoggerFactory
+]]></system-out>
+  <system-err><![CDATA[SLF4J(W): No SLF4J providers were found.
+SLF4J(W): Defaulting to no-operation (NOP) logger implementation
+SLF4J(W): See https://www.slf4j.org/codes.html#noProviders for further details.
+]]></system-err>
+</testsuite>

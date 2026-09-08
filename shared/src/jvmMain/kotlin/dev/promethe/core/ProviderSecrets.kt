@@ -113,6 +113,7 @@ object RuntimeConfigRegistry {
             "DISCORD_PUBLIC_KEY",
             "DISCORD_MESSAGE_CONTENT_ENABLED",
             "DISCORD_ALLOWED_USER_IDS",
+            "DISCORD_APPROVER_USER_IDS",
             "DISCORD_KNOWLEDGE_CHANNEL_IDS",
             "DISCORD_WEBHOOK_URL",
             "SLACK_BOT_TOKEN",

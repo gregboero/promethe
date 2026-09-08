@@ -1,0 +1,144 @@
+{
+  "syntheticReplay": true,
+  "providerCauseEstablished": false,
+  "finding": "On the third request, page0 answer remains as a generic observation but call0 name/arguments/id are absent; call1 and its result retain native structure.",
+  "calls": [
+    {
+      "call": 1,
+      "structuredCalls": [],
+      "structuredResults": [],
+      "observations": []
+    },
+    {
+      "call": 2,
+      "structuredCalls": [
+        {
+          "call_id": "call-0",
+          "name": "json_query",
+          "arguments": "{\"page\":0}"
+        }
+      ],
+      "structuredResults": [
+        {
+          "call_id": "call-0",
+          "output": "{\"answer\":11}"
+        }
+      ],
+      "observations": []
+    },
+    {
+      "call": 3,
+      "structuredCalls": [
+        {
+          "call_id": "call-1",
+          "name": "json_query",
+          "arguments": "{\"page\":1}"
+        }
+      ],
+      "structuredResults": [
+        {
+          "call_id": "call-1",
+          "output": "{\"answer\":22}"
+        }
+      ],
+      "observations": [
+        {
+          "content": [
+            {
+              "type": "input_text",
+              "text": "Observation: {\"answer\":11}"
+            }
+          ],
+          "role": "developer",
+          "type": "message"
+        }
+      ]
+    },
+    {
+      "call": 4,
+      "structuredCalls": [
+        {
+          "call_id": "call-2",
+          "name": "json_query",
+          "arguments": "{\"page\":0}"
+        }
+      ],
+      "structuredResults": [
+        {
+          "call_id": "call-2",
+          "output": "{\"answer\":11}"
+        }
+      ],
+      "observations": [
+        {
+          "content": [
+            {
+              "type": "input_text",
+              "text": "Observation: {\"answer\":11}"
+            }
+          ],
+          "role": "developer",
+          "type": "message"
+        },
+        {
+          "content": [
+            {
+              "type": "input_text",
+              "text": "Observation: {\"answer\":22}"
+            }
+          ],
+          "role": "developer",
+          "type": "message"
+        }
+      ]
+    },
+    {
+      "call": 5,
+      "structuredCalls": [
+        {
+          "call_id": "call-3",
+          "name": "json_query",
+          "arguments": "{\"page\":1}"
+        }
+      ],
+      "structuredResults": [
+        {
+          "call_id": "call-3",
+          "output": "{\"answer\":22}"
+        }
+      ],
+      "observations": [
+        {
+          "content": [
+            {
+              "type": "input_text",
+              "text": "Observation: {\"answer\":11}"
+            }
+          ],
+          "role": "developer",
+          "type": "message"
+        },
+        {
+          "content": [
+            {
+              "type": "input_text",
+              "text": "Observation: {\"answer\":22}"
+            }
+          ],
+          "role": "developer",
+          "type": "message"
+        },
+        {
+          "content": [
+            {
+              "type": "input_text",
+              "text": "Observation: {\"answer\":11}"
+            }
+          ],
+          "role": "developer",
+          "type": "message"
+        }
+      ]
+    }
+  ]
+}

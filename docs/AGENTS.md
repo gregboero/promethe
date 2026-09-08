@@ -1,5 +1,7 @@
 # AI Agent Guide — Internal Architecture
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 > Technical documentation of the Prométhé agent engine: PRA loop, tools, memory, resilience and self-evolution.
 
 ## Overview

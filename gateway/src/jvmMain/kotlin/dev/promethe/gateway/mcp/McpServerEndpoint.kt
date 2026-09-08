@@ -52,11 +52,13 @@ fun Route.mcpServerRoutes(
     allowedOrigins: Set<String> = emptySet(),
     secureToolExecutor: SecureToolExecutor? = null,
     taskManager: McpTaskManager? = null,
+    roundTripManager: McpRoundTripManager? = null,
 ) {
     val exporter =
         McpToolExporter(
             secureToolExecutor = secureToolExecutor,
             taskManager = taskManager,
+            roundTripManager = roundTripManager,
         )
     val json = Json {
         ignoreUnknownKeys = true

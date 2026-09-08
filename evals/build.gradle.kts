@@ -11,6 +11,7 @@ dependencies {
 
     testImplementation(kotlin("test"))
     testImplementation(libs.koog.agents)
+    testImplementation(libs.koog.skills)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.ktor.client.core)
     testImplementation(libs.okio)

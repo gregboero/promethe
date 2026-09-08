@@ -1,5 +1,7 @@
 # Prométhé Architecture — Phase B
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 ## 1. Overview
 
 Prométhé is an autonomous AI agent built with **Kotlin Multiplatform** (KMP).
@@ -20,7 +22,8 @@ approval, workspace and audit control.
 | Module | Role | Key technologies |
 |---|---|---|
 | `:shared` | Common KMP code — agent core, tools, memory, LLM adapter, persistence | Kotlin/JVM, Exposed, Flyway, Koin |
-| `:gateway` | HTTP/WS server — omnichannel routing | Ktor 3.5.0 CIO |
+| `:gateway` | HTTP/WS server — omnichannel routing | Ktor 3.5.2 CIO |
+| `:androidApp` | Android application host and launcher; depends on the KMP UI library | AGP 9.1.1, compileSdk 37 |
 | `:api` | Data models and API interfaces | Kotlin (shared structures) |
 | `:composeApp` | Compose Multiplatform UI + unified entry point | Desktop / Wasm / Android / iOS |
 
@@ -107,7 +110,7 @@ flowchart LR
 
 ## 7. Persistence
 
-- **Engine**: SQLite via Exposed 1.3.0 + Flyway 12.8.1 migrations
+- **Engine**: SQLite via Exposed 1.5.0 + Flyway 13.5.0 migrations
 
 | Table | Role |
 |---|---|
@@ -190,7 +193,7 @@ registry. See **RAG.md** for embedding providers, vector stores, and the ingesti
 | `/api/v1/plugins/...` | REST | Plugin management |
 | `/api/v1/voice/...` | REST | Voice + TTS configuration |
 | `/api/v1/webhooks/...` | REST | Webhook management |
-| `/approval/...` | REST | Tool approval gate |
+| `/api/v1/approval/...` | REST | Tool approval gate |
 | `/ws/agents` | WebSocket | Monitor events |
 | `/ws/chat/voice` | WebSocket | Real-time voice stream |
 | `openAiCompatRoutes` | REST | OpenAI-compatible API |

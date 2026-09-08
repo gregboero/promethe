@@ -1,5 +1,7 @@
 # Promethe v1.0 Capability Certification
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](../EXPERIMENTAL_STATUS.md).
+
 > Certification record and evidence index for the v1.0 release. Runtime `GET /api/v1/capabilities` is authoritative for maturity and installation status. This file records scope, evidence, and review; it must never manually claim a contradictory status.
 
 ## Source of truth
@@ -25,13 +27,13 @@ The gateway endpoint returns:
 }
 ```
 
-At each certification run, attach the raw response, endpoint URL, build, timestamp, and target. Match records by exact `id`. `maturity` is the public support claim; `availability` is installation/configuration state. Configuration presence does not promote maturity. A required capability absent from the response is a registry defect and cannot be filled in by this document. The table below intentionally contains no hand-authored status values.
+At each certification run, attach the raw response, endpoint URL, build, timestamp, and target. Match records by exact `id`. `maturity` is the internal experimental capability tier; `availability` is installation/configuration state. Configuration presence does not promote maturity. A required capability absent from the response is a registry defect and cannot be filled in by this document. The table below intentionally contains no hand-authored status values.
 
 ## Maturity rules
 
 | Runtime `maturity` | Evidence required | Public rule |
 |---|---|---|
-| `STABLE` | Passing applicable M01-M24 checks, two independent repeatable runs/environments, documented failure and security behavior, owner, current review date, independent review | May be advertised for the exact `platforms` and scope in the descriptor |
+| `STABLE` | Passing applicable M01-M24 checks, two independent repeatable runs/environments, documented failure and security behavior, owner, current review date, independent review | May be described as tested for the exact `platforms` and scope; no production or support guarantee |
 | `BETA` | One end-to-end manual run, known limitations, failure evidence, owner, current review date | Must carry a beta warning and no reliability guarantee |
 | `LAB` | Reproducible proof of life, explicit scope/risk, owner | Experimental only; excluded from stable promise |
 | `UNAVAILABLE` | Absence/blocker evidence, expected user-visible unavailable behavior, next review date | Must not be advertised as available |

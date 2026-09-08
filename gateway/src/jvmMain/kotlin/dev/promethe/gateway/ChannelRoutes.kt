@@ -102,6 +102,7 @@ private val CHANNEL_DEFINITIONS = listOf(
                 "DISCORD_GUILD_ID",
                 "DISCORD_MESSAGE_CONTENT_ENABLED",
                 "DISCORD_ALLOWED_USER_IDS",
+                "DISCORD_APPROVER_USER_IDS",
                 "DISCORD_KNOWLEDGE_CHANNEL_IDS",
             ),
         webhookPath = "/webhook/discord",

@@ -1,0 +1,14 @@
+[
+  {
+    "mode": "baseline",
+    "archive": "baseline-draft-0.md"
+  },
+  {
+    "mode": "reused",
+    "archive": "reused-draft-0.md"
+  },
+  {
+    "mode": "conditional",
+    "archive": "conditional-draft-0.md"
+  }
+]

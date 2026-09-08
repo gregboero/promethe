@@ -7,6 +7,30 @@ import dev.promethe.api.ToolEgress
 import dev.promethe.api.ToolIdempotency
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+
+enum class ToolContractCoverageIssueType {
+    MISSING_EXPLICIT_CONTRACT,
+    EFFECT_WITHOUT_APPROVAL,
+    UNKNOWN_EFFECT_EGRESS,
+}
+
+data class ToolContractCoverageIssue(
+    val toolName: String,
+    val type: ToolContractCoverageIssueType,
+    val detail: String,
+)
+
+data class ToolContractCoverageReport(
+    val toolCount: Int,
+    val explicitContractCount: Int,
+    val effectfulToolCount: Int,
+    val issues: List<ToolContractCoverageIssue>,
+) {
+    val valid: Boolean
+        get() = issues.isEmpty()
+}
 
 /** Declarative security and execution contract shared by every tool entry point. */
 data class ToolContract(
@@ -180,6 +204,7 @@ object ToolContractRegistry {
             "browser_type" to ToolRisk.EXTERNAL_EFFECT,
             "browser_press" to ToolRisk.EXTERNAL_EFFECT,
             "browser_dialog" to ToolRisk.EXTERNAL_EFFECT,
+            "delegate_task" to ToolRisk.EXECUTE,
             "codex_delegate" to ToolRisk.EXECUTE,
             "claude_code_delegate" to ToolRisk.EXECUTE,
         )
@@ -282,10 +307,43 @@ object ToolContractRegistry {
                             "remove_channel_rule" to ToolRisk.CONFIG_CHANGE,
                         ),
                 ),
+            "todo" to
+                operationContract(
+                    toolName = "todo",
+                    source = ToolContractSource.BUILTIN,
+                    catalogRisk = ToolRisk.DESTRUCTIVE,
+                    missingRisk = ToolRisk.READ,
+                    unknownRisk = ToolRisk.WRITE,
+                    operations =
+                        mapOf(
+                            "list" to ToolRisk.READ,
+                            "add" to ToolRisk.WRITE,
+                            "done" to ToolRisk.WRITE,
+                            "remove" to ToolRisk.DESTRUCTIVE,
+                        ),
+                ),
+            "notes" to
+                operationContract(
+                    toolName = "notes",
+                    source = ToolContractSource.BUILTIN,
+                    catalogRisk = ToolRisk.DESTRUCTIVE,
+                    missingRisk = ToolRisk.READ,
+                    unknownRisk = ToolRisk.WRITE,
+                    operations =
+                        mapOf(
+                            "list" to ToolRisk.READ,
+                            "get" to ToolRisk.READ,
+                            "set" to ToolRisk.WRITE,
+                            "delete" to ToolRisk.DESTRUCTIVE,
+                        ),
+                ),
         )
 
     private val staticContracts: Map<String, ToolContract> =
         buildMap {
+            setOf("harness_inspect", "harness_propose", "harness_evaluate", "harness_activate", "harness_rollback", "harness_disable", "harness_adapt").forEach { name ->
+                put(name, directContract(name, if (name == "harness_inspect") ToolRisk.READ else ToolRisk.CONFIG_CHANGE, ToolContractSource.BUILTIN, ToolEgress.NONE))
+            }
             knownReadOnlyTools.forEach { toolName ->
                 put(
                     toolName,
@@ -322,8 +380,8 @@ object ToolContractRegistry {
         dynamicContracts[toolName]
             ?: staticContracts[toolName]
             ?: when {
-                toolName.startsWith("mcp_") -> fallbackContract(toolName, ToolContractSource.MCP)
-                toolName.startsWith("acp_") -> fallbackContract(toolName, ToolContractSource.ACP)
+                toolName.startsWith("mcp_") -> remoteDynamicContract(toolName, ToolContractSource.MCP)
+                toolName.startsWith("acp_") -> remoteDynamicContract(toolName, ToolContractSource.ACP)
                 else -> fallbackContract(toolName, ToolContractSource.FALLBACK)
             }
 
@@ -341,11 +399,101 @@ object ToolContractRegistry {
         dynamicContracts = dynamicContracts - toolName
     }
 
+    fun audit(toolNames: Iterable<String>): ToolContractCoverageReport {
+        val names = toolNames.distinct().sorted()
+        val contracts = names.associateWith(::contractFor)
+        val issues =
+            contracts.flatMap { (toolName, contract) ->
+                buildList {
+                    if (!contract.explicit) {
+                        add(
+                            ToolContractCoverageIssue(
+                                toolName,
+                                ToolContractCoverageIssueType.MISSING_EXPLICIT_CONTRACT,
+                                "No explicit contract or approved dynamic contract family",
+                            ),
+                        )
+                    }
+                    if (contract.catalogRisk != ToolRisk.READ && contract.approval == ToolApprovalRequirement.NONE) {
+                        add(
+                            ToolContractCoverageIssue(
+                                toolName,
+                                ToolContractCoverageIssueType.EFFECT_WITHOUT_APPROVAL,
+                                "Effectful catalog risk ${contract.catalogRisk} has no approval policy",
+                            ),
+                        )
+                    }
+                    if (contract.catalogRisk != ToolRisk.READ && contract.egress == ToolEgress.UNKNOWN) {
+                        add(
+                            ToolContractCoverageIssue(
+                                toolName,
+                                ToolContractCoverageIssueType.UNKNOWN_EFFECT_EGRESS,
+                                "Effectful tool has unknown egress",
+                            ),
+                        )
+                    }
+                    verifyEffectApproval(toolName, contract).forEach(::add)
+                }
+            }
+        return ToolContractCoverageReport(
+            toolCount = names.size,
+            explicitContractCount = contracts.values.count(ToolContract::explicit),
+            effectfulToolCount = contracts.values.count { it.catalogRisk != ToolRisk.READ },
+            issues = issues,
+        )
+    }
+
+    fun requireCompleteCoverage(toolNames: Iterable<String>): ToolContractCoverageReport {
+        val report = audit(toolNames)
+        check(report.valid) {
+            report.issues.joinToString(
+                prefix = "Tool contract coverage failed: ",
+                separator = "; ",
+            ) { issue -> "${issue.toolName} [${issue.type}]: ${issue.detail}" }
+        }
+        return report
+    }
+
+    fun staticContractNames(): Set<String> = staticContracts.keys
+
     val approvalRequiredToolNames: Set<String>
         get() =
             staticContracts
                 .filterValues { contract -> contract.catalogRisk != ToolRisk.READ }
                 .keys
+}
+
+private fun verifyEffectApproval(
+    toolName: String,
+    contract: ToolContract,
+): List<ToolContractCoverageIssue> {
+    val checks = mutableListOf<Pair<String, JsonObject>>()
+    if (contract.missingOperationRisk != ToolRisk.READ) {
+        checks += "missing operation" to buildJsonObject {}
+    }
+    val operationKey = contract.operationKeys.firstOrNull()
+    if (operationKey != null) {
+        contract.operationRisks
+            .filterValues { risk -> risk != ToolRisk.READ }
+            .keys
+            .forEach { operation ->
+                checks += "operation '$operation'" to buildJsonObject { put(operationKey, operation) }
+            }
+        if (contract.unknownOperationRisk != ToolRisk.READ) {
+            checks += "unknown operation" to buildJsonObject { put(operationKey, "__contract_audit_unknown__") }
+        }
+    }
+    return checks.mapNotNull { (label, arguments) ->
+        if (contract.evaluate(arguments).mandatoryApproval) {
+            null
+        } else {
+            ToolContractCoverageIssue(
+                toolName,
+                ToolContractCoverageIssueType.EFFECT_WITHOUT_APPROVAL,
+                "$label can produce an effect without mandatory approval",
+            )
+        }
+    }
 }
 
 private fun readContract(
@@ -385,6 +533,21 @@ private fun sensitiveRemoteContract(toolName: String): ToolContract =
     ToolContract(
         toolName = toolName,
         source = ToolContractSource.INTEGRATION,
+        catalogRisk = ToolRisk.EXTERNAL_EFFECT,
+        missingOperationRisk = ToolRisk.EXTERNAL_EFFECT,
+        unknownOperationRisk = ToolRisk.EXTERNAL_EFFECT,
+        approval = ToolApprovalRequirement.ALWAYS,
+        idempotency = ToolIdempotency.NEVER_AUTOMATIC,
+        egress = ToolEgress.REMOTE_SERVICE,
+    )
+
+private fun remoteDynamicContract(
+    toolName: String,
+    source: ToolContractSource,
+): ToolContract =
+    ToolContract(
+        toolName = toolName,
+        source = source,
         catalogRisk = ToolRisk.EXTERNAL_EFFECT,
         missingOperationRisk = ToolRisk.EXTERNAL_EFFECT,
         unknownOperationRisk = ToolRisk.EXTERNAL_EFFECT,

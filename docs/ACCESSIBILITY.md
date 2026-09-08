@@ -1,5 +1,7 @@
 # Accessibility Guide
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 ## Overview
 
 Promethe uses **Compose Multiplatform semantics** to expose an accessibility tree to browsers and

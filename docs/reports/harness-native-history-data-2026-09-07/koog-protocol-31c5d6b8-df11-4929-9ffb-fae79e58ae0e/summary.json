@@ -1,0 +1,122 @@
+{
+  "batch": "koog-protocol-31c5d6b8-df11-4929-9ffb-fae79e58ae0e",
+  "plannedRuns": 6,
+  "recordedRuns": 6,
+  "completeCohort": true,
+  "correctRuns": 6,
+  "completedRuns": 6,
+  "successfulRuns": 6,
+  "failureCodes": {},
+  "accounting": {
+    "attemptedCalls": 18,
+    "settledCalls": 18,
+    "uncertainCalls": 0,
+    "unknownUsageCalls": 0,
+    "usageComplete": true,
+    "inputTokens": 8301,
+    "outputTokens": 338,
+    "costUpperBoundMicroUsd": 24813,
+    "uncertainReservationMicroUsd": 0
+  },
+  "initialInputHashesIdentical": true,
+  "modelEndpointEffortBoundsVerified": true,
+  "httpStatuses": {
+    "200": 18
+  },
+  "responseStatuses": {
+    "completed": 18
+  },
+  "nativeFunctionCalls": 6,
+  "functionResultInputs": 9,
+  "allRegistriesCleaned": true,
+  "campaignBefore": {
+    "requests": 649,
+    "settledMicroUsd": 3868160
+  },
+  "campaignAfter": {
+    "requests": 667,
+    "settledMicroUsd": 3892973,
+    "uncertainReservations": 0,
+    "remainingMicroUsd": 1107027
+  },
+  "priorBudgetRowsUnchanged": true,
+  "validation": {
+    "api:jvmTest": {
+      "tests": 76,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared:jvmTest": {
+      "tests": 688,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "gateway:test": {
+      "tests": 213,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "evals:test": {
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "composeApp:desktopTest": {
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared:harnessLiveTest": {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "sourceSha256": {
+    "shared/src/commonMain/kotlin/dev/promethe/core/AIAgent.kt": "08cf9bcdd52efe377b380fd0934ba382530524635f480c43fd194e43fee58854",
+    "shared/src/commonMain/kotlin/dev/promethe/core/PendingToolTurn.kt": "6fa2dbf7787f157e2e86fa024470da2cd4b3bc362ed1b39084f8f407a85f01e3",
+    "shared/src/commonMain/kotlin/dev/promethe/core/NativeToolHistory.kt": "66848f93b9d9f3f77eada2e71db16862c535ffe5e3f667dfda0d89f4841bb772",
+    "shared/src/commonMain/kotlin/dev/promethe/core/KoogLlmAdapter.kt": "ed566fa7e90ed4579282c6d3f714b2972ee22ad2d55c9cbbfda52015306e5773",
+    "shared/src/commonMain/kotlin/dev/promethe/core/OpenAiCompatibleProviderPolicy.kt": "ca06e66af3511bf427eaf0998d2bc502c1c213f72dba27d7a61ee3087150fb30",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/HarnessKoogProtocolLiveTest.kt": "fca764a29a4015c377c71fb832d0b35ea09751258374ca7d150a4787698b9d3f",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/HarnessKoogProtocolFixture.kt": "dff448966b476032e4e858a98b4d97580376e6d7fe94cdb8c004ad374aaf1b2e",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/CampaignKoogRelay.kt": "5c71cfc2cb3c18096d72c2b224ec4b3ea4f8fa12368b25a7e98019f59f2b9c27",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/KoogProtocolRelayTest.kt": "e9c65e6f0485499d886a0cd2f59eef3b545e9a1802f006bf2975c262dd7013a8",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/NativeToolHistoryTest.kt": "c79fc6bd80e619eba0f344307ca18af98de63344e3bf137a9635b2dd8c8e6615",
+    "scripts/report-harness-koog-protocol.py": "81063099cdb7d44e7aade2f1ead4e855ef6a07bc91829311255f282f3002ec4d"
+  },
+  "measurementInputSha256": {
+    "build/reports/harness-iteration/live/koog-protocol-31c5d6b8-df11-4929-9ffb-fae79e58ae0e/koog-protocol-31c5d6b8-df11-4929-9ffb-fae79e58ae0e-1-structured-transcript.json": "ef315050b8c7027d511023c9c8219943b8a511f091e70f5119a3e3ae7e914e1c",
+    "build/reports/harness-iteration/live/koog-protocol-31c5d6b8-df11-4929-9ffb-fae79e58ae0e/koog-protocol-31c5d6b8-df11-4929-9ffb-fae79e58ae0e-1-text-transcript.json": "6dc5fc6901c2a5cf4a9e3a5a3fabd94396b8e1a8f93f859bd65182d83ef5a116",
+    "build/reports/harness-iteration/live/koog-protocol-31c5d6b8-df11-4929-9ffb-fae79e58ae0e/koog-protocol-31c5d6b8-df11-4929-9ffb-fae79e58ae0e-2-structured-transcript.json": "e6891611aa949441454df958998b8422fde5da41b7d8234408e5ff565e884016",
+    "build/reports/harness-iteration/live/koog-protocol-31c5d6b8-df11-4929-9ffb-fae79e58ae0e/koog-protocol-31c5d6b8-df11-4929-9ffb-fae79e58ae0e-2-text-transcript.json": "cb59323e48e443c6537a0c2059aa4b04b5c369e07dd4bfe31f2b54afdce64cd6",
+    "build/reports/harness-iteration/live/koog-protocol-31c5d6b8-df11-4929-9ffb-fae79e58ae0e/koog-protocol-31c5d6b8-df11-4929-9ffb-fae79e58ae0e-3-structured-transcript.json": "b826f94a117a51d5544ecbe134f8af0e5a119aa80caeeb54424f39192ad9fbf1",
+    "build/reports/harness-iteration/live/koog-protocol-31c5d6b8-df11-4929-9ffb-fae79e58ae0e/koog-protocol-31c5d6b8-df11-4929-9ffb-fae79e58ae0e-3-text-transcript.json": "6182a44a4ceebb671e0c560fd748617cb5cd80717d0ac1038fa78d4d62f35e6b",
+    "build/reports/harness-iteration/live/koog-protocol-31c5d6b8-df11-4929-9ffb-fae79e58ae0e/protocol.json": "c936181556e32f4ba11227c28a451810bbc1cb5e9b04f9b16a8b6e6aff2c1290",
+    "build/reports/harness-iteration/live/koog-protocol-31c5d6b8-df11-4929-9ffb-fae79e58ae0e/results.json": "a2d3f2f32f57d97606748c7a5c90dfbeb3fe08d9ce16a2f3a0e987157f4532db",
+    "build/reports/harness-iteration/live/request-03da58fa-eeaf-44a7-8701-fad7b0d40dae.json": "2f74c8f95d25a9a3c6d2df4bb17503725c3187d3e43dcd1d07813e373e66d826",
+    "build/reports/harness-iteration/live/request-35207d32-0cf7-4407-8bcf-798e2b39396b.json": "c8ebaba760982e3eded0937b00264516abf2092a29945d35538da1cc29362a34",
+    "build/reports/harness-iteration/live/request-4b34e5ca-acff-480b-aa2b-c7fa9c6d3a55.json": "fee387380db0c03436dece21717f912a487129a3c905f9e99899706ee2f8f26d",
+    "build/reports/harness-iteration/live/request-5b319df2-7d46-4bc7-8508-3a491de9cafa.json": "98cc9120df5f6c261674cbd4b8262ed501f570b95c2c51ee1a9d30e8c8d64a54",
+    "build/reports/harness-iteration/live/request-6292ea9e-c2d7-40ab-adad-4d535c853d56.json": "92c6267c43e599a91b86befb538940ca3a5ab8c539d323d56f6bdc8212c004c1",
+    "build/reports/harness-iteration/live/request-9430f481-376b-47ad-ae3f-dd063c36548a.json": "64f7b5f08677cf80ffb7261f5f6c19156fb49b3c33c8e06611af1917c86f4b94",
+    "build/reports/harness-iteration/live/request-986d12db-d29c-4351-8edc-0ad6e649c82f.json": "bf49f9c155e28281ec7a13f48457e7dbd2d60c733ccdf2baabd9b7c4ec98354d",
+    "build/reports/harness-iteration/live/request-9a0178a7-a0de-4a64-b7a5-72d9dd183ee2.json": "417778c9d730a68007f25ab90435044ba7fcfb7f6dfa7988ade722b5d74dfcc0",
+    "build/reports/harness-iteration/live/request-9c5eb0e4-2349-4625-8c10-e23ed0179ec1.json": "9d516e39bc286bd6b8a73a841db915ae26d501886911d49fb05cd7af77b8628b",
+    "build/reports/harness-iteration/live/request-b42844c2-7ee5-4f4c-9869-4a4990b60f2b.json": "d87c68f93fa0ea030a2ae6c8a8a33ab3f5bd8ddf8cc80bb646a461cdc7832c09",
+    "build/reports/harness-iteration/live/request-bac4c837-1461-446b-8f40-094fcf403516.json": "d910257f9fa9e3674343b17a2615f702158abb6b0c2df50f1eac1d8313adccef",
+    "build/reports/harness-iteration/live/request-c71fbcf4-0494-40a1-b3d1-3d80da3054b3.json": "efe5f98b9c41afe7544037d0d80c62a397d9f10d1917dc0818edbae9f57d9178",
+    "build/reports/harness-iteration/live/request-cafb2c21-c973-439d-ab84-b9d75104e8c7.json": "23096b1c03ed7a5f1df8136e1b91d7cc568299b0430f480f8407dfc651baf215",
+    "build/reports/harness-iteration/live/request-d32fb310-f36d-444d-b0e5-2fe779f564e0.json": "ab70ca880c66cdb1600b7233b3cddee25fbea689afb692e6abd15a39f63c4261",
+    "build/reports/harness-iteration/live/request-dffa28d9-9552-47b8-b283-892b4aecc9f3.json": "be8205d6dcf55599fbbc48c910cc5cadb6c8a9b38a307129540e579a67c5011b",
+    "build/reports/harness-iteration/live/request-e216f1e3-2fc2-4a23-9282-6b2a56d0f849.json": "012611e0f6babc8f0509348faf4fc055305ea8abf1d2b27c6076e0d28a5a1dc7",
+    "build/reports/harness-iteration/live/request-e839639d-7830-4d32-81ba-e9d9f0d27d05.json": "f6b7494c12a4b1d9e9e6a9f38cd03824f7576e09a224d57a522e4b5b2f40cfab",
+    "build/reports/harness-iteration/live/request-ebe4b0ee-b3e5-49dc-9b1b-833fe7c9cd37.json": "66dda8e42fbd699dd85ebebe220fb1741b12f360dc09a30aa56e781691501de5"
+  }
+}

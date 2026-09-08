@@ -55,6 +55,7 @@ import dev.promethe.app.navigation.BackStackPersistence
 import dev.promethe.app.navigation.PrometheRoute
 import dev.promethe.app.network.PrometheClient
 import dev.promethe.app.screens.*
+import dev.promethe.app.screens.viewmodel.SessionsViewModel
 import dev.promethe.app.theme.PrometheTheme
 import dev.promethe.api.LoginClientKind
 import org.jetbrains.compose.resources.StringResource
@@ -404,6 +405,8 @@ private fun AppContent(
     onThemeChanged: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
+    val sessionsViewModel = remember(client) { SessionsViewModel(client) }
+
     androidx.compose.foundation.layout.Box(modifier = modifier.fillMaxSize().testTag("content_area")) {
         NavDisplay(
             backStack = backStack,
@@ -430,7 +433,7 @@ private fun AppContent(
                 when (route) {
                     is PrometheRoute.Sessions -> NavEntry(route) {
                         SessionsScreen(
-                            client = client,
+                            viewModel = sessionsViewModel,
                             onManageProjects = { navigateToTab(PrometheRoute.Projects) },
                             onSessionSelected = { sessionId ->
                                 backStack.add(PrometheRoute.Chat(sessionId))

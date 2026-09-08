@@ -1,5 +1,7 @@
 # Plugin System
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 ## Overview
 
 Plugins extend Promethe's capabilities without modifying the core system. They can add tools, intercept events via hooks, or expose new API routes.

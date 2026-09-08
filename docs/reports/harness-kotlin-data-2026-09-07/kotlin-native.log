@@ -1,0 +1,40 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.5.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :harness-kotlin:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :api:kmpPartiallyResolvedDependenciesChecker
+> Task :shared:kmpPartiallyResolvedDependenciesChecker
+> Task :api:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :shared:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :shared:buildSandboxNative UP-TO-DATE
+> Task :shared:syncSandboxNative UP-TO-DATE
+> Task :shared:jvmProcessResources UP-TO-DATE
+> Task :shared:processJvmMainResources SKIPPED
+> Task :shared:jvmTestProcessResources NO-SOURCE
+> Task :shared:processJvmTestResources SKIPPED
+> Task :api:compileKotlinJvm UP-TO-DATE
+> Task :api:compileJvmMainJava NO-SOURCE
+> Task :api:jvmProcessResources NO-SOURCE
+> Task :api:processJvmMainResources SKIPPED
+> Task :api:jvmMainClasses UP-TO-DATE
+> Task :api:jvmJar UP-TO-DATE
+> Task :harness-kotlin:processResources NO-SOURCE
+> Task :harness-kotlin:windowsLauncher UP-TO-DATE
+> Task :shared:compileKotlinJvm UP-TO-DATE
+> Task :shared:compileJvmMainJava NO-SOURCE
+> Task :shared:jvmMainClasses UP-TO-DATE
+> Task :shared:jvmJar UP-TO-DATE
+> Task :harness-kotlin:compileKotlin
+> Task :harness-kotlin:compileJava NO-SOURCE
+> Task :harness-kotlin:classes UP-TO-DATE
+> Task :harness-kotlin:jar UP-TO-DATE
+> Task :harness-kotlin:startScripts UP-TO-DATE
+> Task :harness-kotlin:installDist UP-TO-DATE
+> Task :harness-kotlin:prepareRuntime SKIPPED
+> Task :shared:compileTestKotlinJvm
+> Task :shared:compileJvmTestJava NO-SOURCE
+> Task :shared:jvmTestClasses
+> Task :shared:harnessKotlinNativeTest
+
+BUILD SUCCESSFUL in 1m 33s
+16 actionable tasks: 5 executed, 11 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.5.1/userguide/configuration_cache_enabling.html

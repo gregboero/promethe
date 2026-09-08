@@ -1,5 +1,7 @@
 # Contexte additionnel
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](docs/EXPERIMENTAL_STATUS.md).
+
 <!-- ═══════════════════════════════════════════════════════════════════
      Ce fichier fournit du contexte additionnel injecté dans le prompt
      système de l'agent. Utilisez-le pour les informations qui changent
@@ -33,7 +35,7 @@
 <!-- Informations sur l'état actuel du projet que l'agent doit connaître. -->
 
 - **Branche active** : <!-- ex: feature/dashboard -->
-- **Environnement cible** : <!-- ex: staging / production -->
+- **Environnement cible** : <!-- ex: local / environnement de test jetable -->
 - **Prochaine release** : <!-- ex: v0.5.0 prévue le 20 janvier -->
 - **Blockers connus** : <!-- ex: "API externe X est en maintenance" -->
 

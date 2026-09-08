@@ -1,0 +1,16 @@
+[
+  {
+    "mode": "reused",
+    "revision": {
+      "id": "89f77b7e-1ea8-4363-95cc-130f05101d7f",
+      "sessionId": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6-reused",
+      "baseRevision": null,
+      "source": "import kotlinx.serialization.json.*\n\nval raw = observation.text\nval result = try {\n    val obj = Json.parseToJsonElement(raw) as? JsonObject\n    obj?.get(\"answer\")?.let { element ->\n        when (element) {\n            is JsonPrimitive -> element.content\n            else -> element.toString()\n        }\n    } ?: raw\n} catch (_: Exception) {\n    Regex(\"(?:^|[\\\\s,])answer=([^\\\\s,]+)\").find(raw)?.groupValues?.get(1) ?: run {\n        val lines = raw.lines()\n        if (lines.size >= 2 && lines[0].split(',').contains(\"answer\")) {\n            val index = lines[0].split(',').indexOf(\"answer\")\n            lines[1].split(',').getOrNull(index) ?: raw\n        } else raw\n    }\n}\nresult",
+      "hash": "09211ce22a956ae92b8bdca61617999ee4ad13674144cf899a584717e7806e8e",
+      "toolName": "json_query",
+      "createdAt": 1788813777326,
+      "language": "KOTLIN"
+    },
+    "validationRecorded": true
+  }
+]

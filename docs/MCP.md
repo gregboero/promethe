@@ -1,5 +1,7 @@
 # MCP Integration
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 > How Prométhé connects to external MCP servers (client role) and how it exposes its own tools
 > as an MCP server (server role).
 
@@ -220,7 +222,7 @@ mode:
 | `server/discover` | Modern only. Returns supported versions, tool capabilities, the Tasks extension when durable storage is active, server identity in result `_meta`, private cache hints, and `resultType: complete`. |
 | `initialize` | Legacy only. Returns `2025-11-25`, tool capabilities and server info. Modern requests receive `-32601`. |
 | `tools/list` | Enumerates policy-visible tools in deterministic name order. Modern results include `resultType`, `ttlMs`, `cacheScope`, server identity and explicit draft 2020-12 input schemas. |
-| `tools/call` | Sends a typed `ToolInvocation` to `SecureToolExecutor`, preserving MCP origin, owner session, exact arguments, risk classification, and mandatory approval. It returns `resultType: task` for an eligible long-running tool only when the client advertises `io.modelcontextprotocol/tasks`; otherwise it remains synchronous. |
+| `tools/call` | Sends a typed `ToolInvocation` to `SecureToolExecutor`, preserving MCP origin, owner session, exact arguments, risk classification, and mandatory approval. It returns `resultType: task` for an eligible long-running tool only when the client advertises `io.modelcontextprotocol/tasks`. Other modern calls can return `input_required` and resume the original suspended execution. |
 | `tasks/get` | Modern only. Returns the session-owned durable state and final result/error. `Mcp-Name` must equal `taskId`. |
 | `tasks/update` | Modern only. Supplies responses requested by an `input_required` task. The capability must be repeated in request metadata. |
 | `tasks/cancel` | Modern only. Persists cancellation and cancels the active coroutine when it still belongs to this process. Repeated cancellation is idempotent. |
@@ -248,6 +250,16 @@ are limited to 64 KiB, sixteen flat primitive fields, and bounded labels/descrip
 also warns the owner never to enter credentials or other secrets. A request times out as `cancel`.
 Pending forms are intentionally held in memory because their originating tool coroutine cannot
 survive a process restart. Promethe does not advertise `sampling/createMessage` or `roots/list`.
+
+The HTTP and stdio server roles also emit `input_required` when a synchronous secured tool calls
+`requestToolInput`. The original coroutine remains suspended instead of replaying the tool. Each
+opaque `requestState` is single-use and bound to the authenticated owner session, tool name,
+canonical arguments, requested input keys, and capabilities advertised on the retry. Replays,
+cross-session use, argument changes, capability removal, malformed responses, and expired states
+fail closed. Server-side continuations allow four rounds, sixteen requests per round, 256 KiB per
+request/response payload, eight pending turns per owner, 128 globally, and two minutes to answer.
+Pending synchronous continuations are intentionally not durable; after restart the client receives
+an unknown or expired state rather than causing Promethe to replay a partly executed tool.
 
 Errors are mapped to standard JSON-RPC codes: `-32601` (method not found), `-32602` (invalid
 params, e.g. missing `name`/`arguments`), `-32603` (uncaught internal error), `-32700` (parse
@@ -284,9 +296,9 @@ string check on the line before/independent of full dispatch).
   `baseUrl` as the message endpoint if it cannot parse a `data:` line from the initial SSE response.
 - **MCP HTTP+SSE is legacy-only and deprecated** — it remains available during the compatibility
   window but receives no new protocol features.
-- **MRTR is client-side and opt-in at the trust boundary** — the Streamable HTTP client can drive
-  bounded modern retries and owner-facing form elicitation. URL-mode elicitation and richer schema
-  renderers are not supported, and Prométhé's server role does not emit `input_required` results yet.
+- **MRTR remains opt-in at the trust boundary** — client and server paths support bounded modern
+  retries and owner-facing form elicitation. URL-mode elicitation and richer schema renderers are
+  not supported. Synchronous server continuations are intentionally lost on process restart.
 - **Tasks use polling, not subscriptions** — durable create/get/update/cancel is implemented, but
   notification subscriptions and resumable push delivery remain future work. The server currently
   opts in a conservative set of long-running tools rather than allowing every tool to become a task.

@@ -346,6 +346,200 @@ class McpToolExporterSecurityTest {
             assertEquals("Hello Promethe", result["content"]!!.jsonArray.first().jsonObject["text"]!!.jsonPrimitive.content)
         }
 
+    @Test
+    fun `modern synchronous input resumes the original tool execution exactly once`() =
+        runTest {
+            ToolRegistry.register(NeverDirectTool("read_file"))
+            var executions = 0
+            var stateCounter = 0
+            val exporter =
+                McpToolExporter(
+                    secureToolExecutor = SecureToolExecutor {
+                        executions++
+                        val responses =
+                            requestToolInput(
+                                buildJsonObject {
+                                    putJsonObject("name") {
+                                        put("method", "elicitation/create")
+                                        putJsonObject("params") { put("message", "Your name?") }
+                                    }
+                                },
+                            )
+                        "Hello ${responses["name"]!!.jsonObject["value"]!!.jsonPrimitive.content}"
+                    },
+                    roundTripManager =
+                        McpRoundTripManager(
+                            scope = this,
+                            nextRequestState = { "state-${++stateCounter}" },
+                        ),
+                )
+            val arguments = buildJsonObject { put("value", "original") }
+
+            val first =
+                exporter.dispatch(
+                    request(
+                        "tools/call",
+                        elicitationCapableToolCall("read_file", arguments),
+                    ),
+                    sessionId = "owner-a",
+                    protocolVersion = McpProtocol.MODERN_VERSION,
+                )!!["result"]!!.jsonObject
+
+            assertEquals(McpProtocol.RESULT_INPUT_REQUIRED, first["resultType"]!!.jsonPrimitive.content)
+            assertEquals("state-1", first["requestState"]!!.jsonPrimitive.content)
+            assertEquals(1, executions)
+
+            val completed =
+                exporter.dispatch(
+                    request(
+                        "tools/call",
+                        roundTripParams(
+                            "read_file",
+                            arguments,
+                            "state-1",
+                            "name",
+                            kotlinx.serialization.json.JsonPrimitive("Promethe"),
+                        ),
+                        id = 2,
+                    ),
+                    sessionId = "owner-a",
+                    protocolVersion = McpProtocol.MODERN_VERSION,
+                )!!["result"]!!.jsonObject
+
+            assertEquals(McpProtocol.RESULT_COMPLETE, completed["resultType"]!!.jsonPrimitive.content)
+            assertEquals("Hello Promethe", completed["content"]!!.jsonArray.first().jsonObject["text"]!!.jsonPrimitive.content)
+            assertEquals(1, executions)
+
+            val replay =
+                exporter.dispatch(
+                    request(
+                        "tools/call",
+                        roundTripParams(
+                            "read_file",
+                            arguments,
+                            "state-1",
+                            "name",
+                            kotlinx.serialization.json.JsonPrimitive("Replay"),
+                        ),
+                        id = 3,
+                    ),
+                    sessionId = "owner-a",
+                    protocolVersion = McpProtocol.MODERN_VERSION,
+                )
+            assertEquals(-32602, replay!!["error"]!!.jsonObject["code"]!!.jsonPrimitive.content.toInt())
+            assertEquals(1, executions)
+        }
+
+    @Test
+    fun `modern request state is bound to the owner tool and arguments`() =
+        runTest {
+            ToolRegistry.register(NeverDirectTool("read_file"))
+            val exporter =
+                McpToolExporter(
+                    secureToolExecutor = SecureToolExecutor {
+                        requestToolInput(
+                            buildJsonObject {
+                                putJsonObject("approval") {
+                                    put("method", "elicitation/create")
+                                    putJsonObject("params") { put("message", "Continue?") }
+                                }
+                            },
+                        )
+                        "done"
+                    },
+                    roundTripManager = McpRoundTripManager(this, nextRequestState = { "bound-state" }),
+                )
+            val arguments = buildJsonObject { put("value", "original") }
+            exporter.dispatch(
+                request(
+                    "tools/call",
+                    elicitationCapableToolCall("read_file", arguments),
+                ),
+                sessionId = "owner-a",
+                protocolVersion = McpProtocol.MODERN_VERSION,
+            )
+
+            val wrongOwner =
+                exporter.dispatch(
+                    request(
+                        "tools/call",
+                        roundTripParams("read_file", arguments, "bound-state", "approval"),
+                        id = 2,
+                    ),
+                    sessionId = "owner-b",
+                    protocolVersion = McpProtocol.MODERN_VERSION,
+                )
+            assertEquals(-32602, wrongOwner!!["error"]!!.jsonObject["code"]!!.jsonPrimitive.content.toInt())
+
+            val wrongArguments =
+                exporter.dispatch(
+                    request(
+                        "tools/call",
+                        roundTripParams(
+                            "read_file",
+                            buildJsonObject { put("value", "changed") },
+                            "bound-state",
+                            "approval",
+                        ),
+                        id = 3,
+                    ),
+                    sessionId = "owner-a",
+                    protocolVersion = McpProtocol.MODERN_VERSION,
+                )
+            assertEquals(-32602, wrongArguments!!["error"]!!.jsonObject["code"]!!.jsonPrimitive.content.toInt())
+
+            val completed =
+                exporter.dispatch(
+                    request(
+                        "tools/call",
+                        roundTripParams("read_file", arguments, "bound-state", "approval"),
+                        id = 4,
+                    ),
+                    sessionId = "owner-a",
+                    protocolVersion = McpProtocol.MODERN_VERSION,
+                )
+            assertEquals(
+                McpProtocol.RESULT_COMPLETE,
+                completed!!["result"]!!.jsonObject["resultType"]!!.jsonPrimitive.content,
+            )
+        }
+
+    @Test
+    fun `modern server input fails closed without the matching client capability`() =
+        runTest {
+            ToolRegistry.register(NeverDirectTool("read_file"))
+            val exporter =
+                McpToolExporter(
+                    secureToolExecutor = SecureToolExecutor {
+                        requestToolInput(
+                            buildJsonObject {
+                                putJsonObject("approval") {
+                                    put("method", "elicitation/create")
+                                    putJsonObject("params") { put("message", "Continue?") }
+                                }
+                            },
+                        )
+                        "unexpected"
+                    },
+                    roundTripManager = McpRoundTripManager(this),
+                )
+
+            val response =
+                exporter.dispatch(
+                    request(
+                        "tools/call",
+                        buildJsonObject {
+                            put("name", "read_file")
+                            putJsonObject("arguments") {}
+                        },
+                    ),
+                    sessionId = "owner-a",
+                    protocolVersion = McpProtocol.MODERN_VERSION,
+                )
+
+            assertEquals(-32602, response!!["error"]!!.jsonObject["code"]!!.jsonPrimitive.content.toInt())
+        }
+
     private fun request(
         method: String,
         params: kotlinx.serialization.json.JsonObject,
@@ -371,6 +565,39 @@ class McpToolExporterSecurityTest {
                 }
             }
         }
+
+    private fun roundTripParams(
+        toolName: String,
+        arguments: kotlinx.serialization.json.JsonObject,
+        requestState: String,
+        responseKey: String,
+        responseValue: kotlinx.serialization.json.JsonElement = kotlinx.serialization.json.JsonPrimitive(true),
+    ) = buildJsonObject {
+        put("name", toolName)
+        put("arguments", arguments)
+        put("requestState", requestState)
+        putJsonObject("inputResponses") {
+            putJsonObject(responseKey) { put("value", responseValue) }
+        }
+        putJsonObject("_meta") {
+            putJsonObject(McpProtocol.CLIENT_CAPABILITIES_META) {
+                putJsonObject("elicitation") {}
+            }
+        }
+    }
+
+    private fun elicitationCapableToolCall(
+        toolName: String,
+        arguments: kotlinx.serialization.json.JsonObject,
+    ) = buildJsonObject {
+        put("name", toolName)
+        put("arguments", arguments)
+        putJsonObject("_meta") {
+            putJsonObject(McpProtocol.CLIENT_CAPABILITIES_META) {
+                putJsonObject("elicitation") {}
+            }
+        }
+    }
 
     @Serializable
     private data class TestArgs(

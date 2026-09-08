@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="skills_evaluations">Évaluations du skill</string>
+    <string name="skills_evaluations_passed">Cette révision a réussi ses cas déclarés. La revue propriétaire reste requise pour la promotion.</string>
+    <string name="skills_evaluations_required">Des évaluations réussies et à jour sont requises avant la promotion.</string>
+    <string name="skills_test_cases">Cas de test</string>
+    <string name="skills_run_evaluations">Lancer les tests</string>
+    <string name="skills_version_history">Historique</string>
+    <string name="skills_evaluation_cost">Les tests utilisent le modèle configuré et peuvent entraîner des coûts. Au plus 20 cas textuels, sans outils.</string>
+    <string name="skills_test_cases_help">Définissez au moins deux tâches différentes et leurs réponses exactes attendues. Enregistrer les cas remet le skill en quarantaine.</string>
+    <string name="skills_case_input">Tâche</string>
+    <string name="skills_expected_answer">Réponse exacte attendue</string>
+    <string name="skills_add_case">Ajouter un cas</string>
+    <string name="skills_restore_help">La restauration crée une révision en quarantaine. Exécutez ses tests et sa revue avant activation.</string>
+    <string name="skills_restore_version">Restaurer cette version</string>
+    <string name="skills_review_note">Preuves et observations de revue</string>
+    <string name="skills_review_scope">Décrivez les vérifications effectuées sur cette version. Cette revue propriétaire ne lance pas les évaluations automatiques.</string>
     <!-- ═══════════════════════════════════════════════════════════════
          Promethe — Chaînes françaises
          Généré pour la release v0.1.0
@@ -94,6 +109,14 @@
     <string name="chat_keyboard_hint">Entrée pour envoyer · Maj+Entrée pour nouvelle ligne</string>
     <string name="chat_scroll_to_bottom">Aller en bas</string>
     <string name="chat_connection_error">Erreur de connexion : %1$s</string>
+    <string name="chat_approval_required">Autorisation requise</string>
+    <string name="chat_approval_tool">Outil : %1$s</string>
+    <string name="chat_approval_arguments">Arguments</string>
+    <string name="chat_approval_reject">Refuser</string>
+    <string name="chat_approval_allow_once">Autoriser une fois</string>
+    <string name="chat_approval_allow_session">Autoriser pour la session</string>
+    <string name="chat_approval_allow_persistent">Toujours autoriser cette configuration exacte</string>
+    <string name="chat_approval_resolution_error">Impossible de résoudre cette demande : %1$s</string>
 
     <!-- ── components/ (MessageBubble, AgentReasoningBlock) ── -->
     <string name="component_message_bubble_copy_a11y">Copier le message</string>
@@ -192,6 +215,8 @@
     <string name="settings_integrations_discord_message_content_label">Ecouter les messages adresses au bot (Message Content)</string>
     <string name="settings_integrations_discord_allowed_users_label">Identifiants utilisateurs autorisés (optionnel)</string>
     <string name="settings_integrations_discord_allowed_users_hint">Identifiants Discord séparés par des virgules. Vide autorise toute personne pouvant joindre le bot.</string>
+    <string name="settings_integrations_discord_approvers_label">Identifiants des responsables d’approbation</string>
+    <string name="settings_integrations_discord_approvers_hint">Utilisateurs Discord recevant les demandes d’autorisation en message privé. Ils doivent partager un serveur avec le bot et autoriser les messages privés.</string>
     <string name="settings_integrations_discord_knowledge_channels_label">Identifiants des canaux de connaissance (optionnel)</string>
     <string name="settings_integrations_discord_knowledge_channels_hint">Les messages de ces canaux sont archivés en JSON-LD et utilisés comme contexte de conversation non fiable.</string>
     <string name="settings_integrations_app_public_key_label">Clé publique de l’application (commandes slash uniquement)</string>
@@ -460,6 +485,7 @@
     <string name="agents_reasoning_effort_low">Faible</string>
     <string name="agents_reasoning_effort_medium">Moyen</string>
     <string name="agents_reasoning_effort_high">Élevé</string>
+    <string name="agents_reasoning_effort_none">Aucun</string>
     <string name="agents_max_iterations_label">Itérations max</string>
     <string name="agents_selected_count">%1$d sélectionné(s)</string>
     <string name="agents_no_items_selected">Aucun élément sélectionné</string>

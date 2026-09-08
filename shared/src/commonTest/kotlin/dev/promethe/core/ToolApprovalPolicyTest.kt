@@ -23,8 +23,10 @@ class ToolApprovalPolicyTest {
         assertFalse(ToolApprovalPolicy.contractFor("unknown_tool").explicit)
         assertEquals(ToolContractSource.FALLBACK, ToolApprovalPolicy.contractFor("unknown_tool").source)
         assertEquals(ToolContractSource.MCP, ToolApprovalPolicy.contractFor("mcp_server_delete_everything").source)
+        assertTrue(ToolApprovalPolicy.contractFor("mcp_server_delete_everything").explicit)
         assertEquals(ToolApprovalRequirement.ALWAYS, ToolApprovalPolicy.contractFor("unknown_tool").approval)
         assertEquals(ToolEgress.UNKNOWN, ToolApprovalPolicy.contractFor("unknown_tool").egress)
+        assertEquals(ToolEgress.REMOTE_SERVICE, ToolApprovalPolicy.contractFor("mcp_server_delete_everything").egress)
     }
 
     @Test
@@ -124,6 +126,9 @@ class ToolApprovalPolicyTest {
                 "mixture_of_agents",
                 "list_agents",
                 "get_subtask_result",
+                "delegate_task",
+                "todo",
+                "notes",
             )
 
         sensitiveTools.forEach { toolName ->
@@ -132,6 +137,33 @@ class ToolApprovalPolicyTest {
         assertEquals(ToolRisk.WRITE, ToolApprovalPolicy.catalogRisk("checkpoint_save"))
         assertEquals(ToolRisk.READ, ToolApprovalPolicy.catalogRisk("list_agents"))
         assertEquals(ToolRisk.READ, ToolApprovalPolicy.catalogRisk("get_subtask_result"))
+    }
+
+    @Test
+    fun `todo and notes reads are safe but mutations require approval`() {
+        val todoList = ToolApprovalPolicy.evaluate("todo", buildJsonObject { put("action", "list") })
+        val todoRemove = ToolApprovalPolicy.evaluate("todo", buildJsonObject { put("action", "remove") })
+        val noteGet = ToolApprovalPolicy.evaluate("notes", buildJsonObject { put("action", "get") })
+        val noteSet = ToolApprovalPolicy.evaluate("notes", buildJsonObject { put("action", "set") })
+
+        assertEquals(ToolRisk.READ, todoList.risk)
+        assertFalse(todoList.mandatoryApproval)
+        assertEquals(ToolRisk.DESTRUCTIVE, todoRemove.risk)
+        assertTrue(todoRemove.mandatoryApproval)
+        assertEquals(ToolRisk.READ, noteGet.risk)
+        assertFalse(noteGet.mandatoryApproval)
+        assertEquals(ToolRisk.WRITE, noteSet.risk)
+        assertTrue(noteSet.mandatoryApproval)
+    }
+
+    @Test
+    fun `contract audit accepts approved dynamic families and rejects unknown tools`() {
+        val accepted = ToolContractRegistry.audit(listOf("read_file", "todo", "mcp_server_tool", "acp_agent_capability"))
+        val rejected = ToolContractRegistry.audit(listOf("unknown_dynamic_tool"))
+
+        assertTrue(accepted.valid, accepted.issues.joinToString())
+        assertFalse(rejected.valid)
+        assertEquals(ToolContractCoverageIssueType.MISSING_EXPLICIT_CONTRACT, rejected.issues.first().type)
     }
 
     @Test

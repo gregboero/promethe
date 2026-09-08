@@ -1,0 +1,12 @@
+[
+  {
+    "mode": "baseline",
+    "source": "koog-kotlin-b751e861-ec81-48d2-ad60-ecae0c158dfc-baseline/skills/extract_ordered_answers_from_json_pages/SKILL.md",
+    "archive": "baseline-draft-0.md"
+  },
+  {
+    "mode": "free",
+    "source": "koog-kotlin-b751e861-ec81-48d2-ad60-ecae0c158dfc-free/skills/extract_ordered_page_answers_via_json_query/SKILL.md",
+    "archive": "free-draft-0.md"
+  }
+]

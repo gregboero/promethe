@@ -29,6 +29,7 @@ private val logger = io.github.oshai.kotlinlogging.KotlinLogging.logger {}
 data class AgentStack(
     val agent: AIAgent,
     val database: PrometheDatabaseApi,
+    val resourceGovernors: ResourceGovernorRegistry,
     val llmAdapter: KoogLlmAdapter,
     val feedbackCollector: FeedbackCollector,
     val orchestrator: AgentOrchestrator,
@@ -159,6 +160,14 @@ object AgentBootstrap {
 
         val apiKeys = CredentialsStore.resolveApiKeys(credentials)
         val database = database ?: DatabaseFactory.create()
+        val quotaRules = PersistentResourceQuotaBank.parseRules(ConfigProvider.get().get("PROMETHE_RESOURCE_QUOTAS", "[]"))
+        val quotaDirectory = java.nio.file.Files.createDirectories(java.nio.file.Path.of(resolvedConfig.profileDirectory)).toRealPath()
+        val aggregateQuotas = if (quotaRules.isEmpty()) {
+            ResourceQuotaBank.NONE
+        } else {
+            PersistentResourceQuotaBank(quotaDirectory.resolve("resource-quotas.sqlite"), quotaDirectory.toString(), quotaRules)
+        }
+        val resourceGovernors = PersistentResourceGovernorRegistry(database, aggregateQuotas = aggregateQuotas)
 
         val httpClient =
             HttpClient {
@@ -174,7 +183,7 @@ object AgentBootstrap {
                 HonchoClient(httpClient, it, resolvedConfig.honchoApiKey)
             }
 
-        val llmAdapter = KoogLlmAdapter(resolvedConfig, database)
+        val llmAdapter = KoogLlmAdapter(resolvedConfig, database, resourceGovernors)
         TracySetup.initialize(resolvedConfig)
         llmAdapter.initializeWithRouter(apiKeys, database)
 
@@ -267,20 +276,45 @@ object AgentBootstrap {
         // The gate is always available: APPROVAL_MODE=auto still permits safe
         // tools automatically, but security-sensitive tools remain mandatory.
         val approvalGate =
-            ToolApprovalGate(resolvedConfig).also {
+            ToolApprovalGate(resolvedConfig, database = database).also {
                 logger.info { "Tool approval gate initialized (mode=${resolvedConfig.approvalMode})" }
             }
+
+        val harness = if (System.getenv("PROMETHE_ENABLE_HARNESS_MUTATION")?.equals("true", ignoreCase = true) == true) {
+            val harnessDirectory = java.nio.file.Path.of(profileDir.toString()).resolve("harness")
+            val scratch = workspaceDirectory.toPath().resolve(".harness-lab")
+            val runner: HarnessRunner = when (val language = System.getenv("PROMETHE_HARNESS_LANGUAGE")?.lowercase() ?: "javascript") {
+                "javascript" -> HarnessNodeRunner(sandboxManager, java.nio.file.Path.of(requireNotNull(System.getenv("PROMETHE_HARNESS_NODE"))), scratch)
+                "kotlin" -> HarnessKotlinRunner(sandboxManager, java.nio.file.Path.of(requireNotNull(System.getenv("PROMETHE_HARNESS_KOTLIN_DIST"))), java.nio.file.Path.of(requireNotNull(System.getenv("PROMETHE_HARNESS_JAVA_RUNTIME"))), scratch, cacheEnabled = System.getenv("PROMETHE_HARNESS_KOTLIN_CACHE")?.toBooleanStrict() ?: true)
+                else -> error("Unsupported harness language: $language")
+            }
+            val store = HarnessStore(harnessDirectory.resolve("harness.sqlite"))
+            val sessionHarness = SessionHarness(store, runner, artifactStore)
+            val control: HarnessControl = if (System.getenv("PROMETHE_HARNESS_ADAPTIVE")?.toBooleanStrictOrNull() == true) {
+                require(runner is HarnessKotlinRunner) { "Adaptive harness requires PROMETHE_HARNESS_LANGUAGE=kotlin" }
+                AdaptiveSessionHarness(sessionHarness, store, runner, runner.compatibilityKey(), System.getenv("PROMETHE_HARNESS_INPUT_MICROUSD_PER_MIB")?.toLong())
+            } else {
+                ToolRegistry.unregister("harness_adapt")
+                sessionHarness
+            }
+            control.also { registerHarnessTools(it) }
+        } else {
+            HarnessLabApprovalGate.TOOLS.forEach { ToolRegistry.unregister(it) }
+            null
+        }
 
         val actionExecutor =
             ActionExecutor(
                 resolvedConfig,
                 httpClient,
                 hookManager = hookManager,
-                approvalGate = approvalGate,
+                approvalGate = if (harness != null) HarnessLabApprovalGate(approvalGate) else approvalGate,
                 sandboxCommandExecutor = sandboxCommandRunner,
                 toolIntentLedger = PersistentToolIntentLedger(database),
                 policyAuditSink = PersistentPolicyAuditSink(database),
                 artifactStore = artifactStore,
+                resourceGovernors = resourceGovernors,
+                observationProcessor = harness,
             )
 
         val localCodingAgentService =
@@ -362,6 +396,7 @@ object AgentBootstrap {
                 skillWriter = skillWriter,
                 trajectoryEvaluator = trajectoryEvaluator,
                 registry = registry,
+                resourceGovernors = resourceGovernors,
             )
 
         // Register delegation tools (default session — will be overridden per-session)
@@ -389,7 +424,7 @@ object AgentBootstrap {
         // ── Introspection Tools (Self-awareness) ────────────
         ToolRegistry.register(AgentStatusTool(llmAdapter, database))
         ToolRegistry.register(SessionHistoryTool(database))
-        ToolRegistry.register(TokenBudgetTool(llmAdapter))
+        ToolRegistry.register(TokenBudgetTool(llmAdapter, resourceGovernors))
         logger.info { "Introspection tools registered (3 tools)" }
 
         val resilience = ResilienceStrategy(llmAdapter)
@@ -410,6 +445,7 @@ object AgentBootstrap {
                 hookManager = hookManager,
                 contextCompressor = contextCompressor,
                 dryRun = false,
+                maxIterations = if (harness is AdaptiveHarnessControl) AdaptiveSessionHarness.AGENT_ITERATIONS else 10,
             )
         logger.info { "Context compressor enabled (threshold=${resolvedConfig.compressionThreshold}, max=${resolvedConfig.maxContextTokens} tokens)" }
         // MCP bridge with JVM transport factory + auto-connect
@@ -443,7 +479,7 @@ object AgentBootstrap {
         val a2aBootstrap =
             AgentA2ABootstrap(
                 registry = registry,
-                executionService = AgentExecutionService(agent, database),
+                executionService = AgentExecutionService(agent, database, resourceGovernors = resourceGovernors),
                 database = database,
                 toolRegistry = ToolRegistry,
             )
@@ -522,6 +558,12 @@ object AgentBootstrap {
             sandboxFileAccess,
         )
 
+        val toolContractCoverage = ToolRegistry.requireCompleteContractCoverage()
+        logger.info {
+            "Tool contracts verified: ${toolContractCoverage.explicitContractCount}/${toolContractCoverage.toolCount} explicit, " +
+                "${toolContractCoverage.effectfulToolCount} effectful"
+        }
+
         // ── Auto-Healing Executor ──────────────────────────────
         val autoHealing =
             AutoHealingExecutor(
@@ -576,6 +618,7 @@ object AgentBootstrap {
         return AgentStack(
             agent = agent,
             database = database,
+            resourceGovernors = resourceGovernors,
             llmAdapter = llmAdapter,
             feedbackCollector = feedbackCollector,
             orchestrator = orchestrator,

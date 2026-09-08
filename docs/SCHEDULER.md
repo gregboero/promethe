@@ -1,5 +1,7 @@
 # Task Scheduler
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 > Scheduled and recurring tasks: CRUD, cron matching, and the `cronjob` agent tool.
 
 ## Overview

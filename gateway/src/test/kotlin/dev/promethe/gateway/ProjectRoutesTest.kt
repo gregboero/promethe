@@ -6,9 +6,6 @@ import dev.promethe.api.SessionInfo
 import io.ktor.client.request.*
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.json
-import io.ktor.server.application.install
-import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.server.testing.ApplicationTestBuilder
@@ -28,13 +25,15 @@ class ProjectRoutesTest {
         workspaceRoot: String,
     ) {
         application {
-            install(ContentNegotiation) {
-                json(Json { encodeDefaults = true })
-            }
             routing {
-                route("/api/v1") {
-                    projectRoutes(database, workspaceRoot)
-                    sessionRoutes(database)
+                installGatewayContentNegotiation()
+                route("/") {
+                    route("api") {
+                        route("v1") {
+                            projectRoutes(database, workspaceRoot)
+                            sessionRoutes(database)
+                        }
+                    }
                 }
             }
         }

@@ -5,6 +5,9 @@ import androidx.lifecycle.viewModelScope
 import dev.promethe.api.SkillDto
 import dev.promethe.api.SkillLifecycle
 import dev.promethe.api.SkillListResponse
+import dev.promethe.api.SkillValidationState
+import dev.promethe.api.SkillEvaluationSuite
+import dev.promethe.api.ConfigureSkillEvaluationRequest
 import dev.promethe.app.network.PrometheClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -53,6 +56,7 @@ data class SkillsUiState(
     val isEditFlow: Boolean = false,
     val architectFirstMessageSent: Boolean = false,
     val originalContentForDiff: String = "",
+    val validation: SkillValidationState? = null,
 )
 
 class SkillsViewModel(
@@ -79,8 +83,59 @@ class SkillsViewModel(
     }
 
     fun selectSkill(skill: SkillDto) {
-        _state.update { it.copy(selectedSkill = skill, editContent = skill.content, isEditing = false) }
+        _state.update { it.copy(selectedSkill = skill, editContent = skill.content, isEditing = false, validation = null) }
+        loadValidation(skill.name)
     }
+
+    private fun loadValidation(name: String) {
+        viewModelScope.launch {
+            try {
+                val validation = client.getSkillValidation(name)
+                _state.update { if (it.selectedSkill?.name == name && it.selectedSkill.contract.revisionHash == validation.revisionHash) it.copy(validation = validation) else it }
+            } catch (e: Exception) {
+                _state.update { if (it.selectedSkill?.name == name) it.copy(error = e.message, validation = null) else it }
+            }
+        }
+    }
+
+    private fun skillOperation(operation: suspend (SkillDto) -> SkillDto) {
+        val selected = _state.value.selectedSkill ?: return
+        _state.update { it.copy(isSaving = true, error = null) }
+        viewModelScope.launch {
+            try {
+                val updated = operation(selected)
+                _state.update { state ->
+                    state.copy(
+                        skills = state.skills.map { if (it.name == updated.name) updated else it },
+                        selectedSkill = if (state.selectedSkill?.name == selected.name) updated else state.selectedSkill,
+                        editContent = if (state.selectedSkill?.name == selected.name) updated.content else state.editContent,
+                        validation = if (state.selectedSkill?.name == selected.name) null else state.validation,
+                        isSaving = false,
+                    )
+                }
+                loadValidation(updated.name)
+            } catch (e: Exception) {
+                _state.update { it.copy(isSaving = false, error = e.message) }
+                loadValidation(selected.name)
+            }
+        }
+    }
+
+    fun configureEvaluations(suites: List<SkillEvaluationSuite>) =
+        skillOperation { skill ->
+            client.configureSkillEvaluations(skill.name, ConfigureSkillEvaluationRequest(requireNotNull(skill.contract.revisionHash), suites))
+        }
+
+    fun evaluateSkill() =
+        skillOperation { skill ->
+            client.evaluateSkill(skill.name, requireNotNull(skill.contract.revisionHash))
+            client.getSkill(skill.name)
+        }
+
+    fun restoreSkill(versionId: String) =
+        skillOperation { skill ->
+            client.restoreSkill(skill.name, requireNotNull(skill.contract.revisionHash), versionId)
+        }
 
     fun startEditing() {
         _state.update { it.copy(isEditing = true) }
@@ -101,8 +156,9 @@ class SkillsViewModel(
         _state.update { it.copy(isSaving = true, error = null) }
         viewModelScope.launch {
             try {
-                client.updateSkill(name, content)
+                val updated = client.updateSkill(name, content, current.selectedSkill?.contract?.revisionHash)
                 _state.update { it.copy(isSaving = false, isEditing = false) }
+                selectSkill(updated)
                 load()
             } catch (e: Exception) {
                 logger.error(e) { "Failed to save skill $name" }
@@ -111,12 +167,15 @@ class SkillsViewModel(
         }
     }
 
-    fun updateLifecycle(lifecycle: SkillLifecycle) {
+    fun updateLifecycle(
+        lifecycle: SkillLifecycle,
+        reviewNote: String? = null,
+    ) {
         val selected = _state.value.selectedSkill ?: return
         _state.update { state -> state.copy(isSaving = true, error = null) }
         viewModelScope.launch {
             try {
-                val updated = client.updateSkillLifecycle(selected.name, lifecycle)
+                val updated = client.updateSkillLifecycle(selected.name, lifecycle, selected.contract.contentHash, reviewNote, selected.contract.revisionHash)
                 _state.update { state ->
                     state.copy(
                         skills = state.skills.map { skill -> if (skill.name == updated.name) updated else skill },
@@ -124,6 +183,7 @@ class SkillsViewModel(
                         isSaving = false,
                     )
                 }
+                loadValidation(updated.name)
             } catch (e: Exception) {
                 logger.error(e) { "Failed to update lifecycle for ${selected.name}" }
                 _state.update { state -> state.copy(error = e.message, isSaving = false) }

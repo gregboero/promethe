@@ -1,0 +1,20 @@
+{
+  "TEST-dev.promethe.core.KoogContractTest.xml": {
+    "tests": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "TEST-dev.promethe.core.KoogProtocolRelayTest.xml": {
+    "tests": 3,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "TEST-dev.promethe.core.KoogRelayBudgetTest.xml": {
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+}

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="SkillEvaluationLifecycleTest[jvm]" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-09-08T02:15:33.699Z" hostname="BUREAU" time="0.113">
+  <properties/>
+  <testcase name="editing metadata or cases invalidates evidence as well as editing body[jvm]" classname="dev.promethe.core.SkillEvaluationLifecycleTest" time="0.025"/>
+  <testcase name="parallel stale writer updates have one winner[jvm]" classname="dev.promethe.core.SkillEvaluationLifecycleTest" time="0.003"/>
+  <testcase name="suite validation rejects empty duplicate and missing tasks before evaluator[jvm]" classname="dev.promethe.core.SkillEvaluationLifecycleTest" time="0.004"/>
+  <testcase name="same size out of band edits cannot use cached active skill or strip managed marker[jvm]" classname="dev.promethe.core.SkillEvaluationLifecycleTest" time="0.006"/>
+  <testcase name="cancellation timeout and evaluator exception never grant evidence[jvm]" classname="dev.promethe.core.SkillEvaluationLifecycleTest" time="0.033"/>
+  <testcase name="edit during evaluation leaves a historical result that cannot promote new revision[jvm]" classname="dev.promethe.core.SkillEvaluationLifecycleTest" time="0.006"/>
+  <testcase name="activation requires current evidence and persists across loader restart[jvm]" classname="dev.promethe.core.SkillEvaluationLifecycleTest" time="0.013"/>
+  <testcase name="rollback restores snapshot and suites in a fresh quarantined revision[jvm]" classname="dev.promethe.core.SkillEvaluationLifecycleTest" time="0.012"/>
+  <testcase name="failed second task blocks promotion even if first passes[jvm]" classname="dev.promethe.core.SkillEvaluationLifecycleTest" time="0.004"/>
+  <testcase name="failed rerun revokes previous pass and interrupted run is fail closed[jvm]" classname="dev.promethe.core.SkillEvaluationLifecycleTest" time="0.006"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

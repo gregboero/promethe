@@ -1,0 +1,89 @@
+{
+  "modelCalls": 0,
+  "additionalCostMicroUsd": 0,
+  "campaignBudget": {
+    "requests": 591,
+    "settledMicroUsd": 3603075,
+    "uncertainReservations": 0,
+    "uncertainMicroUsd": 0
+  },
+  "historicalReplay": {
+    "complete": 14,
+    "empty_final_response": 3,
+    "missing_page_reads": 1
+  },
+  "historicalFinishReasonsAvailable": false,
+  "validation": {
+    "api:jvmTest": {
+      "tests": 76,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared:jvmTest": {
+      "tests": 678,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "gateway:test": {
+      "tests": 213,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "evals:test": {
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "composeApp:desktopTest": {
+      "tests": 23,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "receiptAccountingPythonTests": 2,
+  "futureExposureProtocolVersion": 6,
+  "historicalInputSha256": {
+    "docs/reports/harness-exposure-data-2026-09-07/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0/results.json": "7a23b8446b5079e77ccbfb9ce0825afaa8c3d069e2f54a6890770b8fffbd7cc1",
+    "docs/reports/harness-exposure-data-2026-09-07/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0/protocol.json": "0e899fdf185ba16683947d01c34bc22ab7ec3dcfbeebead8f8bfde4a683a0ea9",
+    "docs/reports/harness-exposure-data-2026-09-07/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0/requests.json": "90b5e6f0e0a9bbb5a4cd97895841c5c880d250f5f706ca089ee75b7d0a7d929a",
+    "docs/reports/harness-exposure-data-2026-09-07/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0-long_json-1-conditional-transcript.json": "f383d7db3d4970e57c1ea81009c965c37aed0de3491f1d5d874360238fa3d878",
+    "docs/reports/harness-exposure-data-2026-09-07/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0-long_json-1-free-transcript.json": "05951a14d83179829157dd5473da035403991becbb2e490a82be086ba0abf60c",
+    "docs/reports/harness-exposure-data-2026-09-07/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0-long_json-1-original-transcript.json": "05951a14d83179829157dd5473da035403991becbb2e490a82be086ba0abf60c",
+    "docs/reports/harness-exposure-data-2026-09-07/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0-long_json-2-conditional-transcript.json": "a220cf70d992834c8028bcca91c4ec05d16bef8d1d06465217924d040f24e2c4",
+    "docs/reports/harness-exposure-data-2026-09-07/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0-long_json-2-free-transcript.json": "726b5d47aa74c53c47c36f46b4ab942f94eee74be351747de8a71c4245c16fbb",
+    "docs/reports/harness-exposure-data-2026-09-07/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0-long_json-2-original-transcript.json": "f4221af639d1f2a51d22ca34d6494e7baa4689d62506b2e69ad8f82732174c28",
+    "docs/reports/harness-exposure-data-2026-09-07/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0-long_json-3-conditional-transcript.json": "12a7bed58c9163e51793572c2bae3ebf89b31f0a26cad3470cf5bd23d434c6f1",
+    "docs/reports/harness-exposure-data-2026-09-07/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0-long_json-3-free-transcript.json": "271fdfeceb4e3294700500d8936f5b15814cc6b2cc3225a870ee28213ebf0aa0",
+    "docs/reports/harness-exposure-data-2026-09-07/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0-long_json-3-original-transcript.json": "37861b1e393c65256212b07fd1192570bf30dbc68d7e3e05ab799827aa6eabeb",
+    "docs/reports/harness-exposure-data-2026-09-07/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0-small_mixed-1-conditional-transcript.json": "2eff07d29d03361bda6fbcb51daeaa0c1e8f9a0e7c95499eb29c6e5f97c9e13f",
+    "docs/reports/harness-exposure-data-2026-09-07/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0-small_mixed-1-free-transcript.json": "37861b1e393c65256212b07fd1192570bf30dbc68d7e3e05ab799827aa6eabeb",
+    "docs/reports/harness-exposure-data-2026-09-07/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0-small_mixed-1-original-transcript.json": "0eb49dbec2d5caacf588520291f1339e37d7ad1fd5fd69186a957ab9ba5e06fd",
+    "docs/reports/harness-exposure-data-2026-09-07/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0-small_mixed-2-conditional-transcript.json": "f6566332760235972f227e9a29439ddc4be912e87a172240e639be4da7ad874a",
+    "docs/reports/harness-exposure-data-2026-09-07/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0-small_mixed-2-free-transcript.json": "37861b1e393c65256212b07fd1192570bf30dbc68d7e3e05ab799827aa6eabeb",
+    "docs/reports/harness-exposure-data-2026-09-07/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0-small_mixed-2-original-transcript.json": "86582c9a9d7aa0cbe6067cde97f13d0621b32009b9a065f7ffc01282c7f142d6",
+    "docs/reports/harness-exposure-data-2026-09-07/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0-small_mixed-3-conditional-transcript.json": "3d6fdf64214011b309fa57a39f0698d7081306a2a65f6e602b3b3c14deb05766",
+    "docs/reports/harness-exposure-data-2026-09-07/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0-small_mixed-3-free-transcript.json": "16b34950d5a51c847c95e6f9c302522852565df3e4aab06168454eb7a28bb758",
+    "docs/reports/harness-exposure-data-2026-09-07/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0/kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0-small_mixed-3-original-transcript.json": "f0ac0374c9ac542430254cc5465f1d7242358814bc31cfcfeb8802beb1b0ddaa"
+  },
+  "sourceSha256": {
+    "shared/src/commonMain/kotlin/dev/promethe/core/AIAgent.kt": "9db5529dda8e26a0f9b4e9f37d854c5c3d93d403eecbe4e7fb4042a951d11dbd",
+    "shared/src/commonMain/kotlin/dev/promethe/core/AgentCompletionValidator.kt": "d8338587a60dd2be5198149a2c9a0efc28b1cb08b487559df09f90d4f0c3329f",
+    "shared/src/jvmMain/kotlin/dev/promethe/core/HarnessTaskCompletion.kt": "1f16741cb96535547863cade1b3b87953eb5ba8202e48997af728951e8dbfb80",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/CampaignResponseDiagnostics.kt": "800bae85caa28bf5a96fe3f6cdc5a89597aa93e418cd5b52818d838506f59a8d",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/HarnessLiveCampaignTest.kt": "6e29ff757dbf0cb995dcab51d1f31b1f5986d4b9fa03a5f02799de1fddbb6765",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/HarnessDecisionLiveTest.kt": "4d42bb126fef6ef650a0fb4af66279723cdcc3ae0afbe50e1dba87621aadbc59",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/CampaignResponseDiagnosticsTest.kt": "0eff17455a7e546042187b57b99dfa630b01ba81465ea8696e2804e16d5109bc",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/HarnessTaskCompletionTest.kt": "aa97e7d2dce27da9bf3d4aa3789b904e3b44b167ee1390c97b16d5a820db643b",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/HarnessCompletionLoopTest.kt": "b89e2507d4988251dee4507c7f2449a78e36d4d0dffc65350de2157a5b0253c0",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/HarnessHistoricalCompletionReplayTest.kt": "dd8f9c89de47d7d7cb9fdcefcb60a5c482e82c228142d82e176a12831a9fd215",
+    "scripts/harness-receipt-accounting.py": "1f03a30a1f096f6347a6226026afe6533f750baa84c306c090c81990ded63520",
+    "scripts/test-harness-receipt-accounting.py": "1e356844de54ad1ce4617584af71a7aac8084fb316e487721ff37932300ec52b",
+    "scripts/report-harness-decisions.py": "6c84e5fc734079b763ffcf67c8c89ac3d55c6189448bb2bac026e7a644ddc93a",
+    "scripts/report-harness-response-diagnostics.py": "5d806a314dc53cb8864179a0b5d13c3da900a42ee8f16cd2a0637f7d4c218c26"
+  }
+}

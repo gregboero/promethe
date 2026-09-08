@@ -28,6 +28,7 @@ import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -57,8 +58,9 @@ class ApprovalRoutesTest {
             coroutineScope {
                 val gate = configureRoutes()
                 val ownerToken = createOwnerAndLogin()
+                val policyArgs = """{"action":"listen_channel","targetId":"123"}"""
 
-                val remoteAttempt = async { gate.checkMandatory("shell", """{"executable":"git"}""", "session-a") }
+                val remoteAttempt = async { gate.checkMandatory("discord_policy", policyArgs, "session-a") }
                 val remoteRequestId = awaitPending(gate)
                 val forbidden =
                     client.post("/approval/$remoteRequestId") {
@@ -71,7 +73,7 @@ class ApprovalRoutesTest {
                 gate.respond(remoteRequestId, approved = false)
                 assertFalse(remoteAttempt.await().allowed)
 
-                val localAttempt = async { gate.checkMandatory("shell", """{"executable":"git"}""", "session-b") }
+                val localAttempt = async { gate.checkMandatory("discord_policy", policyArgs, "session-b") }
                 val localRequestId = awaitPending(gate)
                 val approved =
                     client.post("/approval/$localRequestId") {
@@ -133,6 +135,45 @@ class ApprovalRoutesTest {
 
                 assertEquals(HttpStatusCode.Forbidden, response.status)
                 assertEquals(1, gate.listPending().size)
+                gate.respond(requestId, approved = false)
+                assertFalse(pending.await().allowed)
+            }
+        }
+
+    @Test
+    fun `persistent configuration choice is advertised only to the local owner`() =
+        testApplication {
+            coroutineScope {
+                val gate = configureRoutes()
+                val ownerToken = createOwnerAndLogin()
+                val pending =
+                    async {
+                        gate.checkMandatory(
+                            "discord_policy",
+                            """{"action":"listen_channel","targetId":"123"}""",
+                            "session-a",
+                        )
+                    }
+                val requestId = awaitPending(gate)
+
+                val localListing =
+                    client.get("/approval/pending") {
+                        header(HttpHeaders.Authorization, "Bearer $apiKey")
+                    }
+                val localItem =
+                    json.parseToJsonElement(localListing.bodyAsText()).jsonObject
+                        .getValue("pending").jsonArray.single().jsonObject
+                assertTrue(localItem.getValue("persistentAllowed").jsonPrimitive.content.toBoolean())
+
+                val remoteListing =
+                    client.get("/approval/pending") {
+                        header(HttpHeaders.Authorization, "Bearer $ownerToken")
+                    }
+                val remoteItem =
+                    json.parseToJsonElement(remoteListing.bodyAsText()).jsonObject
+                        .getValue("pending").jsonArray.single().jsonObject
+                assertFalse(remoteItem.getValue("persistentAllowed").jsonPrimitive.content.toBoolean())
+
                 gate.respond(requestId, approved = false)
                 assertFalse(pending.await().allowed)
             }

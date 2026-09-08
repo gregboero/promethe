@@ -1,0 +1,24 @@
+[
+  {
+    "id": "6e1eece7-842e-4418-b409-b3c5113b1a6f",
+    "sessionId": "kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0",
+    "baseRevision": null,
+    "source": "val text = observation.text\nval value = try { Json.parseToJsonElement(text) } catch (_: Exception) { null }\nwhen {\n    value is JsonObject && value[\"answer\"] is JsonPrimitive -> (value[\"answer\"] as JsonPrimitive).content\n    text.startsWith(\"id,answer\\n\") -> text.substringAfter('\\n').substringAfter(',')\n    text.startsWith(\"DATA answer=\") -> text.removePrefix(\"DATA answer=\")\n    else -> text\n}",
+    "hash": "b155594c154d168132cdcf781e0c72b7d5b5e2ce4554eac7d757551483374398",
+    "toolName": "json_query",
+    "createdAt": 1788798075855,
+    "language": "KOTLIN",
+    "validated": true
+  },
+  {
+    "id": "c3777edc-35c8-426e-9ef7-2e40cc920b36",
+    "sessionId": "kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0",
+    "baseRevision": null,
+    "source": "val text = observation.text\nval value = try { Json.parseToJsonElement(text) } catch (_: Exception) { null }\nwhen {\n    value is JsonObject && value[\"answer\"] is JsonPrimitive -> (value[\"answer\"] as JsonPrimitive).content\n    text.startsWith(\"id,answer\\n\") -> text.substringAfter('\\n').substringAfter(',')\n    text.startsWith(\"DATA answer=\") -> text.removePrefix(\"DATA answer=\")\n    else -> text\n}",
+    "hash": "b155594c154d168132cdcf781e0c72b7d5b5e2ce4554eac7d757551483374398",
+    "toolName": "json_query",
+    "createdAt": 1788798596995,
+    "language": "KOTLIN",
+    "validated": true
+  }
+]

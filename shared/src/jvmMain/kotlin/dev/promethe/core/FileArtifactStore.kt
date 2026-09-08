@@ -4,6 +4,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withTimeout
+import java.nio.channels.FileChannel
+import java.nio.channels.OverlappingFileLockException
+import java.nio.file.StandardOpenOption
 import java.nio.file.AtomicMoveNotSupportedException
 import java.nio.file.FileAlreadyExistsException
 import java.nio.file.Files
@@ -16,9 +21,20 @@ class ArtifactIntegrityException(
     message: String,
 ) : IllegalStateException(message)
 
+class ArtifactQuotaException(
+    message: String,
+) : IllegalStateException(message)
+
+data class ArtifactRetentionCandidate(
+    val hash: String,
+    val sizeBytes: Long,
+    val modifiedAtMillis: Long,
+)
+
 class FileArtifactStore(
     root: Path,
     private val maxArtifactBytes: Int = DEFAULT_MAX_ARTIFACT_BYTES,
+    private val maxStoreBytes: Long = DEFAULT_MAX_STORE_BYTES,
 ) : ArtifactStore {
     private val root = root.toAbsolutePath().normalize()
     private val canonicalRoot: Path
@@ -26,6 +42,7 @@ class FileArtifactStore(
 
     init {
         require(maxArtifactBytes > 0) { "Maximum artifact size must be positive" }
+        require(maxStoreBytes > 0) { "Maximum store size must be positive" }
         Files.createDirectories(this.root)
         canonicalRoot = this.root.toRealPath()
     }
@@ -38,13 +55,19 @@ class FileArtifactStore(
             require(request.mediaType.isNotBlank()) { "Artifact media type must not be blank" }
             val hash = sha256(request.content)
             writeMutex.withLock {
-                val target = pathFor(hash)
-                Files.createDirectories(target.parent)
-                requireContainedDirectory(target.parent)
-                if (Files.exists(target, LinkOption.NOFOLLOW_LINKS)) {
-                    verifyExisting(target, hash)
-                } else {
-                    writeAtomically(target, request.content, hash)
+                withStoreLock {
+                    val target = pathFor(hash)
+                    Files.createDirectories(target.parent)
+                    requireContainedDirectory(target.parent)
+                    if (Files.exists(target, LinkOption.NOFOLLOW_LINKS)) {
+                        verifyExisting(target, hash)
+                    } else {
+                        val used = inventory().sumOf { it.sizeBytes }
+                        if (request.content.size.toLong() > maxStoreBytes - used) {
+                            throw ArtifactQuotaException("Artifact store quota of $maxStoreBytes bytes exhausted; review retention before retrying")
+                        }
+                        writeAtomically(target, request.content, hash)
+                    }
                 }
             }
             ArtifactReference(
@@ -69,6 +92,56 @@ class FileArtifactStore(
 
     private fun pathFor(hash: String): Path = root.resolve("sha256").resolve(hash.take(2)).resolve(hash)
 
+    /** Read-only plan: callers must supply all ledger references. Nothing is deleted automatically. */
+    suspend fun retentionCandidates(
+        referencedHashes: Set<String>,
+        olderThanMillis: Long,
+    ): List<ArtifactRetentionCandidate> =
+        withContext(Dispatchers.IO) {
+            require(referencedHashes.all { ARTIFACT_HASH.matches(it) }) { "Invalid protected artifact hash" }
+            writeMutex.withLock {
+                withStoreLock {
+                    inventory().filter { it.hash !in referencedHashes && it.modifiedAtMillis < olderThanMillis }
+                        .sortedBy { it.modifiedAtMillis }
+                }
+            }
+        }
+
+    private fun inventory(): List<ArtifactRetentionCandidate> {
+        val directory = root.resolve("sha256")
+        if (!Files.exists(directory, LinkOption.NOFOLLOW_LINKS)) return emptyList()
+        requireContainedDirectory(directory)
+        return Files.walk(directory).use { paths ->
+            paths.filter { Files.isRegularFile(it, LinkOption.NOFOLLOW_LINKS) }
+                .map { path ->
+                    requireContainedDirectory(path.parent)
+                    ArtifactRetentionCandidate(path.fileName.toString(), Files.size(path), Files.getLastModifiedTime(path).toMillis())
+                }.toList()
+        }
+    }
+
+    private suspend fun <T> withStoreLock(block: () -> T): T {
+        val lockPath = root.resolve(".store.lock")
+        FileChannel.open(lockPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE, LinkOption.NOFOLLOW_LINKS).use { channel ->
+            return withTimeout(10_000) {
+                var lock = try {
+                    channel.tryLock()
+                } catch (_: OverlappingFileLockException) {
+                    null
+                }
+                while (lock == null) {
+                    delay(10)
+                    lock = try {
+                        channel.tryLock()
+                    } catch (_: OverlappingFileLockException) {
+                        null
+                    }
+                }
+                lock.use { block() }
+            }
+        }
+    }
+
     private fun verifyExisting(
         target: Path,
         expectedHash: String,
@@ -81,8 +154,8 @@ class FileArtifactStore(
     }
 
     private fun requireContainedDirectory(directory: Path) {
-        if (!directory.toRealPath().startsWith(canonicalRoot)) {
-            throw ArtifactIntegrityException("Artifact path escapes the configured store")
+        if (directory.toRealPath() != canonicalRoot.resolve(root.relativize(directory))) {
+            throw ArtifactIntegrityException("Artifact directory is redirected or escapes the configured store")
         }
     }
 
@@ -123,5 +196,6 @@ class FileArtifactStore(
 
     companion object {
         private const val DEFAULT_MAX_ARTIFACT_BYTES = 16 * 1024 * 1024
+        private const val DEFAULT_MAX_STORE_BYTES = 256L * 1024 * 1024
     }
 }

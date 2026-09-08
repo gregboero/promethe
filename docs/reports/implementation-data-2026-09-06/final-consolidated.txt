@@ -1,0 +1,1066 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.5.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+Calculating task graph as configuration cache cannot be reused due to --write-verification-metadata
+Configuration 'wasmJsNpmAggregated' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+Configuration 'wasmJsTestNpmAggregated' was resolved during configuration time.
+This is a build performance and scalability issue.
+See https://github.com/gradle/gradle/issues/2298
+Run with --info for a stacktrace.
+> Task :kotlinWasmKotlinNpmCachesSetup
+> Task :api:kmpPartiallyResolvedDependenciesChecker
+> Task :api:checkKotlinGradlePluginConfigurationErrors SKIPPED
+
+> Task :composeApp:verifyKoogResolvedVersionsInComposeApp
+Koog resolved-version check passed for :composeApp:desktopCompileClasspath
+
+> Task :composeApp:verifyKtorResolvedVersionsInComposeApp
+> Task :api:compileKotlinJvm UP-TO-DATE
+> Task :kotlinWasmNodeJsSetup UP-TO-DATE
+> Task :api:compileJvmMainJava NO-SOURCE
+> Task :api:jvmProcessResources NO-SOURCE
+> Task :api:processJvmMainResources SKIPPED
+> Task :api:jvmMainClasses UP-TO-DATE
+> Task :api:jvmJar UP-TO-DATE
+> Task :kotlinWasmRestoreYarnLock
+> Task :kotlinWasmYarnSetup UP-TO-DATE
+
+> Task :shared:verifyKoogResolvedVersionsInShared
+Koog resolved-version check passed for :shared:jvmCompileClasspath
+
+> Task :shared:verifyKtorResolvedVersionsInShared
+> Task :shared:kmpPartiallyResolvedDependenciesChecker
+> Task :shared:checkKotlinGradlePluginConfigurationErrors SKIPPED
+
+> Task :evals:verifyKoogResolvedVersionsInEvals
+Koog resolved-version check passed for :evals:testRuntimeClasspath
+
+> Task :evals:verifyKtorResolvedVersionsInEvals
+> Task :evals:checkKotlinGradlePluginConfigurationErrors SKIPPED
+
+> Task :gateway:verifyKoogResolvedVersionsInGateway
+Koog resolved-version check passed for :gateway:runtimeClasspath
+
+> Task :gateway:verifyKtorResolvedVersionsInGateway
+> Task :gateway:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :evals:processResources NO-SOURCE
+> Task :evals:processTestResources UP-TO-DATE
+
+> Task :androidApp:verifyKoogResolvedVersionsInAndroidApp
+Koog resolved-version check passed for :androidApp:debugRuntimeClasspath
+
+> Task :androidApp:verifyKtorResolvedVersionsInAndroidApp
+> Task :androidApp:preBuild UP-TO-DATE
+> Task :androidApp:preDebugBuild UP-TO-DATE
+> Task :androidApp:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :androidApp:generateDebugResources UP-TO-DATE
+> Task :gateway:processResources UP-TO-DATE
+> Task :gateway:processTestResources NO-SOURCE
+> Task :androidApp:packageDebugResources UP-TO-DATE
+> Task :androidApp:javaPreCompileDebug UP-TO-DATE
+> Task :androidApp:generateDebugAssets UP-TO-DATE
+> Task :androidApp:desugarDebugFileDependencies UP-TO-DATE
+> Task :androidApp:mapDebugSourceSetPaths UP-TO-DATE
+> Task :androidApp:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :androidApp:extractDeepLinksDebug UP-TO-DATE
+> Task :composeApp:checkDesktopMainComposeLibrariesCompatibility
+> Task :composeApp:kmpPartiallyResolvedDependenciesChecker
+> Task :composeApp:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :composeApp:convertXmlValueResourcesForCommonMain UP-TO-DATE
+> Task :composeApp:copyNonXmlValueResourcesForCommonMain NO-SOURCE
+> Task :composeApp:prepareComposeResourcesTaskForCommonMain UP-TO-DATE
+> Task :composeApp:generateResourceAccessorsForCommonMain UP-TO-DATE
+> Task :composeApp:convertXmlValueResourcesForDesktopMain NO-SOURCE
+> Task :composeApp:copyNonXmlValueResourcesForDesktopMain NO-SOURCE
+> Task :composeApp:prepareComposeResourcesTaskForDesktopMain NO-SOURCE
+> Task :composeApp:generateResourceAccessorsForDesktopMain NO-SOURCE
+> Task :composeApp:generateActualResourceCollectorsForDesktopMain UP-TO-DATE
+> Task :composeApp:generateComposeResClass UP-TO-DATE
+> Task :composeApp:generateExpectResourceCollectorsForCommonMain UP-TO-DATE
+> Task :composeApp:checkDesktopTestComposeLibrariesCompatibility
+> Task :composeApp:assembleDesktopMainResources
+> Task :composeApp:desktopProcessResources UP-TO-DATE
+> Task :composeApp:processDesktopMainResources SKIPPED
+> Task :composeApp:convertXmlValueResourcesForCommonTest NO-SOURCE
+> Task :composeApp:copyNonXmlValueResourcesForCommonTest NO-SOURCE
+> Task :composeApp:prepareComposeResourcesTaskForCommonTest NO-SOURCE
+> Task :composeApp:generateResourceAccessorsForCommonTest NO-SOURCE
+> Task :composeApp:convertXmlValueResourcesForDesktopTest NO-SOURCE
+> Task :composeApp:copyNonXmlValueResourcesForDesktopTest NO-SOURCE
+> Task :composeApp:prepareComposeResourcesTaskForDesktopTest NO-SOURCE
+> Task :composeApp:generateResourceAccessorsForDesktopTest NO-SOURCE
+> Task :composeApp:assembleDesktopTestResources
+> Task :composeApp:desktopTestProcessResources UP-TO-DATE
+> Task :composeApp:processDesktopTestResources SKIPPED
+> Task :composeApp:androidPreBuild UP-TO-DATE
+> Task :composeApp:preAndroidMainBuild UP-TO-DATE
+> Task :composeApp:generateAndroidMainEmptyResourceFiles UP-TO-DATE
+> Task :composeApp:convertXmlValueResourcesForAndroidMain NO-SOURCE
+> Task :composeApp:copyNonXmlValueResourcesForAndroidMain NO-SOURCE
+> Task :composeApp:prepareComposeResourcesTaskForAndroidMain NO-SOURCE
+> Task :composeApp:generateResourceAccessorsForAndroidMain NO-SOURCE
+> Task :composeApp:generateActualResourceCollectorsForAndroidMain UP-TO-DATE
+> Task :composeApp:copyAndroidMainComposeResourcesToAndroidAssets UP-TO-DATE
+> Task :composeApp:packageAndroidMainResources UP-TO-DATE
+> Task :composeApp:parseAndroidMainLocalResources UP-TO-DATE
+> Task :composeApp:generateAndroidMainRFile UP-TO-DATE
+> Task :evals:loadKtlintReporters UP-TO-DATE
+> Task :gateway:loadKtlintReporters UP-TO-DATE
+> Task :evals:runKtlintCheckOverKotlinScripts UP-TO-DATE
+> Task :gateway:runKtlintCheckOverKotlinScripts UP-TO-DATE
+> Task :evals:ktlintKotlinScriptCheck UP-TO-DATE
+> Task :gateway:ktlintKotlinScriptCheck UP-TO-DATE
+> Task :evals:runKtlintCheckOverMainSourceSet UP-TO-DATE
+> Task :evals:ktlintMainSourceSetCheck UP-TO-DATE
+> Task :evals:runKtlintCheckOverTestSourceSet UP-TO-DATE
+> Task :gateway:runKtlintCheckOverMainSourceSet UP-TO-DATE
+> Task :gateway:ktlintMainSourceSetCheck UP-TO-DATE
+> Task :evals:ktlintTestSourceSetCheck UP-TO-DATE
+> Task :evals:ktlintCheck UP-TO-DATE
+> Task :gateway:runKtlintCheckOverTestSourceSet UP-TO-DATE
+> Task :gateway:ktlintTestSourceSetCheck UP-TO-DATE
+> Task :gateway:ktlintCheck UP-TO-DATE
+> Task :androidApp:checkDebugDuplicateClasses UP-TO-DATE
+
+> Task :evals:auditResolvedDependenciesTestRuntimeClasspath
+Resolved dependency inventory: E:\workspace\perso\projectRandD\promethe\build\reports\dependency-audit\evals-testRuntimeClasspath.json
+
+> Task :gateway:auditResolvedDependenciesRuntimeClasspath
+Resolved dependency inventory: E:\workspace\perso\projectRandD\promethe\build\reports\dependency-audit\gateway-runtimeClasspath.json
+
+> Task :kotlinWasmToolingSetup
+> Task :verifyDependencyAlignment
+> Task :androidApp:processDebugNavigationResources UP-TO-DATE
+> Task :androidApp:parseDebugLocalResources UP-TO-DATE
+> Task :androidApp:generateDebugRFile UP-TO-DATE
+> Task :androidApp:compileDebugNavigationResources UP-TO-DATE
+> Task :api:jvmTestProcessResources NO-SOURCE
+> Task :api:processJvmTestResources SKIPPED
+> Task :api:wasmJsPackageJson UP-TO-DATE
+> Task :api:wasmJsTestPackageJson UP-TO-DATE
+> Task :composeApp:compileAndroidMain UP-TO-DATE
+> Task :composeApp:bundleAndroidMainClassesToCompileJar UP-TO-DATE
+> Task :composeApp:generateAndroidMainAssets UP-TO-DATE
+> Task :composeApp:mergeAndroidMainAssets UP-TO-DATE
+> Task :composeApp:bundleAndroidMainClassesToRuntimeJar UP-TO-DATE
+> Task :composeApp:writeAndroidMainAarMetadata UP-TO-DATE
+> Task :composeApp:processAndroidMainManifest UP-TO-DATE
+> Task :androidApp:mergeDebugResources UP-TO-DATE
+> Task :composeApp:mapAndroidMainSourceSetPaths UP-TO-DATE
+> Task :composeApp:compileAndroidMainLibraryResources UP-TO-DATE
+> Task :composeApp:processAndroidMainJavaRes UP-TO-DATE
+> Task :composeApp:bundleLibRuntimeToDirAndroidMain UP-TO-DATE
+> Task :composeApp:mergeAndroidMainJniLibFolders UP-TO-DATE
+> Task :composeApp:mergeAndroidMainNativeLibs NO-SOURCE
+> Task :composeApp:copyAndroidMainJniLibsProjectOnly UP-TO-DATE
+> Task :api:wasmJsPublicPackageJson UP-TO-DATE
+> Task :api:wasmJsTestPublicPackageJson UP-TO-DATE
+> Task :composeApp:wasmJsPackageJson UP-TO-DATE
+> Task :composeApp:wasmJsTestPackageJson UP-TO-DATE
+> Task :androidApp:compileDebugKotlin UP-TO-DATE
+> Task :androidApp:compileDebugJavaWithJavac NO-SOURCE
+> Task :androidApp:mergeDebugAssets UP-TO-DATE
+> Task :androidApp:compressDebugAssets UP-TO-DATE
+> Task :composeApp:wasmJsPublicPackageJson UP-TO-DATE
+> Task :androidApp:checkDebugAarMetadata UP-TO-DATE
+> Task :composeApp:wasmJsTestPublicPackageJson UP-TO-DATE
+> Task :kotlinWasmPackageJsonUmbrella UP-TO-DATE
+> Task :wasmRootPackageJson UP-TO-DATE
+> Task :kotlinWasmNpmInstall UP-TO-DATE
+> Task :kotlinWasmStoreYarnLock
+> Task :androidApp:processDebugMainManifest UP-TO-DATE
+> Task :androidApp:processDebugManifest UP-TO-DATE
+> Task :androidApp:processDebugManifestForPackage UP-TO-DATE
+> Task :androidApp:processDebugResources UP-TO-DATE
+> Task :androidApp:dexBuilderDebug UP-TO-DATE
+> Task :composeApp:wasmJsResolveResourcesFromDependencies
+> Task :composeApp:convertXmlValueResourcesForWasmJsMain NO-SOURCE
+> Task :composeApp:copyNonXmlValueResourcesForWasmJsMain NO-SOURCE
+> Task :composeApp:prepareComposeResourcesTaskForWasmJsMain NO-SOURCE
+> Task :composeApp:assembleWasmJsMainResources
+> Task :api:loadKtlintReporters UP-TO-DATE
+> Task :api:runKtlintCheckOverCommonMainSourceSet UP-TO-DATE
+> Task :api:ktlintCommonMainSourceSetCheck UP-TO-DATE
+> Task :api:runKtlintCheckOverCommonTestSourceSet UP-TO-DATE
+> Task :api:ktlintCommonTestSourceSetCheck UP-TO-DATE
+> Task :api:runKtlintCheckOverJvmMainSourceSet NO-SOURCE
+> Task :api:ktlintJvmMainSourceSetCheck SKIPPED
+> Task :api:runKtlintCheckOverJvmTestSourceSet NO-SOURCE
+> Task :api:ktlintJvmTestSourceSetCheck SKIPPED
+> Task :composeApp:wasmJsResolveSelfResourcesCopyHierarchicalMultiplatformResources
+> Task :api:runKtlintCheckOverKotlinScripts UP-TO-DATE
+> Task :api:ktlintKotlinScriptCheck UP-TO-DATE
+> Task :api:runKtlintCheckOverWasmJsMainSourceSet NO-SOURCE
+> Task :api:ktlintWasmJsMainSourceSetCheck SKIPPED
+> Task :api:runKtlintCheckOverWasmJsTestSourceSet NO-SOURCE
+> Task :api:ktlintWasmJsTestSourceSetCheck SKIPPED
+> Task :api:ktlintCheck UP-TO-DATE
+> Task :composeApp:wasmJsAggregateResources
+> Task :composeApp:wasmJsProcessResources UP-TO-DATE
+> Task :composeApp:checkWasmJsMainComposeLibrariesCompatibility
+> Task :composeApp:generateResourceAccessorsForWasmJsMain NO-SOURCE
+> Task :composeApp:generateActualResourceCollectorsForWasmJsMain UP-TO-DATE
+> Task :androidApp:mergeDebugGlobalSynthetics UP-TO-DATE
+> Task :androidApp:processDebugJavaRes UP-TO-DATE
+> Task :composeApp:kotlinWasmBinaryenSetup
+> Task :androidApp:mergeDebugJavaResource UP-TO-DATE
+> Task :androidApp:mergeExtDexDebug UP-TO-DATE
+> Task :androidApp:mergeLibDexDebug UP-TO-DATE
+> Task :androidApp:mergeProjectDexDebug UP-TO-DATE
+> Task :androidApp:mergeDebugJniLibFolders UP-TO-DATE
+> Task :composeApp:unpackSkikoWasmRuntime
+> Task :composeApp:processSkikoRuntimeForKWasm UP-TO-DATE
+> Task :composeApp:loadKtlintReporters UP-TO-DATE
+> Task :composeApp:runKtlintCheckOverAndroidMainSourceSet UP-TO-DATE
+> Task :composeApp:ktlintAndroidMainSourceSetCheck UP-TO-DATE
+> Task :composeApp:runKtlintCheckOverCommonMainSourceSet UP-TO-DATE
+> Task :composeApp:ktlintCommonMainSourceSetCheck UP-TO-DATE
+> Task :composeApp:runKtlintCheckOverCommonTestSourceSet NO-SOURCE
+> Task :composeApp:ktlintCommonTestSourceSetCheck SKIPPED
+> Task :composeApp:convertXmlValueResourcesForDesktopDev NO-SOURCE
+> Task :composeApp:copyNonXmlValueResourcesForDesktopDev NO-SOURCE
+> Task :composeApp:prepareComposeResourcesTaskForDesktopDev NO-SOURCE
+> Task :composeApp:generateResourceAccessorsForDesktopDev NO-SOURCE
+> Task :composeApp:runKtlintCheckOverDesktopDevSourceSet NO-SOURCE
+> Task :composeApp:ktlintDesktopDevSourceSetCheck SKIPPED
+> Task :composeApp:runKtlintCheckOverDesktopMainSourceSet UP-TO-DATE
+> Task :androidApp:mergeDebugNativeLibs UP-TO-DATE
+> Task :composeApp:ktlintDesktopMainSourceSetCheck UP-TO-DATE
+> Task :androidApp:stripDebugDebugSymbols UP-TO-DATE
+> Task :androidApp:validateSigningDebug UP-TO-DATE
+> Task :androidApp:writeDebugAppMetadata UP-TO-DATE
+> Task :androidApp:writeDebugSigningConfigVersions UP-TO-DATE
+> Task :composeApp:runKtlintCheckOverDesktopTestSourceSet UP-TO-DATE
+> Task :composeApp:ktlintDesktopTestSourceSetCheck UP-TO-DATE
+> Task :composeApp:runKtlintCheckOverKotlinScripts UP-TO-DATE
+> Task :composeApp:ktlintKotlinScriptCheck UP-TO-DATE
+> Task :composeApp:runKtlintCheckOverWasmJsMainSourceSet UP-TO-DATE
+> Task :composeApp:ktlintWasmJsMainSourceSetCheck UP-TO-DATE
+> Task :composeApp:convertXmlValueResourcesForWasmJsTest NO-SOURCE
+> Task :composeApp:copyNonXmlValueResourcesForWasmJsTest NO-SOURCE
+> Task :composeApp:prepareComposeResourcesTaskForWasmJsTest NO-SOURCE
+> Task :composeApp:generateResourceAccessorsForWasmJsTest NO-SOURCE
+> Task :composeApp:runKtlintCheckOverWasmJsTestSourceSet NO-SOURCE
+> Task :composeApp:ktlintWasmJsTestSourceSetCheck SKIPPED
+> Task :composeApp:ktlintCheck UP-TO-DATE
+> Task :androidApp:packageDebug UP-TO-DATE
+> Task :androidApp:createDebugApkListingFileRedirect UP-TO-DATE
+> Task :androidApp:assembleDebug UP-TO-DATE
+
+> Task :composeApp:auditResolvedDependenciesDesktopRuntimeClasspath
+Resolved dependency inventory: E:\workspace\perso\projectRandD\promethe\build\reports\dependency-audit\composeApp-desktopRuntimeClasspath.json
+
+> Task :composeApp:auditResolvedDependenciesWasmJsCompileClasspath
+Resolved dependency inventory: E:\workspace\perso\projectRandD\promethe\build\reports\dependency-audit\composeApp-wasmJsCompileClasspath.json
+
+> Task :androidApp:loadKtlintReporters UP-TO-DATE
+> Task :androidApp:runKtlintCheckOverAndroidTestDebugSourceSet NO-SOURCE
+> Task :androidApp:ktlintAndroidTestDebugSourceSetCheck SKIPPED
+> Task :androidApp:runKtlintCheckOverAndroidTestReleaseSourceSet NO-SOURCE
+> Task :androidApp:ktlintAndroidTestReleaseSourceSetCheck SKIPPED
+> Task :androidApp:runKtlintCheckOverAndroidTestSourceSet NO-SOURCE
+> Task :androidApp:ktlintAndroidTestSourceSetCheck SKIPPED
+> Task :androidApp:runKtlintCheckOverDebugSourceSet NO-SOURCE
+> Task :androidApp:ktlintDebugSourceSetCheck SKIPPED
+> Task :androidApp:runKtlintCheckOverKotlinScripts UP-TO-DATE
+> Task :androidApp:ktlintKotlinScriptCheck UP-TO-DATE
+> Task :androidApp:runKtlintCheckOverMainSourceSet UP-TO-DATE
+> Task :androidApp:ktlintMainSourceSetCheck UP-TO-DATE
+> Task :androidApp:runKtlintCheckOverReleaseSourceSet NO-SOURCE
+> Task :androidApp:ktlintReleaseSourceSetCheck SKIPPED
+> Task :androidApp:runKtlintCheckOverTestDebugSourceSet NO-SOURCE
+> Task :androidApp:ktlintTestDebugSourceSetCheck SKIPPED
+> Task :androidApp:runKtlintCheckOverTestFixturesDebugSourceSet NO-SOURCE
+> Task :androidApp:ktlintTestFixturesDebugSourceSetCheck SKIPPED
+> Task :androidApp:runKtlintCheckOverTestFixturesReleaseSourceSet NO-SOURCE
+> Task :androidApp:ktlintTestFixturesReleaseSourceSetCheck SKIPPED
+> Task :androidApp:runKtlintCheckOverTestFixturesSourceSet NO-SOURCE
+> Task :androidApp:ktlintTestFixturesSourceSetCheck SKIPPED
+> Task :androidApp:runKtlintCheckOverTestReleaseSourceSet NO-SOURCE
+> Task :androidApp:ktlintTestReleaseSourceSetCheck SKIPPED
+> Task :androidApp:runKtlintCheckOverTestSourceSet NO-SOURCE
+> Task :androidApp:ktlintTestSourceSetCheck SKIPPED
+> Task :androidApp:ktlintCheck UP-TO-DATE
+
+> Task :androidApp:auditResolvedDependenciesDebugRuntimeClasspath
+Resolved dependency inventory: E:\workspace\perso\projectRandD\promethe\build\reports\dependency-audit\androidApp-debugRuntimeClasspath.json
+
+> Task :shared:buildSandboxNative UP-TO-DATE
+> Task :shared:syncSandboxNative UP-TO-DATE
+> Task :shared:jvmProcessResources UP-TO-DATE
+> Task :shared:processJvmMainResources SKIPPED
+> Task :shared:jvmTestProcessResources NO-SOURCE
+> Task :shared:processJvmTestResources SKIPPED
+> Task :shared:loadKtlintReporters UP-TO-DATE
+> Task :shared:runKtlintCheckOverCommonMainSourceSet UP-TO-DATE
+> Task :shared:ktlintCommonMainSourceSetCheck UP-TO-DATE
+> Task :shared:runKtlintCheckOverCommonTestSourceSet UP-TO-DATE
+> Task :shared:ktlintCommonTestSourceSetCheck UP-TO-DATE
+> Task :shared:runKtlintCheckOverJvmMainSourceSet UP-TO-DATE
+> Task :shared:ktlintJvmMainSourceSetCheck UP-TO-DATE
+> Task :shared:runKtlintCheckOverJvmTestSourceSet UP-TO-DATE
+> Task :shared:ktlintJvmTestSourceSetCheck UP-TO-DATE
+> Task :shared:runKtlintCheckOverKotlinScripts UP-TO-DATE
+> Task :shared:ktlintKotlinScriptCheck UP-TO-DATE
+> Task :shared:ktlintCheck UP-TO-DATE
+
+> Task :shared:auditResolvedDependenciesJvmCompileClasspath
+Resolved dependency inventory: E:\workspace\perso\projectRandD\promethe\build\reports\dependency-audit\shared-jvmCompileClasspath.json
+
+> Task :auditResolvedDependencies
+
+> Task :api:compileTestKotlinJvm
+w: file:///E:/workspace/perso/projectRandD/promethe/api/src/commonTest/kotlin/dev/promethe/api/a2ui/A2UISerializationTest.kt:64:23 This declaration needs opt-in. Its usage should be marked with '@kotlinx.serialization.ExperimentalSerializationApi' or '@OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/api/src/commonTest/kotlin/dev/promethe/api/a2ui/A2UISerializationTest.kt:65:23 This declaration needs opt-in. Its usage should be marked with '@kotlinx.serialization.ExperimentalSerializationApi' or '@OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)'
+
+> Task :api:compileJvmTestJava NO-SOURCE
+> Task :api:jvmTestClasses
+> Task :api:compileKotlinWasmJs
+> Task :api:jvmTest
+> Task :shared:compileKotlinJvm
+
+> Task :composeApp:compileKotlinWasmJs
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/a2ui/renderers/FormRenderers.kt:67:85 Elvis operator (?:) always returns the left operand of non-nullable type 'String'.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/components/MessageBubble.kt:134:40 'val LocalClipboardManager: ProvidableCompositionLocal<ClipboardManager>' is deprecated. Use LocalClipboard instead which supports suspend functions.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/network/A2AChatClient.kt:191:21 Unnecessary safe call on a non-null receiver of type 'List<Part>'.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/screens/AgentProfilesScreen.kt:576:29 'fun TabRow(selectedTabIndex: Int, modifier: Modifier = ..., containerColor: Color = ..., contentColor: Color = ..., indicator: ComposableFunction1<List<TabPosition>, Unit> = ..., divider: ComposableFunction0<Unit> = ..., tabs: ComposableFunction0<Unit>): Unit' is deprecated. Replaced with PrimaryTabRow and SecondaryTabRow.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/screens/GepaDashboard.kt:209:61 'fun Modifier.menuAnchor(): Modifier' is deprecated. Use overload that takes ExposedDropdownMenuAnchorType and enabled parameters.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/screens/GepaDashboard.kt:253:61 'fun Modifier.menuAnchor(): Modifier' is deprecated. Use overload that takes ExposedDropdownMenuAnchorType and enabled parameters.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/screens/McpScreen.kt:78:17 'fun TabRow(selectedTabIndex: Int, modifier: Modifier = ..., containerColor: Color = ..., contentColor: Color = ..., indicator: ComposableFunction1<List<TabPosition>, Unit> = ..., divider: ComposableFunction0<Unit> = ..., tabs: ComposableFunction0<Unit>): Unit' is deprecated. Replaced with PrimaryTabRow and SecondaryTabRow.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/screens/McpScreen.kt:259:37 Elvis operator (?:) always returns the left operand of non-nullable type 'String'.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/screens/SkillsScreen.kt:639:42 'val Icons.Filled.Send: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.Send.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/screens/SkillsScreen.kt:695:44 'val LocalClipboardManager: ProvidableCompositionLocal<ClipboardManager>' is deprecated. Use LocalClipboard instead which supports suspend functions.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/screens/settings/LlmSection.kt:703:48 'fun Modifier.menuAnchor(): Modifier' is deprecated. Use overload that takes ExposedDropdownMenuAnchorType and enabled parameters.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/screens/settings/LlmSection.kt:770:48 'fun Modifier.menuAnchor(): Modifier' is deprecated. Use overload that takes ExposedDropdownMenuAnchorType and enabled parameters.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/screens/settings/SettingsComponents.kt:137:13 'fun TabRow(selectedTabIndex: Int, modifier: Modifier = ..., containerColor: Color = ..., contentColor: Color = ..., indicator: ComposableFunction1<List<TabPosition>, Unit> = ..., divider: ComposableFunction0<Unit> = ..., tabs: ComposableFunction0<Unit>): Unit' is deprecated. Replaced with PrimaryTabRow and SecondaryTabRow.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/util/CronUtils.kt:31:72 'val dayOfMonth: Int' is deprecated. Use the 'day' property instead.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/util/CronUtils.kt:60:29 'val dayOfMonth: Int' is deprecated. Use the 'day' property instead.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/util/CronUtils.kt:61:24 'val monthNumber: Int' is deprecated. Use the 'month' property instead.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/util/CronUtils.kt:130:40 'val monthNumber: Int' is deprecated. Use the 'month' property instead.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/util/CronUtils.kt:131:22 'val dayOfMonth: Int' is deprecated. Use the 'day' property instead.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/util/Formatting.kt:36:32 'val dayOfMonth: Int' is deprecated. Use the 'day' property instead.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/wasmJsMain/kotlin/dev/promethe/app/Main.kt:28:5 This declaration needs opt-in. Its usage should be marked with '@kotlin.js.ExperimentalWasmJsInterop' or '@OptIn(kotlin.js.ExperimentalWasmJsInterop::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/wasmJsMain/kotlin/dev/promethe/app/config/LocaleManager.wasmJs.kt:10:50 This declaration needs opt-in. Its usage should be marked with '@kotlin.js.ExperimentalWasmJsInterop' or '@OptIn(kotlin.js.ExperimentalWasmJsInterop::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/wasmJsMain/kotlin/dev/promethe/app/config/LocaleManager.wasmJs.kt:12:41 This declaration needs opt-in. Its usage should be marked with '@kotlin.js.ExperimentalWasmJsInterop' or '@OptIn(kotlin.js.ExperimentalWasmJsInterop::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/wasmJsMain/kotlin/dev/promethe/app/network/PlatformHttpClient.wasmJs.kt:12:17 This declaration needs opt-in. Its usage should be marked with '@kotlin.js.ExperimentalWasmJsInterop' or '@OptIn(kotlin.js.ExperimentalWasmJsInterop::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/wasmJsMain/kotlin/dev/promethe/app/network/PlatformHttpClient.wasmJs.kt:12:41 This declaration needs opt-in. Its usage should be marked with '@kotlin.js.ExperimentalWasmJsInterop' or '@OptIn(kotlin.js.ExperimentalWasmJsInterop::class)'
+
+> Task :composeApp:wasmJsMainClasses
+
+> Task :shared:compileKotlinJvm
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmMain/kotlin/dev/promethe/db/PrometheDatabase.kt:1557:50 Redundant call of conversion method.
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmMain/kotlin/dev/promethe/db/PrometheDatabase.kt:1576:51 Redundant call of conversion method.
+
+> Task :shared:compileJvmMainJava NO-SOURCE
+> Task :shared:jvmMainClasses
+> Task :shared:jvmJar UP-TO-DATE
+> Task :evals:compileKotlin
+> Task :evals:compileJava NO-SOURCE
+> Task :evals:classes UP-TO-DATE
+> Task :evals:jar UP-TO-DATE
+> Task :evals:compileTestKotlin
+> Task :evals:compileTestJava NO-SOURCE
+> Task :evals:testClasses UP-TO-DATE
+> Task :evals:test UP-TO-DATE
+
+> Task :shared:compileTestKotlinJvm
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:57:13 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:71:13 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:83:13 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:95:13 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:113:13 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:121:13 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:134:13 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:149:17 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:163:13 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:172:13 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:191:13 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:201:13 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:219:13 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:244:17 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:267:17 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:292:17 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:307:17 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/ToolApprovalGateTest.kt:322:17 This declaration needs opt-in. Its usage should be marked with '@kotlinx.coroutines.ExperimentalCoroutinesApi' or '@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)'
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/hooks/HookManagerTest.kt:92:53 No cast needed.
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/providers/CapabilityRouterTest.kt:16:29 No cast needed.
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/providers/CapabilityRouterTest.kt:28:32 No cast needed.
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/providers/CapabilityRouterTest.kt:46:32 No cast needed.
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/providers/CapabilityRouterTest.kt:82:52 No cast needed.
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/tools/media/MediaToolsMultiProviderTest.kt:98:61 No cast needed.
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/core/tools/media/MediaToolsMultiProviderTest.kt:114:37 No cast needed.
+w: file:///E:/workspace/perso/projectRandD/promethe/shared/src/jvmTest/kotlin/dev/promethe/db/DatabaseBackupServiceTest.kt:26:89 Unnecessary non-null assertion (!!) on a non-null receiver of type 'File'.
+
+> Task :shared:compileJvmTestJava NO-SOURCE
+> Task :shared:jvmTestClasses
+
+> Task :gateway:compileKotlin
+w: file:///E:/workspace/perso/projectRandD/promethe/gateway/src/jvmMain/kotlin/dev/promethe/gateway/ChannelRoutes.kt:18:17 'object EnvConfigStore : Any' is deprecated. Use CredentialsStore.load()?.toEnvMap() instead.
+
+> Task :gateway:compileJava NO-SOURCE
+> Task :gateway:classes UP-TO-DATE
+> Task :gateway:jar UP-TO-DATE
+
+> Task :gateway:shadowJar
+'META-INF/promethe_gateway.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/promethe_shared.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/promethe_api.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/koin-logger-slf4j.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/koog-ktor.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/koog-agents.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/koog-agents-additions.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/agents-features-opentelemetry.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/compat.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/java-typealiases.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/opentelemetry-extension-kotlin.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/exposed-dao.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/exposed-jdbc.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/exposed-kotlin-datetime.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/exposed-core.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/agents-mcp.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/prompt-executor-llms-all.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/agents-features-a2a-server.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/agents-features-a2a-client.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/agents-features-event-handler.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/agents-features-memory.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/agents-features-snapshot.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/agents-features-tokenizer.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/agents-features-trace.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/agents-cli.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/agents-planner.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/agents-features-longterm-memory.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/agents-core.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/ktor-server-cio.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/a2a-transport-server-jsonrpc-http.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/ktor-server-content-negotiation.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/kotlin-sdk-client.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/kotlin-sdk-core.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/ktor-server-websockets.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/ktor-server-cors.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/ktor-server-status-pages.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/ktor-server-sse.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/koin-ktor.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/ktor-server-di.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/ktor-server-core.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/a2a-transport-client-jsonrpc-http.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/embeddings-llm.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/http-client-ktor.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/prompt-executor-bedrock-client.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/a2a-server.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/a2a-client.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/ktor-serialization-kotlinx-json.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/ktor-client-content-negotiation.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/prompt-processor.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/prompt-executor-cached.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/prompt-executor-model.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/ktor-client-cio.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/ktor-client-apache5.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/ktor-client-logging.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/ktor-client-core.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/bedrockruntime.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/aws-config.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/http-client-engine-default.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/http-client-engine-okhttp.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/okhttp-coroutines.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/okhttp.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/aws-http.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/aws-endpoint.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/aws-core.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/aws-json-protocols.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/aws-xml-protocols.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/aws-protocol-core.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/aws-event-stream.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/aws-signing-default.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/http-auth-aws.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/aws-signing-common.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/http-client.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/smithy-client.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/aws-credentials.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/http-auth.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/http-auth-api.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/http.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/identity-api.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/telemetry-defaults.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/logging-slf4j2.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/telemetry-api.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/serde-json.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/serde-xml.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/serde-form-url.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/serde.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/runtime-core.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/okio.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/prompt-executor-google-client.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/prompt-executor-anthropic-client.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/prompt-executor-ollama-client.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/prompt-executor-openai-client.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/prompt-executor-deepseek-client.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/prompt-executor-mistralai-client.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/prompt-executor-openrouter-client.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/prompt-executor-dashscope-client.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/prompt-executor-openai-client-base.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/prompt-executor-clients.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/prompt-structure.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/prompt-cache-files.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/prompt-cache-redis.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/prompt-cache-model.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/agents-tools.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/prompt-markdown.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/prompt-tokenizer.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/prompt-xml.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/agents-features-a2a-core.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/prompt-model.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/utils.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/prompt-llm.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/a2a-transport-core-jsonrpc.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/a2a-core.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/agents-utils.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/skills.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/kotlinx-schema-generator-json.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/kotlinx-schema-generator-core.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/kotlin-logging.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/koin-core.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/kotlinx-coroutines-jdk9.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/kotlinx-coroutines-reactive.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/kotlinx-coroutines-slf4j.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/ktor-http-cio.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/ktor-websocket-serialization.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/ktor-serialization-kotlinx.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/ktor-serialization.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/ktor-websockets.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/ktor-network-tls.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/ktor-http.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/ktor-events.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/ktor-network.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/ktor-sse.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/ktor-utils.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/http-client-core.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/rag-vector.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/rag-base.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/ktor-io.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/implementation.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/core.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/exporters-core.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/sdk-common.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/kotlinx-coroutines-core.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/kotlinx-serialization-protobuf.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/kotlinx-serialization-json-io.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/kotlinx-serialization-core.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/agents-mcp-metadata.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/embeddings-base.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/serialization-jackson.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/serialization-core.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/kotlinx-schema-json.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/kotlinx-serialization-json.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/kotlinx-datetime.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/prompt-executor-litert-client.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/jackson-module-kotlin.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/kotlin-reflection.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/org.jetbrains.kotlin_compiler.common.jvm.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/org.jetbrains.kotlin_compiler.common.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/org.jetbrains.kotlin_descriptors.jvm.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/org.jetbrains.kotlin_descriptors.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/org.jetbrains.kotlin_descriptors.runtime.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/org.jetbrains.kotlin_deserialization.common.jvm.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/org.jetbrains.kotlin_deserialization.common.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/org.jetbrains.kotlin_deserialization.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/org.jetbrains.kotlin_kotlin-metadata-jvm.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/org.jetbrains.kotlin_kotlin-metadata.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/org.jetbrains.kotlin_language.model.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/org.jetbrains.kotlin_language.targets.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/org.jetbrains.kotlin_metadata.jvm.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/org.jetbrains.kotlin_metadata.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/org.jetbrains.kotlin_names.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/org.jetbrains.kotlin_util.runtime.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/stately-concurrent-collections.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/stately-concurrency.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/noop.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/model.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/api-ext.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/platform-implementations.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/sdk-api.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/semconv.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/stately-strict.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/kotlinx-io-core.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/kotlinx-schema-annotations.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/api.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/kotlinx-collections-immutable.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/kotlinx-io-bytestring.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/kotlin-stdlib-jdk7.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/kotlin-stdlib-jdk8.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/kotlin-stdlib.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/annotations.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+'META-INF/lettuce-core.kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer_Decorated but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
+
+> Task :composeApp:compileProductionExecutableKotlinWasmJs
+
+> Task :gateway:compileTestKotlin
+w: file:///E:/workspace/perso/projectRandD/promethe/gateway/src/test/kotlin/dev/promethe/gateway/OpenApiRoutesTest.kt:42:32 Unnecessary safe call on a non-null receiver of type 'JsonObject'.
+w: file:///E:/workspace/perso/projectRandD/promethe/gateway/src/test/kotlin/dev/promethe/gateway/OpenApiRoutesTest.kt:43:32 Unnecessary safe call on a non-null receiver of type 'JsonObject'.
+w: file:///E:/workspace/perso/projectRandD/promethe/gateway/src/test/kotlin/dev/promethe/gateway/OpenApiRoutesTest.kt:44:32 Unnecessary safe call on a non-null receiver of type 'JsonObject'.
+
+> Task :gateway:compileTestJava NO-SOURCE
+> Task :gateway:testClasses UP-TO-DATE
+> Task :gateway:test UP-TO-DATE
+
+> Task :composeApp:compileKotlinDesktop
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/a2ui/renderers/FormRenderers.kt:67:85 Elvis operator (?:) always returns the left operand of non-nullable type 'String'.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/components/MessageBubble.kt:134:40 'val LocalClipboardManager: ProvidableCompositionLocal<ClipboardManager>' is deprecated. Use LocalClipboard instead which supports suspend functions.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/network/A2AChatClient.kt:191:21 Unnecessary safe call on a non-null receiver of type 'List<Part>'.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/screens/AgentProfilesScreen.kt:576:29 'fun TabRow(selectedTabIndex: Int, modifier: Modifier = ..., containerColor: Color = ..., contentColor: Color = ..., indicator: ComposableFunction1<List<TabPosition>, Unit> = ..., divider: ComposableFunction0<Unit> = ..., tabs: ComposableFunction0<Unit>): Unit' is deprecated. Replaced with PrimaryTabRow and SecondaryTabRow.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/screens/GepaDashboard.kt:209:61 'fun Modifier.menuAnchor(): Modifier' is deprecated. Use overload that takes ExposedDropdownMenuAnchorType and enabled parameters.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/screens/GepaDashboard.kt:253:61 'fun Modifier.menuAnchor(): Modifier' is deprecated. Use overload that takes ExposedDropdownMenuAnchorType and enabled parameters.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/screens/McpScreen.kt:78:17 'fun TabRow(selectedTabIndex: Int, modifier: Modifier = ..., containerColor: Color = ..., contentColor: Color = ..., indicator: ComposableFunction1<List<TabPosition>, Unit> = ..., divider: ComposableFunction0<Unit> = ..., tabs: ComposableFunction0<Unit>): Unit' is deprecated. Replaced with PrimaryTabRow and SecondaryTabRow.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/screens/McpScreen.kt:259:37 Elvis operator (?:) always returns the left operand of non-nullable type 'String'.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/screens/SkillsScreen.kt:639:42 'val Icons.Filled.Send: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.Send.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/screens/SkillsScreen.kt:695:44 'val LocalClipboardManager: ProvidableCompositionLocal<ClipboardManager>' is deprecated. Use LocalClipboard instead which supports suspend functions.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/screens/settings/LlmSection.kt:703:48 'fun Modifier.menuAnchor(): Modifier' is deprecated. Use overload that takes ExposedDropdownMenuAnchorType and enabled parameters.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/screens/settings/LlmSection.kt:770:48 'fun Modifier.menuAnchor(): Modifier' is deprecated. Use overload that takes ExposedDropdownMenuAnchorType and enabled parameters.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/screens/settings/SettingsComponents.kt:137:13 'fun TabRow(selectedTabIndex: Int, modifier: Modifier = ..., containerColor: Color = ..., contentColor: Color = ..., indicator: ComposableFunction1<List<TabPosition>, Unit> = ..., divider: ComposableFunction0<Unit> = ..., tabs: ComposableFunction0<Unit>): Unit' is deprecated. Replaced with PrimaryTabRow and SecondaryTabRow.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/util/CronUtils.kt:31:72 'val dayOfMonth: Int' is deprecated. Use the 'day' property instead.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/util/CronUtils.kt:60:29 'val dayOfMonth: Int' is deprecated. Use the 'day' property instead.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/util/CronUtils.kt:61:24 'val monthNumber: Int' is deprecated. Use the 'month' property instead.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/util/CronUtils.kt:130:40 'val monthNumber: Int' is deprecated. Use the 'month' property instead.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/util/CronUtils.kt:131:22 'val dayOfMonth: Int' is deprecated. Use the 'day' property instead.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/commonMain/kotlin/dev/promethe/app/util/Formatting.kt:36:32 'val dayOfMonth: Int' is deprecated. Use the 'day' property instead.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/desktopMain/kotlin/dev/promethe/app/Main.kt:319:9 'fun readLine(): String?' is deprecated. Use `readln()` instead of `readLine()!!`, and `readlnOrNull()` instead of `readLine()`.
+w: file:///E:/workspace/perso/projectRandD/promethe/composeApp/src/desktopMain/kotlin/dev/promethe/app/Main.kt:323:9 'fun readLine(): String?' is deprecated. Use `readln()` instead of `readLine()!!`, and `readlnOrNull()` instead of `readLine()`.
+
+> Task :composeApp:compileDesktopMainJava NO-SOURCE
+> Task :composeApp:desktopMainClasses
+> Task :composeApp:desktopJar UP-TO-DATE
+> Task :composeApp:compileTestKotlinDesktop
+> Task :composeApp:compileDesktopTestJava NO-SOURCE
+> Task :composeApp:desktopTestClasses
+> Task :composeApp:desktopTest
+> Task :shared:jvmTest
+> Task :composeApp:compileProductionExecutableKotlinWasmJsOptimize
+> Task :composeApp:wasmJsProductionExecutableCompileSync
+
+> Task :composeApp:wasmJsBrowserProductionWebpack
+Critical dependency: the request of a dependency is an expression
+asset size limit: The following asset(s) exceed the recommended size limit (244 KiB).
+This can impact web performance.
+Assets: 
+  promethe.js (532 KiB)
+  bfa5198fb2fe683c613a.wasm (8.24 MiB)
+  4ff6dc77de8bcaeda511.wasm (9.58 MiB)
+entrypoint size limit: The following entrypoint(s) combined asset size exceeds the recommended limit (244 KiB). This can impact web performance.
+Entrypoints:
+  main (532 KiB)
+      promethe.js
+webpack performance recommendations: 
+You can limit the size of your bundles by using import() or require.ensure to lazy load some parts of your application.
+For more info visit https://webpack.js.org/guides/code-splitting/
+assets by status 17.8 MiB [cached] 2 assets
+asset promethe.js 532 KiB [compared for emit] [minimized] [big] (name: main) 2 related assets
+runtime modules 4.38 KiB 7 modules
+built modules 948 KiB (javascript) 17.8 MiB (asset) [built]
+  javascript modules 948 KiB
+    modules by path ./kotlin/*.mjs 556 KiB
+      modules with warnings 61.6 KiB [true warnings]
+        ./kotlin/promethe-composeApp.mjs 2.78 KiB [built] [code generated] [4 warnings]
+        ./kotlin/promethe-composeApp.import-object.mjs 58.8 KiB [built] [code generated] [1 warning]
+      ./kotlin/skiko.mjs 492 KiB [built] [code generated]
+      ./kotlin/promethe-composeApp.js-builtins.mjs 2.05 KiB [built] [code generated]
+    ../../node_modules/@js-joda/core/dist/js-joda.esm.js 392 KiB [built] [code generated]
+    ./kotlin/ lazy strict namespace object 160 bytes [built] [code generated]
+  asset modules 17.8 MiB (asset) 84 bytes (javascript)
+    ./kotlin/promethe-composeApp.wasm 9.58 MiB (asset) 42 bytes (javascript) [built] [code generated]
+    ./kotlin/skiko.wasm 8.24 MiB (asset) 42 bytes (javascript) [built] [code generated]
+webpack 5.101.3 compiled with 4 warnings in 2438 ms
+
+> Task :composeApp:wasmJsBrowserDistribution UP-TO-DATE
+Persisted dependency lock state for unknown
+Persisted dependency lock state for buildscript of root project 'promethe'
+Persisted dependency lock state for root project 'promethe'
+Persisted dependency lock state for project ':androidApp'
+Persisted dependency lock state for project ':api'
+Persisted dependency lock state for project ':composeApp'
+Persisted dependency lock state for project ':evals'
+Persisted dependency lock state for project ':gateway'
+Persisted dependency lock state for project ':shared'
+Persisted dependency lock state for buildscript of project ':gateway'
+
+[Incubating] Problems report is available at: file:///E:/workspace/perso/projectRandD/promethe/build/reports/problems/problems-report.html
+
+BUILD SUCCESSFUL in 8m 51s
+194 actionable tasks: 53 executed, 141 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.5.1/userguide/configuration_cache_enabling.html

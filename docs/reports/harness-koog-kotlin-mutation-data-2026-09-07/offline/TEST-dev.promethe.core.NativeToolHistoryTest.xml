@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="NativeToolHistoryTest[jvm]" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-09-07T19:28:29.002Z" hostname="BUREAU" time="0.003">
+  <properties/>
+  <testcase name="compression preserves typed exchanges and mixed conversation with identical observations[jvm]" classname="dev.promethe.core.NativeToolHistoryTest" time="0.001"/>
+  <testcase name="filtered observations cannot reappear from typed history and state is execution local[jvm]" classname="dev.promethe.core.NativeToolHistoryTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

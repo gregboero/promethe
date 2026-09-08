@@ -23,84 +23,15 @@ class SecurityTest {
 
     @Test
     fun testDangerousToolsNamesAreValid() {
-        // Ensure each DANGEROUS_TOOLS entry matches a known tool name.
-        // This test catches the class of bug where tool names drift from the gate.
-        val knownDangerousToolNames = setOf(
-            "execute_code",
-            "write_file",
-            "file_delete",
-            "file_move",
-            "patch",
-            "shell",
-            "execute_command",
-            "docker",
-            "process_manager",
-            "plugin_hook",
-            "git_commit",
-            "git_branch",
-            "config_set",
-            "browser_eval",
-            "send_email",
-            "twilio",
-            "send_message",
-            "signal",
-            "slack",
-            "discord",
-            "ha_call_service",
-            "memory_save",
-            "memory_forget",
-            "knowledge_ingest",
-            "knowledge_delete",
-            "skill_create",
-            "skill_improve",
-            "create_agent",
-            "promote_agent",
-            "cleanup_ephemeral_agents",
-            "browser_click",
-            "browser_type",
-            "browser_press",
-            "browser_dialog",
-            "codex_delegate",
-            "claude_code_delegate",
-            "github",
-            "calendar",
-            "notion",
-            "jira",
-            "cronjob",
-            "discord_policy",
-            "csv",
-            "generate_image",
-            "analyze_image",
-            "text_to_speech",
-            "video_generate",
-            "video_analyze",
-            "api_call",
-            "web_screenshot",
-            "browser_navigate",
-            "render_ui",
-            "checkpoint_save",
-            "autonomous_goal",
-            "mixture_of_agents",
-        )
-
         val dangerousTools = ToolApprovalGate.DANGEROUS_TOOLS
+        val contractDrivenTools =
+            ToolContractRegistry.staticContractNames().filterTo(mutableSetOf()) { toolName ->
+                ToolContractRegistry.contractFor(toolName).catalogRisk != ToolRisk.READ
+            }
 
-        // Every entry in DANGEROUS_TOOLS must be a known tool name
-        for (tool in dangerousTools) {
-            assertTrue(
-                tool in knownDangerousToolNames,
-                "DANGEROUS_TOOLS contains '$tool' which is not a known dangerous tool name. " +
-                    "Known: $knownDangerousToolNames",
-            )
-        }
-
-        // Every known dangerous tool should be in DANGEROUS_TOOLS
-        for (tool in knownDangerousToolNames) {
-            assertTrue(
-                tool in dangerousTools,
-                "Known dangerous tool '$tool' is NOT in DANGEROUS_TOOLS set. " +
-                    "Add it to ToolApprovalGate.DANGEROUS_TOOLS",
-            )
+        assertEquals(contractDrivenTools, dangerousTools, "The approval facade drifted from ToolContractRegistry")
+        dangerousTools.forEach { toolName ->
+            assertTrue(ToolContractRegistry.contractFor(toolName).explicit, toolName)
         }
     }
 

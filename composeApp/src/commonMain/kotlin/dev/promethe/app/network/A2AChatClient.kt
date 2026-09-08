@@ -17,6 +17,7 @@ import ai.koog.a2a.model.TextPart
 import ai.koog.a2a.transport.Request
 import ai.koog.a2a.transport.client.jsonrpc.http.HttpJSONRPCClientTransport
 import dev.promethe.api.ChatEvent
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.sync.Mutex
@@ -165,6 +166,8 @@ class A2AChatClient(
                         emit(chatEvent)
                     }
                 }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 logger.error(e) { "A2A streaming error for session $sessionId" }
                 emit(ChatEvent(type = "error", content = "Streaming error: ${e.message}"))

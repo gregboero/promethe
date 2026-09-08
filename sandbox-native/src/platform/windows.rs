@@ -768,7 +768,13 @@ fn run_broker_execution(
         uuid::Uuid::new_v4().simple(),
     ));
     let password = decrypt_credential(&credential_path)?;
-    let broker_job = create_job(&validated.request)?;
+    // This outer job contains the trusted runner as well as the requested child.
+    // The runner installs a nested job with the original limit for untrusted
+    // processes. Counting the runner against a limit of one prevents any child
+    // from starting (CreateProcessAsUserW fails with ERROR_NOT_ENOUGH_QUOTA).
+    let mut broker_request = validated.request.clone();
+    broker_request.profile.limits.process_limit += 1;
+    let broker_job = create_job(&broker_request)?;
     let mut runner = launch_runner_suspended(
         &runner_path,
         &pipe_name,
@@ -1213,7 +1219,7 @@ fn run_self_test_command(
                     max_output_bytes_per_stream: 16 * 1024,
                     memory_bytes: 128 * 1024 * 1024,
                     cpu_limit: 1.0,
-                    process_limit: 8,
+                    process_limit: 1,
                 },
             },
             interactive: false,

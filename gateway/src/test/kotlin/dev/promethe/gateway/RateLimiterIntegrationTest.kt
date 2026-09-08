@@ -3,8 +3,6 @@ package dev.promethe.gateway
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
-import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -32,17 +30,31 @@ class RateLimiterIntegrationTest {
     private fun ApplicationTestBuilder.configureApp(
         maxRequests: Int,
         windowMs: Long,
+        localApiKeyAuthentication: Boolean = false,
     ) {
         RateLimiter.configure(maxRequests, windowMs)
         application {
-            install(ContentNegotiation) { json() }
+            if (localApiKeyAuthentication) {
+                intercept(ApplicationCallPipeline.Plugins) {
+                    call.attributes.put(
+                        AuthMiddleware.CredentialKindKey,
+                        AuthMiddleware.CredentialKind.LOCAL_API_KEY,
+                    )
+                }
+            }
             RateLimiter.install(this)
             routing {
-                get("/api/test-limit") {
-                    call.respondText("OK")
-                }
-                get("/health") {
-                    call.respondText("HEALTHY")
+                installGatewayContentNegotiation()
+                route("/") {
+                    get("api/test-limit") {
+                        call.respondText("OK")
+                    }
+                    get("health") {
+                        call.respondText("HEALTHY")
+                    }
+                    get(".well-known/agent-card.json") {
+                        call.respondText("DISCOVERY")
+                    }
                 }
             }
         }
@@ -80,6 +92,8 @@ class RateLimiterIntegrationTest {
             // Request 3: Too Many Requests
             val response3 = client.get("/api/test-limit")
             assertEquals(HttpStatusCode.TooManyRequests, response3.status)
+            assertEquals(ContentType.Application.Json, response3.contentType())
+            assertNotNull(response3.headers[HttpHeaders.RetryAfter])
 
             val errorBody = json.parseToJsonElement(response3.bodyAsText()).jsonObject
             assertTrue(errorBody.containsKey("error"))
@@ -88,14 +102,33 @@ class RateLimiterIntegrationTest {
         }
 
     @Test
-    fun `health checks and webhooks are bypassed`() =
+    fun `health and discovery routes are bypassed`() =
         testApplication {
             configureApp(maxRequests = 0, windowMs = 10_000L) // 0 requests allowed
 
-            // GET /health should succeed since it's bypassed
-            val response = client.get("/health")
+            val healthResponse = client.get("/health")
+            assertEquals(HttpStatusCode.OK, healthResponse.status)
+            assertEquals("HEALTHY", healthResponse.bodyAsText())
+            assertNull(healthResponse.headers["X-RateLimit-Limit"])
+
+            val discoveryResponse = client.get("/.well-known/agent-card.json")
+            assertEquals(HttpStatusCode.OK, discoveryResponse.status)
+            assertEquals("DISCOVERY", discoveryResponse.bodyAsText())
+            assertNull(discoveryResponse.headers["X-RateLimit-Limit"])
+        }
+
+    @Test
+    fun `authenticated loopback desktop requests are bypassed`() =
+        testApplication {
+            configureApp(
+                maxRequests = 0,
+                windowMs = 10_000L,
+                localApiKeyAuthentication = true,
+            )
+
+            val response = client.get("/api/test-limit")
             assertEquals(HttpStatusCode.OK, response.status)
-            assertEquals("HEALTHY", response.bodyAsText())
+            assertEquals("OK", response.bodyAsText())
             assertNull(response.headers["X-RateLimit-Limit"])
         }
 }

@@ -1,0 +1,60 @@
+{
+  "nativeWindowsTests": {
+    "passed": 13,
+    "failed": 0
+  },
+  "documentationChecks": {
+    "passed": 36,
+    "total": 36
+  },
+  "cordis": {
+    "numTotalTests": 102,
+    "numPassedTests": 102,
+    "numFailedTests": 0,
+    "numPendingTests": 0
+  },
+  "api:jvmTest": {
+    "tests": 76,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "shared:jvmTest": {
+    "tests": 646,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "gateway:test": {
+    "tests": 213,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "evals:test": {
+    "tests": 15,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "composeApp:desktopTest": {
+    "tests": 23,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "shared:harnessLiveTest": {
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "campaignBudget": {
+    "capMicroUsd": 5000000,
+    "requestsReserved": 70,
+    "settledRequests": 70,
+    "settledCostUpperBoundMicroUsd": 296785,
+    "uncertainReservationMicroUsd": 0,
+    "committedMicroUsd": 296785
+  }
+}

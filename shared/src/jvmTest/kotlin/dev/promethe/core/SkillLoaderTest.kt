@@ -68,19 +68,20 @@ class SkillLoaderCacheTest {
             assertEquals("real-skill", skills.first().name)
         }
 
-    // ── 2. Cache hit: second call returns same results ──
+    // ── 2. Direct edits invalidate previously observed content ──
 
     @Test
-    fun listSkills_cacheHit_returnsSameInstance() =
+    fun listSkills_observesSameSizeEditsWithoutInvalidation() =
         runTest {
             writeSkill("cached-skill", "# Cached\nSome skill content for caching")
 
             val loader = createLoader()
             val first = loader.listSkills()
+            writeSkill("cached-skill", "# Cached\nMore skill content for caching")
             val second = loader.listSkills()
 
-            // Same list reference means cache was used (no re-read)
-            assertSame(first, second, "Second call should return the cached list instance")
+            assertTrue(second.single().content.contains("More skill content"))
+            assertNotEquals(first.single().contract.contentHash, second.single().contract.contentHash)
         }
 
     // ── 3. invalidateCache forces re-read ──

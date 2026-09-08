@@ -219,6 +219,17 @@ fun SkillsScreen(client: PrometheClient) {
                             SkillLifecycle.ACTIVE -> SkillLifecycle.DEPRECATED
                             SkillLifecycle.DEPRECATED -> SkillLifecycle.DRAFT
                         }
+                    val requiresReview = nextLifecycle in setOf(SkillLifecycle.CANDIDATE, SkillLifecycle.ACTIVE)
+                    var reviewNote by remember(selected.name, selected.contract.contentHash, selected.contract.lifecycle) { mutableStateOf("") }
+                    if (requiresReview && !state.isEditing) {
+                        OutlinedTextField(
+                            value = reviewNote,
+                            onValueChange = { reviewNote = it.take(2_000) },
+                            label = { Text(stringResource(Res.string.skills_review_note)) },
+                            supportingText = { Text(stringResource(Res.string.skills_review_scope)) },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -229,10 +240,10 @@ fun SkillsScreen(client: PrometheClient) {
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
-                        if (!selected.isSystem && !state.isEditing) {
+                        if ((!selected.isSystem || selected.contract.validationRequired) && !state.isEditing) {
                             FilledTonalButton(
-                                onClick = { viewModel.updateLifecycle(nextLifecycle) },
-                                enabled = !state.isSaving,
+                                onClick = { viewModel.updateLifecycle(nextLifecycle, reviewNote.takeIf { requiresReview }) },
+                                enabled = !state.isSaving && (!requiresReview || (reviewNote.isNotBlank() && state.validation?.canPromote == true)),
                             ) {
                                 Icon(
                                     imageVector = Icons.Filled.PublishedWithChanges,
@@ -245,6 +256,8 @@ fun SkillsScreen(client: PrometheClient) {
                         }
                     }
                     Spacer(Modifier.height(12.dp))
+
+                    if (!state.isEditing) SkillValidationPanel(state, viewModel)
 
                     HorizontalDivider()
                     Spacer(Modifier.height(16.dp))

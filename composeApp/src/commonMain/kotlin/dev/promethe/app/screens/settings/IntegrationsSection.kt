@@ -376,6 +376,17 @@ fun IntegrationsSection(
                     },
                 )
                 OutlinedTextField(
+                    value = state.intDiscordApproverUserIds,
+                    onValueChange = { onUpdate { copy(intDiscordApproverUserIds = it) } },
+                    label = { Text(stringResource(Res.string.settings_integrations_discord_approvers_label)) },
+                    modifier = Modifier.fillMaxWidth().testTag("settings_discord_approvers"),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = settingsFieldColors(colors),
+                    supportingText = {
+                        Text(stringResource(Res.string.settings_integrations_discord_approvers_hint))
+                    },
+                )
+                OutlinedTextField(
                     value = state.intDiscordKnowledgeChannelIds,
                     onValueChange = { onUpdate { copy(intDiscordKnowledgeChannelIds = it) } },
                     label = { Text(stringResource(Res.string.settings_integrations_discord_knowledge_channels_label)) },

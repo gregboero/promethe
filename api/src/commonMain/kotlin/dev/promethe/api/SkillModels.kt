@@ -49,6 +49,14 @@ data class SkillContract(
     val version: String = "1",
     val owner: String? = null,
     val contentHash: String? = null,
+    val reviewedContentHash: String? = null,
+    val reviewNote: String? = null,
+    val reviewedAt: String? = null,
+    val validationRequired: Boolean = false,
+    val revisionId: String? = null,
+    val revisionHash: String? = null,
+    val evaluatedRunId: String? = null,
+    val reviewedRevisionHash: String? = null,
 )
 
 @Serializable
@@ -67,11 +75,15 @@ data class CreateSkillRequest(
 @Serializable
 data class UpdateSkillRequest(
     val content: String,
+    val expectedRevisionHash: String? = null,
 )
 
 @Serializable
 data class UpdateSkillLifecycleRequest(
     val lifecycle: SkillLifecycle,
+    val expectedContentHash: String? = null,
+    val reviewNote: String? = null,
+    val expectedRevisionHash: String? = null,
 )
 
 @Serializable

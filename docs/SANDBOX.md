@@ -1,5 +1,7 @@
 # Promethe Sandbox
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 ## Scope and status
 
 Promethe process tools are designed to fail closed when the native sandbox is
@@ -181,8 +183,10 @@ is not deleted by the uninstall script.
   process lifecycle management.
 - Network allowlists and a local authenticated proxy are not available in the
   current helper; network remains disabled.
-- `PERSISTENT` approval grants are currently process-lifetime grants; durable
-  database-backed approval persistence is not implemented yet.
+- `PERSISTENT` approval is available only for exact `CONFIG_CHANGE`
+  fingerprints. Those grants are stored in SQLite until local-owner revocation;
+  process, file and arbitrary command grants remain limited to `ONCE` or
+  `SESSION`.
 - The native helper is not usable until its platform artifact is packaged or
   `PROMETHE_SANDBOX_HELPER` points to a verified executable.
 

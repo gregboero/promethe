@@ -1,6 +1,8 @@
 package dev.promethe.core
 
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import java.nio.file.Files
 import kotlin.io.path.createTempDirectory
 import kotlin.test.Test
@@ -24,7 +26,41 @@ class FileArtifactStoreTest {
                 assertEquals(first, second)
                 assertTrue(first.uri.endsWith(first.hash))
                 assertContentEquals(request.content, store.read(first.hash))
-                assertEquals(1, Files.walk(root).use { paths -> paths.filter(Files::isRegularFile).count() })
+                assertEquals(1, Files.walk(root.resolve("sha256")).use { paths -> paths.filter(Files::isRegularFile).count() })
+            } finally {
+                root.toFile().deleteRecursively()
+            }
+        }
+
+    @Test
+    fun `quota survives reopening and deduplication does not consume space`() =
+        runTest {
+            val root = createTempDirectory("promethe-artifact-quota")
+            try {
+                val first = FileArtifactStore(root, maxStoreBytes = 4).put(writeRequest("1234"))
+                val reopened = FileArtifactStore(root, maxStoreBytes = 4)
+                assertEquals(first, reopened.put(writeRequest("1234")))
+                assertFailsWith<ArtifactQuotaException> { reopened.put(writeRequest("5")) }
+                assertTrue(reopened.retentionCandidates(setOf(first.hash), Long.MAX_VALUE).isEmpty())
+                assertEquals(listOf(first.hash), reopened.retentionCandidates(emptySet(), Long.MAX_VALUE).map { it.hash })
+                assertContentEquals("1234".encodeToByteArray(), reopened.read(first.hash), "Planning never deletes")
+            } finally {
+                root.toFile().deleteRecursively()
+            }
+        }
+
+    @Test
+    fun `concurrent store instances cannot exceed shared quota`() =
+        runTest {
+            val root = createTempDirectory("promethe-artifact-race")
+            try {
+                val results = (1..8).map { index ->
+                    async {
+                        runCatching { FileArtifactStore(root, maxStoreBytes = 4).put(writeRequest("$index$index$index$index")) }
+                    }
+                }.awaitAll()
+                assertEquals(1, results.count { it.isSuccess })
+                assertEquals(7, results.count { it.exceptionOrNull() is ArtifactQuotaException })
             } finally {
                 root.toFile().deleteRecursively()
             }

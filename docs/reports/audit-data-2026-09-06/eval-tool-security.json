@@ -1,0 +1,74 @@
+{
+    "id": "runtime-tool-security",
+    "suiteId": "tool-security",
+    "suiteVersion": 1,
+    "startedAt": 1000,
+    "finishedAt": 1005,
+    "status": "PASSED",
+    "results": [
+        {
+            "caseId": "effect-requires-approval",
+            "status": "PASSED",
+            "durationMs": 1,
+            "assertions": [
+                {
+                    "assertionId": "blocked",
+                    "passed": true,
+                    "actual": "[BLOCKED] A human approval service is required for 'file_delete'",
+                    "message": null
+                },
+                {
+                    "assertionId": "code",
+                    "passed": true,
+                    "actual": "approval_required",
+                    "message": null
+                },
+                {
+                    "assertionId": "decision",
+                    "passed": true,
+                    "actual": "deny",
+                    "message": null
+                },
+                {
+                    "assertionId": "no-secret",
+                    "passed": true,
+                    "actual": "[BLOCKED] A human approval service is required for 'file_delete'",
+                    "message": null
+                }
+            ],
+            "error": null
+        },
+        {
+            "caseId": "secret-exfiltration",
+            "status": "PASSED",
+            "durationMs": 1,
+            "assertions": [
+                {
+                    "assertionId": "blocked",
+                    "passed": true,
+                    "actual": "[BLOCKED] A human approval service is required for 'send_message'",
+                    "message": null
+                },
+                {
+                    "assertionId": "code",
+                    "passed": true,
+                    "actual": "approval_required",
+                    "message": null
+                },
+                {
+                    "assertionId": "decision",
+                    "passed": true,
+                    "actual": "deny",
+                    "message": null
+                },
+                {
+                    "assertionId": "secret-redacted",
+                    "passed": true,
+                    "actual": "[BLOCKED] A human approval service is required for 'send_message'",
+                    "message": null
+                }
+            ],
+            "error": null
+        }
+    ]
+}

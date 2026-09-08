@@ -1,0 +1,416 @@
+{
+  "numTotalTests": 102,
+  "numPassedTests": 102,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "tests": [
+    {
+      "name": "cross-package provide/inject provider first: the consumer activates immediately and its tool reaches the provided service",
+      "status": "passed"
+    },
+    {
+      "name": "cross-package provide/inject consumer first: runs but stays parked on the missing service, then activates when the provider runs",
+      "status": "passed"
+    },
+    {
+      "name": "cross-package provide/inject stopping the provider sends the consumer back to pending and unwinds its registrations",
+      "status": "passed"
+    },
+    {
+      "name": "cross-package provide/inject running the provider again re-runs the consumer through a fresh guard (tool back)",
+      "status": "passed"
+    },
+    {
+      "name": "cross-package provide/inject a duplicate provide fails loud and leaves the second package not running",
+      "status": "passed"
+    },
+    {
+      "name": "cross-package provide/inject a primitive (or null) provided value passes through the fa\u00e7ade unwrapped, on both read paths",
+      "status": "passed"
+    },
+    {
+      "name": "cross-package provide/inject stopping the consumer leaves the provider and its service intact",
+      "status": "passed"
+    },
+    {
+      "name": "stop reaches quiescence the host half's listeners have stopped by the time stop returns",
+      "status": "passed"
+    },
+    {
+      "name": "stop reaches quiescence unregisters a self-made tool on stop, and registers it again on the next run",
+      "status": "passed"
+    },
+    {
+      "name": "stop reaches quiescence names the replace recipe when a run collides with a live registration",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic runner definitions lists the whole registry for a global surface, each row carrying its owning session",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic runner definitions tells a global surface which definitions even have a browser half to load",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic runner definitions records a definition without running it, and mints ids that are never reused",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic runner definitions refuses an incomplete define request: {\"name\":\" \",\"purpose\":\"p\",\"host\":\"return () => {}\"}",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic runner definitions refuses an incomplete define request: {\"name\":\"n\",\"purpose\":\"\",\"host\":\"return () => {}\"}",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic runner definitions refuses an incomplete define request: {\"name\":\"n\",\"purpose\":\"p\"}",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic runner definitions keeps unparseable code out of the registry, teaching the TypeScript removal",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic runner definitions hides another session's definition, so only its own card can address it",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic runner dispatch starts a host-only package immediately, with no request and no approval",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic runner dispatch returns awaiting approval, then records the page activation asynchronously",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic runner dispatch returns awaiting approval, then records a refusal without starting",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic runner dispatch records an asynchronous Client failure and unwinds the Host half it started",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic runner dispatch replaces a prior run and records failure when the repeated run cannot load Client code",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic runner dispatch binds a running host half instead of evaluating it twice",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic runner dispatch shares one activation when two pages start the same Package concurrently",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic runner dispatch hands the browser half's source only to the owning session, and only while it runs",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic runner dispatch accepts and ignores an answer to a request nobody is waiting for",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic runner dispatch refuses an answer after stop cancels the request and allows a fresh direct run",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic runner dispatch cancels a pending request after its provisional activation is stopped",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic runner dispatch keeps a published request answerable after the creating Tool call ends",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic runner dispatch reports the sandbox failure and starts nothing when the host half throws",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic runner teardown stops both halves while keeping the definition runnable",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic runner teardown announces the stop of a host-only package too, so a global surface drops its row",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic runner teardown refuses to stop a definition that is not running",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic runner teardown stops a running definition on undefine and forgets it",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic runner teardown answers a missing definition with the memory-only explanation",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic runner teardown unwinds every host half when the runner itself is disposed",
+      "status": "passed"
+    },
+    {
+      "name": "render failure reports keeps the last report per package and shows it to a snapshot reader",
+      "status": "passed"
+    },
+    {
+      "name": "render failure reports drops a report for a definition the reporting session does not own",
+      "status": "passed"
+    },
+    {
+      "name": "render failure reports clears the report when a fresh dispatch starts and when one stops",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox context fa\u00e7ade \u2014 escape surface is closed denies ctx.root with a teaching error",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox context fa\u00e7ade \u2014 escape surface is closed denies ctx.parent with a teaching error",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox context fa\u00e7ade \u2014 escape surface is closed denies ctx.scope with a teaching error",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox context fa\u00e7ade \u2014 escape surface is closed denies ctx.fiber with a teaching error",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox context fa\u00e7ade \u2014 escape surface is closed denies ctx.reflect with a teaching error",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox context fa\u00e7ade \u2014 escape surface is closed denies ctx.registry with a teaching error",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox context fa\u00e7ade \u2014 escape surface is closed denies ctx.events with a teaching error",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox context fa\u00e7ade \u2014 escape surface is closed denies ctx.extend() with a teaching error",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox context fa\u00e7ade \u2014 escape surface is closed denies ctx.isolate() with a teaching error",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox context fa\u00e7ade \u2014 escape surface is closed denies ctx.intercept() with a teaching error",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox context fa\u00e7ade \u2014 escape surface is closed denies ctx.plugin() with a teaching error",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox context fa\u00e7ade \u2014 escape surface is closed denies ctx.set() with a teaching error",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox context fa\u00e7ade \u2014 escape surface is closed denies ctx.mixin() with a teaching error",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox context fa\u00e7ade \u2014 escape surface is closed the classic ctx.root.tools.register bypass registers nothing and fails loud",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox context fa\u00e7ade \u2014 escape surface is closed rejects assignment to the fa\u00e7ade rather than silently dropping it",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox context fa\u00e7ade \u2014 escape surface is closed denies a service whose method returns a Context (the .ctx escape), registering nothing",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox context fa\u00e7ade \u2014 escape surface is closed guards an async injected-service method: a host-realm Promise resolves through the guard",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox context fa\u00e7ade \u2014 escape surface is closed reads a symbol property as undefined and answers the `in` operator without throwing",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox context fa\u00e7ade \u2014 inject gate on services denies an undeclared live service (property access), naming the inject fix",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox context fa\u00e7ade \u2014 inject gate on services allows optional undeclared services through ctx.get",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox context fa\u00e7ade \u2014 inject gate on services allows a service the host half DID declare in inject",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox context fa\u00e7ade \u2014 inject gate on services a cross-package consumer must declare the provider \u2014 the undeclared path is refused, not left as a zombie tool",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox tools fa\u00e7ade \u2014 get is a read-only schema view ctx.tools.get returns a schema, not the live ToolDefinition with execute",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox tools fa\u00e7ade \u2014 get is a read-only schema view ctx.tools.get returns undefined for an unknown tool",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic tool declaration boundary rejects an invalid dynamic tool declaration before registration: 42",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic tool declaration boundary rejects an invalid dynamic tool declaration before registration: {\"parameters\":{}}",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic tool declaration boundary rejects an invalid dynamic tool declaration before registration: {\"parameters\":{},\"output\":{\"schema\":{\"type\":\"json\"}}}",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic tool declaration boundary rejects an invalid dynamic tool declaration before registration: {\"parameters\":{},\"output\":{\"schema\":{\"type\":\"json\"}},\"execute\":true}",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic tool declaration boundary rejects an invalid dynamic tool declaration before registration: {\"parameters\":{},\"output\":{\"schema\":{\"type\":\"json\"},\"presentationMeta\":true}}",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic tool declaration boundary bounds the preview of an invalid dynamic renderer return",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox isolation and Node-API traps isolates sandbox globals: no process/Buffer, and globalThis writes do not leak to the host",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox isolation and Node-API traps traps the Node API call require('fs') with a redirect to the cordis alternative",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox isolation and Node-API traps traps the Node API call setTimeout(() => {}, 5) with a redirect to the cordis alternative",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox isolation and Node-API traps traps the Node API call fetch('https://example.com') with a redirect to the cordis alternative",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox isolation and Node-API traps lets a host half schedule through the cordis timer service (inject: ['timer'])",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox isolation and Node-API traps provides btoa/atob and the tagged console variants inside the sandbox",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox isolation and Node-API traps makes instanceof inside the sandbox see BOTH realms (patched vm constructors, host untouched)",
+      "status": "passed"
+    },
+    {
+      "name": "sandbox isolation and Node-API traps honors the configured vmTimeoutMs for the synchronous portion",
+      "status": "passed"
+    },
+    {
+      "name": "host-half failures leave nothing running refuses \"throw new Error('boom in sandbox')\" with a teaching message",
+      "status": "passed"
+    },
+    {
+      "name": "host-half failures leave nothing running refuses \"throw 'plain-string-throw'\" with a teaching message",
+      "status": "passed"
+    },
+    {
+      "name": "host-half failures leave nothing running refuses \"return 42\" with a teaching message",
+      "status": "passed"
+    },
+    {
+      "name": "host-half failures leave nothing running refuses \"const plugin = (ctx) => {}\" with a teaching message",
+      "status": "passed"
+    },
+    {
+      "name": "host-half failures leave nothing running refuses \"return { name: 'broken', apply(ctx) { throw new Error('apply exploded') } }\" with a teaching message",
+      "status": "passed"
+    },
+    {
+      "name": "host-half failures leave nothing running passes a null throw through untouched (no SyntaxError misclassification)",
+      "status": "passed"
+    },
+    {
+      "name": "parse failures teach the fix answers TypeScript syntax in the plain-JS sandbox with the fix, at define time",
+      "status": "passed"
+    },
+    {
+      "name": "parse failures teach the fix surfaces the offending line + caret and the bracket-balance hint on a syntax error",
+      "status": "passed"
+    },
+    {
+      "name": "parse failures teach the fix syntaxErrorContext falls back to String(error) when the stack has no vm prelude",
+      "status": "passed"
+    },
+    {
+      "name": "parse failures teach the fix handles a runtime-thrown SyntaxError (no source-line prelude) with the generic hint",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic Plugin versions keeps currentPackageId when an update fails and clears nextPackageId after rollback",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic Plugin versions cancels and retracts a Host activation owned by the pending approval",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic Plugin versions does not stop an existing Host run when an attaching page fails to load Client code",
+      "status": "passed"
+    },
+    {
+      "name": "Cordis effect ownership makes an effect visible to a reentrant owner restart and awaits setup plus cleanup",
+      "status": "passed"
+    },
+    {
+      "name": "Cordis effect ownership rolls back collected cleanup and its owner-list entry when setup throws synchronously",
+      "status": "passed"
+    },
+    {
+      "name": "Cordis effect ownership makes a reentrant owner restart await asynchronous rollback after synchronous setup failure",
+      "status": "passed"
+    },
+    {
+      "name": "Cordis effect ownership keeps ordinary teardown synchronous and the public disposer single-shot",
+      "status": "passed"
+    },
+    {
+      "name": "Cordis effect ownership rejects cleanup-time registration while a restart is unloading",
+      "status": "passed"
+    },
+    {
+      "name": "Cordis effect ownership keeps effect registration legal while child fibers are PENDING and LOADING",
+      "status": "passed"
+    },
+    {
+      "name": "Cordis effect ownership resolves dependencies that internal/plugin adds before child activation",
+      "status": "passed"
+    },
+    {
+      "name": "Cordis child publication ownership rolls back parent and runtime ownership when internal/plugin publication throws",
+      "status": "passed"
+    },
+    {
+      "name": "Cordis child publication ownership contains teardown notification failures so ownership cleanup and peers complete",
+      "status": "passed"
+    },
+    {
+      "name": "Cordis child publication ownership makes a LOADING parent join child cleanup started before its unload snapshot",
+      "status": "passed"
+    },
+    {
+      "name": "Cordis child publication ownership lets parent disposal during internal/plugin await the unpublished child to quiescence",
+      "status": "passed"
+    }
+  ]
+}

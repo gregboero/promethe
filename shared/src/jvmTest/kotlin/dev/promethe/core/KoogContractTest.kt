@@ -16,6 +16,21 @@ import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
 class KoogContractTest {
+    @Test fun `OpenAI preserves configured reasoning and output bound on its selected endpoint`() {
+        val model = KoogLlmAdapter.resolveKnownModel("openai", "gpt-5.6-terra")
+        val none = OpenAiCompatibleProviderPolicy.openAIParams(model, ReasoningEffort.NONE, 4096) as ai.koog.prompt.executor.clients.openai.OpenAIResponsesParams
+        assertEquals(KoogReasoningEffort.NONE, none.reasoning?.effort)
+        assertEquals(4096, none.maxTokens)
+        val high = OpenAiCompatibleProviderPolicy.openAIParams(model, ReasoningEffort.HIGH, 1234) as ai.koog.prompt.executor.clients.openai.OpenAIResponsesParams
+        assertEquals(KoogReasoningEffort.HIGH, high.reasoning?.effort)
+        assertEquals(1234, high.maxTokens)
+        val automatic = OpenAiCompatibleProviderPolicy.openAIParams(model, ReasoningEffort.AUTO, 4096) as ai.koog.prompt.executor.clients.openai.OpenAIResponsesParams
+        assertNull(automatic.reasoning)
+        val chat = OpenAiCompatibleProviderPolicy.openAIParams(KoogLlmAdapter.resolveKnownModel("openai", "gpt-4o"), ReasoningEffort.AUTO, 512) as ai.koog.prompt.executor.clients.openai.OpenAIChatParams
+        assertEquals(512, chat.maxTokens)
+        assertNull(chat.reasoningEffort)
+    }
+
     private val context = LlmRequestContext("session-42", AgentExecutionOrigin.A2A)
 
     @Test

@@ -1,5 +1,7 @@
 # Promethe v1.0 Manual Acceptance
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](../EXPERIMENTAL_STATUS.md).
+
 > Executable M01-M24 release checklist. Run against the release-candidate build, record every result, and retain the evidence bundle. This document never assigns a capability maturity or availability value: the live registry at `GET /api/v1/capabilities` is the only status source of truth.
 
 ## Rules of execution
