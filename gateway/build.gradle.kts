@@ -13,6 +13,22 @@ dependencies {
     implementation(project(":shared"))
     implementation(project(":api"))
 
+    // Shared's implementation constraints do not reach this project's compile classpaths.
+    implementation(platform(libs.netty.bom))
+    implementation(platform(libs.jackson2.bom))
+    implementation(platform(libs.jackson3.bom))
+    constraints {
+        implementation(libs.httpclient5) {
+            because("GHSA-hjcp-jmpx-g3qm: connection pool exhaustion")
+        }
+        implementation(libs.httpcore5.core) {
+            because("GHSA-hf6x-8p5f-cgmf: unbounded HTTP header parsing")
+        }
+        implementation(libs.httpcore5.h2) {
+            because("GHSA-v3jc-474w-2wm6: unbounded HPACK header list")
+        }
+    }
+
     // Ktor Server (CIO — full coroutines, no Netty threads)
     implementation(libs.bundles.ktor.server)
 

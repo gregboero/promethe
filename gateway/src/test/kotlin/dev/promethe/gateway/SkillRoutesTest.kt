@@ -260,44 +260,46 @@ class SkillRoutesTest {
         }
 
     @Test
-    fun `editing or restoring defaults of a system skill requires new evidence`() = testApplication {
-        writeSkillDir("clean-code", systemSkillContent())
-        val loader = SkillLoader(fs, skillsDir)
-        val writer = SkillWriter(fs, skillsDir)
-        configureApp(loader, writer)
-        assertEquals(1, loader.listExecutableSkills().size)
-        for (content in listOf("Modified system instructions", "")) {
-            val response = client.put("/api/v1/skills/clean-code") {
-                contentType(ContentType.Application.Json)
-                setBody(json.encodeToString(UpdateSkillRequest(content, loader.listSkills().single().contract.revisionHash)))
+    fun `editing or restoring defaults of a system skill requires new evidence`() =
+        testApplication {
+            writeSkillDir("clean-code", systemSkillContent())
+            val loader = SkillLoader(fs, skillsDir)
+            val writer = SkillWriter(fs, skillsDir)
+            configureApp(loader, writer)
+            assertEquals(1, loader.listExecutableSkills().size)
+            for (content in listOf("Modified system instructions", "")) {
+                val response = client.put("/api/v1/skills/clean-code") {
+                    contentType(ContentType.Application.Json)
+                    setBody(json.encodeToString(UpdateSkillRequest(content, loader.listSkills().single().contract.revisionHash)))
+                }
+                assertEquals(HttpStatusCode.OK, response.status)
+                assertEquals(SkillLifecycle.QUARANTINED, json.decodeFromString<SkillDto>(response.bodyAsText()).contract.lifecycle)
+                assertTrue(loader.listExecutableSkills().isEmpty())
             }
-            assertEquals(HttpStatusCode.OK, response.status)
-            assertEquals(SkillLifecycle.QUARANTINED, json.decodeFromString<SkillDto>(response.bodyAsText()).contract.lifecycle)
-            assertTrue(loader.listExecutableSkills().isEmpty())
+            assertTrue(writer.governance.state(loader.listSkills().single()).versions.size >= 3)
         }
-        assertTrue(writer.governance.state(loader.listSkills().single()).versions.size >= 3)
-    }
 
     @Test
-    fun `stale suite configuration and unknown rollback are rejected without modifying skill`() = testApplication {
-        writeSkillDir("my-custom-skill", customSkillContent())
-        val loader = SkillLoader(fs, skillsDir)
-        val writer = SkillWriter(fs, skillsDir)
-        configureApp(loader, writer)
-        val before = loader.listSkills().single()
-        val suite = SkillEvaluationSuite("fixture", listOf(SkillEvaluationCase("one", "one", "ONE"), SkillEvaluationCase("two", "two", "TWO")))
-        val stale = client.put("/api/v1/skills/my-custom-skill/evaluation-suites") {
-            contentType(ContentType.Application.Json)
-            setBody(json.encodeToString(ConfigureSkillEvaluationRequest("stale", listOf(suite))))
+    fun `stale suite configuration and unknown rollback are rejected without modifying skill`() =
+        testApplication {
+            writeSkillDir("my-custom-skill", customSkillContent())
+            val loader = SkillLoader(fs, skillsDir)
+            val writer = SkillWriter(fs, skillsDir)
+            configureApp(loader, writer)
+            val before = loader.listSkills().single()
+            val suite = SkillEvaluationSuite("fixture", listOf(SkillEvaluationCase("one", "one", "ONE"), SkillEvaluationCase("two", "two", "TWO")))
+            val stale = client.put("/api/v1/skills/my-custom-skill/evaluation-suites") {
+                contentType(ContentType.Application.Json)
+                setBody(json.encodeToString(ConfigureSkillEvaluationRequest("stale", listOf(suite))))
+            }
+            assertEquals(HttpStatusCode.Conflict, stale.status)
+            val restore = client.post("/api/v1/skills/my-custom-skill/restore") {
+                contentType(ContentType.Application.Json)
+                setBody(json.encodeToString(RestoreSkillVersionRequest(before.contract.revisionHash!!, "../outside")))
+            }
+            assertEquals(HttpStatusCode.BadRequest, restore.status)
+            assertEquals(before, loader.listSkills().single())
         }
-        assertEquals(HttpStatusCode.Conflict, stale.status)
-        val restore = client.post("/api/v1/skills/my-custom-skill/restore") {
-            contentType(ContentType.Application.Json)
-            setBody(json.encodeToString(RestoreSkillVersionRequest(before.contract.revisionHash!!, "../outside")))
-        }
-        assertEquals(HttpStatusCode.BadRequest, restore.status)
-        assertEquals(before, loader.listSkills().single())
-    }
 
     // ── 6. DELETE /api/v1/skills/my-custom-skill succeeds ──
 
