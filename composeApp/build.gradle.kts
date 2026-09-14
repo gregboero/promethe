@@ -14,6 +14,13 @@ plugins {
 val enableAndroid = providers.gradleProperty("enableAndroid").map(String::toBoolean).getOrElse(true)
 if (enableAndroid) apply(plugin = "com.android.kotlin.multiplatform.library")
 
+// These coordinates contain the host OS; one shared lockfile cannot require
+// the Windows runtime on Linux/macOS. Keep their versions strictly pinned below.
+dependencyLocking {
+    ignoredDependencies.add("org.jetbrains.compose.desktop:desktop-jvm-*")
+    ignoredDependencies.add("org.jetbrains.skiko:skiko-awt-runtime-*")
+}
+
 kotlin {
     jvm("desktop")
 
@@ -139,6 +146,19 @@ kotlin {
                 compilerOptions {
                     freeCompilerArgs.add("-Xexpect-actual-classes")
                 }
+            }
+        }
+    }
+}
+
+dependencies {
+    constraints {
+        for (platform in listOf("linux-x64", "linux-arm64", "windows-x64", "macos-x64", "macos-arm64")) {
+            add("desktopMainImplementation", "org.jetbrains.compose.desktop:desktop-jvm-$platform") {
+                version { strictly(libs.versions.compose.multiplatform.get()) }
+            }
+            add("desktopMainImplementation", "org.jetbrains.skiko:skiko-awt-runtime-$platform") {
+                version { strictly(libs.versions.skiko.get()) }
             }
         }
     }
