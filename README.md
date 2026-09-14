@@ -97,7 +97,7 @@ The provider is configured via the **Setup Screen** (Desktop app) or a CLI flag.
 | Tool | Version | Check | Notes |
 |---|---|---|---|
 | **JDK** | 21+ | `java -version` | Required |
-| **Gradle** | 9.5.1 | bundled via `gradlew` | Use the pinned wrapper |
+| **Gradle** | 9.7.1 | bundled via `gradlew` | Use the pinned wrapper |
 | **Docker** | 24+ | `docker --version` | Optional — execution backend |
 | **Git** | 2.x | `git --version` | Optional — GitTools tools |
 | **FFmpeg** | 6+ | `ffmpeg -version` | Optional — VideoTools tools |
