@@ -67,6 +67,8 @@ data class AgentExecutionEvent(
     val content: String? = null,
     val tool: String? = null,
     val timestamp: Long,
+    val runId: String? = null,
+    val stepId: String? = null,
 )
 
 // ── GEPA ────────────────────────────────────────────────────────────────────

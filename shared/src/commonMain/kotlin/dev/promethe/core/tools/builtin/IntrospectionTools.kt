@@ -48,7 +48,8 @@ class AgentStatusTool(
             appendLine("  Prompt tokens: ${stats.promptTokens}")
             appendLine("  Completion tokens: ${stats.completionTokens}")
             appendLine("  Estimated cost: $${String.format("%.4f", stats.totalCost)}")
-            appendLine("  Cache: ${stats.cacheHits} hits / ${stats.cacheMisses} misses (${stats.cacheSize} cached)")
+            appendLine("  Provider cache: ${stats.cacheHits} hits / ${stats.cacheMisses} misses (${stats.cacheReadTokens} read tokens)")
+            appendLine("  Stable prefixes: ${stats.prefixReuseHits} reused / ${stats.prefixReuseMisses} new (${stats.cacheSize} tracked)")
 
             if (args.verbose && poolStats.isNotEmpty()) {
                 appendLine("  Provider pools:")
@@ -109,6 +110,7 @@ data class TokenBudgetArgs(
 
 class TokenBudgetTool(
     private val llmAdapter: KoogLlmAdapter,
+    private val resourceGovernors: dev.promethe.core.ResourceGovernorRegistry = dev.promethe.core.GlobalResourceGovernorRegistry,
 ) : SimpleTool<TokenBudgetArgs>(
         argsType = typeToken<TokenBudgetArgs>(),
         name = "token_budget",
@@ -123,6 +125,7 @@ class TokenBudgetTool(
         val total = stats.promptTokens + stats.completionTokens
         val cacheTotal = stats.cacheHits + stats.cacheMisses
         val hitRate = if (cacheTotal > 0) (stats.cacheHits * 100.0 / cacheTotal) else 0.0
+        val quotas = resourceGovernors.quotaSnapshot()
 
         return buildString {
             appendLine("[Token Budget]")
@@ -131,9 +134,20 @@ class TokenBudgetTool(
             appendLine("    Completion: ${stats.completionTokens}")
             appendLine("  Total requests: ${stats.totalRequests}")
             appendLine("  Estimated cost: $${String.format("%.4f", stats.totalCost)}")
-            appendLine("  Cache hit rate: ${String.format("%.1f", hitRate)}%")
+            appendLine("  Provider cache hit rate: ${String.format("%.1f", hitRate)}% (${stats.cacheObservableResponses} observable)")
+            appendLine("  Provider cache tokens: ${stats.cacheReadTokens} read / ${stats.cacheWriteTokens} written")
+            appendLine("  Stable prefix reuse: ${stats.prefixReuseHits} reused / ${stats.prefixReuseMisses} new")
             if (stats.totalRequests > 0) {
                 appendLine("  Avg tokens/request: ${total / stats.totalRequests}")
+            }
+            appendLine("  Aggregate start quotas (local profile; not USD limits):")
+            val policies = resourceGovernors.quotaPolicies()
+            if (policies.isEmpty()) appendLine("    Disabled")
+            policies.forEach { policy ->
+                appendLine("    Policy ${policy.id}: ${policy.dimension}/${policy.selector} ${policy.resource}, max=${policy.maxStarts} per ${policy.windowSeconds}s; wildcard is per subject")
+            }
+            quotas.forEach { quota ->
+                appendLine("    ${quota.ruleId}: ${quota.dimension}/${quota.subject} ${quota.resource} ${quota.used}/${quota.maxStarts}, resetsAt=${quota.resetsAt}")
             }
         }
     }

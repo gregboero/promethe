@@ -114,10 +114,7 @@ class AgentToolsTest {
 
             val tool = MixtureOfAgentsTool(adapter, config)
             val result = tool.execute(MixtureOfAgentsArgs(prompt = "Kotlin vs Java", strategy = "vote"))
-            assertTrue(
-                result.contains("Consensus synthesized answer") || result.contains("Hermes answer") || result.contains("Claude answer") ||
-                    result.contains("GPT answer"),
-            )
+            assertEquals(MixtureOfAgentsTool.VOTE_UNAVAILABLE_MESSAGE, result)
         }
 
     private fun createDummyAgent(db: PrometheDatabaseApi): AIAgent {
@@ -224,9 +221,11 @@ class FakePrometheDatabase : PrometheDatabaseApi {
         role: String,
         content: String,
         timestamp: Long,
+        dataTrust: dev.promethe.api.PolicyDataTrust,
+        sourceRunId: String?,
     ): Int {
         val nextId = messages.size + 1
-        messages.add(MessageRow(nextId, sessionId, role, content, timestamp))
+        messages.add(MessageRow(nextId, sessionId, role, content, timestamp, dataTrust, sourceRunId))
         return nextId
     }
 

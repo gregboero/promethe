@@ -1,0 +1,50 @@
+{
+  "batch": "kotlin-amortization-7fe0c939-3ae1-4e64-a4cc-a5235401c6a6",
+  "plannedRuns": 3,
+  "recordedRuns": 3,
+  "successfulRuns": 3,
+  "accounting": {
+    "attemptedCalls": 30,
+    "settledCalls": 30,
+    "uncertainCalls": 0,
+    "unknownUsageCalls": 0,
+    "usageComplete": true,
+    "inputTokens": 144650,
+    "outputTokens": 1653,
+    "costUpperBoundMicroUsd": 381467,
+    "uncertainReservationMicroUsd": 0
+  },
+  "priorBudgetRowsUnchanged": true,
+  "sourcesUnchanged": true,
+  "observedExposureBytesPerCall": 6962,
+  "reporterSha256AtFreeze": "be70447249b2b065ff0cc6b4ada6cd6b518eddf2cd75399bab7791045104f796",
+  "reporterSha256AtReconciliation": "068373f47fcdbccc3ccaa58013c7c7dc11d96e5491a2777b394bf360aaabd428",
+  "reporterNote": "Post-run Windows long-path archive fix; experiment Kotlin sources still match their frozen hashes",
+  "preflight": {
+    "passed": true,
+    "modelCalls": 0,
+    "sourceHash": "09211ce22a956ae92b8bdca61617999ee4ad13674144cf899a584717e7806e8e",
+    "correctPages": 8,
+    "rawBytes": 46389,
+    "transformedBytesWithoutProvenance": 8,
+    "compilations": 1,
+    "workerProcesses": 2,
+    "compilationMillis": 2572,
+    "evaluationMillis": 13,
+    "totalMillis": 4497,
+    "cacheCleaned": true
+  },
+  "comparison": {
+    "savingMicroUsd": 132991,
+    "elapsedDeltaMillis": 11666,
+    "historicalDirectedCostMicroUsd": 56741,
+    "illustrativeReusesToRecoverEntireDirectedRun": 1,
+    "caveat": "one fixed-order pair; historical directed run is not isolated source-generation cost; no general break-even claim"
+  },
+  "campaignAfter": {
+    "requests": 737,
+    "consumedMicroUsd": 4624197,
+    "uncertainReservations": 0,
+    "remainingMicroUsd": 375803
+  }
+}

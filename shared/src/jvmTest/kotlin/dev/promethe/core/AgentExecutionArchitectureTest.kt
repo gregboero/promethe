@@ -11,7 +11,7 @@ import kotlin.test.assertEquals
 
 class AgentExecutionArchitectureTest {
     @Test
-    fun `only AgentExecutionService enters the agent loop`() {
+    fun `only ExecutionGraph enters the agent loop`() {
         val root = projectRoot()
         val violations =
             listOf(root.resolve("shared/src"), root.resolve("gateway/src"))
@@ -23,7 +23,7 @@ class AgentExecutionArchitectureTest {
                             paths.filter { path ->
                                 path.extension == "kt" &&
                                     !path.toString().contains("Test") &&
-                                    path.name != "AgentExecutionService.kt"
+                                    path.name != "ExecutionGraph.kt"
                             }.filter { path ->
                                 path.readLines().any { line ->
                                     val trimmed = line.trim()
@@ -36,7 +36,50 @@ class AgentExecutionArchitectureTest {
                     }
                 }
 
-        assertEquals(emptyList(), violations, "Agent loop bypasses AgentExecutionService: $violations")
+        assertEquals(emptyList(), violations, "Agent loop bypasses ExecutionGraph: $violations")
+    }
+
+    @Test
+    fun `agent run events remain append only`() {
+        val root = projectRoot()
+        val forbiddenPatterns =
+            listOf(
+                "AgentRunEvents.update",
+                "AgentRunEvents.deleteWhere",
+                "AgentRunEvents.deleteAll",
+                "UPDATE agent_run_events",
+                "DELETE FROM agent_run_events",
+            )
+        val violations =
+            listOf(root.resolve("shared/src/commonMain"), root.resolve("shared/src/jvmMain"))
+                .flatMap { sourceRoot ->
+                    if (!sourceRoot.isDirectory()) {
+                        emptyList()
+                    } else {
+                        Files.walk(sourceRoot).use { paths ->
+                            paths.filter { path -> path.extension == "kt" }
+                                .filter { path ->
+                                    path.readLines().any { line -> forbiddenPatterns.any { pattern -> pattern in line } }
+                                }.map { path -> root.relativize(path).toString() }
+                                .toList()
+                        }
+                    }
+                }
+
+        assertEquals(emptyList(), violations, "Agent run events must never be updated or deleted: $violations")
+    }
+
+    @Test
+    fun `agent loop never restores session scoped checkpoints`() {
+        val source = projectRoot().resolve("shared/src/commonMain/kotlin/dev/promethe/core/AIAgent.kt")
+        val forbiddenPatterns = listOf("getLatestCheckpoint(", "insertCheckpoint(", "clearCheckpoints(")
+        val violations = source.readLines().filter { line -> forbiddenPatterns.any { pattern -> pattern in line } }
+
+        assertEquals(
+            emptyList(),
+            violations,
+            "Durable run recovery must not depend on session-scoped checkpoints: $violations",
+        )
     }
 
     private fun projectRoot(): Path {

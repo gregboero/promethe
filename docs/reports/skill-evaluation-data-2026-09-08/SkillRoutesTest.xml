@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.promethe.gateway.SkillRoutesTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-09-08T02:14:47.769Z" hostname="BUREAU" time="0.164">
+  <properties/>
+  <testcase name="stale suite configuration and unknown rollback are rejected without modifying skill" classname="dev.promethe.gateway.SkillRoutesTest" time="0.035"/>
+  <testcase name="GET skills returns list with correct isSystem flags" classname="dev.promethe.gateway.SkillRoutesTest" time="0.006"/>
+  <testcase name="editing or restoring defaults of a system skill requires new evidence" classname="dev.promethe.gateway.SkillRoutesTest" time="0.021"/>
+  <testcase name="DELETE custom skill succeeds" classname="dev.promethe.gateway.SkillRoutesTest" time="0.004"/>
+  <testcase name="system skill display name cannot bypass lifecycle or deletion protection" classname="dev.promethe.gateway.SkillRoutesTest" time="0.007"/>
+  <testcase name="skill activation requires reviewed lifecycle transitions" classname="dev.promethe.gateway.SkillRoutesTest" time="0.053"/>
+  <testcase name="POST curate returns quarantined proposals without mutating skills" classname="dev.promethe.gateway.SkillRoutesTest" time="0.017"/>
+  <testcase name="GET skill by slug returns isSystem true for system skill" classname="dev.promethe.gateway.SkillRoutesTest" time="0.004"/>
+  <testcase name="custom skill my-custom-skill has isSystem false" classname="dev.promethe.gateway.SkillRoutesTest" time="0.004"/>
+  <testcase name="POST skills creates with sanitized name" classname="dev.promethe.gateway.SkillRoutesTest" time="0.004"/>
+  <testcase name="system skill clean-code has isSystem true" classname="dev.promethe.gateway.SkillRoutesTest" time="0.004"/>
+  <testcase name="DELETE system skill returns 403 Forbidden" classname="dev.promethe.gateway.SkillRoutesTest" time="0.004"/>
+  <system-out><![CDATA[22:14:47.822 INFO  [DefaultDispatcher-worker-14 @request#2042] SkillWriter — Skill updated: /skills/clean-code/SKILL.md
+22:14:47.827 INFO  [DefaultDispatcher-worker-14 @request#2051] SkillWriter — Skill updated: /skills/clean-code/SKILL.md
+22:14:47.836 INFO  [DefaultDispatcher-worker-18 @request#2058] SkillLoader — Deleted skill: my-custom-skill
+22:14:47.851 INFO  [DefaultDispatcher-worker-2 @request#2086] SkillWriter — New skill written: /skills/reviewed/SKILL.md
+22:14:47.868 INFO  [DefaultDispatcher-worker-18 @request#2111] SkillWriter — Skill updated: /skills/reviewed/SKILL.md
+22:14:47.874 INFO  [DefaultDispatcher-worker-20 @request#2123] SkillWriter — Skill updated: /skills/reviewed/SKILL.md
+22:14:47.880 INFO  [DefaultDispatcher-worker-4 @request#2135] SkillWriter — Skill updated: /skills/reviewed/SKILL.md
+22:14:47.884 INFO  [DefaultDispatcher-worker-4 @request#2139] SkillWriter — Skill updated: /skills/reviewed/SKILL.md
+22:14:47.904 INFO  [DefaultDispatcher-worker-7 @request#2154] SkillCurator — Quarantined curation proposal: REVIEW_DUPLICATE for 'Kotlin Build Guide'
+22:14:47.923 INFO  [DefaultDispatcher-worker-2 @request#2190] SkillWriter — New skill written: /skills/my_cool_skill/SKILL.md
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

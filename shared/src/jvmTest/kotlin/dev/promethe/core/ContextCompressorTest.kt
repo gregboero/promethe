@@ -92,7 +92,7 @@ class ContextCompressorTest {
             assertEquals(messages.takeLast(6), result.takeLast(6), "Last messages must be preserved verbatim")
 
             val summaryMessage = result[2]
-            assertEquals("system", summaryMessage.first)
+            assertEquals("assistant", summaryMessage.first)
             assertTrue(summaryMessage.second.contains("[Context Summary"), "Got: ${summaryMessage.second.take(60)}")
             assertTrue(summaryMessage.second.contains("STUB_SUMMARY"))
             assertTrue(summaryMessage.second.contains("4 messages compressed"), "12 - 2 head - 6 tail = 4 middle")
@@ -124,6 +124,33 @@ class ContextCompressorTest {
             compressor.compress("sys", messages)
 
             assertEquals(2, adapter.completeCalls, "Cache cleared — the LLM must be called again")
+        }
+
+    @Test
+    fun `middle instructions and artifact addresses survive a lossy summary`() =
+        runTest {
+            val messages = longHistory().toMutableList()
+            val instruction = "system" to "Never send messages without owner approval"
+            val uri = "artifact://sha256/" + "a".repeat(64)
+            messages[3] = instruction
+            messages[4] = "tool" to ("x".repeat(900) + uri)
+            val result = ContextCompressor(StubAdapter(smallConfig), smallConfig).compress("sys", messages)
+            assertTrue(instruction in result)
+            assertEquals(listOf(instruction), result.filter { it.first == "system" })
+            assertTrue(result.any { it.first == "assistant" && uri in it.second })
+        }
+
+    @Test
+    fun `colliding history hashes do not reuse the wrong summary`() =
+        runTest {
+            val adapter = StubAdapter(smallConfig)
+            val compressor = ContextCompressor(adapter, smallConfig)
+            val first = longHistory().toMutableList().apply { this[3] = "user" to "Aa" }
+            val second = first.toMutableList().apply { this[3] = "user" to "BB" }
+            assertEquals(first.hashCode(), second.hashCode())
+            compressor.compress("sys", first)
+            compressor.compress("sys", second)
+            assertEquals(2, adapter.completeCalls)
         }
 
     @Test

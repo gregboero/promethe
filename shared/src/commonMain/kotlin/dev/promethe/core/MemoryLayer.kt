@@ -1,5 +1,6 @@
 package dev.promethe.core
 
+import dev.promethe.api.PolicyDataTrust
 import dev.promethe.core.memory.MemoryFact
 import dev.promethe.core.memory.MemoryProvider
 import dev.promethe.core.memory.MemoryTier
@@ -31,8 +32,19 @@ class MemoryLayer(
      * Extract facts from a completed session's messages.
      * Called after executeLoop completes successfully.
      */
-    suspend fun extractFacts(sessionId: String): List<MemoryFact> {
-        val messages = database.getMessagesForSession(sessionId)
+    suspend fun extractFacts(
+        sessionId: String,
+        provider: String? = null,
+        model: String? = null,
+        memoryNamespace: String = "default",
+    ): List<MemoryFact> {
+        val messages =
+            database
+                .getMessagesForSession(sessionId)
+                .filter { message ->
+                    message.dataTrust == PolicyDataTrust.TRUSTED &&
+                        !isTrustStateMarker(message.content)
+                }
         if (messages.size < 4) return emptyList()
 
         val conversation = messages.joinToString("\n") { "[${it.role}] ${it.content}" }
@@ -54,8 +66,10 @@ Return ONLY the JSON array, nothing else. If no facts, return []."""
                 inferenceService.complete(
                     systemInstruction = extractionInstruction,
                     messages = listOf("user" to "CONVERSATION:\n${conversation.take(4000)}"),
+                    provider = provider,
+                    model = model,
                 ).content
-            parseFacts(response, sessionId)
+            parseFacts(response, sessionId, memoryNamespace)
         } catch (e: Exception) {
             logger.warn(e) { "Fact extraction failed for session $sessionId" }
             emptyList()
@@ -68,12 +82,13 @@ Return ONLY the JSON array, nothing else. If no facts, return []."""
     suspend fun recallFacts(
         query: String,
         limit: Int = 10,
-    ): List<MemoryFact> = provider.recallFacts(query, limit)
+        userId: String = "default",
+    ): List<MemoryFact> = provider.recallFacts(query, limit, userId)
 
     /**
      * Get all stored facts.
      */
-    suspend fun getAllFacts(): List<MemoryFact> = provider.getAllFacts()
+    suspend fun getAllFacts(userId: String = "default"): List<MemoryFact> = provider.getAllFacts(userId)
 
     /**
      * Store a fact via the memory provider.
@@ -86,17 +101,26 @@ Return ONLY the JSON array, nothing else. If no facts, return []."""
      * Build a memory context block for the system prompt.
      * Queries relevant facts and formats them by category.
      */
-    suspend fun buildMemoryContext(query: String): String {
-        val facts = recallFacts(query)
+    suspend fun buildMemoryContext(
+        query: String,
+        userIds: List<String> = listOf("default"),
+    ): String {
+        val scopes = userIds.distinct()
+        val facts =
+            scopes
+                .flatMap { userId -> recallFacts(query, userId = userId) }
+                .distinctBy { fact -> Triple(fact.userId, fact.id, fact.content) }
         if (facts.isEmpty()) return ""
 
-        val grouped = facts.groupBy { it.category }
         return buildString {
-            appendLine("[User Memory]")
-            grouped.forEach { (category, categoryFacts) ->
-                appendLine("## ${category.replaceFirstChar { it.uppercase() }}")
-                categoryFacts.forEach { f ->
-                    appendLine("- ${f.content}")
+            scopes.forEach { scope ->
+                val scopedFacts = facts.filter { it.userId == scope }
+                if (scopedFacts.isNotEmpty()) {
+                    appendLine(if (scope == "default") "[User Memory]" else "[Project Memory]")
+                    scopedFacts.groupBy { it.category }.forEach { (category, categoryFacts) ->
+                        appendLine("## ${category.replaceFirstChar { it.uppercase() }}")
+                        categoryFacts.forEach { fact -> appendLine("- ${fact.content}") }
+                    }
                 }
             }
         }
@@ -110,6 +134,15 @@ Return ONLY the JSON array, nothing else. If no facts, return []."""
      */
     suspend fun deleteFact(id: String) {
         provider.deleteFact(id)
+    }
+
+    suspend fun deleteFactInNamespace(
+        id: String,
+        userId: String,
+    ): Boolean {
+        if (provider.getAllFacts(userId).none { it.id == id }) return false
+        provider.deleteFact(id)
+        return true
     }
 
     /**
@@ -127,6 +160,7 @@ Return ONLY the JSON array, nothing else. If no facts, return []."""
     private suspend fun parseFacts(
         response: String,
         sessionId: String,
+        memoryNamespace: String,
     ): List<MemoryFact> {
         val jsonStart = response.indexOf('[')
         val jsonEnd = response.lastIndexOf(']')
@@ -139,6 +173,7 @@ Return ONLY the JSON array, nothing else. If no facts, return []."""
                 elements.map { element ->
                     val obj = element.jsonObject
                     MemoryFact(
+                        userId = memoryNamespace,
                         category = obj["category"]?.jsonPrimitive?.content ?: "general",
                         content = obj["fact"]?.jsonPrimitive?.content ?: "",
                         sourceSession = sessionId,

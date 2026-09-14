@@ -1,0 +1,21 @@
+{
+  "scope": "Local profile aggregate start quotas: owner, actual provider and exact tool name",
+  "jvmTests": 1058,
+  "newQuotaTests": 17,
+  "failures": 0,
+  "kotlinStyleChecks": "passed: api, shared, composeApp, harness-kotlin",
+  "paidModelCallsThisIteration": 0,
+  "historicalBudgetRowsUnchanged": true,
+  "historicalCampaignRequests": 737,
+  "historicalConsumedMicroUsd": 4624197,
+  "historicalUnsettledReservations": 0,
+  "validationEnvironment": "Windows, Corretto Java 21; real Koog client using localhost HTTP fixtures",
+  "limitations": [
+    "Counts admitted starts, not aggregate tokens, USD or every SDK-internal HTTP retry.",
+    "Owner is a local profile, not an authenticated multi-user identity.",
+    "Concurrency test uses four bank instances within one JVM; no separate-process stress claim.",
+    "Policies are loaded at bootstrap; changing policy identity or window creates another counter.",
+    "Aggregate reservation is retained if later run persistence or execution fails; no automatic refund."
+  ],
+  "documentationChecks": "36/36"
+}

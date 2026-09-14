@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="ResourceQuotaIntegrationTest[jvm]" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-09-08T01:05:28.346Z" hostname="BUREAU" time="1.484">
+  <properties/>
+  <testcase name="tool quota storage failure blocks side effects without run context[jvm]" classname="dev.promethe.core.ResourceQuotaIntegrationTest" time="0.221"/>
+  <testcase name="tool starts across runs stop at aggregate quota and diagnostic stays accessible[jvm]" classname="dev.promethe.core.ResourceQuotaIntegrationTest" time="0.276"/>
+  <testcase name="second unbound completion is refused before HTTP and without fallback[jvm]" classname="dev.promethe.core.ResourceQuotaIntegrationTest" time="0.284"/>
+  <testcase name="quota storage failure and cancellation never invoke provider or fallback[jvm]" classname="dev.promethe.core.ResourceQuotaIntegrationTest" time="0.434"/>
+  <testcase name="cross provider fallback checks actual fallback quota before dispatch[jvm]" classname="dev.promethe.core.ResourceQuotaIntegrationTest" time="0.268"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[sept. 07, 2026 9:05:28 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.tool.execute' : d80cef4e7276c3719f7540ba107f30c3 1250c5ab9ba22b0c INTERNAL [tracer: dev.promethe:] AttributesMap{data={tool.name=json_query, tool.risk=READ, policy.version=promethe-policy-1, policy.effect=ALLOW, tool.origin=AGENT}, capacity=128, totalAddedValues=5}
+sept. 07, 2026 9:05:28 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.tool.execute' : 6a02f0385b072fb062e82a37c8fe6a68 329244b2a8745615 INTERNAL [tracer: dev.promethe:] AttributesMap{data={tool.result.length=2, tool.success=true, tool.risk=READ, promethe.run.id=r1, policy.effect=ALLOW, tool.name=json_query, policy.version=promethe-policy-1, tool.origin=AGENT}, capacity=128, totalAddedValues=8}
+sept. 07, 2026 9:05:28 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.tool.execute' : 8c5919f08f5eb59f2b6a860d2980506e 8017215e5efc29d4 INTERNAL [tracer: dev.promethe:] AttributesMap{data={tool.name=json_query, tool.risk=READ, promethe.run.id=r2, policy.version=promethe-policy-1, policy.effect=ALLOW, tool.origin=AGENT}, capacity=128, totalAddedValues=6}
+sept. 07, 2026 9:05:29 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'gen_ai.chat' : 50fd20f0b8c37f7f87f0e22f031a73bb 6f6757ca0b00bc22 INTERNAL [tracer: dev.promethe:] AttributesMap{data={gen_ai.request.temperature=0.0, gen_ai.request.message_count=1, gen_ai.usage.completion_tokens=1, gen_ai.usage.cost=1.2499999999999999E-5, gen_ai.system=openai, gen_ai.usage.prompt_tokens=1, gen_ai.request.model=gpt-4o, gen_ai.response.model=gpt-4o}, capacity=128, totalAddedValues=8}
+sept. 07, 2026 9:05:29 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'gen_ai.chat' : 3385d1ea7fe2f7e76809f7d15b1d8e87 5c1c95a1ebb4d104 INTERNAL [tracer: dev.promethe:] AttributesMap{data={gen_ai.system=openai, gen_ai.request.temperature=0.0, gen_ai.request.message_count=1, gen_ai.request.model=gpt-4o}, capacity=128, totalAddedValues=4}
+sept. 07, 2026 9:05:29 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'gen_ai.chat' : 11b89835649fe99076064e3dc3d9f23f 84c33c65333cc6b4 INTERNAL [tracer: dev.promethe:] AttributesMap{data={gen_ai.system=openai, gen_ai.request.temperature=0.0, gen_ai.request.message_count=1, gen_ai.request.model=gpt-4o}, capacity=128, totalAddedValues=4}
+sept. 07, 2026 9:05:29 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'gen_ai.chat' : 6c7ddf8860db9a6d2aefa4a1457326ec 6bfc9cffe5d75e5c INTERNAL [tracer: dev.promethe:] AttributesMap{data={gen_ai.system=openai, gen_ai.request.temperature=0.0, gen_ai.request.message_count=1, gen_ai.request.model=gpt-4o}, capacity=128, totalAddedValues=4}
+sept. 07, 2026 9:05:29 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'gen_ai.chat' : 0dd7f8d28a9ffa9915fb95e48b275743 497f50d6f410d9f8 INTERNAL [tracer: dev.promethe:] AttributesMap{data={gen_ai.system=openai, gen_ai.request.temperature=0.0, gen_ai.request.message_count=1, gen_ai.request.model=gpt-5.6-terra}, capacity=128, totalAddedValues=4}
+]]></system-err>
+</testsuite>

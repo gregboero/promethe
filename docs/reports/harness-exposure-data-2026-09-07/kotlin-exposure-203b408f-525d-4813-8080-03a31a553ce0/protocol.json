@@ -1,0 +1,30 @@
+{
+  "batch": "kotlin-exposure-203b408f-525d-4813-8080-03a31a553ce0",
+  "protocolVersion": 5,
+  "language": "KOTLIN",
+  "compilationCache": true,
+  "actionParser": "balanced-object-with-string-escapes",
+  "model": "gpt-5.6-terra",
+  "reasoningEffort": "none",
+  "taskCount": 6,
+  "plannedRuns": 18,
+  "repetitions": 3,
+  "pagesPerTask": 8,
+  "seedFormula": "99371 + repeat * 101 + familyIndex",
+  "maxIterations": 16,
+  "exposureRule": "two-distinct-observations-at-least1024Bytes-and-at-least4-remaining; sticky until session end",
+  "modes": [
+    "original",
+    "free",
+    "conditional"
+  ],
+  "fixedArmIncluded": false,
+  "campaignCapMicroUsd": 5000000,
+  "fixedSource": "val text = observation.text\nval value = try { Json.parseToJsonElement(text) } catch (_: Exception) { null }\nwhen {\n    value is JsonObject && value[\"answer\"] is JsonPrimitive -> (value[\"answer\"] as JsonPrimitive).content\n    text.startsWith(\"id,answer\\n\") -> text.substringAfter('\\n').substringAfter(',')\n    text.startsWith(\"DATA answer=\") -> text.removePrefix(\"DATA answer=\")\n    else -> text\n}",
+  "fixedSourceHash": "b155594c154d168132cdcf781e0c72b7d5b5e2ce4554eac7d757551483374398",
+  "fixedSourceModelGenerationIncluded": false,
+  "presentationGuard": "below256Bytes-or-no-byte-saving",
+  "fixedSetupIncluded": false,
+  "fixedSourceUsedOnlyForPreflight": true,
+  "postLoopSkillSynthesisIncluded": true
+}

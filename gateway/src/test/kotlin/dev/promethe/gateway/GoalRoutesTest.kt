@@ -173,6 +173,18 @@ class GoalRoutesTest {
             assertEquals("STOPPED", status().state)
         }
 
+    @Test
+    fun `late background updates cannot overwrite stopped state`() {
+        val state = GoalState()
+        state.status = GoalStatusResponse(state = "RUNNING", currentTask = "before")
+
+        state.markStopped()
+        state.updateWhileActive { current -> current.copy(state = "RUNNING", currentTask = "late") }
+
+        assertEquals("STOPPED", state.status.state)
+        assertEquals("before", state.status.currentTask)
+    }
+
     // ── State isolation (the old file-level globals leaked) ─────
 
     @Test

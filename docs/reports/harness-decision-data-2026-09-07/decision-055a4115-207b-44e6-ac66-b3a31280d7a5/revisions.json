@@ -1,0 +1,62 @@
+[
+  {
+    "id": "1cc0cf50-a39d-43ec-81bc-a07033b7e8af",
+    "sessionId": "decision-055a4115-207b-44e6-ac66-b3a31280d7a5-large_json-1-fixed",
+    "baseRevision": null,
+    "source": "const t = observation.text;\ntry { const v = JSON.parse(t); if (v && Object.prototype.hasOwnProperty.call(v, 'answer')) return String(v.answer); } catch (_) {}\nif (t.startsWith('id,answer\\n')) return t.split('\\n')[1].split(',')[1];\nif (t.startsWith('DATA answer=')) return t.slice('DATA answer='.length);\nreturn t;",
+    "hash": "860b4979aeaf49b5d8f4bceda7a0ec1222a1848a10fb1f9eda441f07f411273e",
+    "toolName": "json_query",
+    "createdAt": 1788761383645,
+    "validated": true
+  },
+  {
+    "id": "47b73784-c5a8-4bf5-a691-556c17097d7c",
+    "sessionId": "decision-055a4115-207b-44e6-ac66-b3a31280d7a5-small_mixed-1-fixed",
+    "baseRevision": null,
+    "source": "const t = observation.text;\ntry { const v = JSON.parse(t); if (v && Object.prototype.hasOwnProperty.call(v, 'answer')) return String(v.answer); } catch (_) {}\nif (t.startsWith('id,answer\\n')) return t.split('\\n')[1].split(',')[1];\nif (t.startsWith('DATA answer=')) return t.slice('DATA answer='.length);\nreturn t;",
+    "hash": "860b4979aeaf49b5d8f4bceda7a0ec1222a1848a10fb1f9eda441f07f411273e",
+    "toolName": "json_query",
+    "createdAt": 1788761449046,
+    "validated": true
+  },
+  {
+    "id": "b32ad9fd-7d49-44f0-a272-3c65923a7829",
+    "sessionId": "decision-055a4115-207b-44e6-ac66-b3a31280d7a5-schema_shift-1-fixed",
+    "baseRevision": null,
+    "source": "const t = observation.text;\ntry { const v = JSON.parse(t); if (v && Object.prototype.hasOwnProperty.call(v, 'answer')) return String(v.answer); } catch (_) {}\nif (t.startsWith('id,answer\\n')) return t.split('\\n')[1].split(',')[1];\nif (t.startsWith('DATA answer=')) return t.slice('DATA answer='.length);\nreturn t;",
+    "hash": "860b4979aeaf49b5d8f4bceda7a0ec1222a1848a10fb1f9eda441f07f411273e",
+    "toolName": "json_query",
+    "createdAt": 1788761489822,
+    "validated": true
+  },
+  {
+    "id": "00a07cf4-769d-4742-a3be-897ed39cff29",
+    "sessionId": "decision-055a4115-207b-44e6-ac66-b3a31280d7a5-large_json-2-fixed",
+    "baseRevision": null,
+    "source": "const t = observation.text;\ntry { const v = JSON.parse(t); if (v && Object.prototype.hasOwnProperty.call(v, 'answer')) return String(v.answer); } catch (_) {}\nif (t.startsWith('id,answer\\n')) return t.split('\\n')[1].split(',')[1];\nif (t.startsWith('DATA answer=')) return t.slice('DATA answer='.length);\nreturn t;",
+    "hash": "860b4979aeaf49b5d8f4bceda7a0ec1222a1848a10fb1f9eda441f07f411273e",
+    "toolName": "json_query",
+    "createdAt": 1788761541583,
+    "validated": true
+  },
+  {
+    "id": "4481b164-774f-4b8b-9585-181913f6f1fc",
+    "sessionId": "decision-055a4115-207b-44e6-ac66-b3a31280d7a5-small_mixed-2-fixed",
+    "baseRevision": null,
+    "source": "const t = observation.text;\ntry { const v = JSON.parse(t); if (v && Object.prototype.hasOwnProperty.call(v, 'answer')) return String(v.answer); } catch (_) {}\nif (t.startsWith('id,answer\\n')) return t.split('\\n')[1].split(',')[1];\nif (t.startsWith('DATA answer=')) return t.slice('DATA answer='.length);\nreturn t;",
+    "hash": "860b4979aeaf49b5d8f4bceda7a0ec1222a1848a10fb1f9eda441f07f411273e",
+    "toolName": "json_query",
+    "createdAt": 1788761582717,
+    "validated": true
+  },
+  {
+    "id": "9beed7c9-08ba-4cc1-8391-8250f4bd2bf8",
+    "sessionId": "decision-055a4115-207b-44e6-ac66-b3a31280d7a5-schema_shift-2-fixed",
+    "baseRevision": null,
+    "source": "const t = observation.text;\ntry { const v = JSON.parse(t); if (v && Object.prototype.hasOwnProperty.call(v, 'answer')) return String(v.answer); } catch (_) {}\nif (t.startsWith('id,answer\\n')) return t.split('\\n')[1].split(',')[1];\nif (t.startsWith('DATA answer=')) return t.slice('DATA answer='.length);\nreturn t;",
+    "hash": "860b4979aeaf49b5d8f4bceda7a0ec1222a1848a10fb1f9eda441f07f411273e",
+    "toolName": "json_query",
+    "createdAt": 1788761609972,
+    "validated": true
+  }
+]

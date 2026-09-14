@@ -1,0 +1,28 @@
+> Task :shared:kmpPartiallyResolvedDependenciesChecker
+> Task :api:kmpPartiallyResolvedDependenciesChecker
+> Task :shared:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :api:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :shared:buildSandboxNative UP-TO-DATE
+> Task :shared:syncSandboxNative UP-TO-DATE
+> Task :shared:jvmProcessResources UP-TO-DATE
+> Task :shared:processJvmMainResources SKIPPED
+> Task :shared:jvmTestProcessResources NO-SOURCE
+> Task :shared:processJvmTestResources SKIPPED
+> Task :api:compileKotlinJvm UP-TO-DATE
+> Task :api:compileJvmMainJava NO-SOURCE
+> Task :api:jvmProcessResources NO-SOURCE
+> Task :api:processJvmMainResources SKIPPED
+> Task :api:jvmMainClasses UP-TO-DATE
+> Task :api:jvmJar UP-TO-DATE
+> Task :shared:compileKotlinJvm UP-TO-DATE
+> Task :shared:compileJvmMainJava NO-SOURCE
+> Task :shared:jvmMainClasses UP-TO-DATE
+> Task :shared:jvmJar UP-TO-DATE
+> Task :shared:compileTestKotlinJvm UP-TO-DATE
+> Task :shared:compileJvmTestJava NO-SOURCE
+> Task :shared:jvmTestClasses UP-TO-DATE
+> Task :shared:harnessLiveTest
+
+BUILD SUCCESSFUL in 1m 21s
+11 actionable tasks: 3 executed, 8 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.5.1/userguide/configuration_cache_enabling.html

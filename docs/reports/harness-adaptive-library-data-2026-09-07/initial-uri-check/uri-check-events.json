@@ -1,0 +1,47 @@
+[
+  [
+    "adaptive-native-afddceaf-fd09-48e1-bd78-32e365355dda",
+    null,
+    "adaptation_decision:{\"choice\":\"CREATE\",\"reason\":\"No compatible evaluated version; propose Kotlin, then evaluate and activate. Setup estimate excludes model generation latency and output-token cost\",\"estimatedSavedInputBytes\":33075,\"estimatedAddedMillis\":21000}"
+  ],
+  [
+    "adaptive-native-afddceaf-fd09-48e1-bd78-32e365355dda",
+    "aaa5bb0e-6363-4eb9-a085-8761587a3659",
+    "proposed"
+  ],
+  [
+    "adaptive-native-afddceaf-fd09-48e1-bd78-32e365355dda",
+    "aaa5bb0e-6363-4eb9-a085-8761587a3659",
+    "validated"
+  ],
+  [
+    "adaptive-native-afddceaf-fd09-48e1-bd78-32e365355dda",
+    "aaa5bb0e-6363-4eb9-a085-8761587a3659",
+    "adaptation_published:9d2419db-6484-4c49-8164-7f53a9a0561c:{\"suite\":\"answer-extraction-heldout-v1\",\"passed\":true,\"cases\":10,\"baselineBytes\":27212,\"presentedBytes\":912,\"coldMillis\":4467,\"warmMillis\":1112,\"evaluationMillis\":7380}"
+  ],
+  [
+    "adaptive-native-afddceaf-fd09-48e1-bd78-32e365355dda",
+    "aaa5bb0e-6363-4eb9-a085-8761587a3659",
+    "activation_requested"
+  ],
+  [
+    "adaptive-native-afddceaf-fd09-48e1-bd78-32e365355dda",
+    "aaa5bb0e-6363-4eb9-a085-8761587a3659",
+    "activated"
+  ],
+  [
+    "adaptive-native-afddceaf-fd09-48e1-bd78-32e365355dda",
+    "aaa5bb0e-6363-4eb9-a085-8761587a3659",
+    "processed:d17601f91997e1212129f808158176492c4af9fe556059773143f6111bff1362"
+  ],
+  [
+    "adaptive-native-afddceaf-fd09-48e1-bd78-32e365355dda",
+    null,
+    "adaptation_summary:nativeMillis=13796;savedObservationBytes=10859;transformed=1;decision={\"choice\":\"CREATE\",\"reason\":\"No compatible evaluated version; propose Kotlin, then evaluate and activate. Setup estimate excludes model generation latency and output-token cost\",\"estimatedSavedInputBytes\":33075,\"estimatedAddedMillis\":21000}"
+  ],
+  [
+    "adaptive-native-afddceaf-fd09-48e1-bd78-32e365355dda",
+    null,
+    "session_closed"
+  ]
+]

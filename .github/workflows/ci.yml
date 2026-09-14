@@ -104,13 +104,13 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build
-        run: ./gradlew shared:compileKotlinJvm gateway:compileKotlin api:compileKotlinJvm --no-daemon
+        run: ./gradlew shared:compileKotlinJvm gateway:compileKotlin api:compileKotlinJvm evals:compileKotlin --no-daemon
 
       - name: Compile Desktop and Wasm clients
         run: ./gradlew composeApp:compileKotlinDesktop composeApp:compileKotlinWasmJs --no-daemon
 
-      - name: Unit and security tests
-        run: ./gradlew shared:jvmTest gateway:test api:jvmTest composeApp:desktopTest --no-daemon
+      - name: Unit, security, and golden eval tests
+        run: ./gradlew shared:jvmTest gateway:test api:jvmTest evals:test composeApp:desktopTest --no-daemon
 
       - name: Upload test reports
         if: always()
@@ -121,6 +121,8 @@ jobs:
             shared/build/reports/tests/
             gateway/build/reports/tests/
             api/build/reports/tests/
+            evals/build/reports/tests/
+            evals/build/reports/evals/
             composeApp/build/reports/tests/
           retention-days: 7
 

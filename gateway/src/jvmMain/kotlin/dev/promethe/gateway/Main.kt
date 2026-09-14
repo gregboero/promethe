@@ -10,6 +10,8 @@ import dev.promethe.gateway.auth.OwnerAuthService
 import dev.promethe.di.KoinBootstrap
 import dev.promethe.gateway.di.gatewayModule
 import dev.promethe.gateway.mcp.McpStdioServerMode
+import dev.promethe.gateway.mcp.McpTaskManager
+import dev.promethe.gateway.mcp.McpRoundTripManager
 import dev.promethe.gateway.mcp.McpToolExporter
 import dev.promethe.core.ToolCallOrigin
 import dev.promethe.db.DatabaseBackupService
@@ -99,6 +101,8 @@ suspend fun main(args: Array<String>) =
                     secureToolExecutor = stack.actionExecutor,
                     origin = ToolCallOrigin.MCP_STDIO,
                     exposeApprovalRequiredTools = false,
+                    taskManager = McpTaskManager(earlyDb, this),
+                    roundTripManager = McpRoundTripManager(this),
                 )
             val stdioServer = McpStdioServerMode(toolExporter)
             stdioServer.run()

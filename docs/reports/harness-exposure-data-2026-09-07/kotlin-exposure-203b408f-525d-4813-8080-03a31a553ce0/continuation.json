@@ -1,0 +1,12 @@
+{
+  "recordedAtUtc": "2026-09-07T16:29:32.630453+00:00",
+  "reason": "Baseline visible response empty; inspect completed. Resume only five unexecuted runs, retaining all failures. Upstream cause unknown.",
+  "preservedRows": 13,
+  "preservedRequests": 95,
+  "remainingRuns": 5,
+  "initialResultsSha256": "a5ec0479ae53da9ca351ded0bfddd0a63a4298b0d205ea9996f085cc98aa6f62",
+  "initialTestSourceSha256": "8c031bdd6737de1d4b2b90b40bbd7fa1273510e81a3a772da1aa7de2632c022d",
+  "resumedTestSourceSha256": "0f18badae6ee8554be20b40dc9b124fe11946f23163cff6e5e3bcb61a9ca3d75",
+  "protocolChanged": false,
+  "failedRunsRetried": false
+}

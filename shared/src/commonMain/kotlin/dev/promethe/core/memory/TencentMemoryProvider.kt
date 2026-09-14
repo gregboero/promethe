@@ -59,6 +59,7 @@ class TencentMemoryProvider(
     override suspend fun recallFacts(
         query: String,
         limit: Int,
+        userId: String,
     ): List<MemoryFact> {
         return try {
             val response =
@@ -69,6 +70,7 @@ class TencentMemoryProvider(
                         buildJsonObject {
                             put("query", query)
                             put("limit", limit)
+                            put("user_id", userId)
                         },
                     )
                 }

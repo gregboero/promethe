@@ -10,7 +10,18 @@ object TracySetup {
     private val logger = Log.create("TracySetup")
 
     fun initialize(config: AgentConfig) {
-        Tracing.initialize(config.tracingBackend)
+        val endpoint =
+            if (config.tracingBackend.equals("langfuse", ignoreCase = true)) {
+                config.langfuseHost
+            } else {
+                config.otlpEndpoint
+            }
+        Tracing.initialize(
+            backend = config.tracingBackend,
+            endpoint = endpoint,
+            publicKey = config.langfusePublicKey,
+            secretKey = config.langfuseSecretKey,
+        )
         logger.info { "Backend: ${config.tracingBackend}" }
     }
 }

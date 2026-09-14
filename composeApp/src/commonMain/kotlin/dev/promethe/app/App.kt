@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.AutoFixHigh
 import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.Forum
+import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.Monitor
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Psychology
@@ -54,6 +55,7 @@ import dev.promethe.app.navigation.BackStackPersistence
 import dev.promethe.app.navigation.PrometheRoute
 import dev.promethe.app.network.PrometheClient
 import dev.promethe.app.screens.*
+import dev.promethe.app.screens.viewmodel.SessionsViewModel
 import dev.promethe.app.theme.PrometheTheme
 import dev.promethe.api.LoginClientKind
 import org.jetbrains.compose.resources.StringResource
@@ -76,6 +78,7 @@ private data class NavItem(
 private val navItems =
     listOf(
         NavItem("sessions", Icons.Default.Forum, Res.string.nav_chat, PrometheRoute.Sessions),
+        NavItem("projects", Icons.Default.Folder, Res.string.nav_projects, PrometheRoute.Projects),
         NavItem("agents", Icons.Default.SmartToy, Res.string.nav_agents, PrometheRoute.Agents),
         NavItem("channels", Icons.Filled.Chat, Res.string.nav_channels, PrometheRoute.Channels),
         NavItem("monitor", Icons.Default.Monitor, Res.string.nav_monitor, PrometheRoute.Monitor),
@@ -402,6 +405,8 @@ private fun AppContent(
     onThemeChanged: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
+    val sessionsViewModel = remember(client) { SessionsViewModel(client) }
+
     androidx.compose.foundation.layout.Box(modifier = modifier.fillMaxSize().testTag("content_area")) {
         NavDisplay(
             backStack = backStack,
@@ -428,11 +433,16 @@ private fun AppContent(
                 when (route) {
                     is PrometheRoute.Sessions -> NavEntry(route) {
                         SessionsScreen(
-                            client = client,
+                            viewModel = sessionsViewModel,
+                            onManageProjects = { navigateToTab(PrometheRoute.Projects) },
                             onSessionSelected = { sessionId ->
                                 backStack.add(PrometheRoute.Chat(sessionId))
                             },
                         )
+                    }
+
+                    is PrometheRoute.Projects -> NavEntry(route) {
+                        ProjectsScreen(client)
                     }
 
                     is PrometheRoute.Chat -> NavEntry(route) {

@@ -57,10 +57,28 @@ data class GoalTaskResult(
  * concurrent test applications — or a future multi-mount — don't share state.
  */
 class GoalState {
+    @Volatile
     var goal: String = ""
+
+    @Volatile
     var executor: AutonomousExecutor? = null
+
+    @Volatile
     var job: Job? = null
+
+    @Volatile
     var status: GoalStatusResponse = GoalStatusResponse(state = "IDLE")
+
+    @Synchronized
+    fun updateWhileActive(transform: (GoalStatusResponse) -> GoalStatusResponse) {
+        if (status.state != "STOPPED") status = transform(status)
+    }
+
+    @Synchronized
+    fun markStopped(): Pair<AutonomousExecutor?, Job?> {
+        status = status.copy(state = "STOPPED")
+        return executor to job
+    }
 }
 
 /**
@@ -126,18 +144,20 @@ fun Route.goalRoutes(
                 val llmResponse = agentExecutor.execute(decomposeSessionId, prompt.userPrompt, "goal")
                 val plan = decomposer.parseResponse(llmResponse, req.goal)
 
-                state.status = state.status.copy(
-                    state = "RUNNING",
-                    tasksTotal = plan.tasks.size,
-                )
+                state.updateWhileActive { current ->
+                    current.copy(
+                        state = "RUNNING",
+                        tasksTotal = plan.tasks.size,
+                    )
+                }
 
                 logger.info { "🎯 Goal API: plan de ${plan.tasks.size} tâches, exécution..." }
 
                 // Phase 2 : Exécution autonome
                 val summary = executor.execute(plan) { task, context ->
-                    state.status = state.status.copy(
-                        currentTask = "[${task.index}/${plan.tasks.size}] ${task.title}",
-                    )
+                    state.updateWhileActive { current ->
+                        current.copy(currentTask = "[${task.index}/${plan.tasks.size}] ${task.title}")
+                    }
 
                     val taskPrompt = buildString {
                         appendLine("Tâche ${task.index}/${plan.tasks.size}: ${task.title}")
@@ -159,26 +179,28 @@ fun Route.goalRoutes(
                 }
 
                 // Mise à jour statut final
-                state.status = GoalStatusResponse(
-                    state = summary.state.name,
-                    goal = req.goal,
-                    tasksTotal = summary.tasksTotal,
-                    tasksCompleted = summary.tasksCompleted,
-                    tasksFailed = summary.tasksFailed,
-                    currentTask = "",
-                    totalTokens = summary.totalTokensUsed,
-                    totalCost = summary.totalCost,
-                    elapsedMs = summary.elapsedMs,
-                    results = summary.results.map { r ->
-                        GoalTaskResult(
-                            index = r.taskIndex,
-                            title = r.taskTitle,
-                            status = r.status.name,
-                            response = r.response.take(500),
-                            durationMs = r.durationMs,
-                        )
-                    },
-                )
+                state.updateWhileActive {
+                    GoalStatusResponse(
+                        state = summary.state.name,
+                        goal = req.goal,
+                        tasksTotal = summary.tasksTotal,
+                        tasksCompleted = summary.tasksCompleted,
+                        tasksFailed = summary.tasksFailed,
+                        currentTask = "",
+                        totalTokens = summary.totalTokensUsed,
+                        totalCost = summary.totalCost,
+                        elapsedMs = summary.elapsedMs,
+                        results = summary.results.map { r ->
+                            GoalTaskResult(
+                                index = r.taskIndex,
+                                title = r.taskTitle,
+                                status = r.status.name,
+                                response = r.response.take(500),
+                                durationMs = r.durationMs,
+                            )
+                        },
+                    )
+                }
 
                 logger.info { "🎯 Goal API: terminé (${summary.state}, ${summary.tasksCompleted}/${summary.tasksTotal} réussies)" }
             } catch (e: kotlinx.coroutines.CancellationException) {
@@ -186,9 +208,7 @@ fun Route.goalRoutes(
                 throw e
             } catch (e: Exception) {
                 logger.error(e) { "🎯 Goal API: erreur" }
-                state.status = state.status.copy(
-                    state = "FAILED",
-                )
+                state.updateWhileActive { current -> current.copy(state = "FAILED") }
             }
         }
 
@@ -200,9 +220,9 @@ fun Route.goalRoutes(
     }
 
     post("/goal/stop") {
-        state.executor?.requestStop()
-        state.job?.cancel()
-        state.status = state.status.copy(state = "STOPPED")
+        val (executor, job) = state.markStopped()
+        executor?.requestStop()
+        job?.cancel()
         call.respond(mapOf("status" to "stopped"))
     }
 }

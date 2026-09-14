@@ -5,12 +5,11 @@ import dev.promethe.core.Log
 import kotlinx.coroutines.withContext
 
 /**
- * SkillCurator — automatic skill quality control.
+ * SkillCurator — proposes skill quality actions without mutating user data.
  *
- * Periodically grades every skill via LLM and prunes low-quality ones.
- * Detects near-duplicate skills by title/keyword overlap and merges them.
- *
- * Designed to be invoked by [TaskScheduler] on a daily cron (or manually).
+ * A curation pass grades skills and detects near-duplicates, but every action
+ * is returned as a quarantined proposal for explicit review. The curator
+ * never deletes, merges, writes, or invalidates skills automatically.
  */
 class SkillCurator(
     private val skillLoader: SkillLoader,
@@ -21,10 +20,10 @@ class SkillCurator(
     private val logger = Log.create("SkillCurator")
 
     companion object {
-        /** Skills scoring at or below this threshold are pruned. */
+        /** Skills scoring at or below this threshold receive a review proposal. */
         const val PRUNE_THRESHOLD = 2
 
-        /** Jaccard similarity above this triggers a merge check. */
+        /** Jaccard similarity above this triggers a duplicate review proposal. */
         const val SIMILARITY_THRESHOLD = 0.65
 
         /** Maximum skills to evaluate per curation run (avoid huge LLM costs). */
@@ -32,38 +31,41 @@ class SkillCurator(
     }
 
     /**
-     * Runs a full curation pass:
-     * 1. Load all skills
-     * 2. Detect and merge near-duplicates
-     * 3. Grade each remaining skill via LLM
-     * 4. Prune skills with score ≤ [PRUNE_THRESHOLD]
+     * Runs a non-destructive curation pass.
      *
-     * Returns a [CurationReport] summarizing what happened.
+     * The returned proposals are quarantined until a separate, explicit
+     * approval workflow is introduced. This method deliberately has no write
+     * or delete side effects.
      */
     suspend fun curate(): CurationReport {
         val skills = skillLoader.listSkills()
         if (skills.isEmpty()) return CurationReport(total = 0)
 
-        val merged = mergeNearDuplicates(skills)
-        val remaining = skillLoader.listSkills() // Reload after merges
-
-        val graded = gradeSkills(remaining.take(MAX_SKILLS_PER_RUN))
-        val pruned = mutableListOf<String>()
-        for ((skill, score) in graded) {
-            if (score <= PRUNE_THRESHOLD) {
-                skillLoader.deleteSkill(skill.name)
-                pruned.add(skill.name)
-                logger.info { "Pruned '${skill.name}' (score=$score)" }
-            }
+        val graded = gradeSkills(skills.take(MAX_SKILLS_PER_RUN))
+        val proposals = buildList {
+            graded
+                .filter { (_, score) -> score <= PRUNE_THRESHOLD }
+                .forEach { (skill, score) ->
+                    add(
+                        SkillCurationProposal(
+                            action = CurationAction.REVIEW_LOW_QUALITY,
+                            skill = skill.name,
+                            score = score,
+                            rationale = "Quality score is at or below the review threshold.",
+                        ),
+                    )
+                }
+            addAll(findDuplicateProposals(skills))
         }
 
-        skillLoader.invalidateCache()
+        proposals.forEach { proposal ->
+            logger.info { "Quarantined curation proposal: ${proposal.action} for '${proposal.skill}'" }
+        }
 
         return CurationReport(
             total = skills.size,
-            merged = merged,
-            pruned = pruned,
             graded = graded.map { (s, score) -> s.name to score },
+            proposals = proposals,
         )
     }
 
@@ -119,42 +121,41 @@ class SkillCurator(
                 .toIntOrNull() ?: 3
         }
 
-    // ── Duplicate Detection & Merge ─────────────────────────
+    // ── Duplicate Detection (proposal only) ──────────────────
 
     /**
      * Finds pairs of skills with high keyword overlap (Jaccard similarity)
-     * and merges the shorter one into the longer one.
+     * and returns review proposals. No skill is modified or removed.
      */
-    private suspend fun mergeNearDuplicates(skills: List<SkillEntry>): List<String> {
-        val merged = mutableListOf<String>()
-        val processed = mutableSetOf<String>()
-
+    private fun findDuplicateProposals(skills: List<SkillEntry>): List<SkillCurationProposal> {
+        val proposals = mutableListOf<SkillCurationProposal>()
         for (i in skills.indices) {
-            if (skills[i].name in processed) continue
             for (j in (i + 1) until skills.size) {
-                if (skills[j].name in processed) continue
-
                 val similarity =
                     jaccardSimilarity(
                         extractKeywords(skills[i]),
                         extractKeywords(skills[j]),
                     )
                 if (similarity >= SIMILARITY_THRESHOLD) {
-                    // Keep the longer/richer skill, delete the shorter
-                    val (keep, remove) =
+                    val (primary, related) =
                         if (skills[i].content.length >= skills[j].content.length) {
                             skills[i] to skills[j]
                         } else {
                             skills[j] to skills[i]
                         }
-                    skillLoader.deleteSkill(remove.name)
-                    processed.add(remove.name)
-                    merged.add("${remove.name} → ${keep.name}")
-                    logger.info { "Merged '${remove.name}' into '${keep.name}' (similarity=${"%.2f".format(similarity)})" }
+                    proposals.add(
+                        SkillCurationProposal(
+                            action = CurationAction.REVIEW_DUPLICATE,
+                            skill = primary.name,
+                            relatedSkills = listOf(related.name),
+                            similarity = similarity,
+                            rationale = "Skills have high keyword overlap and require manual comparison.",
+                        ),
+                    )
                 }
             }
         }
-        return merged
+        return proposals
     }
 
     private fun extractKeywords(skill: SkillEntry): Set<String> =
@@ -180,16 +181,34 @@ data class CurationReport(
     val merged: List<String> = emptyList(),
     val pruned: List<String> = emptyList(),
     val graded: List<Pair<String, Int>> = emptyList(),
+    val proposals: List<SkillCurationProposal> = emptyList(),
 ) {
     override fun toString(): String =
         buildString {
             appendLine("=== Skill Curation Report ===")
             appendLine("Total skills: $total")
-            appendLine("Merged: ${merged.size} (${merged.joinToString(", ")})")
-            appendLine("Pruned: ${pruned.size} (${pruned.joinToString(", ")})")
+            appendLine("Merged automatically: 0")
+            appendLine("Pruned automatically: 0")
+            appendLine("Quarantined proposals: ${proposals.size}")
             if (graded.isNotEmpty()) {
                 appendLine("Grades: ${graded.joinToString(", ") { "${it.first}=${it.second}" }}")
                 appendLine("Average: ${"%.1f".format(graded.map { it.second }.average())}/5")
             }
         }
 }
+
+enum class CurationAction {
+    REVIEW_LOW_QUALITY,
+    REVIEW_DUPLICATE,
+}
+
+/** A non-applied curation recommendation awaiting explicit review. */
+data class SkillCurationProposal(
+    val action: CurationAction,
+    val skill: String,
+    val relatedSkills: List<String> = emptyList(),
+    val score: Int? = null,
+    val similarity: Double? = null,
+    val rationale: String,
+    val quarantined: Boolean = true,
+)

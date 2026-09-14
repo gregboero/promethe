@@ -84,13 +84,14 @@ class CapabilityRoutesTest {
             val body = json.decodeFromString<CapabilityListResponse>(response.bodyAsText())
             val channels = body.capabilities.filter { it.category == "channel" }
             val tools = ToolRegistry.listTools()
+            val betaChannels = setOf("telegram", "discord", "slack", "whatsapp", "signal", "matrix", "sms")
 
             assertTrue(
-                channels.filter { it.id.removePrefix("channel.") in setOf("telegram", "discord", "slack", "whatsapp", "signal", "matrix") }
+                channels.filter { it.id.removePrefix("channel.") in betaChannels }
                     .all { it.maturity.name == "BETA" },
             )
             assertTrue(
-                channels.filter { it.id.removePrefix("channel.") !in setOf("telegram", "discord", "slack", "whatsapp", "signal", "matrix") }
+                channels.filter { it.id.removePrefix("channel.") !in betaChannels }
                     .all { it.maturity.name == "LAB" },
             )
             assertTrue(
@@ -105,7 +106,10 @@ class CapabilityRoutesTest {
             if (tools.none { it.name.startsWith("mcp_") }) {
                 assertEquals(CapabilityAvailability.MISSING_CONFIGURATION, mcp.availability)
             }
-            assertEquals(tools.map { "tool.${it.name}" }.toSet(), body.capabilities.filter { it.category == "tool" }.map { it.id }.toSet())
+            val toolCapabilities = body.capabilities.filter { it.category == "tool" }
+            assertEquals(tools.map { "tool.${it.name}" }.toSet(), toolCapabilities.map { it.id }.toSet())
+            assertTrue(toolCapabilities.all { it.toolContract != null })
+            assertTrue(toolCapabilities.all { it.risk == it.toolContract?.catalogRisk?.name })
         }
 
     @Test

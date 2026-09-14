@@ -1,17 +1,20 @@
 # Context Management & Resilience
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 > How Promethe keeps long-running agent sessions within token budgets and recovers
 > from LLM/tool failures without dropping the conversation.
 
 ## Overview
 
-Four cooperating components handle the "things go wrong" and "context gets too big"
+Seven cooperating components handle the "things go wrong" and "context gets too big"
 problems:
 
 | Component | File | Role |
 |---|---|---|
 | `ContextCompressor` | `shared/src/commonMain/kotlin/dev/promethe/core/ContextCompressor.kt` | Keeps conversation history within the model's context window |
 | `ToolOutputPruner` | `shared/src/commonMain/kotlin/dev/promethe/core/ToolOutputPruner.kt` | Pre-cleans verbose tool output before compression |
+| `ArtifactStore` | `shared/src/commonMain/kotlin/dev/promethe/core/ArtifactStore.kt`, `FileArtifactStore.kt` | Stores large text tool observations by SHA-256 and returns compact durable references |
 | `ResilienceStrategy` | `shared/src/commonMain/kotlin/dev/promethe/core/ResilienceStrategy.kt` | 3-level failure escalation (retry → replan → decompose) for the agent loop |
 | `AutoHealingExecutor` | `shared/src/jvmMain/kotlin/dev/promethe/core/AutoHealingExecutor.kt` | Wraps `ActionExecutor` with transparent tool-call retries |
 | `KoogLlmAdapter` fallback chain | `shared/src/commonMain/kotlin/dev/promethe/core/KoogLlmAdapter.kt` | Intra-provider then cross-provider model fallback on LLM call failure |
@@ -20,6 +23,17 @@ problems:
 All of this is wired up in `AgentBootstrap.kt`, which constructs one
 `ResilienceStrategy` and one `ContextCompressor` per agent and passes them into
 `AIAgent`, plus one `AutoHealingExecutor` wrapping the shared `ActionExecutor`.
+
+Before a successful tool result enters the conversation, `ActionExecutor` lets
+the after-tool hooks inspect the complete value. Results larger than 8 KiB are
+then written outside the workspace under the active Promethe profile's
+`artifacts/sha256/` directory. The observation keeps a bounded head and tail,
+the SHA-256 hash, byte size and an `artifact://sha256/...` URI. The hash is also
+stored in `tool_intents` and `agent_run_events`; `artifact_read` retrieves at
+most 4096 bytes per call. Failed and blocked results are never externalized and
+remain bounded by the existing output limit.
+
+The file store caps each artifact at 16 MiB and the complete store at 256 MiB by default. A process lock serializes writes across instances; existing content is counted again after a restart, and deduplication does not consume extra quota. Quota exhaustion fails explicitly. `retentionCandidates(referencedHashes, olderThanMillis)` produces a read-only plan excluding supplied ledger references. It never deletes automatically: callers must assemble the complete reference set before deciding on cleanup. This is a bounded local store, not encrypted archival storage.
 
 ---
 
@@ -58,14 +72,16 @@ skipped even if over budget.
    skipped entirely.
 2. **Sliding-window summarization** — if still over budget, the compressor keeps
    the first 2 messages (`keepFirstN`) and last 6 messages (`keepLastN`)
-   untouched, and replaces everything in between with one `system` message:
+   untouched. Middle `system` and `developer` instructions remain verbatim; other middle messages become an `assistant` message:
    `[Context Summary — N messages compressed]` followed by an LLM-generated
    summary (prompted to stay under 300 words, temperature 0.1, using the
-   agent's configured model).
-3. **Summary caching** — summaries are cached in-memory keyed by the hash of
+   agent's configured model). The summary is explicitly fallible conversation data, not authoritative instructions. Artifact addresses are retained outside the generated summary so they can be reread even when the summary is lossy.
+3. **Summary caching** — summaries are cached in-memory keyed by SHA-256 of length-delimited fields in
    the compressed message block, so the same block is never re-summarized
    twice in a session. Capped at 50 entries (oldest evicted first); can be
-   cleared via `clearCache()` (e.g. on session reset).
+   cleared via suspend `clearCache()` (e.g. on session reset). Access is serialized; raw histories are not logged as cache keys.
+
+Compression remains a heuristic and does not guarantee that every result fits a tiny token budget or retains every fact. Deterministic tests cover instruction/reference retention and colliding JVM hashes; they do not measure model recall quality.
 
 If there's nothing between head and tail to compress, the original messages are
 returned unchanged.
@@ -229,6 +245,9 @@ it does not read `maxContextTokens`/`compressionThreshold` directly.
   huge message blows the budget.
 - The summary cache is in-memory only (per process) and capped at 50 entries;
   it is not persisted across restarts.
+- The ArtifactStore currently covers successful text tool outputs only. It has
+  no encryption, owner quota, retention/garbage collection, remote backend or
+  first-class capture/file/audio metadata yet.
 - `ResilienceStrategy`'s non-retryable error detection is a simple substring
   match on the error message (`"401"`, `"403"`, `"invalid api"`, etc.) — it is
   not based on structured error codes/types.

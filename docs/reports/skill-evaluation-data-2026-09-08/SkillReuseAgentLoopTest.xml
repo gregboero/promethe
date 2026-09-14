@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="SkillReuseAgentLoopTest[jvm]" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-09-08T02:15:33.840Z" hostname="BUREAU" time="0.59">
+  <properties/>
+  <testcase name="evaluated skill is reused on two independent agent tasks after restart[jvm]" classname="dev.promethe.core.SkillReuseAgentLoopTest" time="0.59"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[sept. 07, 2026 10:15:34 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.llm_call' : ccad1d036f378eed351635599770e62e aa27b0c256cdf0c5 INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.provider=openai, agent.tool_count=0, agent.model=fixture, agent.history_size=1}, capacity=128, totalAddedValues=4}
+sept. 07, 2026 10:15:34 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.run' : ccad1d036f378eed351635599770e62e 8179d86d2a517b4e INTERNAL [tracer: dev.promethe:] AttributesMap{data={promethe.run.id=run-mts1f30e-c02c7a49a340fce380017733, agent.origin=INTERNAL}, capacity=128, totalAddedValues=2}
+sept. 07, 2026 10:15:34 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.llm_call' : 8d7a7122f915487af9cd8908c28cf699 6bfc6deb335bbd21 INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.provider=openai, agent.tool_count=0, agent.model=fixture, agent.history_size=1}, capacity=128, totalAddedValues=4}
+sept. 07, 2026 10:15:34 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.run' : 8d7a7122f915487af9cd8908c28cf699 e358ac4ed295a940 INTERNAL [tracer: dev.promethe:] AttributesMap{data={promethe.run.id=run-mts1f37t-1fccdc80af04bb1f31ac098f, agent.origin=INTERNAL}, capacity=128, totalAddedValues=2}
+]]></system-err>
+</testsuite>

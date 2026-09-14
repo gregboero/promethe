@@ -19,6 +19,7 @@ typealias ToolRisk = dev.promethe.api.ToolRisk
 data class ToolPolicyDecision(
     val risk: ToolRisk,
     val mandatoryApproval: Boolean,
+    val ownerOnly: Boolean = false,
 )
 
 /** Deterministic representation used when approvals are bound to arguments. */

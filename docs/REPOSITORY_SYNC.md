@@ -1,5 +1,7 @@
 # Repository synchronization
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 Promethe is developed in the `projectRandD` monorepo and published to
 [gregboero/promethe](https://github.com/gregboero/promethe) with Google
 Copybara. The monorepo is the only source of truth for files managed by the

@@ -13,6 +13,22 @@ dependencies {
     implementation(project(":shared"))
     implementation(project(":api"))
 
+    // Shared's implementation constraints do not reach this project's compile classpaths.
+    implementation(platform(libs.netty.bom))
+    implementation(platform(libs.jackson2.bom))
+    implementation(platform(libs.jackson3.bom))
+    constraints {
+        implementation(libs.httpclient5) {
+            because("GHSA-hjcp-jmpx-g3qm: connection pool exhaustion")
+        }
+        implementation(libs.httpcore5.core) {
+            because("GHSA-hf6x-8p5f-cgmf: unbounded HTTP header parsing")
+        }
+        implementation(libs.httpcore5.h2) {
+            because("GHSA-v3jc-474w-2wm6: unbounded HPACK header list")
+        }
+    }
+
     // Ktor Server (CIO — full coroutines, no Netty threads)
     implementation(libs.bundles.ktor.server)
 
@@ -28,6 +44,12 @@ dependencies {
     // BouncyCastle (Ed25519 for Discord webhook verification)
     implementation(libs.bouncycastle)
 
+    // Discord Gateway lifecycle, reconnects, heartbeats, and REST rate limits.
+    implementation(libs.jda)
+
+    // Twilio request validation and outbound SMS replies.
+    implementation(libs.twilio)
+
     // Koog stable core and prompt-executor clients.
     implementation(libs.bundles.koog.stable)
 
@@ -36,7 +58,7 @@ dependencies {
 
     // Logging (kotlin-logging → SLF4J → Logback)
     implementation(libs.kotlin.logging)
-    implementation("ch.qos.logback:logback-classic:1.5.18")
+    implementation(libs.logback.classic)
 
     // Koin DI (Ktor integration)
     implementation(libs.koin.core)

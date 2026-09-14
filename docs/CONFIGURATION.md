@@ -1,5 +1,7 @@
 # Configuration Reference
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 > All Prométhé configuration variables, organized by domain.
 
 ## Configuration methods
@@ -10,7 +12,7 @@
 | **Settings Screen** (Desktop app) | 2nd | Change config while in use |
 | **REST API** (`/api/v1/config/env`) | 3rd | Automation, scripts |
 | **`.env` file** | 4th | Docker, CI/CD |
-| **System environment variables** | 5th | Production |
+| **System environment variables** | 5th | Headless/container experiments |
 
 ---
 
@@ -34,7 +36,7 @@
 | `GOOGLE_API_KEY` | Google AI Studio | `AIza...` |
 | `DEEPSEEK_API_KEY` | DeepSeek | `sk-...` |
 | `NVIDIA_NIM_API_KEY` | NVIDIA NIM | `nvapi-...` |
-| `LITELLM_API_KEY` | LiteLLM proxy | *(depends on proxy config, e.g. `sk-promethe-dev`)* |
+| `LITELLM_API_KEY` | LiteLLM proxy | Dedicated key configured on your proxy |
 | `MOONSHOT_API_KEY` | Kimi | `sk-...` |
 | `XAI_API_KEY` | xAI (Grok) | `xai-...` |
 
@@ -140,11 +142,13 @@ unsandboxed fallback.
 
 | Variable | Type | Default | Description |
 |---|---|---|---|
-| `SANDBOX_BACKEND` | string | `auto` | Native backend selection. Linux uses Bubblewrap/seccomp. macOS and Windows execution are deliberately `UNAVAILABLE` until detached-process and read confinement are respectively certified. Docker and WSL2 are not automatic fallbacks yet. |
+| `SANDBOX_BACKEND` | string | `auto` | Native backend selection. Linux uses Bubblewrap/seccomp. Windows uses the elevated restricted-identity backend after its one-time UAC setup and self-test. macOS remains unavailable. Docker and WSL2 are not automatic fallbacks yet. |
 | `SANDBOX_WORKSPACE` | path | `~/.promethe/workspace` | Canonical root exposed to process and workspace file tools. Runtime data, credentials, plugins and the database remain outside this root. |
-| `SANDBOX_MODE` | string | `WORKSPACE_WRITE` | `READ_ONLY` or `WORKSPACE_WRITE`. `FULL_ACCESS` is rejected fail-closed. |
+| `SANDBOX_MODE` | string | `WORKSPACE_WRITE` | `READ_ONLY`, `WORKSPACE_WRITE`, or local-only `FULL_ACCESS` for file tools. Commands and code execution remain confined to `SANDBOX_WORKSPACE`. |
+| `SANDBOX_READABLE_ROOTS` | JSON array | `[]` | Additional absolute directories readable by file tools, for example `["C:\\Users\\me\\Documents"]`. The workspace root is managed automatically. |
+| `SANDBOX_WRITABLE_ROOTS` | JSON array | `[]` | Additional absolute directories writable by file tools, for example `["C:\\Users\\me\\Documents\\output"]`. Every writable root must also be readable. |
 | `SANDBOX_APPROVAL_POLICY` | string | `ON_REQUEST` | Approval policy for process effects. |
-| `SANDBOX_NETWORK_MODE` | string | `OFF` | Network is disabled. `ALLOWLIST` is rejected until an authenticated proxy is implemented. |
+| `SANDBOX_NETWORK_MODE` | string | `OFF` | Network remains disabled. `ALLOWLIST` is rejected until an authenticated proxy is implemented; selected roots and `FULL_ACCESS` do not change this. |
 | `SANDBOX_ALLOWED_DOMAINS` | comma-separated strings | empty | Reserved for the future authenticated proxy; it does not enable network access today. |
 | `PROMETHE_SANDBOX_HELPER` | path | packaged helper | Absolute path to the native helper executable. |
 | `PROMETHE_SANDBOX_HELPER_SHA256` | hex string | — | Required 64-character SHA-256 checksum when `PROMETHE_SANDBOX_HELPER` is configured. |
@@ -152,14 +156,68 @@ unsandboxed fallback.
 
 The native helper enforces bounded execution, workspace roots, protected
 metadata paths (`.git`, `.promethe`, `.codex`, `.agents`) and OS-specific
-process isolation. MCP stdio is unavailable until IPC v2 adds persistent
-bidirectional sessions.
+process isolation. The workspace may legitimately be empty; no starter files
+are created in it. Selected roots and local `FULL_ACCESS` apply only to file
+tools. `FULL_ACCESS` does not expand command, code-execution or MCP stdio
+roots, and approvals remain mandatory for every unconfined file operation.
+MCP stdio is unavailable until IPC v2 adds persistent bidirectional sessions.
 
-The Windows setup scripts remain available for experimental validation, but
-the helper currently returns `BACKEND_UNAVAILABLE` for every execution until
-read confinement is certified. Running setup does not enable the backend.
-Use `sandbox-native/windows/uninstall.ps1` for removal. See
+`SANDBOX_READABLE_ROOTS` and `SANDBOX_WRITABLE_ROOTS` must be valid JSON
+arrays, not comma-separated strings. For example:
+
+```dotenv
+SANDBOX_READABLE_ROOTS=["C:\\Users\\me\\Documents","D:\\datasets"]
+SANDBOX_WRITABLE_ROOTS=["C:\\Users\\me\\Documents\\output"]
+```
+
+These roots are intended for local configuration. Remote sessions cannot
+enable `FULL_ACCESS` or alter the local file-access boundary. File operations
+still pass through path canonicalization, protected-path checks and approval.
+
+On Windows, use **Settings > Sandbox > Install sandbox**. The loopback-only
+setup route launches the packaged setup script, requests UAC, installs a
+protected runner and executes a behavioral self-test. Setup cancellation or
+self-test failure keeps process tools unavailable. Windows setup leaves the
+owner profile ACL unchanged, grants process access only to the registered
+workspace, and disables network access. Selected roots are used by file tools
+only. Use `sandbox-native/windows/uninstall.ps1`
+from an elevated terminal for removal. See
 [`SANDBOX.md`](SANDBOX.md) and the [manual test matrix](release/SANDBOX_MANUAL_TESTS.md).
+
+---
+
+## 3B. Local development agents
+
+Promethe can expose authenticated local Codex and Claude Code installations as
+specialized tools inside the normal agent loop. They are not A2A agents and do
+not add separate REST lifecycle routes. Detection is visible through
+`GET /api/v1/capabilities` and can be refreshed with the existing settings
+reload action.
+
+| Variable | Type | Default | Description |
+|---|---|---|---|
+| `CODEX_CLI_PATH` | absolute path | PATH discovery | Optional path to a native `codex` executable. |
+| `CLAUDE_CODE_CLI_PATH` | absolute path | PATH discovery | Optional path to a native `claude` executable. |
+
+The CLI must already be authenticated by the current OS user. Promethe never
+copies or reads the provider credential files. It records only the executable
+path, version and SHA-256 identity in memory, and persists only the external
+thread/session id in Promethe session metadata.
+
+`codex_delegate` uses `codex app-server` over JSONL stdio and requires a Codex
+version with named permission profiles. Promethe installs a network-disabled
+permission profile on every thread and turn, disables discovered Codex MCP and
+plugin/app entries for that delegation, and never inherits a resumed thread's
+wider permissions. Existing user-level Codex hooks remain part of the trusted
+local CLI installation and are reported as a BETA limitation. `claude_code_delegate`
+uses Claude Code streaming JSON with user and project setting sources disabled.
+In write mode, its only MCP server is an
+ephemeral permission tool connected to Promethe's local approval gate; automatic
+memory is disabled for the delegated process.
+
+`READ_ONLY` and `WORKSPACE_WRITE` are the only access modes. Full-access,
+skipped-permission and automatic-approval flags are rejected. Cloud Codex and
+Claude Agent SDK execution are not included in this release.
 
 ---
 
@@ -199,7 +257,7 @@ Use `sandbox-native/windows/uninstall.ps1` for removal. See
 
 | Variable | Type | Default | Description |
 |---|---|---|---|
-| `TRACING_BACKEND` | string | `console` | Backend: `console`, `langfuse`, `otlp` |
+| `TRACING_BACKEND` | string | `console` | Backend: `none`, `console`, `langfuse`, `otlp` |
 
 ### Langfuse (if TRACING_BACKEND=langfuse)
 
@@ -246,10 +304,10 @@ Use `sandbox-native/windows/uninstall.ps1` for removal. See
 
 ## 9. Messaging channels
 
-| Channel | Variable 1 | Variable 2 |
+| Channel | Required | Optional / secondary |
 |---|---|---|
 | **Telegram** | `TELEGRAM_BOT_TOKEN` | `TELEGRAM_SECRET_TOKEN` |
-| **Discord** | `DISCORD_BOT_TOKEN` | `DISCORD_PUBLIC_KEY` |
+| **Discord** | `DISCORD_BOT_TOKEN` | `DISCORD_PUBLIC_KEY` (slash commands), `DISCORD_MESSAGE_CONTENT_ENABLED` (default `false`), `DISCORD_ALLOWED_USER_IDS`, `DISCORD_APPROVER_USER_IDS`, `DISCORD_KNOWLEDGE_CHANNEL_IDS` |
 | **Slack** | `SLACK_BOT_TOKEN` | `SLACK_SIGNING_SECRET` |
 | **WhatsApp** | `WHATSAPP_PHONE_NUMBER_ID` | `WHATSAPP_ACCESS_TOKEN` |
 | **Signal** | `SIGNAL_CLI_REST_URL` | `SIGNAL_PHONE_NUMBER` |
@@ -268,6 +326,22 @@ Inbound webhook verification secrets read by the gateway are:
 | Matrix | `MATRIX_WEBHOOK_TOKEN` | Shared webhook token |
 
 See [CHANNELS.md](CHANNELS.md) for detailed setup guides.
+
+Discord ID lists accept values separated by commas, semicolons, spaces, or newlines. An empty
+`DISCORD_ALLOWED_USER_IDS` preserves unrestricted access for users who can reach the bot. Once the
+setting is non-empty, only valid numeric IDs in the list can invoke Promethe; a malformed non-empty
+list denies every user. `DISCORD_KNOWLEDGE_CHANNEL_IDS` is empty by default and therefore archives
+nothing. These variables remain the static bootstrap policy. Authenticated owner conversations and the
+`/api/v1/channels/discord/policy` API can add structured SQLite-backed overrides at runtime: scoped
+allow/deny rules, deterministic subject phrases, channel capture and project association. Dynamic
+`DENY` rules take precedence and policy changes do not require a process restart.
+
+`DISCORD_APPROVER_USER_IDS` contains the Discord user IDs responsible for approving effectful tool
+requests initiated from Discord. Promethe sends each responsible user a private message containing
+redacted arguments and Reject, Allow once, and Session buttons. Exact `CONFIG_CHANGE` requests also
+offer an Always allow choice. This stores only the exact operation fingerprint in SQLite and remains in
+force across restarts until the local owner revokes it. Leave this setting empty to disable Discord approval delivery; pending
+requests remain visible to the local owner and eventually time out closed.
 
 ---
 
@@ -288,7 +362,7 @@ See [CHANNELS.md](CHANNELS.md) for detailed setup guides.
 
 | Variable | Type | Default | Description |
 |---|---|---|---|
-| `LITELLM_MASTER_KEY` | string | `sk-promethe-dev` | LiteLLM proxy master key |
+| `LITELLM_MASTER_KEY` | string | required, no default | Dedicated LiteLLM proxy master key for the Compose overlay |
 | `LITELLM_API_KEY` | string | — | Key to connect to the proxy |
 
 ---
@@ -408,6 +482,39 @@ The canonical provider-secret registry also includes `OPENAI_API_KEY`, `GOOGLE_A
 | Budget preset `UNLIMITED` | — | — | No limits (⚠️ costly) |
 
 Budgets are configured via the API (`POST /api/v1/goal`) with the `budgetPreset` field.
+
+### Aggregate resource quotas
+
+`PROMETHE_RESOURCE_QUOTAS` is a process-owned JSON array loaded at bootstrap, default `[]` (no aggregate quotas). It adds shared admission counters across sessions of the local bootstrap profile. **These limits count admitted attempts/starts, not successful operations, tokens or USD.** This local profile scope is not an authenticated multi-user identity. The implementation is locally validated; see the [quota report](reports/RESOURCE_AGGREGATE_QUOTAS_2026-09-07.md) for evidence and concurrency-test limits.
+
+| Field | Values and meaning |
+|---|---|
+| `id` | Unique within at most 128 rules; 1–64 letters, digits, `.`, `_` or `-` |
+| `dimension` | `OWNER`, `PROVIDER` or `TOOL` |
+| `resource` | `LLM_CALL`, `TOOL_START` or `SUB_AGENT` |
+| `maxStarts` | Integer from 0 to 1,000,000,000; zero denies all matching starts |
+| `windowSeconds` | Integer from 60 to 31,536,000; default 86,400 |
+| `selector` | Default `*`; otherwise 1–128 letters, digits or `_.:/-` |
+
+`OWNER` requires `selector="*"` and totals the chosen resource across sessions of the local profile. `PROVIDER` only supports `LLM_CALL`, using lowercase provider names; `TOOL` only supports `TOOL_START`, using exact tool names. A `*` provider/tool selector means **a separate quota per encountered provider/tool**, not one combined quota. Multiple matching rules apply together.
+
+Example PowerShell configuration before launching the application:
+
+```powershell
+$env:PROMETHE_RESOURCE_QUOTAS = '[{"id":"profile-llm-day","dimension":"OWNER","resource":"LLM_CALL","maxStarts":100},{"id":"provider-hour","dimension":"PROVIDER","resource":"LLM_CALL","selector":"*","maxStarts":30,"windowSeconds":3600},{"id":"command-day","dimension":"TOOL","resource":"TOOL_START","selector":"execute_command","maxStarts":10},{"id":"agents-day","dimension":"OWNER","resource":"SUB_AGENT","maxStarts":5}]'
+```
+
+These sample values impose 100 admitted LLM attempts per profile/day, 30 per provider/hour, ten `execute_command` starts/day and five sub-agent starts/day. Choose limits for the experiment before launch. The JSON configuration is limited to 65,536 characters; copying `.env.example` alone does not export process variables.
+
+Counters persist in `<profile>/resource-quotas.sqlite`. Windows are fixed and aligned to the Unix epoch in UTC, not rolling periods from the first request. A backward clock change cannot reopen a past quota window. Changing only `maxStarts` preserves consumption; changing the rule identity, dimension, resource, normalized selector or period establishes a different policy. No automatic history purge is performed.
+
+Rules are loaded at bootstrap: restart the affected sessions/processes to apply a configuration change. Editing the JSON for an already-open session does not reload its rules; no dynamic reload is implemented. Processes sharing a profile must use the same quota configuration.
+
+All matching counters are reserved atomically: a quota denial charges none of them. Aggregate admission occurs before run persistence. A subsequent persistence failure or cancellation keeps the admitted count, with no automatic refund. A root-run budget denial before aggregate admission does not consume an aggregate start.
+
+The integration covers Koog attempts including missing run context and provider fallback, direct tools and sub-agent starts. It does not promise to count SDK-internal HTTP retries individually. A quota denial or unavailable admission storage blocks the provider without fallback.
+
+For diagnostics, use the existing `token_budget` tool to inspect rules, usage and limits, including `resetsAt` (Unix timestamp in milliseconds); policies show their window length in seconds. With wildcard provider/tool rules, counters appear for subjects encountered in the current window; an empty list does not mean the policy is disabled. A consumed start after failure can be expected. These counters are separate from provider billing and the existing run/goal budgets.
 
 ---
 

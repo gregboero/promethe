@@ -1,0 +1,17 @@
+[
+  {
+    "mode": "directed",
+    "source": "kotlin-directed-e1e34b71-73e6-43d3-b5fd-38e9bb6e1be3-directed/skills/kotlin_harness_processor_lifecycle/SKILL.md",
+    "archive": "directed-draft-0.md"
+  },
+  {
+    "mode": "baseline",
+    "source": "kotlin-directed-e1e34b71-73e6-43d3-b5fd-38e9bb6e1be3-baseline/skills/retrieve_ordered_answers_from_json_pages/SKILL.md",
+    "archive": "baseline-draft-0.md"
+  },
+  {
+    "mode": "free",
+    "source": "kotlin-directed-e1e34b71-73e6-43d3-b5fd-38e9bb6e1be3-free/skills/retrieve_ordered_page_answers_via_json_query/SKILL.md",
+    "archive": "free-draft-0.md"
+  }
+]

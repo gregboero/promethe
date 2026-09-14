@@ -56,7 +56,7 @@ class McpSseTransport(
         // Send initialize request
         val params =
             buildJsonObject {
-                put("protocolVersion", "2025-11-05")
+                put("protocolVersion", McpProtocol.LEGACY_VERSION)
                 putJsonObject("capabilities") {}
                 putJsonObject("clientInfo") {
                     put("name", "promethe")
@@ -137,7 +137,7 @@ class McpSseTransport(
             val response =
                 outboundClient.postJsonFollowingRedirects(
                     url = endpoint,
-                    headers = mapOf("MCP-Protocol-Version" to "2025-11-05"),
+                    headers = mapOf(McpProtocol.PROTOCOL_VERSION_HEADER to McpProtocol.LEGACY_VERSION),
                     body = request.toString(),
                 )
             if (response.status !in 200..299) {

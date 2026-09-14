@@ -95,8 +95,16 @@ private val CHANNEL_DEFINITIONS = listOf(
     ChannelDefinition(
         name = "discord",
         displayName = "Discord",
-        requiredKeys = listOf("DISCORD_BOT_TOKEN", "DISCORD_PUBLIC_KEY"),
-        optionalKeys = listOf("DISCORD_GUILD_ID"),
+        requiredKeys = listOf("DISCORD_BOT_TOKEN"),
+        optionalKeys =
+            listOf(
+                "DISCORD_PUBLIC_KEY",
+                "DISCORD_GUILD_ID",
+                "DISCORD_MESSAGE_CONTENT_ENABLED",
+                "DISCORD_ALLOWED_USER_IDS",
+                "DISCORD_APPROVER_USER_IDS",
+                "DISCORD_KNOWLEDGE_CHANNEL_IDS",
+            ),
         webhookPath = "/webhook/discord",
     ),
     ChannelDefinition(
@@ -123,5 +131,11 @@ private val CHANNEL_DEFINITIONS = listOf(
         displayName = "Matrix",
         requiredKeys = listOf("MATRIX_HOMESERVER_URL", "MATRIX_ACCESS_TOKEN"),
         webhookPath = "/webhook/matrix",
+    ),
+    ChannelDefinition(
+        name = "sms",
+        displayName = "SMS (Twilio)",
+        requiredKeys = listOf("TWILIO_ACCOUNT_SID", "TWILIO_AUTH_TOKEN", "TWILIO_PHONE_NUMBER"),
+        webhookPath = "/webhook/sms",
     ),
 )

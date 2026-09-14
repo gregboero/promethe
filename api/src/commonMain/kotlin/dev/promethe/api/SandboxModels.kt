@@ -115,7 +115,10 @@ data class SandboxStatus(
     val networkMode: SandboxNetworkMode,
     val degraded: Boolean = false,
     val setupRequired: Boolean = false,
+    val setupAvailable: Boolean = false,
+    val localConfigurationAllowed: Boolean = false,
     val selfTestPassed: Boolean = false,
+    val workspaceRoot: String? = null,
     val message: String? = null,
 )
 

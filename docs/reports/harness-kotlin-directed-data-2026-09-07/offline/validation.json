@@ -1,0 +1,32 @@
+{
+  "api": {
+    "tests": 76,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "shared": {
+    "tests": 693,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "gateway": {
+    "tests": 213,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "evals": {
+    "tests": 15,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "composeApp": {
+    "tests": 23,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  }
+}

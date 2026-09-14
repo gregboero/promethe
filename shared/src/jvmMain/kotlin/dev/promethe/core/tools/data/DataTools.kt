@@ -6,6 +6,8 @@ import ai.koog.serialization.typeToken
 import dev.promethe.core.SecureJvmOutboundHttpClient
 import dev.promethe.core.SecureJvmWorkspaceFileReader
 import dev.promethe.core.SecureJvmWorkspaceFileWriter
+import dev.promethe.core.WorkspaceFileReader
+import dev.promethe.core.WorkspaceFileWriter
 import dev.promethe.core.WorkspacePathPolicy
 import dev.promethe.core.sandbox.SandboxedCommandRunner
 import dev.promethe.core.sandbox.renderCommandOutput
@@ -134,8 +136,8 @@ class JsonQueryTool :
 
 class CsvTool(
     private val workDir: String,
-    private val reader: SecureJvmWorkspaceFileReader,
-    private val writer: SecureJvmWorkspaceFileWriter,
+    private val reader: WorkspaceFileReader,
+    private val writer: WorkspaceFileWriter,
 ) : SimpleTool<CsvArgs>(
         argsType = typeToken<CsvArgs>(),
         name = "csv",

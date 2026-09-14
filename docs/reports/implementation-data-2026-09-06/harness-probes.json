@@ -1,0 +1,80 @@
+[
+  {
+    "harness": "deepseek",
+    "scenario": "tool",
+    "runId": "1",
+    "paidCalls": 0,
+    "scope": "Upstream runtime transport and bounded lifecycle only; no model quality comparison",
+    "version": "deepseek-harness-sdk/runtime-bin 0.1.2rc1",
+    "exitCode": 0,
+    "passed": true,
+    "elapsedSeconds": 2.219,
+    "requestCount": 2,
+    "toolResultObserved": true
+  },
+  {
+    "harness": "deepseek",
+    "scenario": "tool",
+    "runId": "2",
+    "paidCalls": 0,
+    "scope": "Upstream runtime transport and bounded lifecycle only; no model quality comparison",
+    "version": "deepseek-harness-sdk/runtime-bin 0.1.2rc1",
+    "exitCode": 0,
+    "passed": true,
+    "elapsedSeconds": 1.766,
+    "requestCount": 2,
+    "toolResultObserved": true
+  },
+  {
+    "harness": "deepseek",
+    "scenario": "tool",
+    "runId": "3",
+    "paidCalls": 0,
+    "scope": "Upstream runtime transport and bounded lifecycle only; no model quality comparison",
+    "version": "deepseek-harness-sdk/runtime-bin 0.1.2rc1",
+    "exitCode": 0,
+    "passed": true,
+    "elapsedSeconds": 1.735,
+    "requestCount": 2,
+    "toolResultObserved": true
+  },
+  {
+    "harness": "hermes",
+    "scenario": "tool",
+    "runId": "1",
+    "paidCalls": 0,
+    "scope": "Upstream runtime transport and bounded lifecycle only; no model quality comparison",
+    "version": "v2026.8.31",
+    "exitCode": 0,
+    "passed": true,
+    "elapsedSeconds": 16.579,
+    "requestCount": 3,
+    "toolResultObserved": true
+  },
+  {
+    "harness": "hermes",
+    "scenario": "tool",
+    "runId": "2",
+    "paidCalls": 0,
+    "scope": "Upstream runtime transport and bounded lifecycle only; no model quality comparison",
+    "version": "v2026.8.31",
+    "exitCode": 0,
+    "passed": true,
+    "elapsedSeconds": 14.562,
+    "requestCount": 3,
+    "toolResultObserved": true
+  },
+  {
+    "harness": "hermes",
+    "scenario": "tool",
+    "runId": "3",
+    "paidCalls": 0,
+    "scope": "Upstream runtime transport and bounded lifecycle only; no model quality comparison",
+    "version": "v2026.8.31",
+    "exitCode": 0,
+    "passed": true,
+    "elapsedSeconds": 15.031,
+    "requestCount": 3,
+    "toolResultObserved": true
+  }
+]

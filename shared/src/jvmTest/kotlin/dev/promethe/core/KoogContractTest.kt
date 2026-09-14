@@ -1,6 +1,7 @@
 package dev.promethe.core
 
 import ai.koog.prompt.executor.clients.openai.base.models.ReasoningEffort as KoogReasoningEffort
+import ai.koog.prompt.executor.clients.anthropic.AnthropicCacheControl
 import ai.koog.prompt.executor.clients.openai.models.OpenAIInclude
 import ai.koog.prompt.message.Message
 import ai.koog.prompt.message.MessagePart
@@ -11,9 +12,25 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
+import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
 class KoogContractTest {
+    @Test fun `OpenAI preserves configured reasoning and output bound on its selected endpoint`() {
+        val model = KoogLlmAdapter.resolveKnownModel("openai", "gpt-5.6-terra")
+        val none = OpenAiCompatibleProviderPolicy.openAIParams(model, ReasoningEffort.NONE, 4096) as ai.koog.prompt.executor.clients.openai.OpenAIResponsesParams
+        assertEquals(KoogReasoningEffort.NONE, none.reasoning?.effort)
+        assertEquals(4096, none.maxTokens)
+        val high = OpenAiCompatibleProviderPolicy.openAIParams(model, ReasoningEffort.HIGH, 1234) as ai.koog.prompt.executor.clients.openai.OpenAIResponsesParams
+        assertEquals(KoogReasoningEffort.HIGH, high.reasoning?.effort)
+        assertEquals(1234, high.maxTokens)
+        val automatic = OpenAiCompatibleProviderPolicy.openAIParams(model, ReasoningEffort.AUTO, 4096) as ai.koog.prompt.executor.clients.openai.OpenAIResponsesParams
+        assertNull(automatic.reasoning)
+        val chat = OpenAiCompatibleProviderPolicy.openAIParams(KoogLlmAdapter.resolveKnownModel("openai", "gpt-4o"), ReasoningEffort.AUTO, 512) as ai.koog.prompt.executor.clients.openai.OpenAIChatParams
+        assertEquals(512, chat.maxTokens)
+        assertNull(chat.reasoningEffort)
+    }
+
     private val context = LlmRequestContext("session-42", AgentExecutionOrigin.A2A)
 
     @Test
@@ -75,5 +92,27 @@ class KoogContractTest {
         assertEquals("weather", result.tool)
         assertFalse(result.isError)
         assertEquals("encrypted-state", preservedReasoning.encrypted)
+    }
+
+    @Test
+    fun `system messages form a stable anthropic prefix before conversation`() {
+        val prompt =
+            KoogLlmAdapter(AgentConfig()).buildPrompt(
+                systemPrompt = "base",
+                messages =
+                    listOf(
+                        "user" to "question",
+                        "system" to "policy",
+                        "assistant" to "answer",
+                    ),
+                provider = "anthropic",
+            )
+
+        assertEquals(
+            listOf(Message.Role.System, Message.Role.System, Message.Role.User, Message.Role.Assistant),
+            prompt.messages.map { it.role },
+        )
+        assertNull(prompt.messages.first().parts.single().cacheControl)
+        assertIs<AnthropicCacheControl.Default>(prompt.messages[1].parts.single().cacheControl)
     }
 }

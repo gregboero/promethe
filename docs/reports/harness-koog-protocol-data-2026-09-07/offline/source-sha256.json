@@ -1,0 +1,11 @@
+{
+  "api/src/commonMain/kotlin/dev/promethe/api/ReasoningEffort.kt": "45ee224aed2eb2415cd398240c6cf99b95400f83f10d68c45963b86f6436caac",
+  "shared/src/commonMain/kotlin/dev/promethe/core/KoogLlmAdapter.kt": "a310701e6b022d5549c562850cb8151e34ebdc3712bb24a60c76452a76eb9809",
+  "shared/src/commonMain/kotlin/dev/promethe/core/OpenAiCompatibleProviderPolicy.kt": "ca06e66af3511bf427eaf0998d2bc502c1c213f72dba27d7a61ee3087150fb30",
+  "shared/src/jvmTest/kotlin/dev/promethe/core/CampaignKoogRelay.kt": "cf00bd07b0aa3f262c1739f77ccc65a1abb9d8a07c7d4699da8d97cddc6feac0",
+  "shared/src/jvmTest/kotlin/dev/promethe/core/HarnessKoogProtocolFixture.kt": "dff448966b476032e4e858a98b4d97580376e6d7fe94cdb8c004ad374aaf1b2e",
+  "shared/src/jvmTest/kotlin/dev/promethe/core/HarnessKoogProtocolLiveTest.kt": "7d9f882e30c67907f61ceade7f5b6b03e158a33e3d96203fc7237dbf4a432c08",
+  "shared/src/jvmTest/kotlin/dev/promethe/core/KoogProtocolRelayTest.kt": "c9450e610942b2281068b4ceabba0dc067ae93f81e85fef64a714692100544bb",
+  "shared/src/jvmTest/kotlin/dev/promethe/core/KoogRelayBudgetTest.kt": "9c6672561120c142a02f23d80badda5b5f99e6bfe9bd3e49c1b0b2035a1298c9",
+  "scripts/report-harness-koog-protocol.py": "72b7bf5e6c0736a5e6797fd362979d2bd6563bcc0a9eeb9a0f7483921e10c414"
+}

@@ -4,6 +4,8 @@ import dev.promethe.api.*
 import dev.promethe.core.*
 import dev.promethe.core.MemoryLayer
 import dev.promethe.db.PrometheDatabaseApi
+import dev.promethe.gateway.mcp.McpTaskManager
+import dev.promethe.gateway.mcp.McpRoundTripManager
 import dev.promethe.gateway.mcp.mcpServerRoutes
 import dev.promethe.gateway.voice.AudioSessionManager
 import dev.promethe.gateway.voice.VoiceProviderRegistry
@@ -26,6 +28,10 @@ import io.ktor.server.http.content.*
 import io.ktor.server.sse.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collect
 import kotlinx.serialization.json.*
 import okio.Path.Companion.toPath
@@ -35,9 +41,11 @@ private val logger = io.github.oshai.kotlinlogging.KotlinLogging.logger {}
 class OmnichannelGateway(
     private val agent: AIAgent,
     private val database: PrometheDatabaseApi,
+    private val resourceGovernors: ResourceGovernorRegistry = GlobalResourceGovernorRegistry,
     private val llmAdapter: KoogLlmAdapter,
     private val feedbackCollector: FeedbackCollector,
     private val mcpBridge: McpBridge,
+    private val mcpElicitationBroker: McpElicitationBroker,
     private val memoryLayer: MemoryLayer,
     private val taskScheduler: dev.promethe.core.TaskScheduler? = null,
     private val hookManager: dev.promethe.core.hooks.HookManager? = null,
@@ -56,9 +64,14 @@ class OmnichannelGateway(
     private val actionExecutor: dev.promethe.core.ActionExecutor,
     private val sandboxManager: dev.promethe.core.sandbox.SandboxManager,
     private val sandboxRuntimePolicy: dev.promethe.core.sandbox.SandboxRuntimePolicy,
+    private val localCodingAgentService: dev.promethe.core.coding.LocalCodingAgentService,
     private val oauthManager: dev.promethe.gateway.auth.OAuthManager? = null,
 ) {
     private var server: EmbeddedServer<*, *>? = null
+    private var discordGateway: DiscordGatewayManager? = null
+    private val mcpExecutionScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private val mcpTaskManager = McpTaskManager(database, mcpExecutionScope)
+    private val mcpRoundTripManager = McpRoundTripManager(mcpExecutionScope)
     private val startTime = System.currentTimeMillis()
 
     fun start() {
@@ -85,8 +98,35 @@ class OmnichannelGateway(
             skillWriter = effectiveSkillWriter,
             database = database,
         )
-        val agentExecutionService = AgentExecutionService(agent, database)
+        val agentExecutionService = AgentExecutionService(agent, database, resourceGovernors = resourceGovernors)
+        val a2aClient = A2AInternalClient(agentExecutionService)
         val providerCatalogSource = DefaultProviderCatalogSource.instance
+        val discordKnowledgeArchive = DiscordKnowledgeArchive()
+        val discordPolicyService = DiscordPolicyService(database)
+        kotlinx.coroutines.runBlocking { discordPolicyService.reload() }
+        val activeDiscordGateway =
+            DiscordGatewayManager(
+                DiscordAgentExecutor { sessionId, text, externalContext, projectId ->
+                    a2aClient.execute(
+                        sessionId,
+                        text,
+                        channelHint = "discord",
+                        origin = dev.promethe.core.ToolCallOrigin.CHANNEL,
+                        externalContext = externalContext,
+                        projectId = projectId,
+                    )
+                },
+                policyService = discordPolicyService,
+                knowledgeArchive = discordKnowledgeArchive,
+                approvalGate = approvalGate,
+            )
+        kotlinx.coroutines.runBlocking {
+            dev.promethe.core.ToolRegistry.register(
+                DiscordPolicyTool(discordPolicyService) { activeDiscordGateway.reload() },
+            )
+        }
+        discordGateway?.close()
+        discordGateway = activeDiscordGateway
 
         server =
             embeddedServer(CIO, host = securityConfig.bindHost, port = port) {
@@ -104,7 +144,7 @@ class OmnichannelGateway(
 //                }
                 AuthMiddleware.install(this, apiKey, securityConfig, ownerAuthService)
 
-                // Rate limiter — 60 requests/min per IP
+                // Remote rate limiter; authenticated loopback desktop calls are exempt.
                 RateLimiter.install(this)
 
                 routing {
@@ -131,17 +171,16 @@ class OmnichannelGateway(
                         mcpServerRoutes(
                             allowedOrigins = securityConfig.allowedOrigins.map { it.value }.toSet(),
                             secureToolExecutor = actionExecutor,
+                            taskManager = mcpTaskManager,
+                            roundTripManager = mcpRoundTripManager,
                         )
 
-                        capabilityRoutes(providerCatalogSource)
+                        capabilityRoutes(providerCatalogSource, localCodingAgentService)
                         installProviderCatalogRoutes(providerCatalogSource)
                         openApiRoutes()
 
                         // ── Shared voice registry (used by REST config + WS routes) ──
                         val voiceRegistry = VoiceProviderRegistry(database)
-
-                        // ── A2A Internal Client (shared by goal routes, webhooks, etc.) ──
-                        val a2aClient = A2AInternalClient(agentExecutionService)
 
                         // ACP is a protocol surface and stays at /.well-known and /acp.
                         acpRoutes(a2aClient)
@@ -157,6 +196,7 @@ class OmnichannelGateway(
                             route("v1") {
                                 // ===================== Extracted Route Modules =====================
                                 sessionRoutes(database)
+                                projectRoutes(database, sandboxRuntimePolicy.workspaceRoot())
 
                                 agentProfileRoutes(database)
                                 memoryRoutes(memoryLayer)
@@ -179,6 +219,7 @@ class OmnichannelGateway(
 
                                 // ── Channel Management Routes ──
                                 channelRoutes()
+                                discordPolicyRoutes(discordPolicyService) { activeDiscordGateway.reload() }
 
                                 // ── Config Env Routes ──
                                 configEnvRoutes()
@@ -198,6 +239,16 @@ class OmnichannelGateway(
                                     skillCurator = effectiveSkillCurator,
                                     fs = okio.FileSystem.SYSTEM,
                                     skillsDir = effectiveSkillsDir,
+                                    evaluationSubject = SkillEvaluationSubject { skill, input ->
+                                        llmAdapter.completeWithProfile(
+                                            systemPrompt = "Follow this skill to answer the user's task. Return only the requested answer. No tools are available.\n\n${skill.content}",
+                                            messages = listOf("user" to input),
+                                            provider = (config ?: AgentConfig()).provider,
+                                            model = (config ?: AgentConfig()).modelName,
+                                            temperature = 0.0,
+                                        ).content
+                                    },
+                                    evaluatorId = "koog-text-exact-v1; requested=${(config ?: AgentConfig()).provider}/${(config ?: AgentConfig()).modelName}",
                                 )
 
                                 // ── Orchestrator Routes ──
@@ -217,6 +268,10 @@ class OmnichannelGateway(
                                     config = config,
                                     database = database,
                                     providerCatalogSource = providerCatalogSource,
+                                    onSettingsReloaded = {
+                                        activeDiscordGateway.reload()
+                                        localCodingAgentService.refresh()
+                                    },
                                 )
 
                                 // ── Voice Config Routes (REST) ──
@@ -268,7 +323,12 @@ class OmnichannelGateway(
                                 mcpManagementRoutes(mcpBridge, database, dev.promethe.core.security.SecretCipher.fromConfig())
 
                                 approvalRoutes(approvalGate)
-                                sandboxSecurityRoutes(sandboxManager, sandboxRuntimePolicy)
+                                mcpElicitationRoutes(mcpElicitationBroker)
+                                sandboxSecurityRoutes(
+                                    sandboxManager,
+                                    sandboxRuntimePolicy,
+                                    remoteAccessEnabled = securityConfig.remoteAccessEnabled,
+                                )
                             }
                         }
 
@@ -284,7 +344,12 @@ class OmnichannelGateway(
 
                         // ===================== Webhooks =====================
 
-                        channelWebhookRoutes(a2aClient)
+                        channelWebhookRoutes(
+                            a2aClient,
+                            securityConfig.publicBaseUrl,
+                            discordKnowledgeArchive,
+                            discordPolicyService,
+                        )
 
                         systemRoutes(startTime)
                         authRoutes(ownerAuthService, securityConfig)
@@ -324,12 +389,7 @@ class OmnichannelGateway(
                     }
 
                     // ── WASM Web UI static serving ──
-                    val wasmDir =
-                        java.io.File(
-                            System.getenv("PROMETHE_WEB_DIR")
-                                ?.takeIf { it.isNotBlank() }
-                                ?: "composeApp/build/dist/wasmJs/productionExecutable",
-                        ).canonicalFile
+                    val wasmDir = resolveWebUiDirectory(System.getenv("PROMETHE_WEB_DIR"))
                     if (wasmDir.exists() && wasmDir.isDirectory) {
                         staticFiles("/", wasmDir) {
                             default("index.html")
@@ -340,10 +400,14 @@ class OmnichannelGateway(
                     }
                 }
             }.start(wait = false)
+        activeDiscordGateway.start()
         logger.info { "Promethe Gateway started on ${securityConfig.bindHost}:$port — REST + WebSocket ready" }
     }
 
     fun stop() {
+        discordGateway?.close()
+        discordGateway = null
+        mcpExecutionScope.cancel()
         server?.stop(1000, 2000)
         logger.info { "Promethe Gateway stopped" }
     }
@@ -378,4 +442,34 @@ class OmnichannelGateway(
             // Title generation is best-effort, don't fail the request
         }
     }
+}
+
+internal fun resolveWebUiDirectory(
+    configuredPath: String?,
+    workingDirectory: java.io.File = java.io.File(System.getProperty("user.dir")),
+): java.io.File {
+    configuredPath?.takeIf { it.isNotBlank() }?.let { path ->
+        val configured = java.io.File(path)
+        return (if (configured.isAbsolute) configured else java.io.File(workingDirectory, path)).canonicalFile
+    }
+
+    val composeModule =
+        when {
+            workingDirectory.name.equals("composeApp", ignoreCase = true) -> {
+                workingDirectory
+            }
+
+            java.io.File(workingDirectory, "composeApp").isDirectory -> {
+                java.io.File(workingDirectory, "composeApp")
+            }
+
+            workingDirectory.parentFile?.let { java.io.File(it, "composeApp").isDirectory } == true -> {
+                java.io.File(workingDirectory.parentFile, "composeApp")
+            }
+
+            else -> {
+                java.io.File(workingDirectory, "composeApp")
+            }
+        }
+    return java.io.File(composeModule, "build/dist/wasmJs/productionExecutable").canonicalFile
 }

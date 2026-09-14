@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="KoogContractTest[jvm]" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-09-07T18:06:29.416Z" hostname="BUREAU" time="0.346">
+  <properties/>
+  <testcase name="xai AUTO omits reasoning and Chat omits Responses-only fields[jvm]" classname="dev.promethe.core.KoogContractTest" time="0.033"/>
+  <testcase name="OpenAI preserves configured reasoning and output bound on its selected endpoint[jvm]" classname="dev.promethe.core.KoogContractTest" time="0.049"/>
+  <testcase name="system messages form a stable anthropic prefix before conversation[jvm]" classname="dev.promethe.core.KoogContractTest" time="0.25"/>
+  <testcase name="kimi chat parameters omit temperature and disable parallel tools[jvm]" classname="dev.promethe.core.KoogContractTest" time="0.001"/>
+  <testcase name="xai Responses parameters preserve encrypted reasoning without storage[jvm]" classname="dev.promethe.core.KoogContractTest" time="0.0"/>
+  <testcase name="typed tool turn preserves reasoning call id and result[jvm]" classname="dev.promethe.core.KoogContractTest" time="0.006"/>
+  <system-out><![CDATA[kotlin-logging: initializing... active logger factory: Slf4jLoggerFactory
+]]></system-out>
+  <system-err><![CDATA[SLF4J(W): No SLF4J providers were found.
+SLF4J(W): Defaulting to no-operation (NOP) logger implementation
+SLF4J(W): See https://www.slf4j.org/codes.html#noProviders for further details.
+]]></system-err>
+</testsuite>

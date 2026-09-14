@@ -1,12 +1,208 @@
 package dev.promethe.db
 
+import dev.promethe.api.AgentRunEventRecord
+import dev.promethe.api.AgentRunRecord
+import dev.promethe.api.AgentRunStatus
+import dev.promethe.api.PolicyDataTrust
 import dev.promethe.api.ReasoningEffort
+import dev.promethe.api.ToolIntentRecord
+import dev.promethe.api.ToolIntentStatus
+import kotlinx.serialization.Serializable
+
+@Serializable
+enum class McpTaskStatus {
+    WORKING,
+    INPUT_REQUIRED,
+    COMPLETED,
+    FAILED,
+    CANCELLED,
+}
+
+@Serializable
+data class McpTaskRecord(
+    val taskId: String,
+    val ownerSessionId: String,
+    val method: String,
+    val resourceName: String,
+    val runId: String? = null,
+    val status: McpTaskStatus,
+    val statusMessage: String? = null,
+    val resultJson: String? = null,
+    val errorJson: String? = null,
+    val inputRequestsJson: String? = null,
+    val createdAt: Long,
+    val lastUpdatedAt: Long,
+    val ttlMs: Long? = null,
+    val pollIntervalMs: Long? = null,
+)
+
+data class PersistentApprovalGrantRow(
+    val id: String,
+    val fingerprint: String,
+    val allowed: Boolean,
+    val createdAt: Long,
+    val expiresAt: Long,
+)
+
+data class ResourceGovernorStateRow(
+    val rootRunId: String,
+    val maxTokens: Long,
+    val maxCostDollars: Double,
+    val maxLlmCalls: Int,
+    val maxToolStarts: Int,
+    val maxSubAgents: Int,
+    val maxDurationMs: Long,
+    val startedAt: Long,
+    val tokensUsed: Long,
+    val costDollars: Double,
+    val llmCallsStarted: Int,
+    val toolsStarted: Int,
+    val subAgentsStarted: Int,
+    val version: Long,
+    val updatedAt: Long,
+)
+
+data class ResourceGovernorBindingRow(
+    val sessionId: String,
+    val rootRunId: String,
+    val runId: String?,
+    val createdAt: Long,
+    val updatedAt: Long,
+)
 
 /**
  * Platform-agnostic database interface consumed by core classes in commonMain.
  * The actual implementation (Exposed) lives in jvmMain.
  */
 interface PrometheDatabaseApi {
+    // ── Agent runs ──
+    suspend fun insertAgentRun(
+        run: AgentRunRecord,
+        event: AgentRunEventRecord? = null,
+    ): Boolean = true
+
+    suspend fun transitionAgentRun(
+        runId: String,
+        expectedStatuses: Set<AgentRunStatus>,
+        status: AgentRunStatus,
+        stepCount: Int,
+        lastStepId: String?,
+        errorCode: String?,
+        startedAt: Long?,
+        finishedAt: Long?,
+        updatedAt: Long,
+        event: AgentRunEventRecord? = null,
+    ): Boolean = true
+
+    suspend fun updateAgentRunProgress(
+        runId: String,
+        stepCount: Int,
+        lastStepId: String,
+        updatedAt: Long,
+        event: AgentRunEventRecord? = null,
+    ): Boolean = true
+
+    suspend fun getAgentRun(runId: String): AgentRunRecord? = null
+
+    suspend fun getAgentRunsByStatus(statuses: Set<AgentRunStatus>): List<AgentRunRecord> = emptyList()
+
+    suspend fun appendAgentRunEvent(event: AgentRunEventRecord): Boolean = true
+
+    suspend fun getAgentRunEvents(runId: String): List<AgentRunEventRecord> = emptyList()
+
+    // ── Durable resource budgets ──
+    suspend fun insertResourceGovernorState(state: ResourceGovernorStateRow): Boolean = true
+
+    suspend fun updateResourceGovernorState(
+        expectedVersion: Long,
+        state: ResourceGovernorStateRow,
+    ): Boolean = true
+
+    suspend fun getResourceGovernorState(rootRunId: String): ResourceGovernorStateRow? = null
+
+    suspend fun insertResourceGovernorBinding(binding: ResourceGovernorBindingRow): Boolean = true
+
+    suspend fun claimResourceGovernorBinding(
+        sessionId: String,
+        expectedRunId: String?,
+        runId: String,
+        updatedAt: Long,
+    ): Boolean = true
+
+    suspend fun getResourceGovernorBinding(sessionId: String): ResourceGovernorBindingRow? = null
+
+    suspend fun getResourceGovernorBindingForRun(runId: String): ResourceGovernorBindingRow? = null
+
+    suspend fun deleteResourceGovernorBinding(
+        sessionId: String,
+        runId: String?,
+    ): Boolean = true
+
+    // ── MCP tasks ──
+    suspend fun insertMcpTask(task: McpTaskRecord): Boolean = true
+
+    suspend fun updateMcpTask(
+        taskId: String,
+        ownerSessionId: String,
+        expectedStatuses: Set<McpTaskStatus>,
+        status: McpTaskStatus,
+        statusMessage: String?,
+        resultJson: String?,
+        errorJson: String?,
+        inputRequestsJson: String?,
+        lastUpdatedAt: Long,
+    ): Boolean = true
+
+    suspend fun getMcpTask(
+        taskId: String,
+        ownerSessionId: String,
+    ): McpTaskRecord? = null
+
+    suspend fun getMcpTasksByStatus(statuses: Set<McpTaskStatus>): List<McpTaskRecord> = emptyList()
+
+    // ── Tool intents ──
+    suspend fun insertToolIntent(
+        intent: ToolIntentRecord,
+        event: AgentRunEventRecord? = null,
+    ): Boolean = true
+
+    suspend fun transitionToolIntent(
+        intentId: String,
+        expectedStatuses: Set<ToolIntentStatus>,
+        status: ToolIntentStatus,
+        resultHash: String?,
+        artifactHash: String?,
+        errorCode: String?,
+        startedAt: Long?,
+        finishedAt: Long?,
+        updatedAt: Long,
+        event: AgentRunEventRecord? = null,
+    ): Boolean = true
+
+    suspend fun resetToolIntentForRetry(
+        intentId: String,
+        expectedStatuses: Set<ToolIntentStatus>,
+        updatedAt: Long,
+        event: AgentRunEventRecord? = null,
+    ): Boolean = true
+
+    suspend fun getToolIntentByIdempotencyKeyHash(idempotencyKeyHash: String): ToolIntentRecord? = null
+
+    suspend fun getToolIntent(intentId: String): ToolIntentRecord? = null
+
+    suspend fun getToolIntentsByStatus(statuses: Set<ToolIntentStatus>): List<ToolIntentRecord> = emptyList()
+
+    // ── Projects ──
+    suspend fun insertProject(project: ProjectRow) = Unit
+
+    suspend fun updateProject(project: ProjectRow) = Unit
+
+    suspend fun getProject(id: String): ProjectRow? = null
+
+    suspend fun getAllProjects(): List<ProjectRow> = emptyList()
+
+    suspend fun getProjectSessionCounts(): Map<String, Int> = emptyMap()
+
     // ── Sessions ──
     suspend fun insertSession(
         id: String,
@@ -21,6 +217,13 @@ interface PrometheDatabaseApi {
     )
 
     suspend fun getAllSessions(): List<SessionRow>
+
+    suspend fun getSession(id: String): SessionRow? = getAllSessions().find { it.id == id }
+
+    suspend fun assignSessionToProject(
+        sessionId: String,
+        projectId: String?,
+    ) = Unit
 
     suspend fun deleteSession(id: String)
 
@@ -47,6 +250,8 @@ interface PrometheDatabaseApi {
         role: String,
         content: String,
         timestamp: Long,
+        dataTrust: PolicyDataTrust = PolicyDataTrust.TRUSTED,
+        sourceRunId: String? = null,
     ): Int
 
     suspend fun getMessagesForSession(sessionId: String): List<MessageRow>
@@ -149,6 +354,12 @@ interface PrometheDatabaseApi {
 
     suspend fun getAllSettings(): Map<String, String>
 
+    suspend fun getPersistentApprovalGrants(now: Long): List<PersistentApprovalGrantRow> = emptyList()
+
+    suspend fun replacePersistentApprovalGrant(grant: PersistentApprovalGrantRow): Unit = throw UnsupportedApprovalGrantStorage()
+
+    suspend fun deletePersistentApprovalGrant(id: String): Unit = throw UnsupportedApprovalGrantStorage()
+
     // ── Gateway security (JVM implementation overrides these methods) ──
     suspend fun getRemoteOwner(): RemoteOwnerRow? = null
 
@@ -174,6 +385,10 @@ interface PrometheDatabaseApi {
     ) = Unit
 
     suspend fun insertSecurityAuditLog(log: SecurityAuditLogRow) = Unit
+
+    suspend fun listSecurityAuditLogs(limit: Int = 1_000): List<SecurityAuditLogRow> = emptyList()
+
+    suspend fun verifySecurityAuditChain(): SecurityAuditChainVerification = SecurityAuditChainVerification(valid = true, entries = 0)
 
     suspend fun insertOAuthAuthorization(authorization: OAuthAuthorizationRow) = Unit
 
@@ -210,6 +425,11 @@ interface PrometheDatabaseApi {
     suspend fun getLlmUsageByProvider(): Map<String, LlmProviderStats>
 }
 
+private class UnsupportedApprovalGrantStorage :
+    UnsupportedOperationException(
+        "Persistent approval grants are not supported by this database",
+    )
+
 // ── Data classes shared between commonMain and jvmMain ──
 
 data class SessionRow(
@@ -217,6 +437,19 @@ data class SessionRow(
     val createdAt: Long,
     val metadata: String?,
     val title: String? = null,
+    val projectId: String? = null,
+)
+
+data class ProjectRow(
+    val id: String,
+    val name: String,
+    val description: String = "",
+    val instructions: String = "",
+    val workspacePath: String,
+    val memoryNamespace: String,
+    val archived: Boolean = false,
+    val createdAt: Long,
+    val updatedAt: Long,
 )
 
 data class MessageRow(
@@ -225,6 +458,8 @@ data class MessageRow(
     val role: String,
     val content: String,
     val timestamp: Long,
+    val dataTrust: PolicyDataTrust = PolicyDataTrust.TRUSTED,
+    val sourceRunId: String? = null,
 )
 
 data class FeedbackRow(
@@ -348,6 +583,14 @@ data class SecurityAuditLogRow(
     val remoteAddress: String = "",
     val detail: String = "",
     val createdAt: Long,
+    val previousHash: String = "",
+    val entryHash: String = "",
+)
+
+data class SecurityAuditChainVerification(
+    val valid: Boolean,
+    val entries: Int,
+    val invalidEntryHash: String? = null,
 )
 
 data class OAuthAuthorizationRow(

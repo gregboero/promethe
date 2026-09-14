@@ -1,6 +1,9 @@
 package dev.promethe.core
 
+import dev.promethe.db.PersistentApprovalGrantRow
+import dev.promethe.db.PrometheDatabaseApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
@@ -13,6 +16,7 @@ import java.security.MessageDigest
 import java.security.SecureRandom
 import java.util.Base64
 import java.util.Locale
+import java.util.concurrent.CopyOnWriteArrayList
 
 private val logger = io.github.oshai.kotlinlogging.KotlinLogging.logger {}
 
@@ -25,11 +29,12 @@ private val logger = io.github.oshai.kotlinlogging.KotlinLogging.logger {}
  * - "all": every tool call requires approval before execution
  *
  * When approval is required, the gate stores a pending request and waits
- * for it to be approved/rejected via the REST API endpoint `POST /approval/{id}`.
+ * for it to be approved/rejected via the REST API endpoint `POST /api/v1/approval/{id}`.
  */
 class ToolApprovalGate(
     private val config: AgentConfig,
     private val clock: () -> Long = { System.currentTimeMillis() },
+    private val database: PrometheDatabaseApi? = null,
 ) : ApprovalGate {
     /** Tools which can modify files, processes, configuration, or external state. */
     companion object {
@@ -40,10 +45,15 @@ class ToolApprovalGate(
 
         private const val MIN_GRANT_TTL_MS = 1_000L
         private const val DEFAULT_SESSION_TTL_MS = 8 * 60 * 60 * 1_000L
-        private const val DEFAULT_PERSISTENT_TTL_MS = 30 * 24 * 60 * 60 * 1_000L
         private const val MAX_SESSION_TTL_MS = 24 * 60 * 60 * 1_000L
         private const val MAX_PERSISTENT_TTL_MS = 365 * 24 * 60 * 60 * 1_000L
         private const val MIN_KNOWN_SECRET_LENGTH = 8
+
+        fun requiresLocalOwner(toolName: String): Boolean =
+            toolName == "codex_delegate" ||
+                toolName == "claude_code_delegate" ||
+                toolName.startsWith("codex_local_action") ||
+                toolName.startsWith("claude_code_action:")
 
         private val COMMAND_ARGUMENT_TOOLS =
             setOf(
@@ -84,6 +94,7 @@ class ToolApprovalGate(
         val argsDigest: String,
         val fingerprint: String,
         val sessionId: String,
+        val persistentAllowed: Boolean,
         var status: ApprovalStatus = ApprovalStatus.PENDING,
         var resolvedScope: ApprovalGate.ApprovalScope? = null,
         var resolutionId: String? = null,
@@ -105,17 +116,42 @@ class ToolApprovalGate(
     enum class ResponseResult {
         ACCEPTED,
         NOT_FOUND,
+        LOCAL_OWNER_REQUIRED,
         PERSISTENT_REQUIRES_LOCAL_OWNER,
         INVALID_EXPIRATION,
+        PERSISTENCE_FAILED,
     }
 
     enum class RevocationResult {
         REVOKED,
         NOT_FOUND,
         PERSISTENT_REQUIRES_LOCAL_OWNER,
+        PERSISTENCE_FAILED,
     }
 
     private val approvalGrants = mutableMapOf<String, ApprovalGrant>()
+    private val requestListeners = CopyOnWriteArrayList<(ApprovalRequest) -> Unit>()
+
+    init {
+        runBlocking { database?.getPersistentApprovalGrants(clock()) }
+            ?.forEach { stored ->
+                approvalGrants[stored.id] =
+                    ApprovalGrant(
+                        id = stored.id,
+                        fingerprint = stored.fingerprint,
+                        sessionId = null,
+                        scope = ApprovalGate.ApprovalScope.PERSISTENT,
+                        allowed = stored.allowed,
+                        createdAt = stored.createdAt,
+                        expiresAt = stored.expiresAt,
+                    )
+            }
+    }
+
+    fun addRequestListener(listener: (ApprovalRequest) -> Unit): AutoCloseable {
+        requestListeners += listener
+        return AutoCloseable { requestListeners -= listener }
+    }
 
     /**
      * Checks whether the given tool call needs approval and waits for it.
@@ -170,11 +206,16 @@ class ToolApprovalGate(
                 argsDigest = sha256(args),
                 fingerprint = fingerprint,
                 sessionId = sessionId,
+                persistentAllowed = supportsPersistentApproval(toolName, args),
                 createdAt = clock(),
             )
 
         synchronized(pendingApprovals) {
             pendingApprovals[requestId] = request
+        }
+        requestListeners.forEach { listener ->
+            runCatching { listener(request) }
+                .onFailure { error -> logger.warn(error) { "Approval request listener failed" } }
         }
 
         logger.info { "⏸ Waiting for approval: $toolName (id=$requestId)" }
@@ -232,13 +273,46 @@ class ToolApprovalGate(
         scope: ApprovalGate.ApprovalScope,
         expiresInMs: Long? = null,
         localOwner: Boolean = false,
-    ): ResponseResult {
-        if (scope == ApprovalGate.ApprovalScope.PERSISTENT && !localOwner) {
-            return ResponseResult.PERSISTENT_REQUIRES_LOCAL_OWNER
-        }
+    ): ResponseResult =
+        respondInternal(
+            requestId = requestId,
+            approved = approved,
+            scope = scope,
+            expiresInMs = expiresInMs,
+            requestAuthorized = { true },
+            persistentAuthorized = { request -> localOwner && request.persistentAllowed },
+        )
 
-        val ttl = expiresInMs ?: defaultTtl(scope)
-        if (scope != ApprovalGate.ApprovalScope.ONCE && ttl !in MIN_GRANT_TTL_MS..maxTtl(scope)) {
+    fun respondFromIntegrationApprover(
+        requestId: String,
+        approved: Boolean,
+        scope: ApprovalGate.ApprovalScope,
+    ): ResponseResult =
+        respondInternal(
+            requestId = requestId,
+            approved = approved,
+            scope = scope,
+            expiresInMs = null,
+            requestAuthorized = { request -> !requiresLocalOwner(request.toolName) },
+            persistentAuthorized = ApprovalRequest::persistentAllowed,
+        )
+
+    private fun respondInternal(
+        requestId: String,
+        approved: Boolean,
+        scope: ApprovalGate.ApprovalScope,
+        expiresInMs: Long?,
+        requestAuthorized: (ApprovalRequest) -> Boolean,
+        persistentAuthorized: (ApprovalRequest) -> Boolean,
+    ): ResponseResult {
+        val ttl =
+            expiresInMs
+                ?: when (scope) {
+                    ApprovalGate.ApprovalScope.ONCE -> 0L
+                    ApprovalGate.ApprovalScope.SESSION -> DEFAULT_SESSION_TTL_MS
+                    ApprovalGate.ApprovalScope.PERSISTENT -> null
+                }
+        if (scope != ApprovalGate.ApprovalScope.ONCE && ttl != null && ttl !in MIN_GRANT_TTL_MS..maxTtl(scope)) {
             return ResponseResult.INVALID_EXPIRATION
         }
 
@@ -246,6 +320,12 @@ class ToolApprovalGate(
             val request = pendingApprovals[requestId]
                 ?.takeIf { it.status == ApprovalStatus.PENDING }
                 ?: return@synchronized ResponseResult.NOT_FOUND
+            if (!requestAuthorized(request)) {
+                return@synchronized ResponseResult.LOCAL_OWNER_REQUIRED
+            }
+            if (scope == ApprovalGate.ApprovalScope.PERSISTENT && !persistentAuthorized(request)) {
+                return@synchronized ResponseResult.PERSISTENT_REQUIRES_LOCAL_OWNER
+            }
             val resolutionId =
                 if (scope == ApprovalGate.ApprovalScope.ONCE) {
                     request.id
@@ -258,8 +338,11 @@ class ToolApprovalGate(
                             scope = scope,
                             allowed = approved,
                             createdAt = clock(),
-                            expiresAt = clock() + ttl,
+                            expiresAt = ttl?.let { clock() + it } ?: Long.MAX_VALUE,
                         )
+                    if (grant.scope == ApprovalGate.ApprovalScope.PERSISTENT && !persistGrant(grant)) {
+                        return@synchronized ResponseResult.PERSISTENCE_FAILED
+                    }
                     synchronized(approvalGrants) {
                         removeConflictingGrant(grant)
                         approvalGrants[grant.id] = grant
@@ -273,20 +356,29 @@ class ToolApprovalGate(
         }
     }
 
+    private fun supportsPersistentApproval(
+        toolName: String,
+        args: String,
+    ): Boolean =
+        runCatching {
+            val arguments = Json.parseToJsonElement(args) as? JsonObject ?: return@runCatching false
+            ToolApprovalPolicy.evaluate(toolName, arguments).risk == ToolRisk.CONFIG_CHANGE
+        }.getOrDefault(false)
+
     /**
      * List all pending approval requests (for UI display).
      */
     fun listPending(): List<ApprovalRequest> =
         synchronized(pendingApprovals) {
-            pendingApprovals.values
-                .filter { it.status == ApprovalStatus.PENDING }
-                .sortedByDescending { it.createdAt }
+            newestFirst(
+                pendingApprovals.values.filter { it.status == ApprovalStatus.PENDING },
+            ) { it.createdAt }
         }
 
     fun listGrants(): List<ApprovalGrant> =
         synchronized(approvalGrants) {
             pruneExpiredGrants()
-            approvalGrants.values.sortedByDescending { it.createdAt }
+            newestFirst(approvalGrants.values) { it.createdAt }
         }
 
     fun revoke(
@@ -298,6 +390,9 @@ class ToolApprovalGate(
             val grant = approvalGrants[grantId] ?: return@synchronized RevocationResult.NOT_FOUND
             if (grant.scope == ApprovalGate.ApprovalScope.PERSISTENT && !localOwner) {
                 return@synchronized RevocationResult.PERSISTENT_REQUIRES_LOCAL_OWNER
+            }
+            if (grant.scope == ApprovalGate.ApprovalScope.PERSISTENT && !deletePersistedGrant(grant.id)) {
+                return@synchronized RevocationResult.PERSISTENCE_FAILED
             }
             approvalGrants.remove(grantId)
             RevocationResult.REVOKED
@@ -343,17 +438,32 @@ class ToolApprovalGate(
         }
     }
 
+    private fun persistGrant(grant: ApprovalGrant): Boolean =
+        runCatching {
+            runBlocking {
+                database?.replacePersistentApprovalGrant(
+                    PersistentApprovalGrantRow(
+                        id = grant.id,
+                        fingerprint = grant.fingerprint,
+                        allowed = grant.allowed,
+                        createdAt = grant.createdAt,
+                        expiresAt = grant.expiresAt,
+                    ),
+                )
+            }
+        }.onFailure { error ->
+            logger.error(error) { "Failed to persist approval grant ${grant.id}" }
+        }.isSuccess
+
+    private fun deletePersistedGrant(grantId: String): Boolean =
+        runCatching { runBlocking { database?.deletePersistentApprovalGrant(grantId) } }
+            .onFailure { error -> logger.error(error) { "Failed to revoke persistent approval grant $grantId" } }
+            .isSuccess
+
     private fun pruneExpiredGrants() {
         val now = clock()
         approvalGrants.entries.removeIf { (_, grant) -> grant.expiresAt <= now }
     }
-
-    private fun defaultTtl(scope: ApprovalGate.ApprovalScope): Long =
-        when (scope) {
-            ApprovalGate.ApprovalScope.ONCE -> 0
-            ApprovalGate.ApprovalScope.SESSION -> DEFAULT_SESSION_TTL_MS
-            ApprovalGate.ApprovalScope.PERSISTENT -> DEFAULT_PERSISTENT_TTL_MS
-        }
 
     private fun maxTtl(scope: ApprovalGate.ApprovalScope): Long =
         when (scope) {
@@ -496,9 +606,9 @@ class ToolApprovalGate(
      */
     fun listPendingProviders(): List<ProviderChoiceRequest> =
         synchronized(pendingProviderChoices) {
-            pendingProviderChoices.values
-                .filter { it.status == ApprovalStatus.PENDING }
-                .sortedByDescending { it.createdAt }
+            newestFirst(
+                pendingProviderChoices.values.filter { it.status == ApprovalStatus.PENDING },
+            ) { it.createdAt }
         }
 
     private fun cleanupProvider(requestId: String) {
@@ -510,6 +620,23 @@ class ToolApprovalGate(
     private fun secureRequestId(prefix: String): String {
         val random = ByteArray(18).also { SecureRandom().nextBytes(it) }
         return "$prefix-${Base64.getUrlEncoder().withoutPadding().encodeToString(random)}"
+    }
+
+    /** Avoids a lazily loaded comparator class while the Desktop app is running from Gradle class directories. */
+    private inline fun <T> newestFirst(
+        values: Collection<T>,
+        createdAt: (T) -> Long,
+    ): List<T> {
+        val result = ArrayList<T>(values.size)
+        for (value in values) {
+            val timestamp = createdAt(value)
+            var insertionIndex = 0
+            while (insertionIndex < result.size && createdAt(result[insertionIndex]) >= timestamp) {
+                insertionIndex++
+            }
+            result.add(insertionIndex, value)
+        }
+        return result
     }
 
     private fun sha256(value: String): String =

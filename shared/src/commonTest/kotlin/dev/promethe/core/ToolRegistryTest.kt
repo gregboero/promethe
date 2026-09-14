@@ -7,6 +7,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class ToolRegistryTest {
     @BeforeTest
@@ -85,5 +86,21 @@ class ToolRegistryTest {
             // Snapshot is independent copy
             ToolRegistry.clear()
             assertEquals(1, snapshot.size, "Snapshot should not be affected by clear")
+        }
+
+    @Test
+    fun `registered tool inventory has complete contracts`() =
+        runTest {
+            val fs = getFileSystem()
+            val config = AgentConfig()
+            val basePath = getProfileDirectoryPath(config)
+            ToolRegistry.register(FileReadTool(fs, basePath))
+            ToolRegistry.register(FileWriteTool(fs, basePath))
+
+            val report = ToolRegistry.requireCompleteContractCoverage()
+
+            assertTrue(report.valid)
+            assertEquals(2, report.toolCount)
+            assertEquals(1, report.effectfulToolCount)
         }
 }

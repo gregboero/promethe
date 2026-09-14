@@ -1,0 +1,112 @@
+[
+  {
+    "id": "e2327515-3ce9-41fe-91b3-01fe85f4e46d",
+    "sessionId": "kotlin-decision-f64874e2-24bc-46a8-a5c7-c6332714f40d",
+    "baseRevision": null,
+    "source": "val text = observation.text\nval value = try { Json.parseToJsonElement(text) } catch (_: Exception) { null }\nwhen {\n    value is JsonObject && value[\"answer\"] is JsonPrimitive -> (value[\"answer\"] as JsonPrimitive).content\n    text.startsWith(\"id,answer\\n\") -> text.substringAfter('\\n').substringAfter(',')\n    text.startsWith(\"DATA answer=\") -> text.removePrefix(\"DATA answer=\")\n    else -> text\n}",
+    "hash": "b155594c154d168132cdcf781e0c72b7d5b5e2ce4554eac7d757551483374398",
+    "toolName": "json_query",
+    "createdAt": 1788796381500,
+    "language": "KOTLIN",
+    "validated": true
+  },
+  {
+    "id": "73906bd7-33b7-4c69-9df1-616f51543d0b",
+    "sessionId": "kotlin-decision-f64874e2-24bc-46a8-a5c7-c6332714f40d-large_json-1-fixed",
+    "baseRevision": null,
+    "source": "val text = observation.text\nval value = try { Json.parseToJsonElement(text) } catch (_: Exception) { null }\nwhen {\n    value is JsonObject && value[\"answer\"] is JsonPrimitive -> (value[\"answer\"] as JsonPrimitive).content\n    text.startsWith(\"id,answer\\n\") -> text.substringAfter('\\n').substringAfter(',')\n    text.startsWith(\"DATA answer=\") -> text.removePrefix(\"DATA answer=\")\n    else -> text\n}",
+    "hash": "b155594c154d168132cdcf781e0c72b7d5b5e2ce4554eac7d757551483374398",
+    "toolName": "json_query",
+    "createdAt": 1788796386305,
+    "language": "KOTLIN",
+    "validated": true
+  },
+  {
+    "id": "a1c660c8-be82-4bfd-a8f6-88419d27939c",
+    "sessionId": "kotlin-decision-f64874e2-24bc-46a8-a5c7-c6332714f40d-small_mixed-1-fixed",
+    "baseRevision": null,
+    "source": "val text = observation.text\nval value = try { Json.parseToJsonElement(text) } catch (_: Exception) { null }\nwhen {\n    value is JsonObject && value[\"answer\"] is JsonPrimitive -> (value[\"answer\"] as JsonPrimitive).content\n    text.startsWith(\"id,answer\\n\") -> text.substringAfter('\\n').substringAfter(',')\n    text.startsWith(\"DATA answer=\") -> text.removePrefix(\"DATA answer=\")\n    else -> text\n}",
+    "hash": "b155594c154d168132cdcf781e0c72b7d5b5e2ce4554eac7d757551483374398",
+    "toolName": "json_query",
+    "createdAt": 1788796460759,
+    "language": "KOTLIN",
+    "validated": true
+  },
+  {
+    "id": "50ee9b11-4b87-4e82-ab86-01e04261150d",
+    "sessionId": "kotlin-decision-f64874e2-24bc-46a8-a5c7-c6332714f40d-schema_shift-1-fixed",
+    "baseRevision": null,
+    "source": "val text = observation.text\nval value = try { Json.parseToJsonElement(text) } catch (_: Exception) { null }\nwhen {\n    value is JsonObject && value[\"answer\"] is JsonPrimitive -> (value[\"answer\"] as JsonPrimitive).content\n    text.startsWith(\"id,answer\\n\") -> text.substringAfter('\\n').substringAfter(',')\n    text.startsWith(\"DATA answer=\") -> text.removePrefix(\"DATA answer=\")\n    else -> text\n}",
+    "hash": "b155594c154d168132cdcf781e0c72b7d5b5e2ce4554eac7d757551483374398",
+    "toolName": "json_query",
+    "createdAt": 1788796495656,
+    "language": "KOTLIN",
+    "validated": true
+  },
+  {
+    "id": "4cd2978d-1f2f-4cd6-b938-a73db855d6f9",
+    "sessionId": "kotlin-decision-f64874e2-24bc-46a8-a5c7-c6332714f40d-large_json-2-fixed",
+    "baseRevision": null,
+    "source": "val text = observation.text\nval value = try { Json.parseToJsonElement(text) } catch (_: Exception) { null }\nwhen {\n    value is JsonObject && value[\"answer\"] is JsonPrimitive -> (value[\"answer\"] as JsonPrimitive).content\n    text.startsWith(\"id,answer\\n\") -> text.substringAfter('\\n').substringAfter(',')\n    text.startsWith(\"DATA answer=\") -> text.removePrefix(\"DATA answer=\")\n    else -> text\n}",
+    "hash": "b155594c154d168132cdcf781e0c72b7d5b5e2ce4554eac7d757551483374398",
+    "toolName": "json_query",
+    "createdAt": 1788796547077,
+    "language": "KOTLIN",
+    "validated": true
+  },
+  {
+    "id": "7734a75a-e2ad-40e0-b24c-68fc78a95771",
+    "sessionId": "kotlin-decision-f64874e2-24bc-46a8-a5c7-c6332714f40d-small_mixed-2-fixed",
+    "baseRevision": null,
+    "source": "val text = observation.text\nval value = try { Json.parseToJsonElement(text) } catch (_: Exception) { null }\nwhen {\n    value is JsonObject && value[\"answer\"] is JsonPrimitive -> (value[\"answer\"] as JsonPrimitive).content\n    text.startsWith(\"id,answer\\n\") -> text.substringAfter('\\n').substringAfter(',')\n    text.startsWith(\"DATA answer=\") -> text.removePrefix(\"DATA answer=\")\n    else -> text\n}",
+    "hash": "b155594c154d168132cdcf781e0c72b7d5b5e2ce4554eac7d757551483374398",
+    "toolName": "json_query",
+    "createdAt": 1788796591743,
+    "language": "KOTLIN",
+    "validated": true
+  },
+  {
+    "id": "e5b6543b-16b0-4385-a6dd-97a80dfdba86",
+    "sessionId": "kotlin-decision-f64874e2-24bc-46a8-a5c7-c6332714f40d-schema_shift-2-fixed",
+    "baseRevision": null,
+    "source": "val text = observation.text\nval value = try { Json.parseToJsonElement(text) } catch (_: Exception) { null }\nwhen {\n    value is JsonObject && value[\"answer\"] is JsonPrimitive -> (value[\"answer\"] as JsonPrimitive).content\n    text.startsWith(\"id,answer\\n\") -> text.substringAfter('\\n').substringAfter(',')\n    text.startsWith(\"DATA answer=\") -> text.removePrefix(\"DATA answer=\")\n    else -> text\n}",
+    "hash": "b155594c154d168132cdcf781e0c72b7d5b5e2ce4554eac7d757551483374398",
+    "toolName": "json_query",
+    "createdAt": 1788796622582,
+    "language": "KOTLIN",
+    "validated": true
+  },
+  {
+    "id": "8e454466-bb55-4bc6-8ac2-c3dcb7c45e2e",
+    "sessionId": "kotlin-decision-f64874e2-24bc-46a8-a5c7-c6332714f40d-large_json-3-fixed",
+    "baseRevision": null,
+    "source": "val text = observation.text\nval value = try { Json.parseToJsonElement(text) } catch (_: Exception) { null }\nwhen {\n    value is JsonObject && value[\"answer\"] is JsonPrimitive -> (value[\"answer\"] as JsonPrimitive).content\n    text.startsWith(\"id,answer\\n\") -> text.substringAfter('\\n').substringAfter(',')\n    text.startsWith(\"DATA answer=\") -> text.removePrefix(\"DATA answer=\")\n    else -> text\n}",
+    "hash": "b155594c154d168132cdcf781e0c72b7d5b5e2ce4554eac7d757551483374398",
+    "toolName": "json_query",
+    "createdAt": 1788796685188,
+    "language": "KOTLIN",
+    "validated": true
+  },
+  {
+    "id": "19acf979-fe85-4697-ab81-21614323069b",
+    "sessionId": "kotlin-decision-f64874e2-24bc-46a8-a5c7-c6332714f40d-small_mixed-3-fixed",
+    "baseRevision": null,
+    "source": "val text = observation.text\nval value = try { Json.parseToJsonElement(text) } catch (_: Exception) { null }\nwhen {\n    value is JsonObject && value[\"answer\"] is JsonPrimitive -> (value[\"answer\"] as JsonPrimitive).content\n    text.startsWith(\"id,answer\\n\") -> text.substringAfter('\\n').substringAfter(',')\n    text.startsWith(\"DATA answer=\") -> text.removePrefix(\"DATA answer=\")\n    else -> text\n}",
+    "hash": "b155594c154d168132cdcf781e0c72b7d5b5e2ce4554eac7d757551483374398",
+    "toolName": "json_query",
+    "createdAt": 1788796725734,
+    "language": "KOTLIN",
+    "validated": true
+  },
+  {
+    "id": "6a10e443-c33d-4005-9fce-cd74cfd87d5c",
+    "sessionId": "kotlin-decision-f64874e2-24bc-46a8-a5c7-c6332714f40d-schema_shift-3-fixed",
+    "baseRevision": null,
+    "source": "val text = observation.text\nval value = try { Json.parseToJsonElement(text) } catch (_: Exception) { null }\nwhen {\n    value is JsonObject && value[\"answer\"] is JsonPrimitive -> (value[\"answer\"] as JsonPrimitive).content\n    text.startsWith(\"id,answer\\n\") -> text.substringAfter('\\n').substringAfter(',')\n    text.startsWith(\"DATA answer=\") -> text.removePrefix(\"DATA answer=\")\n    else -> text\n}",
+    "hash": "b155594c154d168132cdcf781e0c72b7d5b5e2ce4554eac7d757551483374398",
+    "toolName": "json_query",
+    "createdAt": 1788796795274,
+    "language": "KOTLIN",
+    "validated": true
+  }
+]

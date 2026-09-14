@@ -1,5 +1,7 @@
 # Messaging Channels Guide
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 > Detailed configuration for the 19 messaging channels supported by Prométhé.
 
 ## Overview
@@ -64,20 +66,83 @@ curl http://localhost:8080/api/v1/channels
 1. Go to the [Discord Developer Portal](https://discord.com/developers/applications)
 2. Create a **New Application**
 3. **Bot** tab → Create a bot → Copy the **Bot Token**
-4. **General Information** tab → Copy the **Public Key**
-5. **OAuth2** tab → URL Generator → Select `bot` + `applications.commands`
-6. Invite the bot to your server with the generated URL
+4. To enable Message Content, turn on **Privileged Gateway Intents → Message Content Intent** in the **Bot** tab
+5. **OAuth2** tab → URL Generator → Select the `bot` scope
+6. Grant **View Channels**, **Send Messages**, and **Read Message History**
+7. Invite the bot to your server with the generated URL
+8. Save the token and Message Content setting in Promethe. The Gateway reconnects immediately.
 
 ### Environment variables
 
 ```bash
 DISCORD_BOT_TOKEN=MTI...xyz
+DISCORD_MESSAGE_CONTENT_ENABLED=false
+DISCORD_ALLOWED_USER_IDS=123456789012345678,234567890123456789
+DISCORD_APPROVER_USER_IDS=123456789012345678
+DISCORD_KNOWLEDGE_CHANNEL_IDS=345678901234567890
+```
+
+`DISCORD_PUBLIC_KEY` is optional. It is used only for signed HTTP interactions such as slash
+commands; direct messages and server mentions use the persistent Discord Gateway connection.
+
+Enable Discord **Developer Mode**, then use **Copy User ID** and **Copy Channel ID** to obtain the
+numeric values. Leave `DISCORD_ALLOWED_USER_IDS` empty to preserve the existing behavior. When it is
+set, only listed users may trigger the agent through mentions, replies, direct messages, or slash
+commands. Invalid entries are ignored; a non-empty list containing no valid ID denies everyone.
+
+Set `DISCORD_APPROVER_USER_IDS` to the owner or integration managers who should receive private
+authorization requests when a Discord conversation reaches an effectful tool. Approvers must share a
+server with the bot and permit direct messages. Button actions are accepted only from IDs in this list;
+local coding-agent actions remain restricted to the local Desktop owner. Exact `CONFIG_CHANGE` requests
+also provide an Always allow action. That grant is stored in SQLite, survives restarts and can be revoked
+by the local owner; no process, file or arbitrary tool execution can receive that scope.
+
+`DISCORD_KNOWLEDGE_CHANNEL_IDS` is an explicit opt-in archive. Every new human message received in a
+listed channel, including messages from users who cannot invoke the agent, and every Promethe reply is
+written as one JSON-LD [`schema.org/Message`](https://schema.org/Message) document under
+`~/.promethe/knowledge/discord/<guild-id>/<channel-id>/`. Promethe may use recent messages from that
+same channel as untrusted conversation context when an authorized user invokes it. Existing Discord
+history is not imported, attachments are recorded only as metadata and URLs, and edits, deletions,
+reactions, and messages from other bots are not archived.
+
+### Live owner policy
+
+The authenticated owner can update Discord rules from a normal Promethe conversation. For example:
+
+- `Autorise <@123456789012345678> à parler de météo et de transports.`
+- `Refuse désormais <@123456789012345678>.`
+- `Ajoute <#345678901234567890> à l'écoute et associe-le au projet project-release.`
+- `Arrête d'archiver <#345678901234567890>.`
+
+Promethe maps these requests to the `discord_policy` tool. Listing is read-only; every mutation is a
+`CONFIG_CHANGE` requiring owner approval. The tool is rejected when invoked from Discord, webhooks,
+ACP, MCP, voice, schedules or autonomous goals, so a Discord participant cannot change their own rule.
+The approval card appears directly in the initiating local chat and offers Always allow for the exact
+configuration fingerprint.
+
+Runtime rules are persisted in SQLite and applied immediately to Gateway messages and signed Discord
+interactions. An `ALLOW` rule with subjects accepts a message only when it contains one of those
+accent-insensitive phrases. An empty subject list allows every subject. A `DENY` rule takes precedence.
+Creating the first dynamic `ALLOW` rule turns the dynamic rules into an allow-list; with only `DENY`
+rules, other users keep the existing fallback behavior. Static environment lists remain compatible:
+dynamic rules can refine, deny or extend them.
+
+A listened channel captures all new human messages as Open Knowledge. When it is associated with a
+Promethe project, addressed messages and slash commands also use that project's workspace, instructions
+and memory. Enabling the first listened channel may cause one short JDA reconnect to request
+`GatewayIntent.MESSAGE_CONTENT`; later user, subject and project changes do not interrupt the connection.
+
+### Configure interactions (optional)
+
+For slash commands, copy the **Public Key** from **General Information**, add the
+`applications.commands` OAuth2 scope, and configure:
+
+```bash
 DISCORD_PUBLIC_KEY=abc123def456...
 ```
 
-### Configure interactions
+Then set in the Developer Portal:
 
-In the Developer Portal → your app → **General Information**:
 - **Interactions Endpoint URL**: `https://promethe.example.com/webhook/discord`
 
 ### Test
@@ -92,8 +157,19 @@ In the Developer Portal → your app → **General Information**:
 | Problem | Solution |
 |---|---|
 | Invalid interaction | Check the `DISCORD_PUBLIC_KEY` (Ed25519 signature) |
-| Bot offline | Check the token and intents (MESSAGE_CONTENT intent required) |
-| No response | Enable the `MESSAGE CONTENT` intent in the Developer Portal |
+| Bot offline | Check `DISCORD_BOT_TOKEN`, save settings again, and look for `Discord Gateway ready` in the gateway log |
+| Mention ignored | Ensure the bot can view the channel and that the mention resolves to the bot user |
+| Reply rejected | Grant **Send Messages** and **Read Message History** in the channel |
+
+Promethe always responds to direct messages and explicit mentions. Setting
+`DISCORD_MESSAGE_CONTENT_ENABLED=true` also lets it recognize messages beginning with its Discord
+username or server nickname (for example, `Promethe, help me`) and replies to one of its messages.
+Name matching ignores accents and tolerates a small spelling error, so common variants such as
+`Promete` and `Promethee` work too. The name must remain at the beginning of the message, optionally
+after a greeting. Other server conversation is ignored unless its channel is explicitly listed in
+`DISCORD_KNOWLEDGE_CHANNEL_IDS` or the live owner policy. Addressed-message mode or any knowledge channel makes JDA request
+`GatewayIntent.MESSAGE_CONTENT`; Discord must also have the intent enabled in the Developer Portal or
+the Gateway connection is rejected.
 
 ---
 
@@ -315,7 +391,8 @@ EMAIL_API_MODE=SENDGRID                     # SENDGRID, MAILGUN, or SMTP_RAW
 ```bash
 TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 TWILIO_AUTH_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-TWILIO_FROM_NUMBER=+14155552671              # E.164 format
+TWILIO_PHONE_NUMBER=+14155552671             # E.164 format
+PUBLIC_BASE_URL=https://promethe.example.com
 ```
 
 ### Configure the webhook
@@ -324,13 +401,18 @@ In the Twilio console → Phone Numbers → your number → Messaging:
 - **When a message comes in**: `https://promethe.example.com/webhook/sms`
 - **HTTP Method**: POST
 
+Promethe validates `X-Twilio-Signature`, acknowledges the webhook immediately with empty TwiML,
+then sends the message through the same A2A agent loop as the other channels. The agent reply is
+sent asynchronously through Twilio. Settings changes apply without restarting the gateway.
+
 ### Troubleshooting
 
 | Problem | Solution |
 |---|---|
 | 401 Unauthorized | Check Account SID + Auth Token |
+| Invalid Twilio signature | Ensure `PUBLIC_BASE_URL` exactly matches the public HTTPS URL configured in Twilio |
 | Number not verified | In trial mode, the recipient must be verified |
-| Truncated messages | SMS limited to 1600 characters (multi-segment) |
+| Truncated replies | Promethe limits an agent reply to three messages of 1500 characters to bound cost |
 
 ---
 

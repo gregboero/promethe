@@ -1,0 +1,39 @@
+{
+  "batch": "koog-protocol-4324cd8e-a67c-49ae-931e-1577b6be3aa3",
+  "model": "gpt-5.6-terra",
+  "endpoint": "responses",
+  "reasoningEffort": "none",
+  "maxOutputTokens": 4096,
+  "plannedRuns": 6,
+  "maxPaidRequests": 36,
+  "pagesPerTask": 2,
+  "maxIterations": 6,
+  "campaignCapMicroUsd": 5000000,
+  "formalToolsOnlyDifference": true,
+  "fixedPromptDate": "2026-09-07 (fixed experiment date)",
+  "nativeToolChoiceForced": false,
+  "fallbackEnabled": false,
+  "tasks": [
+    [
+      3471,
+      8063
+    ],
+    [
+      5192,
+      2847
+    ],
+    [
+      6904,
+      1358
+    ]
+  ],
+  "order": [
+    "text",
+    "structured",
+    "structured",
+    "text",
+    "text",
+    "structured"
+  ],
+  "postLoopSkillSynthesisEligible": false
+}

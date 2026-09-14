@@ -1,0 +1,4 @@
+{
+  "nativeTasksExecuted": 0,
+  "cause": "runTest virtual clock expired external-process preflight; corrected to runBlocking. Direct real-time helper self-test passed. No sandbox configuration changes."
+}

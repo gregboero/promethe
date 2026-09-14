@@ -1,0 +1,22 @@
+{
+  "scripts/report-skill-evaluations.py": "b614938cb44b42e031c52560e31305245806c1bad40b4758a92ddf01d13c2a20",
+  "api/src/commonMain/kotlin/dev/promethe/api/SkillModels.kt": "b2048cd54913b05dbf74a5d0bd8f3f362347eac2b61358e4b43b90a60b6c2062",
+  "api/src/commonMain/kotlin/dev/promethe/api/SkillEvaluationModels.kt": "b36a9bb9f66f976263fd82bad74f8fe004b1133e59438b400e9eaf33141f9577",
+  "shared/src/commonMain/kotlin/dev/promethe/core/SkillLoader.kt": "bab485cb0ee2d6a2e78b4b0e3fdf3f9c2cc6e739eebc87a7f617f1565ac324ee",
+  "shared/src/commonMain/kotlin/dev/promethe/core/SkillWriter.kt": "baff9e71951a264fdff924b9e085228cf6e29579fbbbf3eeebc29dcd4b16d167",
+  "shared/src/commonMain/kotlin/dev/promethe/core/SkillGovernanceStore.kt": "c265334dd89ca9e8422a208e078850182fd27fe84b4298cd8524bf614c6a5c71",
+  "shared/src/commonMain/kotlin/dev/promethe/core/SkillEvaluationService.kt": "168df5edee82b93a00af3999d8d766487ba77002141e3d527b5105ad17d8f572",
+  "shared/src/commonMain/kotlin/dev/promethe/core/evolution/GepaEvolver.kt": "fecefe264430d4fd3daac12a7e51a262bde517767b885e48646115ce3b512081",
+  "shared/src/jvmTest/kotlin/dev/promethe/core/SkillEvaluationLifecycleTest.kt": "12a314f22ada9eec27be07d18111bba100c8fb6304f58fdb3a8ccc6647580cf1",
+  "shared/src/jvmTest/kotlin/dev/promethe/core/SkillReuseAgentLoopTest.kt": "b0681a94bfd69b84757e8f0846ae32dd2b68772cb6be0ba9dcc90a3df0b9f07c",
+  "shared/src/jvmTest/kotlin/dev/promethe/core/SkillLoaderTest.kt": "0f35d53c2c3408055856d6058ddac75f60300ec893265c0ab0595a7d04bebae1",
+  "gateway/src/jvmMain/kotlin/dev/promethe/gateway/SkillRoutes.kt": "65ab9f2d8f198f3914f5b607ef26ad71a052ba90d0694a6cf9284dda8d48852e",
+  "gateway/src/jvmMain/kotlin/dev/promethe/gateway/OmnichannelGateway.kt": "b1a840ef40325178e2611baa48457eaaf24af652b4db3a937faced6841157994",
+  "gateway/src/test/kotlin/dev/promethe/gateway/SkillRoutesTest.kt": "9c9d4bfc0c044d11292ef2bc6793d0164dc017940aacb5eab22947c68794a7ed",
+  "composeApp/src/commonMain/kotlin/dev/promethe/app/screens/SkillsScreen.kt": "5a79d9d0b69383ae8fefc6b08bc875fb1f1a9ceae4007f1c9b28d88d37aa9794",
+  "composeApp/src/commonMain/kotlin/dev/promethe/app/screens/SkillValidationPanel.kt": "ef6079da7f163e875982c79a77ec524d4843ae432aad5eae77e2200b7d9d818c",
+  "composeApp/src/commonMain/kotlin/dev/promethe/app/screens/viewmodel/SkillsViewModel.kt": "d80a2cbff079855478072407b85c49c64829609cbc43f5cb25670eb5636a6828",
+  "composeApp/src/commonMain/kotlin/dev/promethe/app/network/PrometheClient.kt": "3225e66a1b0d840036f90347c460a7e85fdc0b3da353ec69610dc849c6c8e40d",
+  "composeApp/src/commonMain/composeResources/values/strings.xml": "ba6bf47baa49108277be087373c18eaa49270506dfedff8ac365697ce379794b",
+  "composeApp/src/commonMain/composeResources/values-fr/strings.xml": "6b2f3c46894d03331b915559c4e511e3e97ce66744fddc7a7ba6a38d08e14158"
+}

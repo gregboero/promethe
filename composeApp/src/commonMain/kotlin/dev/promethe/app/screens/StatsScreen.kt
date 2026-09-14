@@ -204,6 +204,12 @@ fun StatsScreen(client: PrometheClient) {
                             StatusRow(stringResource(Res.string.stats_misses), status.llm.cache.misses.toString())
                             StatusRow(stringResource(Res.string.stats_size), status.llm.cache.size.toString())
                             StatusRow(stringResource(Res.string.stats_rate), "${(status.llm.cache.hitRate * 100).fmt(1)}%")
+                            StatusRow(stringResource(Res.string.stats_cache_read_tokens), status.llm.cache.readTokens.fmtGrouped())
+                            StatusRow(stringResource(Res.string.stats_cache_write_tokens), status.llm.cache.writeTokens.fmtGrouped())
+                            StatusRow(
+                                stringResource(Res.string.stats_prefix_reuse),
+                                "${status.llm.cache.prefixReuseHits}/${status.llm.cache.prefixReuseHits + status.llm.cache.prefixReuseMisses}",
+                            )
                         }
                     }
                 }

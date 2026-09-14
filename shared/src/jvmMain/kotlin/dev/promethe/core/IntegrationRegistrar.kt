@@ -108,14 +108,9 @@ object IntegrationRegistrar {
         }
         logger.info { "Web scraper tool registered" }
 
-        // Twilio SMS/WhatsApp
-        val twilioSid = ConfigProvider.get().get("TWILIO_ACCOUNT_SID", "")
-        val twilioToken = ConfigProvider.get().get("TWILIO_AUTH_TOKEN", "")
-        val twilioPhone = ConfigProvider.get().get("TWILIO_PHONE_NUMBER", "")
-        if (twilioSid.isNotBlank() && twilioToken.isNotBlank()) {
-            ToolRegistry.register(TwilioTool(httpClient, twilioSid, twilioToken, twilioPhone))
-            logger.info { "Twilio tool registered (SMS + WhatsApp)" }
-        }
+        // Twilio resolves credentials per invocation so Settings changes apply without a restart.
+        ToolRegistry.register(TwilioTool(httpClient))
+        logger.info { "Twilio tool registered (SMS + WhatsApp, dynamic credentials)" }
 
         // Browser Automation — supports CDP (local) and Browserbase (cloud)
         val browserBackendType = ConfigProvider.get().get("BROWSER_BACKEND", "")
@@ -168,22 +163,24 @@ object IntegrationRegistrar {
         workDir: okio.Path,
         apiKeys: Map<String, String>,
         sandboxCommandRunner: SandboxedCommandRunner,
+        sandboxFileAccess: dev.promethe.core.sandbox.SandboxPolicyFileAccess,
     ) {
         // ── Provider Registry & Capability Router ─────────────────
         val providerRegistry = dev.promethe.core.providers.ProviderRegistry(LiveProviderKeys)
         val capabilityRouter = dev.promethe.core.providers.CapabilityRouter(providerRegistry)
 
-        // ── Filesystem Tools (6) ──────────────────────────────────
-        val secureReader = SecureJvmWorkspaceFileReader(workDirStr)
-        val secureWriter = SecureJvmWorkspaceFileWriter(workDirStr)
-        val secureMutator = SecureJvmWorkspaceFileMutator(workDirStr)
+        // ── Filesystem Tools (7) ──────────────────────────────────
+        val secureReader = sandboxFileAccess
+        val secureWriter = sandboxFileAccess
+        val secureMutator = sandboxFileAccess
+        ToolRegistry.register(dev.promethe.core.tools.fs.WorkspaceRootsTool(sandboxFileAccess))
         ToolRegistry.register(dev.promethe.core.tools.fs.FileDeleteTool(workDirStr, secureMutator))
         ToolRegistry.register(dev.promethe.core.tools.fs.FileMoveTool(workDirStr, secureMutator))
-        ToolRegistry.register(dev.promethe.core.tools.fs.DirectoryTreeTool(workDirStr))
-        ToolRegistry.register(dev.promethe.core.tools.fs.FileSearchTool(workDirStr))
-        ToolRegistry.register(dev.promethe.core.tools.fs.CodeGrepTool(workDirStr))
-        ToolRegistry.register(dev.promethe.core.tools.fs.PatchTool(workDirStr, secureReader, secureWriter))
-        logger.info { "Filesystem tools registered (6 tools)" }
+        ToolRegistry.register(dev.promethe.core.tools.fs.DirectoryTreeTool(workDirStr, sandboxFileAccess))
+        ToolRegistry.register(dev.promethe.core.tools.fs.FileSearchTool(workDirStr, sandboxFileAccess))
+        ToolRegistry.register(dev.promethe.core.tools.fs.CodeGrepTool(workDirStr, sandboxFileAccess))
+        ToolRegistry.register(dev.promethe.core.tools.fs.PatchTool(workDirStr, secureReader, secureWriter, sandboxFileAccess))
+        logger.info { "Filesystem tools registered (7 tools)" }
 
         // ── Git Tools (5) ─────────────────────────────────────────
         ToolRegistry.register(dev.promethe.core.tools.git.GitStatusTool(workDirStr, sandboxCommandRunner))
@@ -313,7 +310,7 @@ object IntegrationRegistrar {
                 onConfigChanged = { key, value ->
                     // Hot-reload: propagate llmProvider / llmModel changes to the live adapter
                     when (key) {
-                        "llmProvider" -> llmAdapter.updateActiveModel(value, llmAdapter.currentModel)
+                        "llmProvider" -> llmAdapter.updateActiveModel(value, "")
                         "llmModel" -> llmAdapter.updateActiveModel(llmAdapter.currentProvider, value)
                     }
                 },

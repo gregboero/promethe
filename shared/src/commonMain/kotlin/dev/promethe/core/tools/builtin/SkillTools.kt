@@ -3,6 +3,8 @@ package dev.promethe.core.tools.builtin
 import ai.koog.agents.core.tools.SimpleTool
 import ai.koog.agents.core.tools.annotations.LLMDescription
 import ai.koog.serialization.typeToken
+import dev.promethe.api.SkillContract
+import dev.promethe.api.SkillLifecycle
 import dev.promethe.core.SkillEntry
 import dev.promethe.core.SkillLoader
 import dev.promethe.core.SkillWriter
@@ -78,10 +80,11 @@ class SkillLoadTool(
             """.trimMargin(),
     ) {
     override suspend fun execute(args: SkillLoadArgs): String {
-        val allSkills = skillLoader.listSkills()
-        val skill =
-            allSkills.find { it.name == args.name }
-                ?: return "[Skills] Skill '${args.name}' not found. Available: ${allSkills.map { it.name }.take(10)}"
+        val skill = skillLoader.loadFull(args.name)
+        if (skill == null) {
+            val available = skillLoader.listExecutableSkills().map { entry -> entry.name }.take(10)
+            return "[Skills] Active skill '${args.name}' not found. Available: $available"
+        }
 
         return buildString {
             appendLine("[Skill: ${skill.name}]")
@@ -117,12 +120,21 @@ class SkillCreateTool(
             """.trimMargin(),
     ) {
     override suspend fun execute(args: SkillCreateArgs): String {
-        val entry = SkillEntry(name = args.name, content = args.content)
+        val entry =
+            SkillEntry(
+                name = args.name,
+                content = args.content,
+                contract =
+                    SkillContract(
+                        lifecycle = SkillLifecycle.DRAFT,
+                        provenance = "agent",
+                    ),
+            )
         val path = skillWriter.write(entry)
         return if (path != null) {
             // Invalidate the loader cache so the new skill is discoverable
             skillLoader.invalidateCache()
-            "[Skills] Created skill '${args.name}' at $path"
+            "[Skills] Created DRAFT skill '${args.name}' at $path; owner review is required before activation."
         } else {
             "[Skills] Skill '${args.name}' already exists. Use skill_improve to update it."
         }
@@ -166,8 +178,7 @@ class SkillImproveTool(
 
         // Build updated entry with improvement metadata
         val updatedEntry =
-            SkillEntry(
-                name = args.name,
+            existing.copy(
                 content =
                     buildString {
                         appendLine("<!-- Improved: ${Clock.System.now()} -->")
@@ -177,24 +188,20 @@ class SkillImproveTool(
                         appendLine()
                         append(args.updatedContent)
                     },
+                contract =
+                    existing.contract.copy(
+                        lifecycle = SkillLifecycle.QUARANTINED,
+                        contentHash = null,
+                    ),
             )
 
         return try {
-            // Delete the old skill file, then write the new version
-            val fs = dev.promethe.core.getFileSystem()
-            // Invalidate cache first so we can discover the skill directory
-            skillLoader.invalidateCache()
-
-            // Write via SkillWriter won't work if file exists, so use fs directly
-            // SkillWriter always writes to skillsDir/name.md
-            // We need to find the skills directory from existing skills
-            val path = skillWriter.write(updatedEntry)
+            val path = skillWriter.update(updatedEntry)
             if (path != null) {
-                "[Skills] Improved skill '${args.name}': ${args.changeDescription}"
+                skillLoader.invalidateCache()
+                "[Skills] Improved skill '${args.name}' and moved it to QUARANTINED: ${args.changeDescription}"
             } else {
-                // File still exists — SkillWriter skips duplicates
-                // This means we need the user to delete manually for now
-                "[Skills] Skill '${args.name}' already exists and cannot be overwritten directly. Consider using a new name."
+                "[Skills] Skill '${args.name}' could not be updated."
             }
         } catch (e: Exception) {
             "[Skills] Failed to improve skill: ${e.message}"
@@ -218,7 +225,7 @@ class SkillListTool(
         description = "List all skills in the skill library with their names.",
     ) {
     override suspend fun execute(args: SkillListArgs): String {
-        val skills = skillLoader.listSkills()
+        val skills = skillLoader.listExecutableSkills()
         if (skills.isEmpty()) {
             return "[Skills] No skills in the library yet. Use skill_create to add one."
         }

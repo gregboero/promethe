@@ -22,6 +22,39 @@ class DatabaseMigrationsTest {
                     statement.executeQuery("SELECT version FROM flyway_schema_history WHERE version = '4'").use { rows ->
                         assertTrue(rows.next(), "V4 reasoning effort migration should be recorded")
                     }
+                    statement.executeQuery("SELECT version FROM flyway_schema_history WHERE version = '5'").use { rows ->
+                        assertTrue(rows.next(), "V5 projects migration should be recorded")
+                    }
+                    statement.executeQuery("SELECT version FROM flyway_schema_history WHERE version = '6'").use { rows ->
+                        assertTrue(rows.next(), "V6 agent run ledger migration should be recorded")
+                    }
+                    statement.executeQuery("SELECT version FROM flyway_schema_history WHERE version = '7'").use { rows ->
+                        assertTrue(rows.next(), "V7 tool intent ledger migration should be recorded")
+                    }
+                    statement.executeQuery("SELECT version FROM flyway_schema_history WHERE version = '8'").use { rows ->
+                        assertTrue(rows.next(), "V8 agent run events migration should be recorded")
+                    }
+                    statement.executeQuery("SELECT version FROM flyway_schema_history WHERE version = '9'").use { rows ->
+                        assertTrue(rows.next(), "V9 run request fingerprint migration should be recorded")
+                    }
+                    statement.executeQuery("SELECT version FROM flyway_schema_history WHERE version = '10'").use { rows ->
+                        assertTrue(rows.next(), "V10 artifact reference migration should be recorded")
+                    }
+                    statement.executeQuery("SELECT version FROM flyway_schema_history WHERE version = '11'").use { rows ->
+                        assertTrue(rows.next(), "V11 security audit hash-chain migration should be recorded")
+                    }
+                    statement.executeQuery("SELECT version FROM flyway_schema_history WHERE version = '12'").use { rows ->
+                        assertTrue(rows.next(), "V12 message trust provenance migration should be recorded")
+                    }
+                    statement.executeQuery("SELECT version FROM flyway_schema_history WHERE version = '13'").use { rows ->
+                        assertTrue(rows.next(), "V13 MCP tasks migration should be recorded")
+                    }
+                    statement.executeQuery("SELECT version FROM flyway_schema_history WHERE version = '14'").use { rows ->
+                        assertTrue(rows.next(), "V14 durable approval grant migration should be recorded")
+                    }
+                    statement.executeQuery("SELECT version FROM flyway_schema_history WHERE version = '15'").use { rows ->
+                        assertTrue(rows.next(), "V15 durable resource governor migration should be recorded")
+                    }
                     statement.executeQuery("SELECT reasoning_effort FROM agent_profiles WHERE id = 'main'").use { rows ->
                         assertTrue(rows.next())
                         assertEquals("AUTO", rows.getString(1))
@@ -76,6 +109,65 @@ class DatabaseMigrationsTest {
                         val columns = mutableSetOf<String>()
                         while (rows.next()) columns += rows.getString("name")
                         assertTrue("reasoning_effort" in columns, "V4 must preserve the reasoning effort column")
+                    }
+                    statement.executeQuery("PRAGMA table_info(sessions)").use { rows ->
+                        val columns = mutableSetOf<String>()
+                        while (rows.next()) columns += rows.getString("name")
+                        assertTrue("project_id" in columns, "V5 must add the project association")
+                    }
+                    statement.executeQuery("PRAGMA table_info(agent_runs)").use { rows ->
+                        val columns = mutableSetOf<String>()
+                        while (rows.next()) columns += rows.getString("name")
+                        assertTrue("run_id" in columns, "V6 must add the durable run ledger")
+                        assertTrue("status" in columns, "V6 must persist the run status")
+                        assertTrue("request_fingerprint" in columns, "V9 must bind recovery to the original request")
+                    }
+                    statement.executeQuery("PRAGMA table_info(tool_intents)").use { rows ->
+                        val columns = mutableSetOf<String>()
+                        while (rows.next()) columns += rows.getString("name")
+                        assertTrue("idempotency_key_hash" in columns, "V7 must add durable tool idempotency")
+                        assertTrue("invocation_hash" in columns, "V7 must bind idempotency to the full invocation")
+                        assertTrue("artifact_hash" in columns, "V10 must persist the tool-output artifact reference")
+                    }
+                    statement.executeQuery("PRAGMA table_info(agent_run_events)").use { rows ->
+                        val columns = mutableSetOf<String>()
+                        while (rows.next()) columns += rows.getString("name")
+                        assertTrue("event_id" in columns, "V8 must add idempotent event identifiers")
+                        assertTrue("sequence" in columns, "V8 must order events within a run")
+                        assertTrue("invocation_hash" in columns, "V8 must persist only the tool invocation fingerprint")
+                        assertTrue("request_fingerprint" in columns, "V9 must preserve the request fingerprint in events")
+                        assertTrue("artifact_hash" in columns, "V10 must preserve artifact references in events")
+                    }
+                    statement.executeQuery("PRAGMA table_info(security_audit_logs)").use { rows ->
+                        val columns = mutableSetOf<String>()
+                        while (rows.next()) columns += rows.getString("name")
+                        assertTrue("previous_hash" in columns, "V11 must preserve the previous audit hash")
+                        assertTrue("entry_hash" in columns, "V11 must preserve the current audit hash")
+                    }
+                    statement.executeQuery("PRAGMA table_info(messages)").use { rows ->
+                        val columns = mutableSetOf<String>()
+                        while (rows.next()) columns += rows.getString("name")
+                        assertTrue("data_trust" in columns, "V12 must persist the message trust classification")
+                        assertTrue("source_run_id" in columns, "V12 must persist the message source run")
+                    }
+                    statement.executeQuery("PRAGMA table_info(approval_grants)").use { rows ->
+                        val columns = mutableSetOf<String>()
+                        while (rows.next()) columns += rows.getString("name")
+                        assertTrue("fingerprint" in columns, "V14 must persist exact approval fingerprints")
+                        assertTrue("expires_at" in columns, "V14 must support revocable expiring grants")
+                    }
+                    statement.executeQuery("PRAGMA table_info(resource_governors)").use { rows ->
+                        val columns = mutableSetOf<String>()
+                        while (rows.next()) columns += rows.getString("name")
+                        assertTrue("root_run_id" in columns, "V15 must persist the root run budget")
+                        assertTrue("tokens_used" in columns, "V15 must persist token consumption")
+                        assertTrue("version" in columns, "V15 must guard concurrent budget updates")
+                    }
+                    statement.executeQuery("PRAGMA table_info(resource_governor_bindings)").use { rows ->
+                        val columns = mutableSetOf<String>()
+                        while (rows.next()) columns += rows.getString("name")
+                        assertTrue("session_id" in columns, "V15 must persist governed sessions")
+                        assertTrue("root_run_id" in columns, "V15 must preserve child budget inheritance")
                     }
                 }
             }

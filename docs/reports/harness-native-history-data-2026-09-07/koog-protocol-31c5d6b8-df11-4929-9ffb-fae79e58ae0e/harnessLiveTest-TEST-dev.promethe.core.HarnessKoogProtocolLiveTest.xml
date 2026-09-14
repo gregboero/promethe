@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.promethe.core.HarnessKoogProtocolLiveTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-09-07T18:20:57.135Z" hostname="BUREAU" time="25.382">
+  <properties/>
+  <testcase name="compare formal Koog tools with JSON text on paired two page tasks" classname="dev.promethe.core.HarnessKoogProtocolLiveTest" time="25.379"/>
+  <system-out><![CDATA[kotlin-logging: initializing... active logger factory: Slf4jLoggerFactory
+]]></system-out>
+  <system-err><![CDATA[SLF4J(W): No SLF4J providers were found.
+SLF4J(W): Defaulting to no-operation (NOP) logger implementation
+SLF4J(W): See https://www.slf4j.org/codes.html#noProviders for further details.
+]]></system-err>
+</testsuite>

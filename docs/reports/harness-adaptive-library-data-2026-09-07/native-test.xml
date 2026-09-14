@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.promethe.core.HarnessAdaptationNativeTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-09-07T23:14:18.253Z" hostname="BUREAU" time="47.748">
+  <properties/>
+  <testcase name="evaluated Kotlin adaptation survives restart and serves unseen task" classname="dev.promethe.core.HarnessAdaptationNativeTest" time="47.746"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[SLF4J(W): No SLF4J providers were found.
+SLF4J(W): Defaulting to no-operation (NOP) logger implementation
+SLF4J(W): See https://www.slf4j.org/codes.html#noProviders for further details.
+]]></system-err>
+</testsuite>

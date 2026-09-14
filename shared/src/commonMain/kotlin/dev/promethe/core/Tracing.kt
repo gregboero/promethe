@@ -2,15 +2,20 @@ package dev.promethe.core
 
 /**
  * KMP-compatible tracing abstraction.
- * On JVM: delegates to JetBrains Tracy (OpenTelemetry).
+ * On JVM: delegates to the OpenTelemetry SDK.
  * On other targets: no-op.
  */
 expect object Tracing {
     /**
      * Initialize the tracing backend. Call once at startup.
-     * @param backend "console", "langfuse", or "otlp"
+     * @param backend "none", "console", "langfuse", or "otlp"
      */
-    fun initialize(backend: String = "console")
+    fun initialize(
+        backend: String = "console",
+        endpoint: String = "",
+        publicKey: String = "",
+        secretKey: String = "",
+    )
 
     /**
      * Flush all pending traces. Call before shutdown.
@@ -21,10 +26,10 @@ expect object Tracing {
      * Execute [block] inside a named tracing span.
      * Attributes can be set via the [SpanScope] receiver.
      */
-    inline fun <T> span(
+    suspend fun <T> span(
         name: String,
         attributes: Map<String, Any> = emptyMap(),
-        block: SpanScope.() -> T,
+        block: suspend SpanScope.() -> T,
     ): T
 }
 

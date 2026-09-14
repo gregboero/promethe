@@ -1,0 +1,58 @@
+{
+  "modelCalls": 0,
+  "addedCostMicroUsd": 0,
+  "budgetRowsUnchanged": true,
+  "distributionsAndSourcesUnchanged": true,
+  "successfulRuns": 6,
+  "correctPages": 48,
+  "medianByMode": {
+    "baseline": {
+      "wallMillis": 16733,
+      "setupMillis": 5748,
+      "compilationMillis": 2490,
+      "evaluationMillis": 83,
+      "stagingMillis": 2675,
+      "processMillis": 13189,
+      "medianPageMillis": 1298.5
+    },
+    "optimized": {
+      "wallMillis": 16140,
+      "setupMillis": 5671,
+      "compilationMillis": 2562,
+      "evaluationMillis": 70,
+      "stagingMillis": 2689,
+      "processMillis": 12335,
+      "medianPageMillis": 1279.5
+    }
+  },
+  "pairedDifferences": [
+    {
+      "repetition": 0,
+      "savedMillis": 347,
+      "reductionPercent": 2.10468854248802
+    },
+    {
+      "repetition": 1,
+      "savedMillis": 9444,
+      "reductionPercent": 36.342646040175474
+    },
+    {
+      "repetition": 2,
+      "savedMillis": 844,
+      "reductionPercent": 5.043925177792385
+    }
+  ],
+  "medianWallReductionPercent": 3.5438952967190573,
+  "isolation": {
+    "freshProcessState": true,
+    "cachedTimeoutEnforced": true,
+    "failedArtifactRecompiled": true,
+    "sessionCacheCleaned": true
+  },
+  "jvmTests": 1025,
+  "nativeTests": 1,
+  "campaignRequests": 737,
+  "consumedMicroUsd": 4624197,
+  "remainingMicroUsd": 375803,
+  "limitation": "Three alternating local pairs on one JSON extraction script; combined optimization, no causal split; no model/app end-to-end or long CPU throughput measurement"
+}

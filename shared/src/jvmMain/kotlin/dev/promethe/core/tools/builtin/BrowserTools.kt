@@ -225,16 +225,14 @@ class BrowserVisionTool(
 ) : SimpleTool<BrowserVisionArgs>(
         argsType = typeToken<BrowserVisionArgs>(),
         name = "browser_vision",
-        description = "Take a screenshot of current page and analyze it. Returns base64 screenshot for multimodal analysis.",
+        description = "[UNAVAILABLE] Browser vision requires a configured VLM integration; screenshot analysis is not wired yet.",
     ) {
-    override suspend fun execute(args: BrowserVisionArgs): String {
-        val result = backend.screenshot()
-        return if (result.success) {
-            "Screenshot captured for vision analysis (${result.content.length} chars base64). Question: ${args.question}"
-        } else {
-            "Error: ${result.error}"
-        }
+    companion object {
+        const val UNAVAILABLE_MESSAGE =
+            "[UNAVAILABLE] Browser vision requires a configured VLM integration; no screenshot was analyzed."
     }
+
+    override suspend fun execute(args: BrowserVisionArgs): String = UNAVAILABLE_MESSAGE
 }
 
 @Serializable
@@ -259,7 +257,8 @@ class BrowserDialogTool(
 }
 
 /**
- * Factory to create all 12 browser tools for a given [BrowserBackend].
+ * Factory to create the 11 browser tools with implemented behavior for a given [BrowserBackend].
+ * Browser vision stays out of the registry until a VLM actually analyzes the screenshot.
  */
 object BrowserTools {
     fun create(backend: BrowserBackend): List<SimpleTool<*>> =
@@ -271,12 +270,11 @@ object BrowserTools {
             BrowserExtractTool(backend),
             BrowserScreenshotTool(backend),
             BrowserEvalTool(backend),
-            // Extended 6
+            // Extended tools
             BrowserScrollTool(backend),
             BrowserBackTool(backend),
             BrowserPressTool(backend),
             BrowserGetImagesTool(backend),
-            BrowserVisionTool(backend),
             BrowserDialogTool(backend),
         )
 }

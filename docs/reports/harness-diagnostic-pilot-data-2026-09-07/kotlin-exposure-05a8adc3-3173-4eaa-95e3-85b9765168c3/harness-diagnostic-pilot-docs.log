@@ -1,0 +1,55 @@
+
+--- Doc verification: Promethe ---
+    Root: E:\workspace\perso\projectRandD\promethe
+
+[1] Stack versions
+  [OK] Ktor version = 3.5.2
+  [OK] Exposed version = 1.5.0
+  [OK] Kotlin version = 2.4.10
+  [OK] Koog SDK version = 1.2.0
+  [OK] SQLite JDBC version = 3.53.4.0
+  [OK] Compose version = 1.12.0
+  [OK] Koog version page matches both declared release lines
+  [OK] README Gradle prerequisite matches the wrapper
+  [OK] Public README explicitly identifies a non-production sandbox
+  [OK] No SQLDelight references (replaced by Exposed)
+  [OK] No Netty references (replaced by CIO)
+
+[2] Channel count
+  [OK] Channel count matches docs
+
+[3] Phantom routes (historically false patterns)
+  [OK] No phantom: POST /api/chat (does not exist)
+  [OK] No phantom: WS /ws/chat (does not exist)
+  [OK] No phantom: agent-card.json (actual: agent.json)
+  [OK] No phantom: POST /a2a (actual: POST /agents/a2a)
+  [OK] No phantom: POST /execute (removed)
+  [OK] No phantom: legacy remote setup route (removed)
+  [OK] No phantom: legacy /api/auth/login route (actual: /auth/login)
+  [OK] No phantom: URL query credentials (rejected)
+  [OK] No phantom: persisted browser API key (removed)
+
+[4] Security route contracts
+  [OK] A2A endpoint is documented and mounted
+  [OK] Remote owner and sessions are documented and mounted
+  [OK] OAuth callback is fixed and protected by owner sessions
+  [OK] Wasm bridge documents cookie-backed login without a persisted token
+  [OK] Persistent MCP management is documented and mounted
+  [OK] MCP elicitation is documented and mounted
+  [OK] Tool approval management is documented and mounted
+  [OK] Discord live policy is documented and mounted
+  [OK] Plugin API documents only mounted management routes
+  [OK] Capability catalog and generated OpenAPI are documented and mounted
+  [OK] Management REST routes are versioned under /api/v1
+  [OK] No unversioned management API paths in documentation
+
+[5] Gradle modules
+  [OK] No reference to deleted cli/ module
+  [OK] All modules in settings.gradle.kts exist on disk
+
+[6] Internal links in INDEX.md
+  [OK] All files linked in INDEX.md exist
+
+-------------------------------------------
+Result: 36/36 checks passed
+   Documentation is consistent with code

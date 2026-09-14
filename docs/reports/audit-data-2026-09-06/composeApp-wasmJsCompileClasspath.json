@@ -1,0 +1,2098 @@
+{
+    "project": ":composeApp",
+    "configuration": "wasmJsCompileClasspath",
+    "modules": [
+        {
+            "group": "ai.koog",
+            "artifact": "a2a-client",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:agents-features-a2a-client-wasm-js:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "a2a-client-wasm-js",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:a2a-client:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "a2a-core",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:a2a-client-wasm-js:1.1.1-beta",
+                "ai.koog:a2a-transport-core-jsonrpc-wasm-js:1.1.1-beta",
+                "ai.koog:agents-features-a2a-core-wasm-js:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "a2a-core-wasm-js",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:a2a-core:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "a2a-transport-client-jsonrpc-http",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "project :composeApp"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "a2a-transport-client-jsonrpc-http-wasm-js",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:a2a-transport-client-jsonrpc-http:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "a2a-transport-core-jsonrpc",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:a2a-transport-client-jsonrpc-http-wasm-js:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "a2a-transport-core-jsonrpc-wasm-js",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:a2a-transport-core-jsonrpc:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-core",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-features-a2a-client-wasm-js:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-core-wasm-js",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-core:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-features-a2a-client",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "project :composeApp"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-features-a2a-client-wasm-js",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:agents-features-a2a-client:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-features-a2a-core",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:agents-features-a2a-client-wasm-js:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-features-a2a-core-wasm-js",
+            "version": "1.1.1-beta",
+            "requiredBy": [
+                "ai.koog:agents-features-a2a-core:1.1.1-beta"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-tools",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-core-wasm-js:1.1.1",
+                "ai.koog:prompt-executor-clients-wasm-js:1.1.1",
+                "ai.koog:prompt-executor-model-wasm-js:1.1.1",
+                "ai.koog:prompt-structure-wasm-js:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-tools-wasm-js",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-tools:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-utils",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-core-wasm-js:1.1.1",
+                "ai.koog:prompt-llm-wasm-js:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "agents-utils-wasm-js",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-utils:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "http-client-core",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-executor-openai-client-base-wasm-js:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "http-client-core-wasm-js",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:http-client-core:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-clients",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-executor-model-wasm-js:1.1.1",
+                "ai.koog:prompt-executor-openai-client-base-wasm-js:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-clients-wasm-js",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-executor-clients:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-model",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-core-wasm-js:1.1.1",
+                "ai.koog:prompt-processor-wasm-js:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-model-wasm-js",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-executor-model:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-openai-client",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-core-wasm-js:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-openai-client-base",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-executor-openai-client-wasm-js:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-openai-client-base-wasm-js",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-executor-openai-client-base:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-executor-openai-client-wasm-js",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-executor-openai-client:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-llm",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-core-wasm-js:1.1.1",
+                "ai.koog:prompt-executor-model-wasm-js:1.1.1",
+                "ai.koog:prompt-model-wasm-js:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-llm-wasm-js",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-llm:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-markdown",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-core-wasm-js:1.1.1",
+                "ai.koog:prompt-processor-wasm-js:1.1.1",
+                "ai.koog:prompt-structure-wasm-js:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-markdown-wasm-js",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-markdown:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-model",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-features-a2a-core-wasm-js:1.1.1-beta",
+                "ai.koog:agents-tools-wasm-js:1.1.1",
+                "ai.koog:prompt-executor-clients-wasm-js:1.1.1",
+                "ai.koog:prompt-executor-model-wasm-js:1.1.1",
+                "ai.koog:prompt-markdown-wasm-js:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-model-wasm-js",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-model:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-processor",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-core-wasm-js:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-processor-wasm-js",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-processor:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-structure",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-core-wasm-js:1.1.1",
+                "ai.koog:prompt-executor-clients-wasm-js:1.1.1",
+                "ai.koog:prompt-executor-model-wasm-js:1.1.1",
+                "ai.koog:prompt-executor-openai-client-base-wasm-js:1.1.1",
+                "ai.koog:prompt-executor-openai-client-wasm-js:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "prompt-structure-wasm-js",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:prompt-structure:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "serialization-core",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-tools-wasm-js:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "serialization-core-wasm-js",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:serialization-core:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "utils",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:agents-core-wasm-js:1.1.1",
+                "ai.koog:prompt-executor-openai-client-base-wasm-js:1.1.1",
+                "ai.koog:prompt-model-wasm-js:1.1.1"
+            ]
+        },
+        {
+            "group": "ai.koog",
+            "artifact": "utils-wasm-js",
+            "version": "1.1.1",
+            "requiredBy": [
+                "ai.koog:utils:1.1.1"
+            ]
+        },
+        {
+            "group": "androidx.annotation",
+            "artifact": "annotation",
+            "version": "1.9.1",
+            "requiredBy": [
+                "androidx.collection:collection-wasm-js:1.5.0",
+                "androidx.lifecycle:lifecycle-common-wasm-js:2.9.4",
+                "androidx.lifecycle:lifecycle-runtime-compose-wasm-js:2.9.4",
+                "androidx.lifecycle:lifecycle-runtime-wasm-js:2.9.4",
+                "androidx.lifecycle:lifecycle-viewmodel-savedstate-wasm-js:2.9.4",
+                "androidx.lifecycle:lifecycle-viewmodel-wasm-js:2.9.4",
+                "androidx.navigationevent:navigationevent-wasm-js:1.0.0-rc01",
+                "androidx.savedstate:savedstate-wasm-js:1.4.0",
+                "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose-wasm-js:2.9.6",
+                "org.jetbrains.compose.ui:ui-graphics-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-unit-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-wasm-js:1.11.1"
+            ]
+        },
+        {
+            "group": "androidx.annotation",
+            "artifact": "annotation-wasm-js",
+            "version": "1.9.1",
+            "requiredBy": [
+                "androidx.annotation:annotation:1.9.1"
+            ]
+        },
+        {
+            "group": "androidx.collection",
+            "artifact": "collection",
+            "version": "1.5.0",
+            "requiredBy": [
+                "org.jetbrains.compose.foundation:foundation-wasm-js:1.11.1"
+            ]
+        },
+        {
+            "group": "androidx.collection",
+            "artifact": "collection-wasm-js",
+            "version": "1.5.0",
+            "requiredBy": [
+                "androidx.collection:collection:1.5.0"
+            ]
+        },
+        {
+            "group": "androidx.compose.runtime",
+            "artifact": "runtime",
+            "version": "1.11.2",
+            "requiredBy": [
+                "androidx.compose.runtime:runtime-annotation-wasm-js:1.11.2",
+                "androidx.compose.runtime:runtime-retain-wasm-js:1.11.2",
+                "androidx.compose.runtime:runtime-saveable-wasm-js:1.11.2",
+                "androidx.lifecycle:lifecycle-runtime-compose-wasm-js:2.9.4",
+                "androidx.navigation3:navigation3-runtime-wasm-js:1.0.0-rc01",
+                "androidx.savedstate:savedstate-compose-wasm-js:1.4.0",
+                "org.jetbrains.compose.runtime:runtime-wasm-js:1.11.1"
+            ]
+        },
+        {
+            "group": "androidx.compose.runtime",
+            "artifact": "runtime-annotation",
+            "version": "1.11.2",
+            "requiredBy": [
+                "androidx.compose.runtime:runtime-retain-wasm-js:1.11.2",
+                "androidx.compose.runtime:runtime-saveable-wasm-js:1.11.2",
+                "androidx.compose.runtime:runtime-wasm-js:1.11.2",
+                "androidx.navigationevent:navigationevent-wasm-js:1.0.0-rc01"
+            ]
+        },
+        {
+            "group": "androidx.compose.runtime",
+            "artifact": "runtime-annotation-wasm-js",
+            "version": "1.11.2",
+            "requiredBy": [
+                "androidx.compose.runtime:runtime-annotation:1.11.2"
+            ]
+        },
+        {
+            "group": "androidx.compose.runtime",
+            "artifact": "runtime-retain",
+            "version": "1.11.2",
+            "requiredBy": [
+                "androidx.compose.runtime:runtime-annotation-wasm-js:1.11.2",
+                "androidx.compose.runtime:runtime-saveable-wasm-js:1.11.2",
+                "androidx.compose.runtime:runtime-wasm-js:1.11.2",
+                "org.jetbrains.compose.ui:ui-wasm-js:1.11.1"
+            ]
+        },
+        {
+            "group": "androidx.compose.runtime",
+            "artifact": "runtime-retain-wasm-js",
+            "version": "1.11.2",
+            "requiredBy": [
+                "androidx.compose.runtime:runtime-retain:1.11.2"
+            ]
+        },
+        {
+            "group": "androidx.compose.runtime",
+            "artifact": "runtime-saveable",
+            "version": "1.11.2",
+            "requiredBy": [
+                "androidx.compose.runtime:runtime-annotation-wasm-js:1.11.2",
+                "androidx.compose.runtime:runtime-retain-wasm-js:1.11.2",
+                "androidx.compose.runtime:runtime-wasm-js:1.11.2",
+                "androidx.navigation3:navigation3-runtime-wasm-js:1.0.0-rc01",
+                "org.jetbrains.compose.runtime:runtime-saveable-wasm-js:1.11.1"
+            ]
+        },
+        {
+            "group": "androidx.compose.runtime",
+            "artifact": "runtime-saveable-wasm-js",
+            "version": "1.11.2",
+            "requiredBy": [
+                "androidx.compose.runtime:runtime-saveable:1.11.2"
+            ]
+        },
+        {
+            "group": "androidx.compose.runtime",
+            "artifact": "runtime-wasm-js",
+            "version": "1.11.2",
+            "requiredBy": [
+                "androidx.compose.runtime:runtime:1.11.2"
+            ]
+        },
+        {
+            "group": "androidx.lifecycle",
+            "artifact": "lifecycle-common",
+            "version": "2.9.4",
+            "requiredBy": [
+                "androidx.lifecycle:lifecycle-runtime-compose-wasm-js:2.9.4",
+                "androidx.lifecycle:lifecycle-runtime-wasm-js:2.9.4",
+                "androidx.lifecycle:lifecycle-viewmodel-savedstate-wasm-js:2.9.4",
+                "androidx.lifecycle:lifecycle-viewmodel-wasm-js:2.9.4",
+                "org.jetbrains.androidx.lifecycle:lifecycle-common-wasm-js:2.9.6"
+            ]
+        },
+        {
+            "group": "androidx.lifecycle",
+            "artifact": "lifecycle-common-wasm-js",
+            "version": "2.9.4",
+            "requiredBy": [
+                "androidx.lifecycle:lifecycle-common:2.9.4"
+            ]
+        },
+        {
+            "group": "androidx.lifecycle",
+            "artifact": "lifecycle-runtime",
+            "version": "2.9.4",
+            "requiredBy": [
+                "androidx.lifecycle:lifecycle-common-wasm-js:2.9.4",
+                "androidx.lifecycle:lifecycle-runtime-compose-wasm-js:2.9.4",
+                "androidx.lifecycle:lifecycle-viewmodel-savedstate-wasm-js:2.9.4",
+                "androidx.lifecycle:lifecycle-viewmodel-wasm-js:2.9.4",
+                "org.jetbrains.androidx.lifecycle:lifecycle-runtime-wasm-js:2.9.6"
+            ]
+        },
+        {
+            "group": "androidx.lifecycle",
+            "artifact": "lifecycle-runtime-compose",
+            "version": "2.9.4",
+            "requiredBy": [
+                "androidx.lifecycle:lifecycle-common-wasm-js:2.9.4",
+                "androidx.lifecycle:lifecycle-runtime-wasm-js:2.9.4",
+                "androidx.lifecycle:lifecycle-viewmodel-savedstate-wasm-js:2.9.4",
+                "androidx.lifecycle:lifecycle-viewmodel-wasm-js:2.9.4",
+                "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose-wasm-js:2.9.6"
+            ]
+        },
+        {
+            "group": "androidx.lifecycle",
+            "artifact": "lifecycle-runtime-compose-wasm-js",
+            "version": "2.9.4",
+            "requiredBy": [
+                "androidx.lifecycle:lifecycle-runtime-compose:2.9.4"
+            ]
+        },
+        {
+            "group": "androidx.lifecycle",
+            "artifact": "lifecycle-runtime-wasm-js",
+            "version": "2.9.4",
+            "requiredBy": [
+                "androidx.lifecycle:lifecycle-runtime:2.9.4"
+            ]
+        },
+        {
+            "group": "androidx.lifecycle",
+            "artifact": "lifecycle-viewmodel",
+            "version": "2.9.4",
+            "requiredBy": [
+                "androidx.lifecycle:lifecycle-common-wasm-js:2.9.4",
+                "androidx.lifecycle:lifecycle-runtime-compose-wasm-js:2.9.4",
+                "androidx.lifecycle:lifecycle-runtime-wasm-js:2.9.4",
+                "androidx.lifecycle:lifecycle-viewmodel-savedstate-wasm-js:2.9.4",
+                "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-wasm-js:2.9.6"
+            ]
+        },
+        {
+            "group": "androidx.lifecycle",
+            "artifact": "lifecycle-viewmodel-savedstate",
+            "version": "2.9.4",
+            "requiredBy": [
+                "androidx.lifecycle:lifecycle-common-wasm-js:2.9.4",
+                "androidx.lifecycle:lifecycle-runtime-compose-wasm-js:2.9.4",
+                "androidx.lifecycle:lifecycle-runtime-wasm-js:2.9.4",
+                "androidx.lifecycle:lifecycle-viewmodel-wasm-js:2.9.4",
+                "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-savedstate-wasm-js:2.9.6"
+            ]
+        },
+        {
+            "group": "androidx.lifecycle",
+            "artifact": "lifecycle-viewmodel-savedstate-wasm-js",
+            "version": "2.9.4",
+            "requiredBy": [
+                "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.9.4"
+            ]
+        },
+        {
+            "group": "androidx.lifecycle",
+            "artifact": "lifecycle-viewmodel-wasm-js",
+            "version": "2.9.4",
+            "requiredBy": [
+                "androidx.lifecycle:lifecycle-viewmodel:2.9.4"
+            ]
+        },
+        {
+            "group": "androidx.navigation3",
+            "artifact": "navigation3-runtime",
+            "version": "1.0.0-rc01",
+            "requiredBy": [
+                "org.jetbrains.androidx.navigation3:navigation3-ui-wasm-js:1.0.0-alpha05"
+            ]
+        },
+        {
+            "group": "androidx.navigation3",
+            "artifact": "navigation3-runtime-wasm-js",
+            "version": "1.0.0-rc01",
+            "requiredBy": [
+                "androidx.navigation3:navigation3-runtime:1.0.0-rc01"
+            ]
+        },
+        {
+            "group": "androidx.navigationevent",
+            "artifact": "navigationevent",
+            "version": "1.0.0-rc01",
+            "requiredBy": [
+                "androidx.navigation3:navigation3-runtime-wasm-js:1.0.0-rc01",
+                "org.jetbrains.androidx.navigationevent:navigationevent-compose-wasm-js:1.0.0-beta02"
+            ]
+        },
+        {
+            "group": "androidx.navigationevent",
+            "artifact": "navigationevent-wasm-js",
+            "version": "1.0.0-rc01",
+            "requiredBy": [
+                "androidx.navigationevent:navigationevent:1.0.0-rc01"
+            ]
+        },
+        {
+            "group": "androidx.savedstate",
+            "artifact": "savedstate",
+            "version": "1.4.0",
+            "requiredBy": [
+                "androidx.lifecycle:lifecycle-viewmodel-savedstate-wasm-js:2.9.4",
+                "androidx.navigation3:navigation3-runtime-wasm-js:1.0.0-rc01",
+                "androidx.savedstate:savedstate-compose-wasm-js:1.4.0",
+                "org.jetbrains.androidx.navigation3:navigation3-ui-wasm-js:1.0.0-alpha05",
+                "org.jetbrains.androidx.savedstate:savedstate-wasm-js:1.3.6"
+            ]
+        },
+        {
+            "group": "androidx.savedstate",
+            "artifact": "savedstate-compose",
+            "version": "1.4.0",
+            "requiredBy": [
+                "androidx.compose.runtime:runtime-saveable-wasm-js:1.11.2",
+                "androidx.navigation3:navigation3-runtime-wasm-js:1.0.0-rc01",
+                "androidx.savedstate:savedstate-wasm-js:1.4.0",
+                "org.jetbrains.androidx.navigation3:navigation3-ui-wasm-js:1.0.0-alpha05",
+                "org.jetbrains.androidx.savedstate:savedstate-compose-wasm-js:1.3.6",
+                "org.jetbrains.compose.ui:ui-wasm-js:1.11.1"
+            ]
+        },
+        {
+            "group": "androidx.savedstate",
+            "artifact": "savedstate-compose-wasm-js",
+            "version": "1.4.0",
+            "requiredBy": [
+                "androidx.savedstate:savedstate-compose:1.4.0"
+            ]
+        },
+        {
+            "group": "androidx.savedstate",
+            "artifact": "savedstate-wasm-js",
+            "version": "1.4.0",
+            "requiredBy": [
+                "androidx.savedstate:savedstate:1.4.0"
+            ]
+        },
+        {
+            "group": "com.mikepenz",
+            "artifact": "multiplatform-markdown-renderer",
+            "version": "0.41.0",
+            "requiredBy": [
+                "com.mikepenz:multiplatform-markdown-renderer-m3-wasm-js:0.41.0"
+            ]
+        },
+        {
+            "group": "com.mikepenz",
+            "artifact": "multiplatform-markdown-renderer-m3",
+            "version": "0.41.0",
+            "requiredBy": [
+                "project :composeApp"
+            ]
+        },
+        {
+            "group": "com.mikepenz",
+            "artifact": "multiplatform-markdown-renderer-m3-wasm-js",
+            "version": "0.41.0",
+            "requiredBy": [
+                "com.mikepenz:multiplatform-markdown-renderer-m3:0.41.0"
+            ]
+        },
+        {
+            "group": "com.mikepenz",
+            "artifact": "multiplatform-markdown-renderer-wasm-js",
+            "version": "0.41.0",
+            "requiredBy": [
+                "com.mikepenz:multiplatform-markdown-renderer:0.41.0"
+            ]
+        },
+        {
+            "group": "io.github.oshai",
+            "artifact": "kotlin-logging",
+            "version": "8.0.01",
+            "requiredBy": [
+                "ai.koog:prompt-executor-model-wasm-js:1.1.1",
+                "project :composeApp"
+            ]
+        },
+        {
+            "group": "io.github.oshai",
+            "artifact": "kotlin-logging-wasm-js",
+            "version": "8.0.01",
+            "requiredBy": [
+                "io.github.oshai:kotlin-logging:8.0.01"
+            ]
+        },
+        {
+            "group": "io.insert-koin",
+            "artifact": "koin-compose",
+            "version": "4.2.1",
+            "requiredBy": [
+                "io.insert-koin:koin-compose-viewmodel-wasm-js:4.2.1",
+                "project :composeApp"
+            ]
+        },
+        {
+            "group": "io.insert-koin",
+            "artifact": "koin-compose-viewmodel",
+            "version": "4.2.1",
+            "requiredBy": [
+                "project :composeApp"
+            ]
+        },
+        {
+            "group": "io.insert-koin",
+            "artifact": "koin-compose-viewmodel-wasm-js",
+            "version": "4.2.1",
+            "requiredBy": [
+                "io.insert-koin:koin-compose-viewmodel:4.2.1"
+            ]
+        },
+        {
+            "group": "io.insert-koin",
+            "artifact": "koin-compose-wasm-js",
+            "version": "4.2.1",
+            "requiredBy": [
+                "io.insert-koin:koin-compose:4.2.1"
+            ]
+        },
+        {
+            "group": "io.insert-koin",
+            "artifact": "koin-core",
+            "version": "4.2.1",
+            "requiredBy": [
+                "io.insert-koin:koin-compose-wasm-js:4.2.1",
+                "io.insert-koin:koin-core-viewmodel-wasm-js:4.2.1",
+                "project :composeApp"
+            ]
+        },
+        {
+            "group": "io.insert-koin",
+            "artifact": "koin-core-viewmodel",
+            "version": "4.2.1",
+            "requiredBy": [
+                "io.insert-koin:koin-compose-viewmodel-wasm-js:4.2.1"
+            ]
+        },
+        {
+            "group": "io.insert-koin",
+            "artifact": "koin-core-viewmodel-wasm-js",
+            "version": "4.2.1",
+            "requiredBy": [
+                "io.insert-koin:koin-core-viewmodel:4.2.1"
+            ]
+        },
+        {
+            "group": "io.insert-koin",
+            "artifact": "koin-core-wasm-js",
+            "version": "4.2.1",
+            "requiredBy": [
+                "io.insert-koin:koin-core:4.2.1"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-client-content-negotiation",
+            "version": "3.5.0",
+            "requiredBy": [
+                "ai.koog:a2a-client-wasm-js:1.1.1-beta",
+                "ai.koog:a2a-transport-client-jsonrpc-http-wasm-js:1.1.1-beta",
+                "ai.koog:agents-core-wasm-js:1.1.1",
+                "project :composeApp"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-client-content-negotiation-wasm-js",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-client-content-negotiation:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-client-core",
+            "version": "3.5.0",
+            "requiredBy": [
+                "ai.koog:a2a-client-wasm-js:1.1.1-beta",
+                "ai.koog:a2a-transport-client-jsonrpc-http-wasm-js:1.1.1-beta",
+                "io.ktor:ktor-client-content-negotiation-wasm-js:3.5.0",
+                "io.ktor:ktor-client-js-wasm-js:3.5.0",
+                "io.ktor:ktor-client-logging-wasm-js:3.3.3",
+                "io.ktor:ktor-client-websockets-wasm-js:3.5.0",
+                "project :composeApp"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-client-core-wasm-js",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-client-core:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-client-js",
+            "version": "3.5.0",
+            "requiredBy": [
+                "project :composeApp"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-client-js-wasm-js",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-client-js:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-client-logging",
+            "version": "3.3.3",
+            "requiredBy": [
+                "ai.koog:agents-core-wasm-js:1.1.1"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-client-logging-wasm-js",
+            "version": "3.3.3",
+            "requiredBy": [
+                "io.ktor:ktor-client-logging:3.3.3"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-client-websockets",
+            "version": "3.5.0",
+            "requiredBy": [
+                "project :composeApp"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-client-websockets-wasm-js",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-client-websockets:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-events",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-client-core-wasm-js:3.5.0",
+                "io.ktor:ktor-server-core-wasm-js:3.3.3"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-events-wasm-js",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-events:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-http",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-client-core-wasm-js:3.5.0",
+                "io.ktor:ktor-http-cio-wasm-js:3.5.0",
+                "io.ktor:ktor-server-core-wasm-js:3.3.3",
+                "io.ktor:ktor-websockets-wasm-js:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-http-cio",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-client-core-wasm-js:3.5.0",
+                "io.ktor:ktor-server-cio-wasm-js:3.3.3",
+                "io.ktor:ktor-server-core-wasm-js:3.3.3"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-http-cio-wasm-js",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-http-cio:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-http-wasm-js",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-http:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-io",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-http-cio-wasm-js:3.5.0",
+                "io.ktor:ktor-utils-wasm-js:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-io-wasm-js",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-io:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-network",
+            "version": "3.3.3",
+            "requiredBy": [
+                "io.ktor:ktor-server-cio-wasm-js:3.3.3"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-network-wasm-js",
+            "version": "3.3.3",
+            "requiredBy": [
+                "io.ktor:ktor-network:3.3.3"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-serialization",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-client-content-negotiation-wasm-js:3.5.0",
+                "io.ktor:ktor-serialization-kotlinx-wasm-js:3.5.0",
+                "io.ktor:ktor-server-core-wasm-js:3.3.3",
+                "io.ktor:ktor-websocket-serialization-wasm-js:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-serialization-kotlinx",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-serialization-kotlinx-json-wasm-js:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-serialization-kotlinx-json",
+            "version": "3.5.0",
+            "requiredBy": [
+                "ai.koog:a2a-client-wasm-js:1.1.1-beta",
+                "ai.koog:a2a-transport-client-jsonrpc-http-wasm-js:1.1.1-beta",
+                "ai.koog:agents-core-wasm-js:1.1.1",
+                "project :composeApp"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-serialization-kotlinx-json-wasm-js",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-serialization-kotlinx-json:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-serialization-kotlinx-wasm-js",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-serialization-kotlinx:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-serialization-wasm-js",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-serialization:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-server-cio",
+            "version": "3.3.3",
+            "requiredBy": [
+                "ai.koog:agents-core-wasm-js:1.1.1"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-server-cio-wasm-js",
+            "version": "3.3.3",
+            "requiredBy": [
+                "io.ktor:ktor-server-cio:3.3.3"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-server-core",
+            "version": "3.3.3",
+            "requiredBy": [
+                "io.ktor:ktor-server-cio-wasm-js:3.3.3",
+                "io.ktor:ktor-server-sse-wasm-js:3.3.3"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-server-core-wasm-js",
+            "version": "3.3.3",
+            "requiredBy": [
+                "io.ktor:ktor-server-core:3.3.3"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-server-sse",
+            "version": "3.3.3",
+            "requiredBy": [
+                "ai.koog:agents-core-wasm-js:1.1.1"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-server-sse-wasm-js",
+            "version": "3.3.3",
+            "requiredBy": [
+                "io.ktor:ktor-server-sse:3.3.3"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-sse",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-client-core-wasm-js:3.5.0",
+                "io.ktor:ktor-server-sse-wasm-js:3.3.3"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-sse-wasm-js",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-sse:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-utils",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-events-wasm-js:3.5.0",
+                "io.ktor:ktor-http-wasm-js:3.5.0",
+                "io.ktor:ktor-network-wasm-js:3.3.3",
+                "io.ktor:ktor-server-core-wasm-js:3.3.3",
+                "io.ktor:ktor-sse-wasm-js:3.5.0",
+                "io.ktor:ktor-websockets-wasm-js:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-utils-wasm-js",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-utils:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-websocket-serialization",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-client-core-wasm-js:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-websocket-serialization-wasm-js",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-websocket-serialization:3.5.0"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-websockets",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-serialization-wasm-js:3.5.0",
+                "io.ktor:ktor-server-cio-wasm-js:3.3.3",
+                "io.ktor:ktor-server-core-wasm-js:3.3.3"
+            ]
+        },
+        {
+            "group": "io.ktor",
+            "artifact": "ktor-websockets-wasm-js",
+            "version": "3.5.0",
+            "requiredBy": [
+                "io.ktor:ktor-websockets:3.5.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.androidx.lifecycle",
+            "artifact": "lifecycle-common",
+            "version": "2.9.6",
+            "requiredBy": [
+                "org.jetbrains.androidx.lifecycle:lifecycle-runtime-wasm-js:2.9.6",
+                "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose-wasm-js:2.9.6"
+            ]
+        },
+        {
+            "group": "org.jetbrains.androidx.lifecycle",
+            "artifact": "lifecycle-common-wasm-js",
+            "version": "2.9.6",
+            "requiredBy": [
+                "org.jetbrains.androidx.lifecycle:lifecycle-common:2.9.6"
+            ]
+        },
+        {
+            "group": "org.jetbrains.androidx.lifecycle",
+            "artifact": "lifecycle-runtime",
+            "version": "2.9.6",
+            "requiredBy": [
+                "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose-wasm-js:2.9.6"
+            ]
+        },
+        {
+            "group": "org.jetbrains.androidx.lifecycle",
+            "artifact": "lifecycle-runtime-compose",
+            "version": "2.9.6",
+            "requiredBy": [
+                "org.jetbrains.compose.ui:ui-wasm-js:1.11.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.androidx.lifecycle",
+            "artifact": "lifecycle-runtime-compose-wasm-js",
+            "version": "2.9.6",
+            "requiredBy": [
+                "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose:2.9.6"
+            ]
+        },
+        {
+            "group": "org.jetbrains.androidx.lifecycle",
+            "artifact": "lifecycle-runtime-wasm-js",
+            "version": "2.9.6",
+            "requiredBy": [
+                "org.jetbrains.androidx.lifecycle:lifecycle-runtime:2.9.6"
+            ]
+        },
+        {
+            "group": "org.jetbrains.androidx.lifecycle",
+            "artifact": "lifecycle-viewmodel",
+            "version": "2.9.6",
+            "requiredBy": [
+                "io.insert-koin:koin-core-viewmodel-wasm-js:4.2.1",
+                "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose-wasm-js:2.9.6",
+                "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-savedstate-wasm-js:2.9.6"
+            ]
+        },
+        {
+            "group": "org.jetbrains.androidx.lifecycle",
+            "artifact": "lifecycle-viewmodel-compose",
+            "version": "2.9.6",
+            "requiredBy": [
+                "io.insert-koin:koin-compose-viewmodel-wasm-js:4.2.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.androidx.lifecycle",
+            "artifact": "lifecycle-viewmodel-compose-wasm-js",
+            "version": "2.9.6",
+            "requiredBy": [
+                "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.9.6"
+            ]
+        },
+        {
+            "group": "org.jetbrains.androidx.lifecycle",
+            "artifact": "lifecycle-viewmodel-savedstate",
+            "version": "2.9.6",
+            "requiredBy": [
+                "io.insert-koin:koin-core-viewmodel-wasm-js:4.2.1",
+                "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose-wasm-js:2.9.6"
+            ]
+        },
+        {
+            "group": "org.jetbrains.androidx.lifecycle",
+            "artifact": "lifecycle-viewmodel-savedstate-wasm-js",
+            "version": "2.9.6",
+            "requiredBy": [
+                "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-savedstate:2.9.6"
+            ]
+        },
+        {
+            "group": "org.jetbrains.androidx.lifecycle",
+            "artifact": "lifecycle-viewmodel-wasm-js",
+            "version": "2.9.6",
+            "requiredBy": [
+                "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel:2.9.6"
+            ]
+        },
+        {
+            "group": "org.jetbrains.androidx.navigation3",
+            "artifact": "navigation3-ui",
+            "version": "1.0.0-alpha05",
+            "requiredBy": [
+                "project :composeApp"
+            ]
+        },
+        {
+            "group": "org.jetbrains.androidx.navigation3",
+            "artifact": "navigation3-ui-wasm-js",
+            "version": "1.0.0-alpha05",
+            "requiredBy": [
+                "org.jetbrains.androidx.navigation3:navigation3-ui:1.0.0-alpha05"
+            ]
+        },
+        {
+            "group": "org.jetbrains.androidx.navigationevent",
+            "artifact": "navigationevent-compose",
+            "version": "1.0.0-beta02",
+            "requiredBy": [
+                "org.jetbrains.androidx.navigation3:navigation3-ui-wasm-js:1.0.0-alpha05"
+            ]
+        },
+        {
+            "group": "org.jetbrains.androidx.navigationevent",
+            "artifact": "navigationevent-compose-wasm-js",
+            "version": "1.0.0-beta02",
+            "requiredBy": [
+                "org.jetbrains.androidx.navigationevent:navigationevent-compose:1.0.0-beta02"
+            ]
+        },
+        {
+            "group": "org.jetbrains.androidx.savedstate",
+            "artifact": "savedstate",
+            "version": "1.3.6",
+            "requiredBy": [
+                "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-savedstate-wasm-js:2.9.6",
+                "org.jetbrains.androidx.savedstate:savedstate-compose-wasm-js:1.3.6"
+            ]
+        },
+        {
+            "group": "org.jetbrains.androidx.savedstate",
+            "artifact": "savedstate-compose",
+            "version": "1.3.6",
+            "requiredBy": [
+                "org.jetbrains.compose.runtime:runtime-saveable-wasm-js:1.11.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.androidx.savedstate",
+            "artifact": "savedstate-compose-wasm-js",
+            "version": "1.3.6",
+            "requiredBy": [
+                "org.jetbrains.androidx.savedstate:savedstate-compose:1.3.6"
+            ]
+        },
+        {
+            "group": "org.jetbrains.androidx.savedstate",
+            "artifact": "savedstate-wasm-js",
+            "version": "1.3.6",
+            "requiredBy": [
+                "org.jetbrains.androidx.savedstate:savedstate:1.3.6"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.animation",
+            "artifact": "animation",
+            "version": "1.11.1",
+            "requiredBy": [
+                "org.jetbrains.androidx.navigation3:navigation3-ui-wasm-js:1.0.0-alpha05",
+                "org.jetbrains.compose.animation:animation-core-wasm-js:1.11.1",
+                "org.jetbrains.compose.foundation:foundation-wasm-js:1.11.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.animation",
+            "artifact": "animation-core",
+            "version": "1.11.1",
+            "requiredBy": [
+                "org.jetbrains.compose.animation:animation-wasm-js:1.11.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.animation",
+            "artifact": "animation-core-wasm-js",
+            "version": "1.11.1",
+            "requiredBy": [
+                "org.jetbrains.compose.animation:animation-core:1.11.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.animation",
+            "artifact": "animation-wasm-js",
+            "version": "1.11.1",
+            "requiredBy": [
+                "org.jetbrains.compose.animation:animation:1.11.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.components",
+            "artifact": "components-resources",
+            "version": "1.11.1",
+            "requiredBy": [
+                "project :composeApp"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.components",
+            "artifact": "components-resources-wasmJs",
+            "version": "1.11.1",
+            "requiredBy": [
+                "org.jetbrains.compose.components:components-resources:1.11.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.foundation",
+            "artifact": "foundation",
+            "version": "1.11.1",
+            "requiredBy": [
+                "io.insert-koin:koin-compose-wasm-js:4.2.1",
+                "org.jetbrains.compose.foundation:foundation-layout-wasm-js:1.11.1",
+                "org.jetbrains.compose.material3:material3-wasm-js:1.9.0",
+                "org.jetbrains.compose.material:material-ripple-wasm-js:1.9.1",
+                "project :composeApp"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.foundation",
+            "artifact": "foundation-layout",
+            "version": "1.11.1",
+            "requiredBy": [
+                "org.jetbrains.compose.animation:animation-wasm-js:1.11.1",
+                "org.jetbrains.compose.foundation:foundation-wasm-js:1.11.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.foundation",
+            "artifact": "foundation-layout-wasm-js",
+            "version": "1.11.1",
+            "requiredBy": [
+                "org.jetbrains.compose.foundation:foundation-layout:1.11.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.foundation",
+            "artifact": "foundation-wasm-js",
+            "version": "1.11.1",
+            "requiredBy": [
+                "org.jetbrains.compose.foundation:foundation:1.11.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.material3",
+            "artifact": "material3",
+            "version": "1.9.0",
+            "requiredBy": [
+                "project :composeApp"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.material3",
+            "artifact": "material3-wasm-js",
+            "version": "1.9.0",
+            "requiredBy": [
+                "org.jetbrains.compose.material3:material3:1.9.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.material",
+            "artifact": "material-icons-core",
+            "version": "1.7.3",
+            "requiredBy": [
+                "org.jetbrains.compose.material:material-icons-extended-wasm-js:1.7.3"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.material",
+            "artifact": "material-icons-core-wasm-js",
+            "version": "1.7.3",
+            "requiredBy": [
+                "org.jetbrains.compose.material:material-icons-core:1.7.3"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.material",
+            "artifact": "material-icons-extended",
+            "version": "1.7.3",
+            "requiredBy": [
+                "project :composeApp"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.material",
+            "artifact": "material-icons-extended-wasm-js",
+            "version": "1.7.3",
+            "requiredBy": [
+                "org.jetbrains.compose.material:material-icons-extended:1.7.3"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.material",
+            "artifact": "material-ripple",
+            "version": "1.9.1",
+            "requiredBy": [
+                "org.jetbrains.compose.material3:material3-wasm-js:1.9.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.material",
+            "artifact": "material-ripple-wasm-js",
+            "version": "1.9.1",
+            "requiredBy": [
+                "org.jetbrains.compose.material:material-ripple:1.9.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.runtime",
+            "artifact": "runtime",
+            "version": "1.11.1",
+            "requiredBy": [
+                "io.insert-koin:koin-compose-wasm-js:4.2.1",
+                "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose-wasm-js:2.9.6",
+                "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose-wasm-js:2.9.6",
+                "org.jetbrains.androidx.navigation3:navigation3-ui-wasm-js:1.0.0-alpha05",
+                "org.jetbrains.androidx.navigationevent:navigationevent-compose-wasm-js:1.0.0-beta02",
+                "org.jetbrains.androidx.savedstate:savedstate-compose-wasm-js:1.3.6",
+                "org.jetbrains.compose.animation:animation-wasm-js:1.11.1",
+                "org.jetbrains.compose.foundation:foundation-wasm-js:1.11.1",
+                "org.jetbrains.compose.material3:material3-wasm-js:1.9.0",
+                "org.jetbrains.compose.material:material-ripple-wasm-js:1.9.1",
+                "org.jetbrains.compose.runtime:runtime-saveable-wasm-js:1.11.1",
+                "project :composeApp"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.runtime",
+            "artifact": "runtime-saveable",
+            "version": "1.11.1",
+            "requiredBy": [
+                "org.jetbrains.androidx.navigation3:navigation3-ui-wasm-js:1.0.0-alpha05",
+                "org.jetbrains.compose.runtime:runtime-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-wasm-js:1.11.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.runtime",
+            "artifact": "runtime-saveable-wasm-js",
+            "version": "1.11.1",
+            "requiredBy": [
+                "org.jetbrains.compose.runtime:runtime-saveable:1.11.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.runtime",
+            "artifact": "runtime-wasm-js",
+            "version": "1.11.1",
+            "requiredBy": [
+                "org.jetbrains.compose.runtime:runtime:1.11.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.ui",
+            "artifact": "ui",
+            "version": "1.11.1",
+            "requiredBy": [
+                "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose-wasm-js:2.9.6",
+                "org.jetbrains.androidx.navigation3:navigation3-ui-wasm-js:1.0.0-alpha05",
+                "org.jetbrains.compose.foundation:foundation-layout-wasm-js:1.11.1",
+                "org.jetbrains.compose.foundation:foundation-wasm-js:1.11.1",
+                "org.jetbrains.compose.material:material-icons-core-wasm-js:1.7.3",
+                "org.jetbrains.compose.ui:ui-geometry-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-graphics-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-text-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-unit-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-util-wasm-js:1.11.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.ui",
+            "artifact": "ui-geometry",
+            "version": "1.11.1",
+            "requiredBy": [
+                "org.jetbrains.compose.animation:animation-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-graphics-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-text-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-unit-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-util-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-wasm-js:1.11.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.ui",
+            "artifact": "ui-geometry-wasm-js",
+            "version": "1.11.1",
+            "requiredBy": [
+                "org.jetbrains.compose.ui:ui-geometry:1.11.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.ui",
+            "artifact": "ui-graphics",
+            "version": "1.11.1",
+            "requiredBy": [
+                "org.jetbrains.compose.material3:material3-wasm-js:1.9.0",
+                "org.jetbrains.compose.ui:ui-geometry-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-text-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-unit-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-util-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-wasm-js:1.11.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.ui",
+            "artifact": "ui-graphics-wasm-js",
+            "version": "1.11.1",
+            "requiredBy": [
+                "org.jetbrains.compose.ui:ui-graphics:1.11.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.ui",
+            "artifact": "ui-text",
+            "version": "1.11.1",
+            "requiredBy": [
+                "org.jetbrains.compose.material3:material3-wasm-js:1.9.0",
+                "org.jetbrains.compose.ui:ui-geometry-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-graphics-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-unit-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-util-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-wasm-js:1.11.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.ui",
+            "artifact": "ui-text-wasm-js",
+            "version": "1.11.1",
+            "requiredBy": [
+                "org.jetbrains.compose.ui:ui-text:1.11.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.ui",
+            "artifact": "ui-unit",
+            "version": "1.11.1",
+            "requiredBy": [
+                "org.jetbrains.compose.ui:ui-geometry-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-graphics-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-text-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-util-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-wasm-js:1.11.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.ui",
+            "artifact": "ui-unit-wasm-js",
+            "version": "1.11.1",
+            "requiredBy": [
+                "org.jetbrains.compose.ui:ui-unit:1.11.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.ui",
+            "artifact": "ui-util",
+            "version": "1.11.1",
+            "requiredBy": [
+                "org.jetbrains.compose.ui:ui-geometry-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-graphics-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-text-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-unit-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-wasm-js:1.11.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.ui",
+            "artifact": "ui-util-wasm-js",
+            "version": "1.11.1",
+            "requiredBy": [
+                "org.jetbrains.compose.ui:ui-util:1.11.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.compose.ui",
+            "artifact": "ui-wasm-js",
+            "version": "1.11.1",
+            "requiredBy": [
+                "org.jetbrains.compose.ui:ui:1.11.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlin",
+            "artifact": "kotlin-reflect",
+            "version": "2.4.0",
+            "requiredBy": [
+                "io.ktor:ktor-server-core-wasm-js:3.3.3"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlin",
+            "artifact": "kotlin-stdlib",
+            "version": "2.4.0",
+            "requiredBy": [
+                "ai.koog:a2a-client-wasm-js:1.1.1-beta",
+                "ai.koog:a2a-core-wasm-js:1.1.1-beta",
+                "ai.koog:a2a-transport-client-jsonrpc-http-wasm-js:1.1.1-beta",
+                "ai.koog:a2a-transport-core-jsonrpc-wasm-js:1.1.1-beta",
+                "ai.koog:agents-core-wasm-js:1.1.1",
+                "ai.koog:agents-features-a2a-client-wasm-js:1.1.1-beta",
+                "ai.koog:agents-features-a2a-core-wasm-js:1.1.1-beta",
+                "ai.koog:agents-tools-wasm-js:1.1.1",
+                "ai.koog:agents-utils-wasm-js:1.1.1",
+                "ai.koog:http-client-core-wasm-js:1.1.1",
+                "ai.koog:prompt-executor-clients-wasm-js:1.1.1",
+                "ai.koog:prompt-executor-model-wasm-js:1.1.1",
+                "ai.koog:prompt-executor-openai-client-base-wasm-js:1.1.1",
+                "ai.koog:prompt-executor-openai-client-wasm-js:1.1.1",
+                "ai.koog:prompt-llm-wasm-js:1.1.1",
+                "ai.koog:prompt-markdown-wasm-js:1.1.1",
+                "ai.koog:prompt-model-wasm-js:1.1.1",
+                "ai.koog:prompt-processor-wasm-js:1.1.1",
+                "ai.koog:prompt-structure-wasm-js:1.1.1",
+                "ai.koog:serialization-core-wasm-js:1.1.1",
+                "ai.koog:utils-wasm-js:1.1.1",
+                "androidx.annotation:annotation-wasm-js:1.9.1",
+                "androidx.collection:collection-wasm-js:1.5.0",
+                "androidx.compose.runtime:runtime-annotation-wasm-js:1.11.2",
+                "androidx.compose.runtime:runtime-retain-wasm-js:1.11.2",
+                "androidx.compose.runtime:runtime-saveable-wasm-js:1.11.2",
+                "androidx.compose.runtime:runtime-wasm-js:1.11.2",
+                "androidx.lifecycle:lifecycle-common-wasm-js:2.9.4",
+                "androidx.lifecycle:lifecycle-runtime-wasm-js:2.9.4",
+                "androidx.lifecycle:lifecycle-viewmodel-savedstate-wasm-js:2.9.4",
+                "androidx.lifecycle:lifecycle-viewmodel-wasm-js:2.9.4",
+                "androidx.navigation3:navigation3-runtime-wasm-js:1.0.0-rc01",
+                "androidx.savedstate:savedstate-wasm-js:1.4.0",
+                "com.mikepenz:multiplatform-markdown-renderer-m3-wasm-js:0.41.0",
+                "com.mikepenz:multiplatform-markdown-renderer-wasm-js:0.41.0",
+                "io.github.oshai:kotlin-logging-wasm-js:8.0.01",
+                "io.insert-koin:koin-compose-viewmodel-wasm-js:4.2.1",
+                "io.insert-koin:koin-compose-wasm-js:4.2.1",
+                "io.insert-koin:koin-core-viewmodel-wasm-js:4.2.1",
+                "io.insert-koin:koin-core-wasm-js:4.2.1",
+                "io.ktor:ktor-client-content-negotiation-wasm-js:3.5.0",
+                "io.ktor:ktor-client-core-wasm-js:3.5.0",
+                "io.ktor:ktor-client-js-wasm-js:3.5.0",
+                "io.ktor:ktor-client-logging-wasm-js:3.3.3",
+                "io.ktor:ktor-client-websockets-wasm-js:3.5.0",
+                "io.ktor:ktor-events-wasm-js:3.5.0",
+                "io.ktor:ktor-http-cio-wasm-js:3.5.0",
+                "io.ktor:ktor-http-wasm-js:3.5.0",
+                "io.ktor:ktor-io-wasm-js:3.5.0",
+                "io.ktor:ktor-network-wasm-js:3.3.3",
+                "io.ktor:ktor-serialization-kotlinx-json-wasm-js:3.5.0",
+                "io.ktor:ktor-serialization-kotlinx-wasm-js:3.5.0",
+                "io.ktor:ktor-serialization-wasm-js:3.5.0",
+                "io.ktor:ktor-server-cio-wasm-js:3.3.3",
+                "io.ktor:ktor-server-core-wasm-js:3.3.3",
+                "io.ktor:ktor-server-sse-wasm-js:3.3.3",
+                "io.ktor:ktor-sse-wasm-js:3.5.0",
+                "io.ktor:ktor-utils-wasm-js:3.5.0",
+                "io.ktor:ktor-websocket-serialization-wasm-js:3.5.0",
+                "io.ktor:ktor-websockets-wasm-js:3.5.0",
+                "org.jetbrains.compose.animation:animation-core-wasm-js:1.11.1",
+                "org.jetbrains.compose.animation:animation-wasm-js:1.11.1",
+                "org.jetbrains.compose.components:components-resources-wasmJs:1.11.1",
+                "org.jetbrains.compose.foundation:foundation-layout-wasm-js:1.11.1",
+                "org.jetbrains.compose.foundation:foundation-wasm-js:1.11.1",
+                "org.jetbrains.compose.runtime:runtime-saveable-wasm-js:1.11.1",
+                "org.jetbrains.compose.runtime:runtime-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-geometry-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-graphics-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-text-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-unit-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-util-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-wasm-js:1.11.1",
+                "org.jetbrains.kotlin:kotlin-reflect:2.4.0",
+                "org.jetbrains.kotlinx:kotlinx-browser-wasm-js:0.5.0",
+                "org.jetbrains.kotlinx:kotlinx-collections-immutable-wasm-js:0.4.0",
+                "org.jetbrains.kotlinx:kotlinx-coroutines-core-wasm-js:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-datetime-wasm-js:0.8.0",
+                "org.jetbrains.kotlinx:kotlinx-io-bytestring-wasm-js:0.9.0",
+                "org.jetbrains.kotlinx:kotlinx-io-core-wasm-js:0.9.0",
+                "org.jetbrains.kotlinx:kotlinx-schema-annotations-wasm-js:0.4.4",
+                "org.jetbrains.kotlinx:kotlinx-schema-generator-core-wasm-js:0.4.4",
+                "org.jetbrains.kotlinx:kotlinx-schema-generator-json-wasm-js:0.4.4",
+                "org.jetbrains.kotlinx:kotlinx-schema-json-wasm-js:0.4.4",
+                "org.jetbrains.kotlinx:kotlinx-serialization-core-wasm-js:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-serialization-json-io-wasm-js:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-serialization-json-wasm-js:1.11.0",
+                "org.jetbrains:markdown-wasm-js:0.7.3",
+                "project :api",
+                "project :composeApp"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlin",
+            "artifact": "kotlin-stdlib-wasm-js",
+            "version": "2.4.0",
+            "requiredBy": [
+                "org.jetbrains.kotlin:kotlin-stdlib:2.4.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "atomicfu",
+            "version": "0.32.1",
+            "requiredBy": [
+                "io.ktor:ktor-client-content-negotiation-wasm-js:3.5.0",
+                "io.ktor:ktor-client-core-wasm-js:3.5.0",
+                "io.ktor:ktor-client-js-wasm-js:3.5.0",
+                "io.ktor:ktor-client-logging-wasm-js:3.3.3",
+                "io.ktor:ktor-client-websockets-wasm-js:3.5.0",
+                "io.ktor:ktor-events-wasm-js:3.5.0",
+                "io.ktor:ktor-http-cio-wasm-js:3.5.0",
+                "io.ktor:ktor-http-wasm-js:3.5.0",
+                "io.ktor:ktor-io-wasm-js:3.5.0",
+                "io.ktor:ktor-network-wasm-js:3.3.3",
+                "io.ktor:ktor-serialization-kotlinx-json-wasm-js:3.5.0",
+                "io.ktor:ktor-serialization-kotlinx-wasm-js:3.5.0",
+                "io.ktor:ktor-serialization-wasm-js:3.5.0",
+                "io.ktor:ktor-server-cio-wasm-js:3.3.3",
+                "io.ktor:ktor-server-core-wasm-js:3.3.3",
+                "io.ktor:ktor-server-sse-wasm-js:3.3.3",
+                "io.ktor:ktor-sse-wasm-js:3.5.0",
+                "io.ktor:ktor-utils-wasm-js:3.5.0",
+                "io.ktor:ktor-websocket-serialization-wasm-js:3.5.0",
+                "io.ktor:ktor-websockets-wasm-js:3.5.0",
+                "org.jetbrains.kotlinx:kotlinx-coroutines-core-wasm-js:1.11.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "atomicfu-wasm-js",
+            "version": "0.32.1",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:atomicfu:0.32.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-browser",
+            "version": "0.5.0",
+            "requiredBy": [
+                "org.jetbrains.compose.ui:ui-wasm-js:1.11.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-browser-wasm-js",
+            "version": "0.5.0",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-browser:0.5.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-collections-immutable",
+            "version": "0.4.0",
+            "requiredBy": [
+                "com.mikepenz:multiplatform-markdown-renderer-wasm-js:0.41.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-collections-immutable-wasm-js",
+            "version": "0.4.0",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-collections-immutable:0.4.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-coroutines-core",
+            "version": "1.11.0",
+            "requiredBy": [
+                "ai.koog:a2a-client-wasm-js:1.1.1-beta",
+                "ai.koog:a2a-core-wasm-js:1.1.1-beta",
+                "ai.koog:a2a-transport-client-jsonrpc-http-wasm-js:1.1.1-beta",
+                "ai.koog:a2a-transport-core-jsonrpc-wasm-js:1.1.1-beta",
+                "ai.koog:agents-tools-wasm-js:1.1.1",
+                "ai.koog:http-client-core-wasm-js:1.1.1",
+                "ai.koog:prompt-executor-clients-wasm-js:1.1.1",
+                "ai.koog:prompt-executor-model-wasm-js:1.1.1",
+                "ai.koog:prompt-model-wasm-js:1.1.1",
+                "ai.koog:prompt-structure-wasm-js:1.1.1",
+                "ai.koog:utils-wasm-js:1.1.1",
+                "androidx.compose.runtime:runtime-retain-wasm-js:1.11.2",
+                "androidx.compose.runtime:runtime-wasm-js:1.11.2",
+                "androidx.lifecycle:lifecycle-common-wasm-js:2.9.4",
+                "androidx.lifecycle:lifecycle-viewmodel-savedstate-wasm-js:2.9.4",
+                "androidx.lifecycle:lifecycle-viewmodel-wasm-js:2.9.4",
+                "androidx.savedstate:savedstate-wasm-js:1.4.0",
+                "io.ktor:ktor-client-content-negotiation-wasm-js:3.5.0",
+                "io.ktor:ktor-client-core-wasm-js:3.5.0",
+                "io.ktor:ktor-client-js-wasm-js:3.5.0",
+                "io.ktor:ktor-client-logging-wasm-js:3.3.3",
+                "io.ktor:ktor-client-websockets-wasm-js:3.5.0",
+                "io.ktor:ktor-events-wasm-js:3.5.0",
+                "io.ktor:ktor-http-cio-wasm-js:3.5.0",
+                "io.ktor:ktor-http-wasm-js:3.5.0",
+                "io.ktor:ktor-io-wasm-js:3.5.0",
+                "io.ktor:ktor-network-wasm-js:3.3.3",
+                "io.ktor:ktor-serialization-kotlinx-json-wasm-js:3.5.0",
+                "io.ktor:ktor-serialization-kotlinx-wasm-js:3.5.0",
+                "io.ktor:ktor-serialization-wasm-js:3.5.0",
+                "io.ktor:ktor-server-cio-wasm-js:3.3.3",
+                "io.ktor:ktor-server-core-wasm-js:3.3.3",
+                "io.ktor:ktor-server-sse-wasm-js:3.3.3",
+                "io.ktor:ktor-sse-wasm-js:3.5.0",
+                "io.ktor:ktor-utils-wasm-js:3.5.0",
+                "io.ktor:ktor-websocket-serialization-wasm-js:3.5.0",
+                "io.ktor:ktor-websockets-wasm-js:3.5.0",
+                "org.jetbrains.compose.animation:animation-core-wasm-js:1.11.1",
+                "project :composeApp"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-coroutines-core-wasm-js",
+            "version": "1.11.0",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-datetime",
+            "version": "0.8.0",
+            "requiredBy": [
+                "project :composeApp"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-datetime-wasm-js",
+            "version": "0.8.0",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-datetime:0.8.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-io-bytestring",
+            "version": "0.9.0",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-io-core-wasm-js:0.9.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-io-bytestring-wasm-js",
+            "version": "0.9.0",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-io-bytestring:0.9.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-io-core",
+            "version": "0.9.0",
+            "requiredBy": [
+                "ai.koog:agents-core-wasm-js:1.1.1",
+                "ai.koog:prompt-model-wasm-js:1.1.1",
+                "io.ktor:ktor-io-wasm-js:3.5.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-io-core-wasm-js",
+            "version": "0.9.0",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-io-core:0.9.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-schema-annotations",
+            "version": "0.4.4",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-schema-generator-core-wasm-js:0.4.4",
+                "org.jetbrains.kotlinx:kotlinx-schema-generator-json-wasm-js:0.4.4"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-schema-annotations-wasm-js",
+            "version": "0.4.4",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-schema-annotations:0.4.4"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-schema-generator-core",
+            "version": "0.4.4",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-schema-generator-json-wasm-js:0.4.4"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-schema-generator-core-wasm-js",
+            "version": "0.4.4",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-schema-generator-core:0.4.4"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-schema-generator-json",
+            "version": "0.4.4",
+            "requiredBy": [
+                "ai.koog:agents-tools-wasm-js:1.1.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-schema-generator-json-wasm-js",
+            "version": "0.4.4",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-schema-generator-json:0.4.4"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-schema-json",
+            "version": "0.4.4",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-schema-generator-json-wasm-js:0.4.4"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-schema-json-wasm-js",
+            "version": "0.4.4",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-schema-json:0.4.4"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-serialization-core",
+            "version": "1.11.0",
+            "requiredBy": [
+                "ai.koog:prompt-llm-wasm-js:1.1.1",
+                "androidx.lifecycle:lifecycle-viewmodel-savedstate-wasm-js:2.9.4",
+                "androidx.navigation3:navigation3-runtime-wasm-js:1.0.0-rc01",
+                "androidx.savedstate:savedstate-wasm-js:1.4.0",
+                "io.ktor:ktor-http-wasm-js:3.5.0",
+                "io.ktor:ktor-serialization-kotlinx-wasm-js:3.5.0",
+                "io.ktor:ktor-utils-wasm-js:3.5.0",
+                "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose-wasm-js:2.9.6",
+                "org.jetbrains.kotlinx:kotlinx-datetime-wasm-js:0.8.0",
+                "org.jetbrains.kotlinx:kotlinx-serialization-json-io-wasm-js:1.11.0",
+                "org.jetbrains.kotlinx:kotlinx-serialization-json-wasm-js:1.11.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-serialization-core-wasm-js",
+            "version": "1.11.0",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-serialization-core:1.11.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-serialization-json",
+            "version": "1.11.0",
+            "requiredBy": [
+                "ai.koog:a2a-client-wasm-js:1.1.1-beta",
+                "ai.koog:a2a-core-wasm-js:1.1.1-beta",
+                "ai.koog:a2a-transport-client-jsonrpc-http-wasm-js:1.1.1-beta",
+                "ai.koog:a2a-transport-core-jsonrpc-wasm-js:1.1.1-beta",
+                "ai.koog:agents-core-wasm-js:1.1.1",
+                "ai.koog:agents-features-a2a-client-wasm-js:1.1.1-beta",
+                "ai.koog:agents-features-a2a-core-wasm-js:1.1.1-beta",
+                "ai.koog:agents-tools-wasm-js:1.1.1",
+                "ai.koog:http-client-core-wasm-js:1.1.1",
+                "ai.koog:prompt-model-wasm-js:1.1.1",
+                "ai.koog:prompt-processor-wasm-js:1.1.1",
+                "ai.koog:prompt-structure-wasm-js:1.1.1",
+                "ai.koog:utils-wasm-js:1.1.1",
+                "io.ktor:ktor-serialization-kotlinx-json-wasm-js:3.5.0",
+                "org.jetbrains.kotlinx:kotlinx-schema-generator-core-wasm-js:0.4.4",
+                "org.jetbrains.kotlinx:kotlinx-schema-generator-json-wasm-js:0.4.4",
+                "org.jetbrains.kotlinx:kotlinx-schema-json-wasm-js:0.4.4",
+                "org.jetbrains.kotlinx:kotlinx-serialization-json-io-wasm-js:1.11.0",
+                "project :composeApp"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-serialization-json-io",
+            "version": "1.11.0",
+            "requiredBy": [
+                "io.ktor:ktor-serialization-kotlinx-json-wasm-js:3.5.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-serialization-json-io-wasm-js",
+            "version": "1.11.0",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-serialization-json-io:1.11.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.kotlinx",
+            "artifact": "kotlinx-serialization-json-wasm-js",
+            "version": "1.11.0",
+            "requiredBy": [
+                "org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains.skiko",
+            "artifact": "skiko",
+            "version": "0.144.6",
+            "requiredBy": [
+                "org.jetbrains.compose.foundation:foundation-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-graphics-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-text-wasm-js:1.11.1",
+                "org.jetbrains.compose.ui:ui-wasm-js:1.11.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains.skiko",
+            "artifact": "skiko-wasm-js",
+            "version": "0.144.6",
+            "requiredBy": [
+                "org.jetbrains.skiko:skiko:0.144.6"
+            ]
+        },
+        {
+            "group": "org.jetbrains",
+            "artifact": "annotations",
+            "version": "26.0.2-1",
+            "requiredBy": [
+                "ai.koog:http-client-core-wasm-js:1.1.1",
+                "ai.koog:prompt-executor-openai-client-wasm-js:1.1.1",
+                "ai.koog:prompt-llm-wasm-js:1.1.1",
+                "ai.koog:utils-wasm-js:1.1.1"
+            ]
+        },
+        {
+            "group": "org.jetbrains",
+            "artifact": "annotations-wasmJs",
+            "version": "26.0.2-1",
+            "requiredBy": [
+                "org.jetbrains:annotations:26.0.2-1"
+            ]
+        },
+        {
+            "group": "org.jetbrains",
+            "artifact": "markdown",
+            "version": "0.7.3",
+            "requiredBy": [
+                "com.mikepenz:multiplatform-markdown-renderer-m3-wasm-js:0.41.0",
+                "com.mikepenz:multiplatform-markdown-renderer-wasm-js:0.41.0"
+            ]
+        },
+        {
+            "group": "org.jetbrains",
+            "artifact": "markdown-wasm-js",
+            "version": "0.7.3",
+            "requiredBy": [
+                "org.jetbrains:markdown:0.7.3"
+            ]
+        }
+    ]
+}

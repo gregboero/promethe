@@ -9,7 +9,10 @@ import kotlinx.serialization.json.JsonObject
  *
  * Adapts the JVM-specific transports to the common McpBridge.McpTransportApi.
  */
-class JvmMcpTransportFactory : McpBridge.TransportFactory {
+class JvmMcpTransportFactory(
+    private val elicitationBroker: McpElicitationBroker? = null,
+    private val streamableHttpProvider: ((McpBridge.McpServerConfig, Map<String, McpInputRequestHandler>) -> McpBridge.McpTransportApi)? = null,
+) : McpBridge.TransportFactory {
     override fun createTransport(config: McpBridge.McpServerConfig): McpBridge.McpTransportApi =
         when (config.transport.lowercase()) {
             "stdio" -> {
@@ -30,12 +33,18 @@ class JvmMcpTransportFactory : McpBridge.TransportFactory {
             }
 
             "streamable-http" -> {
-                StreamableHttpAdapter(
-                    McpStreamableHttpTransport(
-                        baseUrl = config.url,
-                        customHeaders = config.headers,
-                    ),
-                )
+                val handlers =
+                    elicitationBroker?.let { broker ->
+                        mapOf("elicitation/create" to broker.handlerFor(config.id, config.name))
+                    }.orEmpty()
+                streamableHttpProvider?.invoke(config, handlers)
+                    ?: StreamableHttpAdapter(
+                        McpStreamableHttpTransport(
+                            baseUrl = config.url,
+                            customHeaders = config.headers,
+                            inputRequestHandlers = handlers,
+                        ),
+                    )
             }
 
             else -> {

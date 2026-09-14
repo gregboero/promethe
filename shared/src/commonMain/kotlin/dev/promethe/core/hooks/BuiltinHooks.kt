@@ -34,8 +34,8 @@ class LoggingHook : Hook {
             }
 
             HookEvent.AFTER_TOOL_CALL -> {
-                val resultPreview = context.toolResult?.take(200) ?: ""
-                logger.debug { "Tool result: ${context.toolName} -> $resultPreview..." }
+                val resultLength = context.toolResult?.length ?: 0
+                logger.debug { "Tool result: ${context.toolName} -> $resultLength characters" }
             }
 
             HookEvent.ON_ERROR -> {

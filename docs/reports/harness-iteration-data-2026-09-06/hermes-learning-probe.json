@@ -1,0 +1,13 @@
+{
+  "commit": "29112bef099274229cadff79cdff7bf7b99c4b77",
+  "version": "v2026.8.31",
+  "paidCalls": 0,
+  "autonomousLearningTested": false,
+  "createPatchExit": 0,
+  "createPatchOutput": "{\"created\": true, \"patched\": true, \"listed\": true}\n",
+  "createPatchError": "",
+  "reloadExit": 0,
+  "reloadOutput": "cross-process-reuse-ok\n",
+  "reloadError": "",
+  "passed": true
+}

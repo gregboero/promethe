@@ -1,5 +1,7 @@
 # Changelog
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](docs/EXPERIMENTAL_STATUS.md).
+
 All notable changes to the Promethe project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="AdaptiveHarnessAgentLoopTest[jvm]" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-09-07T23:13:13.989Z" hostname="BUREAU" time="1.395">
+  <properties/>
+  <testcase name="application agent creates evaluated adaptation and next task reuses it[jvm]" classname="dev.promethe.core.AdaptiveHarnessAgentLoopTest" time="1.395"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

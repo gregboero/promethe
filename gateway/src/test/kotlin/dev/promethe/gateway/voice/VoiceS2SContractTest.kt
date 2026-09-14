@@ -33,6 +33,28 @@ class VoiceS2SContractTest {
     }
 
     @Test
+    fun `openai batch stt is available while google chirp remains unavailable`() {
+        val providers = VoiceProviderRegistry.allProviders()
+        val openAI = providers.single { it.id == "openai_stt" }
+        val google = providers.single { it.id == "google_stt" }
+
+        assertTrue(openAI.implemented)
+        assertEquals("OPENAI_API_KEY", openAI.requiredSettingKey)
+        assertEquals("gpt-4o-transcribe", openAI.defaultModels(VoiceCapability.STT).first())
+        assertFalse(google.implemented)
+    }
+
+    @Test
+    fun `openai tts replaces a foreign voice with a supported default`() {
+        val provider = OpenAITTSProvider()
+
+        assertTrue(provider.defaultVoices().any { it.id == "marin" })
+        assertEquals("alloy", TtsSynthesizer.normalizeVoice("openai_tts", "Puck"))
+        assertEquals("cedar", TtsSynthesizer.normalizeVoice("openai_tts", "CEDAR"))
+        assertEquals("Puck", TtsSynthesizer.normalizeVoice("gemini_tts", "Puck"))
+    }
+
+    @Test
     fun `gemini live setup and tool response use current websocket contract`() {
         val client = HttpClient()
         try {

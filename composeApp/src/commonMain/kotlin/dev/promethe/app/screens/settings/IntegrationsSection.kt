@@ -364,6 +364,57 @@ fun IntegrationsSection(
                     shape = RoundedCornerShape(12.dp),
                     colors = settingsFieldColors(colors),
                 )
+                OutlinedTextField(
+                    value = state.intDiscordAllowedUserIds,
+                    onValueChange = { onUpdate { copy(intDiscordAllowedUserIds = it) } },
+                    label = { Text(stringResource(Res.string.settings_integrations_discord_allowed_users_label)) },
+                    modifier = Modifier.fillMaxWidth().testTag("settings_discord_allowed_users"),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = settingsFieldColors(colors),
+                    supportingText = {
+                        Text(stringResource(Res.string.settings_integrations_discord_allowed_users_hint))
+                    },
+                )
+                OutlinedTextField(
+                    value = state.intDiscordApproverUserIds,
+                    onValueChange = { onUpdate { copy(intDiscordApproverUserIds = it) } },
+                    label = { Text(stringResource(Res.string.settings_integrations_discord_approvers_label)) },
+                    modifier = Modifier.fillMaxWidth().testTag("settings_discord_approvers"),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = settingsFieldColors(colors),
+                    supportingText = {
+                        Text(stringResource(Res.string.settings_integrations_discord_approvers_hint))
+                    },
+                )
+                OutlinedTextField(
+                    value = state.intDiscordKnowledgeChannelIds,
+                    onValueChange = { onUpdate { copy(intDiscordKnowledgeChannelIds = it) } },
+                    label = { Text(stringResource(Res.string.settings_integrations_discord_knowledge_channels_label)) },
+                    modifier = Modifier.fillMaxWidth().testTag("settings_discord_knowledge_channels"),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = settingsFieldColors(colors),
+                    supportingText = {
+                        Text(stringResource(Res.string.settings_integrations_discord_knowledge_channels_hint))
+                    },
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = stringResource(Res.string.settings_integrations_discord_message_content_label),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = colors.onSurface,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Switch(
+                        checked = state.intDiscordMessageContentEnabled,
+                        onCheckedChange = { enabled ->
+                            onUpdate { copy(intDiscordMessageContentEnabled = enabled) }
+                        },
+                        modifier = Modifier.testTag("settings_discord_message_content"),
+                    )
+                }
             }
 
             IntegrationCard(

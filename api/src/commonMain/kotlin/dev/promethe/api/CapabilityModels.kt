@@ -20,6 +20,63 @@ enum class CapabilityAvailability {
 }
 
 @Serializable
+enum class CapabilityAuthentication {
+    AUTHENTICATED,
+    SIGNED_OUT,
+    UNKNOWN,
+    NOT_APPLICABLE,
+}
+
+@Serializable
+enum class ToolContractSource {
+    BUILTIN,
+    INTEGRATION,
+    MCP,
+    ACP,
+    LOCAL_AGENT,
+    PLUGIN,
+    FALLBACK,
+}
+
+@Serializable
+enum class ToolIdempotency {
+    SAFE_RETRY,
+    IDEMPOTENCY_KEY_REQUIRED,
+    NEVER_AUTOMATIC,
+}
+
+@Serializable
+enum class ToolEgress {
+    NONE,
+    SANDBOX_PROXY,
+    REMOTE_SERVICE,
+    DEVICE,
+    UNKNOWN,
+}
+
+@Serializable
+enum class ToolApprovalRequirement {
+    NONE,
+    RISK_BASED,
+    ALWAYS,
+}
+
+@Serializable
+data class ToolContractDescriptor(
+    val source: ToolContractSource,
+    val catalogRisk: ToolRisk,
+    val missingOperationRisk: ToolRisk,
+    val unknownOperationRisk: ToolRisk,
+    val approval: ToolApprovalRequirement,
+    val idempotency: ToolIdempotency,
+    val egress: ToolEgress,
+    val ownerOnly: Boolean = false,
+    val explicit: Boolean = true,
+    val operationKeys: List<String> = emptyList(),
+    val operationRisks: Map<String, ToolRisk> = emptyMap(),
+)
+
+@Serializable
 data class CapabilityDescriptor(
     val id: String,
     val name: String,
@@ -30,6 +87,9 @@ data class CapabilityDescriptor(
     val risk: String = "READ",
     val requiredConfiguration: List<String> = emptyList(),
     val limitations: List<String> = emptyList(),
+    val runtimeVersion: String? = null,
+    val authentication: CapabilityAuthentication = CapabilityAuthentication.NOT_APPLICABLE,
+    val toolContract: ToolContractDescriptor? = null,
 )
 
 @Serializable
@@ -53,6 +113,20 @@ enum class ToolCallOrigin {
 }
 
 @Serializable
+enum class PolicyDataTrust {
+    TRUSTED,
+    UNTRUSTED,
+}
+
+@Serializable
+enum class PolicyDataSensitivity {
+    PUBLIC,
+    INTERNAL,
+    CONFIDENTIAL,
+    SECRET,
+}
+
+@Serializable
 enum class ToolRisk {
     READ,
     WRITE,
@@ -69,4 +143,12 @@ data class ToolInvocation(
     val arguments: JsonObject,
     val sessionId: String = "unknown",
     val origin: ToolCallOrigin = ToolCallOrigin.AGENT,
+    val projectId: String? = null,
+    val memoryNamespace: String = "default",
+    val workspaceRelativePath: String? = null,
+    val runId: String? = null,
+    val stepId: String? = null,
+    val idempotencyKey: String? = null,
+    val dataTrust: PolicyDataTrust = PolicyDataTrust.TRUSTED,
+    val dataSensitivity: PolicyDataSensitivity = PolicyDataSensitivity.INTERNAL,
 )

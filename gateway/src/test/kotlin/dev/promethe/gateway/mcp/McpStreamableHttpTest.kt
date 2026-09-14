@@ -1,8 +1,10 @@
 package dev.promethe.gateway.mcp
 
 import dev.promethe.core.JvmOutboundUrlPolicy
+import dev.promethe.core.McpProtocol
 import dev.promethe.core.McpStreamableHttpTransport
 import dev.promethe.core.PinnedJvmOutboundHttpFetcher
+import dev.promethe.db.DatabaseFactory
 import io.ktor.client.HttpClient
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -15,6 +17,10 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.routing.*
 import io.ktor.server.testing.*
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.serialization.json.*
 import java.net.InetAddress
 import kotlin.test.*
@@ -47,7 +53,11 @@ class McpStreamableHttpTest {
 
             assertEquals("promethe", responseJson["name"]?.jsonPrimitive?.content)
             assertEquals("1.0.0", responseJson["version"]?.jsonPrimitive?.content)
-            assertEquals("2025-11-05", responseJson["protocolVersion"]?.jsonPrimitive?.content)
+            assertEquals(McpProtocol.MODERN_VERSION, responseJson["protocolVersion"]?.jsonPrimitive?.content)
+            assertEquals(
+                listOf(McpProtocol.MODERN_VERSION, McpProtocol.LEGACY_VERSION),
+                responseJson["supportedVersions"]?.jsonArray?.map { it.jsonPrimitive.content },
+            )
 
             val capabilities = responseJson["capabilities"]?.jsonObject
             assertNotNull(capabilities)
@@ -57,6 +67,167 @@ class McpStreamableHttpTest {
 
             assertEquals("/mcp", responseJson["endpoint"]?.jsonPrimitive?.content)
         }
+
+    @Test
+    fun `modern MCP discovery is stateless and self describing`() =
+        testApplication {
+            application {
+                install(ContentNegotiation) {
+                    json(Json { ignoreUnknownKeys = true })
+                }
+            }
+            routing {
+                mcpServerRoutes()
+            }
+
+            val response =
+                client.post("/mcp") {
+                    contentType(ContentType.Application.Json)
+                    header(McpProtocol.PROTOCOL_VERSION_HEADER, McpProtocol.MODERN_VERSION)
+                    header(McpProtocol.METHOD_HEADER, "server/discover")
+                    setBody(modernRequest(id = 1, method = "server/discover"))
+                }
+
+            assertEquals(HttpStatusCode.OK, response.status)
+            val result = json.parseToJsonElement(response.bodyAsText()).jsonObject["result"]!!.jsonObject
+            assertEquals("complete", result["resultType"]?.jsonPrimitive?.content)
+            assertEquals(
+                listOf(McpProtocol.MODERN_VERSION, McpProtocol.LEGACY_VERSION),
+                result["supportedVersions"]?.jsonArray?.map { it.jsonPrimitive.content },
+            )
+            assertNotNull(result["_meta"]?.jsonObject?.get(McpProtocol.SERVER_INFO_META))
+        }
+
+    @Test
+    fun `modern MCP rejects missing or inconsistent routing headers`() =
+        testApplication {
+            application {
+                install(ContentNegotiation) {
+                    json(Json { ignoreUnknownKeys = true })
+                }
+            }
+            routing {
+                mcpServerRoutes()
+            }
+
+            val missingMethod =
+                client.post("/mcp") {
+                    contentType(ContentType.Application.Json)
+                    header(McpProtocol.PROTOCOL_VERSION_HEADER, McpProtocol.MODERN_VERSION)
+                    setBody(modernRequest(id = 2, method = "tools/list"))
+                }
+            assertProtocolError(missingMethod, -32020)
+
+            val wrongName =
+                client.post("/mcp") {
+                    contentType(ContentType.Application.Json)
+                    header(McpProtocol.PROTOCOL_VERSION_HEADER, McpProtocol.MODERN_VERSION)
+                    header(McpProtocol.METHOD_HEADER, "tools/call")
+                    header(McpProtocol.NAME_HEADER, "wrong.tool")
+                    setBody(
+                        modernRequest(
+                            id = 3,
+                            method = "tools/call",
+                            params = buildJsonObject {
+                                put("name", "expected.tool")
+                                putJsonObject("arguments") {}
+                            },
+                        ),
+                    )
+                }
+            assertProtocolError(wrongName, -32020)
+        }
+
+    @Test
+    fun `modern MCP reports supported versions for an unknown revision`() =
+        testApplication {
+            application {
+                install(ContentNegotiation) {
+                    json(Json { ignoreUnknownKeys = true })
+                }
+            }
+            routing {
+                mcpServerRoutes()
+            }
+
+            val response =
+                client.post("/mcp") {
+                    contentType(ContentType.Application.Json)
+                    header(McpProtocol.PROTOCOL_VERSION_HEADER, "2099-01-01")
+                    header(McpProtocol.METHOD_HEADER, "tools/list")
+                    setBody(modernRequest(id = 4, method = "tools/list", protocolVersion = "2099-01-01"))
+                }
+
+            assertProtocolError(response, -32022)
+            val data =
+                json.parseToJsonElement(response.bodyAsText()).jsonObject["error"]!!.jsonObject["data"]!!.jsonObject
+            assertEquals(
+                listOf(McpProtocol.MODERN_VERSION, McpProtocol.LEGACY_VERSION),
+                data["supported"]?.jsonArray?.map { it.jsonPrimitive.content },
+            )
+        }
+
+    @Test
+    fun `modern MCP task routes use task id routing and advertise durable support`() {
+        val taskScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+        try {
+            testApplication {
+                application {
+                    install(ContentNegotiation) {
+                        json(Json { ignoreUnknownKeys = true })
+                    }
+                }
+                routing {
+                    mcpServerRoutes(
+                        taskManager = McpTaskManager(DatabaseFactory.createInMemory(), taskScope),
+                    )
+                }
+
+                val card = json.parseToJsonElement(client.get("/.well-known/mcp").bodyAsText()).jsonObject
+                assertNotNull(
+                    card["capabilities"]!!.jsonObject["extensions"]!!.jsonObject[McpProtocol.TASKS_EXTENSION],
+                )
+
+                val accepted =
+                    client.post("/mcp") {
+                        contentType(ContentType.Application.Json)
+                        header(McpProtocol.PROTOCOL_VERSION_HEADER, McpProtocol.MODERN_VERSION)
+                        header(McpProtocol.METHOD_HEADER, "tasks/get")
+                        header(McpProtocol.NAME_HEADER, "task-42")
+                        setBody(
+                            modernRequest(
+                                id = 5,
+                                method = "tasks/get",
+                                params = buildJsonObject { put("taskId", "task-42") },
+                                tasks = true,
+                            ),
+                        )
+                    }
+                assertEquals(HttpStatusCode.OK, accepted.status)
+                val error = json.parseToJsonElement(accepted.bodyAsText()).jsonObject["error"]!!.jsonObject
+                assertEquals(-32602, error["code"]?.jsonPrimitive?.int)
+
+                val rejected =
+                    client.post("/mcp") {
+                        contentType(ContentType.Application.Json)
+                        header(McpProtocol.PROTOCOL_VERSION_HEADER, McpProtocol.MODERN_VERSION)
+                        header(McpProtocol.METHOD_HEADER, "tasks/get")
+                        header(McpProtocol.NAME_HEADER, "another-task")
+                        setBody(
+                            modernRequest(
+                                id = 6,
+                                method = "tasks/get",
+                                params = buildJsonObject { put("taskId", "task-42") },
+                                tasks = true,
+                            ),
+                        )
+                    }
+                assertProtocolError(rejected, -32020)
+            }
+        } finally {
+            taskScope.cancel()
+        }
+    }
 
     @Test
     fun `MCP rejects browser origins outside the explicit allow-list`() =
@@ -106,25 +277,33 @@ class McpStreamableHttpTest {
                 val method = requestJson["method"]?.jsonPrimitive?.content
 
                 val responseJson = when (method) {
-                    "initialize" -> {
+                    "server/discover" -> {
+                        assertEquals(McpProtocol.MODERN_VERSION, request.headers[McpProtocol.PROTOCOL_VERSION_HEADER])
+                        assertEquals("server/discover", request.headers[McpProtocol.METHOD_HEADER])
+                        assertNull(request.headers[McpProtocol.SESSION_HEADER])
+                        val metadata = requestJson["params"]!!.jsonObject["_meta"]!!.jsonObject
+                        assertEquals(
+                            McpProtocol.MODERN_VERSION,
+                            metadata[McpProtocol.PROTOCOL_VERSION_META]?.jsonPrimitive?.content,
+                        )
                         buildJsonObject {
                             put("jsonrpc", "2.0")
                             put("id", requestJson["id"]?.jsonPrimitive?.int)
                             putJsonObject("result") {
+                                put("resultType", "complete")
+                                putJsonArray("supportedVersions") { add(McpProtocol.MODERN_VERSION) }
                                 putJsonObject("capabilities") {}
-                                putJsonObject("serverInfo") {
-                                    put("name", "mock-server")
-                                    put("version", "2.0.0")
-                                }
                             }
                         }
                     }
 
                     "tools/list" -> {
+                        assertEquals("tools/list", request.headers[McpProtocol.METHOD_HEADER])
                         buildJsonObject {
                             put("jsonrpc", "2.0")
                             put("id", requestJson["id"]?.jsonPrimitive?.int)
                             putJsonObject("result") {
+                                put("resultType", "complete")
                                 putJsonArray("tools") {
                                     add(
                                         buildJsonObject {
@@ -139,12 +318,15 @@ class McpStreamableHttpTest {
                     }
 
                     "tools/call" -> {
+                        assertEquals("tools/call", request.headers[McpProtocol.METHOD_HEADER])
+                        assertEquals("get_forecast", request.headers[McpProtocol.NAME_HEADER])
                         val params = requestJson["params"]?.jsonObject
                         assertEquals("get_forecast", params?.get("name")?.jsonPrimitive?.content)
                         buildJsonObject {
                             put("jsonrpc", "2.0")
                             put("id", requestJson["id"]?.jsonPrimitive?.int)
                             putJsonObject("result") {
+                                put("resultType", "complete")
                                 putJsonArray("content") {
                                     add(
                                         buildJsonObject {
@@ -206,4 +388,43 @@ class McpStreamableHttpTest {
             transport.close()
             assertEquals(3, callCount)
         }
+
+    private fun modernRequest(
+        id: Int,
+        method: String,
+        params: JsonObject = buildJsonObject {},
+        protocolVersion: String = McpProtocol.MODERN_VERSION,
+        tasks: Boolean = false,
+    ): String =
+        buildJsonObject {
+            put("jsonrpc", "2.0")
+            put("id", id)
+            put("method", method)
+            putJsonObject("params") {
+                params.forEach { (key, value) -> put(key, value) }
+                putJsonObject("_meta") {
+                    put(McpProtocol.PROTOCOL_VERSION_META, protocolVersion)
+                    putJsonObject(McpProtocol.CLIENT_INFO_META) {
+                        put("name", "test-client")
+                        put("version", "1.0.0")
+                    }
+                    putJsonObject(McpProtocol.CLIENT_CAPABILITIES_META) {
+                        if (tasks) {
+                            putJsonObject("extensions") {
+                                putJsonObject(McpProtocol.TASKS_EXTENSION) {}
+                            }
+                        }
+                    }
+                }
+            }
+        }.toString()
+
+    private suspend fun assertProtocolError(
+        response: HttpResponse,
+        expectedCode: Int,
+    ) {
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+        val error = json.parseToJsonElement(response.bodyAsText()).jsonObject["error"]!!.jsonObject
+        assertEquals(expectedCode, error["code"]?.jsonPrimitive?.int)
+    }
 }

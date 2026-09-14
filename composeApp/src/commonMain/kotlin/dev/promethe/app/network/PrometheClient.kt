@@ -18,6 +18,8 @@ import io.ktor.websocket.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -75,6 +77,8 @@ class PrometheClient(
 
     /** Expose the active credential for native WebSocket Authorization headers. */
     fun getApiKey(): String = apiKey
+
+    suspend fun getCapabilities(): CapabilityListResponse = authenticatedGet("$baseUrl/api/v1/capabilities")
 
     // ── Internal helpers ─────────────────────────────────────────────────────
 
@@ -142,19 +146,32 @@ class PrometheClient(
     ): List<ModelDescriptor> = authenticatedGet("$baseUrl/api/v1/providers/$providerId/models")
 
     /** Current native sandbox backend status and self-test state. */
-    suspend fun getSandboxStatus(): SandboxStatus = authenticatedGet("$baseUrl/api/v1/security/sandbox/status")
+    suspend fun getSandboxStatus(): SandboxStatus =
+        client
+            .get("$baseUrl/api/v1/security/sandbox/status") {
+                accept(ContentType.Application.Json)
+                if (apiKey.isNotBlank()) header("Authorization", "Bearer $apiKey")
+            }.requireSuccessfulJson("Get sandbox status")
 
     /** Active sandbox permission profile. */
-    suspend fun getSandboxPermissionProfile(): SandboxPermissionProfile = authenticatedGet("$baseUrl/api/v1/security/permission-profile")
+    suspend fun getSandboxPermissionProfile(): SandboxPermissionProfile =
+        client
+            .get("$baseUrl/api/v1/security/permission-profile") {
+                accept(ContentType.Application.Json)
+                if (apiKey.isNotBlank()) header("Authorization", "Bearer $apiKey")
+            }.requireSuccessfulJson("Get sandbox permission profile")
 
     /** Update the local sandbox permission profile. */
     suspend fun updateSandboxPermissionProfile(
         profile: SandboxPermissionProfile,
     ): SandboxPermissionProfile =
-        authenticatedPut(
-            "$baseUrl/api/v1/security/permission-profile",
-            profile,
-        )
+        client
+            .put("$baseUrl/api/v1/security/permission-profile") {
+                contentType(ContentType.Application.Json)
+                accept(ContentType.Application.Json)
+                if (apiKey.isNotBlank()) header("Authorization", "Bearer $apiKey")
+                setBody(profile)
+            }.requireSuccessfulJson("Update sandbox permission profile")
 
     /** Run the native sandbox self-test. */
     suspend fun runSandboxSelfTest(): SandboxStatus =
@@ -162,7 +179,15 @@ class PrometheClient(
             .post("$baseUrl/api/v1/security/sandbox/self-test") {
                 accept(ContentType.Application.Json)
                 if (apiKey.isNotBlank()) header("Authorization", "Bearer $apiKey")
-            }.body()
+            }.requireSuccessfulJson("Run sandbox self-test")
+
+    /** Install or repair the local Windows sandbox after explicit UAC consent. */
+    suspend fun setupSandbox(): SandboxStatus =
+        client
+            .post("$baseUrl/api/v1/security/sandbox/setup") {
+                accept(ContentType.Application.Json)
+                if (apiKey.isNotBlank()) header("Authorization", "Bearer $apiKey")
+            }.requireSuccessfulJson("Install sandbox")
 
     /** Create or replace the remote owner from a loopback client using its local API key. */
     suspend fun setupRemoteOwner(
@@ -426,6 +451,11 @@ class PrometheClient(
 
     suspend fun createSession(id: String? = null): SessionInfo = authenticatedPost("$baseUrl/api/v1/sessions", CreateSessionRequest(id))
 
+    suspend fun createSession(
+        id: String? = null,
+        projectId: String?,
+    ): SessionInfo = authenticatedPost("$baseUrl/api/v1/sessions", CreateSessionRequest(id, projectId))
+
     suspend fun deleteSession(sessionId: String) {
         client.delete("$baseUrl/api/v1/sessions/$sessionId") {
             if (apiKey.isNotBlank()) header("Authorization", "Bearer $apiKey")
@@ -440,6 +470,31 @@ class PrometheClient(
     ) {
         patchJson("/api/v1/sessions/$sessionId/metadata", metadata)
     }
+
+    suspend fun assignSessionProject(
+        sessionId: String,
+        projectId: String?,
+    ): SessionInfo =
+        client
+            .patch("$baseUrl/api/v1/sessions/$sessionId/project") {
+                contentType(ContentType.Application.Json)
+                accept(ContentType.Application.Json)
+                if (apiKey.isNotBlank()) header("Authorization", "Bearer $apiKey")
+                setBody(AssignSessionProjectRequest(projectId))
+            }.requireSuccessfulJson("Assign session project")
+
+    // ── Projects ─────────────────────────────────────────────────────────────
+
+    suspend fun getProjects(): ProjectListResponse = authenticatedGet("$baseUrl/api/v1/projects")
+
+    suspend fun createProject(request: CreateProjectRequest): ProjectInfo = authenticatedPost("$baseUrl/api/v1/projects", request)
+
+    suspend fun updateProject(
+        id: String,
+        request: UpdateProjectRequest,
+    ): ProjectInfo = authenticatedPut("$baseUrl/api/v1/projects/$id", request)
+
+    suspend fun activateProject(id: String): ProjectInfo = authenticatedPut("$baseUrl/api/v1/projects/$id/active", emptyMap<String, String>())
 
     // ── Export ────────────────────────────────────────────────────────────────
 
@@ -628,13 +683,34 @@ class PrometheClient(
     suspend fun respondToApproval(
         id: String,
         approved: Boolean,
+        scope: String = "ONCE",
     ): String =
         postJson(
             "/api/v1/approval/$id",
             buildJsonObject {
                 put("approved", approved)
+                put("scope", scope)
             }.toString(),
         )
+
+    suspend fun getPendingMcpElicitations(): kotlinx.serialization.json.JsonObject = getJson("/api/v1/approval/mcp/pending")
+
+    suspend fun respondToMcpElicitation(
+        id: String,
+        action: String,
+        content: kotlinx.serialization.json.JsonObject? = null,
+    ): String =
+        client
+            .post("$baseUrl/api/v1/approval/mcp/$id") {
+                if (apiKey.isNotBlank()) header("Authorization", "Bearer $apiKey")
+                contentType(ContentType.Application.Json)
+                setBody(
+                    buildJsonObject {
+                        put("action", action)
+                        content?.let { put("content", it) }
+                    }.toString(),
+                )
+            }.requireSuccessfulBody("POST /api/v1/approval/mcp/$id")
 
     // Provider Choice (multi-provider AI capabilities)
 
@@ -698,6 +774,24 @@ class PrometheClient(
             throw IllegalStateException("$operation failed (${status.value} ${status.description})$detail")
         }
         return responseBody
+    }
+
+    private suspend inline fun <reified T> HttpResponse.requireSuccessfulJson(operation: String): T {
+        val responseBody = bodyAsText()
+        if (!status.isSuccess()) {
+            val serverMessage =
+                runCatching { json.decodeFromString<ErrorResponse>(responseBody).error }
+                    .getOrNull()
+                    ?.takeIf(String::isNotBlank)
+            val fallback = responseBody.trim().take(1_000).takeIf(String::isNotBlank)
+            val detail = serverMessage ?: fallback ?: "${status.value} ${status.description}"
+            throw IllegalStateException("$operation failed: $detail")
+        }
+        try {
+            return json.decodeFromString(responseBody)
+        } catch (error: SerializationException) {
+            throw IllegalStateException("$operation returned an invalid response.", error)
+        }
     }
 
     // ═════════════════════════════════════════════════════════════════════════
@@ -782,7 +876,38 @@ class PrometheClient(
     suspend fun updateSkill(
         name: String,
         content: String,
-    ): dev.promethe.api.SkillDto = authenticatedPut("$baseUrl/api/v1/skills/$name", dev.promethe.api.UpdateSkillRequest(content = content))
+        expectedRevisionHash: String? = null,
+    ): dev.promethe.api.SkillDto = authenticatedPut("$baseUrl/api/v1/skills/$name", dev.promethe.api.UpdateSkillRequest(content, expectedRevisionHash))
+
+    suspend fun updateSkillLifecycle(
+        name: String,
+        lifecycle: dev.promethe.api.SkillLifecycle,
+        expectedContentHash: String? = null,
+        reviewNote: String? = null,
+        expectedRevisionHash: String? = null,
+    ): dev.promethe.api.SkillDto =
+        authenticatedPut(
+            "$baseUrl/api/v1/skills/$name/lifecycle",
+            dev.promethe.api.UpdateSkillLifecycleRequest(lifecycle, expectedContentHash, reviewNote, expectedRevisionHash),
+        )
+
+    suspend fun getSkillValidation(name: String): dev.promethe.api.SkillValidationState = authenticatedGet("$baseUrl/api/v1/skills/$name/validation")
+
+    suspend fun configureSkillEvaluations(
+        name: String,
+        request: dev.promethe.api.ConfigureSkillEvaluationRequest,
+    ): dev.promethe.api.SkillDto = authenticatedPut("$baseUrl/api/v1/skills/$name/evaluation-suites", request)
+
+    suspend fun evaluateSkill(
+        name: String,
+        revisionHash: String,
+    ): dev.promethe.api.SkillEvaluationRun = authenticatedPost("$baseUrl/api/v1/skills/$name/evaluations", dev.promethe.api.EvaluateSkillRequest(revisionHash))
+
+    suspend fun restoreSkill(
+        name: String,
+        revisionHash: String,
+        versionId: String,
+    ): dev.promethe.api.SkillDto = authenticatedPost("$baseUrl/api/v1/skills/$name/restore", dev.promethe.api.RestoreSkillVersionRequest(revisionHash, versionId))
 
     suspend fun deleteSkill(name: String) {
         client.delete("$baseUrl/api/v1/skills/$name") {

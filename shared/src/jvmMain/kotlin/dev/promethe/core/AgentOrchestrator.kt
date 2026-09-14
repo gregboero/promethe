@@ -28,6 +28,7 @@ class AgentOrchestrator(
     private val registry: AgentA2ARegistry? = null,
     val ephemeralPromoter: EphemeralAgentPromoter = EphemeralAgentPromoter(database),
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob()),
+    private val resourceGovernors: ResourceGovernorRegistry = GlobalResourceGovernorRegistry,
 ) {
     private val mutex = Mutex()
 
@@ -65,6 +66,7 @@ class AgentOrchestrator(
         val systemPromptOverride: String? = null,
         val profileId: String? = null,
         val parentSessionId: String,
+        val parentRunId: String? = null,
     )
 
     /**
@@ -75,12 +77,37 @@ class AgentOrchestrator(
         val childSessionId = "sub-${UUID.randomUUID()}"
         val startTime = Clock.System.now().toEpochMilliseconds()
 
+        if (request.parentRunId != null) {
+            when (val binding = resourceGovernors.bindChild(request.parentSessionId, childSessionId)) {
+                is ChildResourceBinding.Bound -> {
+                    // The child acquires this same governor when its A2A run starts.
+                }
+
+                is ChildResourceBinding.Denied -> {
+                    throw AgentExecutionException("resource_budget_exceeded", binding.admission.message())
+                }
+
+                ChildResourceBinding.ParentNotFound -> {
+                    throw AgentExecutionException("resource_governor_unavailable", "Parent run resource governor is unavailable")
+                }
+
+                ChildResourceBinding.ChildConflict -> {
+                    throw AgentExecutionException("resource_governor_conflict", "Sub-agent session is already governed")
+                }
+            }
+        }
+
         // Register in DB
-        database.insertSessionOrIgnore(
-            id = childSessionId,
-            createdAt = startTime,
-            metadata = """{"parent":"${request.parentSessionId}","profileId":"${request.profileId ?: "default"}"}""",
-        )
+        try {
+            database.insertSessionOrIgnore(
+                id = childSessionId,
+                createdAt = startTime,
+                metadata = """{"parent":"${request.parentSessionId}","profileId":"${request.profileId ?: "default"}"}""",
+            )
+        } catch (error: Exception) {
+            resourceGovernors.unbindSession(childSessionId)
+            throw error
+        }
 
         // Track parent-child
         mutex.withLock {
@@ -137,6 +164,8 @@ class AgentOrchestrator(
                     }
                     // Track failures too for success rate calculation
                     request.profileId?.let { ephemeralPromoter.onDelegationComplete(it, success = false) }
+                } finally {
+                    resourceGovernors.unbindSession(childSessionId)
                 }
             }
 

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="CampaignResponseDiagnosticsTest[jvm]" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-09-07T17:01:54.259Z" hostname="BUREAU" time="0.507">
+  <properties/>
+  <testcase name="provider termination and tool calls have distinct diagnostics[jvm]" classname="dev.promethe.core.CampaignResponseDiagnosticsTest" time="0.002"/>
+  <testcase name="nullable blank and malformed content never become successful text[jvm]" classname="dev.promethe.core.CampaignResponseDiagnosticsTest" time="0.0"/>
+  <testcase name="budget exhaustion never sends a request[jvm]" classname="dev.promethe.core.CampaignResponseDiagnosticsTest" time="0.107"/>
+  <testcase name="usage subsets are diagnostic and never added twice[jvm]" classname="dev.promethe.core.CampaignResponseDiagnosticsTest" time="0.049"/>
+  <testcase name="unaccountable responses and transport failures retain reservation and sanitized receipt[jvm]" classname="dev.promethe.core.CampaignResponseDiagnosticsTest" time="0.218"/>
+  <testcase name="rejected text still settles known usage without persisting refusal or tools[jvm]" classname="dev.promethe.core.CampaignResponseDiagnosticsTest" time="0.131"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

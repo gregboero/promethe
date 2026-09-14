@@ -1,17 +1,19 @@
 package dev.promethe.core
 
+import dev.promethe.api.SkillContract
+import dev.promethe.api.SkillLifecycle
 import dev.promethe.core.Log
 
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import okio.ByteString.Companion.encodeUtf8
 import okio.FileSystem
 import okio.Path
 import okio.buffer
 
 /**
- * SkillLoader — loads SKILL.md files from disk with in-memory caching
- * and a keyword index for O(1) relevant skill lookup.
+ * SkillLoader — loads SKILL.md files and builds a keyword index for relevant skill lookup.
  *
  * Supports the standard SKILL.md format:
  * - Directory-based: skills/<name>/SKILL.md (standard, preferred)
@@ -31,8 +33,8 @@ import okio.buffer
  * - L1: name + description (for matching/discovery)
  * - L2: full body (loaded when skill is activated)
  *
- * Cache is invalidated when the skills directory content changes
- * (file count or any file modification time differs from last load).
+ * Bodies and governance evidence are reloaded before use so out-of-band edits
+ * cannot retain a previously executable cached revision.
  */
 class SkillLoader(
     private val fs: FileSystem,
@@ -40,31 +42,29 @@ class SkillLoader(
 ) {
     private val logger = Log.create("SkillLoader")
 
-    // ── Cache ──
     private val mutex = Mutex()
-    private var cachedSkills: List<SkillEntry> = emptyList()
-    private var cacheFingerprint: String = ""
 
     // ── Keyword Index (inverted) ──
     // keyword → set of skill names that contain it
     private var keywordIndex: Map<String, Set<String>> = emptyMap()
 
     /**
-     * Lists all skills. Uses cache if directory hasn't changed.
+     * Lists skills using their current content and governance state.
      * Supports both directory-based (standard) and flat-file (legacy) formats.
      */
     suspend fun listSkills(): List<SkillEntry> =
         mutex.withLock {
-            val fingerprint = computeFingerprint()
-            if (fingerprint == cacheFingerprint && cachedSkills.isNotEmpty()) {
-                return@withLock cachedSkills
-            }
-            // Reload
+            // Reload bodies and governance state: same-size edits and external suite changes
+            // must never retain an executable cached revision.
             val skills = loadFromDisk()
-            cachedSkills = skills
-            cacheFingerprint = fingerprint
             keywordIndex = buildKeywordIndex(skills)
             skills
+        }
+
+    /** Skills eligible for prompt injection and agent-side loading. */
+    suspend fun listExecutableSkills(): List<SkillEntry> =
+        listSkills().filter { skill ->
+            skill.contract.lifecycle == SkillLifecycle.ACTIVE && SkillGovernanceStore(fs, skillsDirectory).isExecutable(skill)
         }
 
     /**
@@ -73,7 +73,7 @@ class SkillLoader(
      */
     suspend fun loadByNames(names: List<String>): List<SkillEntry> {
         if (names.isEmpty()) return emptyList()
-        val allSkills = listSkills()
+        val allSkills = listExecutableSkills()
         val byName = allSkills.associateBy { it.name }
         return names.mapNotNull { name ->
             byName[name].also { if (it == null) logger.debug { "Skill '$name' not found on disk" } }
@@ -88,12 +88,13 @@ class SkillLoader(
      * ~10 tokens per skill vs ~500+ for full content.
      */
     suspend fun listSummaries(): List<SkillSummaryDto> =
-        listSkills().map { entry ->
+        listExecutableSkills().map { entry ->
             SkillSummaryDto(
                 name = entry.name,
                 description = entry.description,
                 source = entry.source,
                 requirements = entry.requirements,
+                contract = entry.contract,
             )
         }
 
@@ -120,7 +121,7 @@ class SkillLoader(
 
         if (keywords.isEmpty()) return emptyList()
 
-        val allSkills = listSkills()
+        val allSkills = listExecutableSkills()
         if (allSkills.isEmpty()) return emptyList()
 
         // Use inverted index for fast scoring
@@ -138,6 +139,10 @@ class SkillLoader(
      */
     suspend fun deleteSkill(name: String): Boolean =
         mutex.withLock {
+            if (!isValidSkillSlug(name)) {
+                logger.warn { "Rejected invalid skill name '$name'" }
+                return@withLock false
+            }
             return@withLock try {
                 val dirPath = skillsDirectory / name
                 val flatPath = skillsDirectory / "$name.md"
@@ -165,8 +170,7 @@ class SkillLoader(
                 }
 
                 if (deleted) {
-                    cachedSkills = cachedSkills.filter { it.name != name }
-                    cacheFingerprint = "" // Force re-index on next access
+                    keywordIndex = emptyMap()
                     logger.info { "Deleted skill: $name" }
                 }
                 deleted
@@ -181,8 +185,6 @@ class SkillLoader(
      */
     suspend fun invalidateCache() =
         mutex.withLock {
-            cachedSkills = emptyList()
-            cacheFingerprint = ""
             keywordIndex = emptyMap()
         }
 
@@ -239,12 +241,12 @@ class SkillLoader(
                         val skillFile = item / "SKILL.md"
                         if (fs.exists(skillFile)) {
                             val raw = fs.source(skillFile).buffer().use { it.readUtf8() }
-                            entries.add(parseSkillMd(item.name, raw).copy(slug = item.name))
+                            entries.add(withRevision(parseSkillMd(item.name, raw).copy(slug = item.name)))
                         }
                     } else if (item.name.endsWith(".md")) {
                         // ── Legacy format: skill-name.md ──
                         val raw = fs.source(item).buffer().use { it.readUtf8() }
-                        entries.add(parseSkillMd(item.name.removeSuffix(".md"), raw).copy(slug = item.name.removeSuffix(".md")))
+                        entries.add(withRevision(parseSkillMd(item.name.removeSuffix(".md"), raw).copy(slug = item.name.removeSuffix(".md"))))
                     }
                 }
 
@@ -259,19 +261,27 @@ class SkillLoader(
      * Parses a SKILL.md file, extracting YAML frontmatter (name, description)
      * and the markdown body.
      */
-    private fun parseSkillMd(
+    internal fun parseSkillMd(
         fallbackName: String,
         raw: String,
     ): SkillEntry {
         val trimmed = raw.trim()
         if (!trimmed.startsWith("---")) {
             // No frontmatter — treat entire content as body (legacy)
-            return SkillEntry(name = fallbackName, content = trimmed)
+            return SkillEntry(
+                name = fallbackName,
+                content = trimmed,
+                contract = SkillContract(contentHash = skillContentDigest(trimmed)),
+            )
         }
 
-        val endIndex = trimmed.indexOf("---", startIndex = 3)
+        val endIndex = frontmatterEndIndex(trimmed)
         if (endIndex == -1) {
-            return SkillEntry(name = fallbackName, content = trimmed)
+            return SkillEntry(
+                name = fallbackName,
+                content = trimmed,
+                contract = SkillContract(contentHash = skillContentDigest(trimmed)),
+            )
         }
 
         val frontmatter = trimmed.substring(3, endIndex).trim()
@@ -280,10 +290,27 @@ class SkillLoader(
         var name = fallbackName
         var description = ""
         var source = SkillSource.CUSTOM
+        var lifecycle = SkillLifecycle.ACTIVE
+        var provenance: String? = null
+        var version = "1"
+        var owner: String? = null
+        var declaredContentHash: String? = null
+        var reviewedContentHash: String? = null
+        var reviewNote: String? = null
+        var reviewedAt: String? = null
+        var validationRequired = false
+        var revisionId: String? = null
+        var evaluatedRunId: String? = null
+        var reviewedRevisionHash: String? = null
 
         var requiresOAuth: String? = null
         val requiresCli = mutableListOf<String>()
         val platforms = mutableListOf<String>()
+        val triggers = mutableListOf<String>()
+        val antiTriggers = mutableListOf<String>()
+        val requiredTools = mutableListOf<String>()
+        val requiredSkills = mutableListOf<String>()
+        val evalSuite = mutableListOf<String>()
 
         for (line in frontmatter.lines()) {
             val colonIdx = line.indexOf(':')
@@ -301,13 +328,51 @@ class SkillLoader(
                     SkillSource.CUSTOM
                 }
 
+                "lifecycle" -> lifecycle = try {
+                    SkillLifecycle.valueOf(value.uppercase())
+                } catch (_: Exception) {
+                    SkillLifecycle.QUARANTINED
+                }
+
+                "triggers" -> triggers.addAll(parseFrontmatterList(value))
+
+                "anti_triggers" -> antiTriggers.addAll(parseFrontmatterList(value))
+
+                "required_tools" -> requiredTools.addAll(parseFrontmatterList(value))
+
+                "required_skills" -> requiredSkills.addAll(parseFrontmatterList(value))
+
+                "eval_suite" -> evalSuite.addAll(parseFrontmatterList(value))
+
+                "provenance" -> provenance = value.ifBlank { null }
+
+                "version" -> version = value.ifBlank { "1" }
+
+                "owner" -> owner = value.ifBlank { null }
+
+                "content_hash" -> declaredContentHash = value.ifBlank { null }
+
+                "reviewed_content_hash" -> reviewedContentHash = value.ifBlank { null }
+
+                "review_note" -> reviewNote = value.ifBlank { null }
+
+                "reviewed_at" -> reviewedAt = value.ifBlank { null }
+
+                "validation_required" -> validationRequired = value != "false"
+
+                "revision_id" -> revisionId = value.ifBlank { null }
+
+                "evaluated_run_id" -> evaluatedRunId = value.ifBlank { null }
+
+                "reviewed_revision_hash" -> reviewedRevisionHash = value.ifBlank { null }
+
                 "requires_python" -> if (value.lowercase() == "true") requiresCli.addAll(listOf("python", "uv"))
 
                 "requires_oauth" -> requiresOAuth = value.ifBlank { null }
 
-                "requires_cli" -> requiresCli.addAll(value.split(",").map { it.trim() }.filter { it.isNotEmpty() })
+                "requires_cli" -> requiresCli.addAll(parseFrontmatterList(value))
 
-                "platforms" -> platforms.addAll(value.split(",").map { it.trim() }.filter { it.isNotEmpty() })
+                "platforms" -> platforms.addAll(parseFrontmatterList(value))
             }
         }
 
@@ -317,8 +382,55 @@ class SkillLoader(
             requiresOAuth = requiresOAuth,
         )
 
-        return SkillEntry(name = name, description = description, content = body, source = source, requirements = requirements)
+        val contentHash = skillContentDigest(body)
+        if (declaredContentHash != null && declaredContentHash != contentHash) {
+            logger.warn { "Skill '$name' content hash mismatch; quarantining it" }
+            lifecycle = SkillLifecycle.QUARANTINED
+        }
+        val contract =
+            SkillContract(
+                lifecycle = lifecycle,
+                triggers = triggers,
+                antiTriggers = antiTriggers,
+                requiredTools = requiredTools,
+                requiredSkills = requiredSkills,
+                evalSuite = evalSuite,
+                provenance = provenance,
+                version = version,
+                owner = owner,
+                contentHash = contentHash,
+                reviewedContentHash = reviewedContentHash,
+                reviewNote = reviewNote,
+                reviewedAt = reviewedAt,
+                validationRequired = validationRequired,
+                revisionId = revisionId,
+                evaluatedRunId = evaluatedRunId,
+                reviewedRevisionHash = reviewedRevisionHash,
+            )
+
+        return SkillEntry(
+            name = name,
+            description = description,
+            content = body,
+            source = source,
+            requirements = requirements,
+            contract = contract,
+        )
     }
+
+    private fun withRevision(skill: SkillEntry): SkillEntry {
+        val store = SkillGovernanceStore(fs, skillsDirectory)
+        val lifecycle = if (skill.contract.lifecycle == SkillLifecycle.ACTIVE && !store.isExecutable(skill)) SkillLifecycle.QUARANTINED else skill.contract.lifecycle
+        return skill.copy(contract = skill.contract.copy(lifecycle = lifecycle, revisionHash = store.revisionHash(skill)))
+    }
+
+    private fun parseFrontmatterList(value: String): List<String> =
+        value
+            .removePrefix("[")
+            .removeSuffix("]")
+            .split(",")
+            .map { item -> item.trim().trim('"', '\'') }
+            .filter { item -> item.isNotEmpty() }
 
     /**
      * Build inverted keyword index from both description and content.
@@ -340,38 +452,16 @@ class SkillLoader(
         }
         return index
     }
-
-    /**
-     * Compute a lightweight fingerprint based on file count + names.
-     * Cheap to compute, good enough for invalidation.
-     */
-    private fun computeFingerprint(): String {
-        if (!fs.exists(skillsDirectory)) return "empty"
-        return try {
-            val items = fs.list(skillsDirectory)
-            val parts = mutableListOf<String>()
-            for (item in items) {
-                val meta = fs.metadataOrNull(item) ?: continue
-                if (meta.isDirectory) {
-                    if (fs.exists(item / "SKILL.md")) parts.add(item.name)
-                } else if (item.name.endsWith(".md")) {
-                    parts.add(item.name)
-                }
-            }
-            "${parts.size}:${parts.sorted().joinToString(",")}"
-        } catch (e: Exception) {
-            logger.debug(e) { "Failed to compute skills directory fingerprint" }
-            "error"
-        }
-    }
 }
 
+@kotlinx.serialization.Serializable
 data class SkillEntry(
     val name: String,
     val description: String = "",
     val content: String,
     val source: SkillSource = SkillSource.CUSTOM,
     val requirements: SkillRequirements = SkillRequirements(),
+    val contract: SkillContract = SkillContract(),
     /** Directory name on disk (kebab-case), used for system skill matching. */
     val slug: String = "",
 )
@@ -385,19 +475,44 @@ data class SkillSummaryDto(
     val description: String,
     val source: SkillSource = SkillSource.CUSTOM,
     val requirements: SkillRequirements = SkillRequirements(),
+    val contract: SkillContract = SkillContract(),
 )
 
 /**
  * Declares what a skill needs to run.
  */
+@kotlinx.serialization.Serializable
 data class SkillRequirements(
     val platforms: List<String> = emptyList(),
     val requiresCli: List<String> = emptyList(),
     val requiresOAuth: String? = null,
 )
 
+@kotlinx.serialization.Serializable
 enum class SkillSource {
     BUNDLED,
     OPTIONAL,
     CUSTOM,
+}
+
+internal fun skillContentDigest(content: String): String = content.trim().encodeUtf8().sha256().hex()
+
+internal fun isValidSkillSlug(value: String): Boolean = value.matches(Regex("[A-Za-z0-9][A-Za-z0-9_-]{0,127}"))
+
+internal fun normalizeSkillBody(content: String): String {
+    val trimmed = content.trim()
+    if (!trimmed.startsWith("---")) return trimmed
+    val frontmatterEnd = frontmatterEndIndex(trimmed)
+    return if (frontmatterEnd < 0) trimmed else trimmed.substring(frontmatterEnd + 3).trim()
+}
+
+private fun frontmatterEndIndex(content: String): Int {
+    var lineStart = content.indexOf('\n').let { index -> if (index < 0) return -1 else index + 1 }
+    while (lineStart < content.length) {
+        val nextLine = content.indexOf('\n', startIndex = lineStart)
+        val lineEnd = if (nextLine < 0) content.length else nextLine
+        if (content.substring(lineStart, lineEnd).trim() == "---") return lineStart
+        lineStart = lineEnd + 1
+    }
+    return -1
 }

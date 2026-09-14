@@ -1,5 +1,7 @@
 # API Reference
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 > Complete reference for the Prométhé gateway REST and WebSocket API.
 
 **Base URL**: `http://localhost:8080`
@@ -29,9 +31,9 @@ When `CORS_ALLOWED_ORIGINS` is empty, browser cross-origin access is denied. Whe
 an explicit comma-separated list of HTTP(S) origins; wildcard origins are not supported. The same allow-list
 is applied to the MCP HTTP endpoint.
 
-The gateway also applies a bounded in-memory rate limiter: **60 requests/minute per IP** by default,
+The gateway also applies a bounded in-memory rate limiter: **600 requests/minute per remote IP** by default,
 with a separate **120 requests/minute** bucket for signed webhooks (`RateLimiter.kt`; exempt: `/health`
-and `/.well-known/*`). Responses include
+and `/.well-known/*`, plus authenticated local API-key calls from loopback). Responses include
 `X-RateLimit-Limit` / `X-RateLimit-Remaining` / `X-RateLimit-Reset` headers; exceeding the limit returns
 `429 Too Many Requests`.
 
@@ -53,6 +55,11 @@ and `/.well-known/*`). Responses include
 Returns the runtime capability registry used by clients and release certification. Each descriptor carries
 its `STABLE`, `BETA`, `LAB`, or `UNAVAILABLE` maturity, current availability, risk class, platforms,
 required configuration names, and limitations. Secret values are never returned.
+
+Tool descriptors also include a typed `toolContract`: registration source, catalog and fallback risks,
+approval mode, idempotency, egress class, owner-only restriction, operation keys and operation-specific
+risks. `explicit=false` identifies the fail-closed fallback used for an uncontracted tool; such a tool is
+always classified `EXTERNAL_EFFECT` and requires approval.
 
 ### GET /api/v1/providers
 
@@ -149,19 +156,20 @@ curl http://localhost:8080/api/v1/sessions
     "id": "sess-001",
     "createdAt": 1718000000000,
     "metadata": "{}",
-    "messageCount": 12
+    "messageCount": 12,
+    "projectId": "project-2c2b62ba"
   }
 ]
 ```
 
 ### POST /api/v1/sessions
 
-Create a new session.
+Create a new session. `projectId` is optional; when omitted, a new session inherits the server's active project.
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/sessions \
   -H "Content-Type: application/json" \
-  -d '{"metadata": "{\"name\": \"Projet X\"}"}'
+  -d '{"id":"sess-001","projectId":"project-2c2b62ba"}'
 ```
 
 ### DELETE /api/v1/sessions/{id}
@@ -190,6 +198,16 @@ curl -X PATCH http://localhost:8080/api/v1/sessions/sess-001/metadata \
   -d '{"name": "Projet X"}'
 ```
 
+### PATCH /api/v1/sessions/{id}/project
+
+Assign an existing conversation to a project, or send `null` to detach it.
+
+```bash
+curl -X PATCH http://localhost:8080/api/v1/sessions/sess-001/project \
+  -H "Content-Type: application/json" \
+  -d '{"projectId":"project-2c2b62ba"}'
+```
+
 ### GET /api/v1/sessions/{id}/export/json
 
 Export a complete session as JSON (sets `Content-Disposition: attachment`).
@@ -207,6 +225,35 @@ curl http://localhost:8080/api/v1/sessions/sess-001/export/markdown
 ```
 
 > Note: there is no combined `GET /api/v1/sessions/{id}/export` — export is split into the two typed routes above. See also [Session Checkpoints](#session-checkpoints) for `GET/POST/DELETE /api/v1/sessions/{id}/checkpoint(s)`.
+
+---
+
+## Projects
+
+Projects group conversations, trusted instructions, a workspace and isolated long-term memory. All routes
+require owner authentication. Archiving is non-destructive and never deletes project files or memories.
+
+| Method | Route | Purpose |
+|---|---|---|
+| `GET` | `/api/v1/projects` | List projects and the active project id |
+| `POST` | `/api/v1/projects` | Create a project and its workspace |
+| `GET` | `/api/v1/projects/{id}` | Read one project |
+| `PUT` | `/api/v1/projects/{id}` | Update or restore a project |
+| `DELETE` | `/api/v1/projects/{id}` | Archive a project |
+| `PUT` | `/api/v1/projects/{id}/active` | Make a project active |
+| `DELETE` | `/api/v1/projects/active` | Clear the active project |
+
+```bash
+curl -X POST http://localhost:8080/api/v1/projects \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name":"Promethe public release",
+    "description":"Release preparation",
+    "instructions":"Prioritize security regressions and keep the release checklist current."
+  }'
+```
+
+See [PROJECTS.md](PROJECTS.md) for workspace and memory semantics.
 
 ---
 
@@ -350,6 +397,37 @@ curl http://localhost:8080/api/v1/gepa/current
 
 ---
 
+## Sandbox and file permissions
+
+### GET /api/v1/security/sandbox/status
+
+Returns the native process-sandbox state plus `workspaceRoot` and
+`localConfigurationAllowed`. The latter is true only for a loopback request
+authenticated with the local API key.
+
+### GET /api/v1/security/permission-profile
+
+Returns the active file/process permission profile, including canonical
+readable and writable roots.
+
+### PUT /api/v1/security/permission-profile
+
+Updates and persists the profile. This route requires loopback authentication
+with the local API key. `FULL_ACCESS` applies only to approved file tools;
+process tools remain confined to the main workspace. It is rejected whenever
+remote access is enabled.
+
+### POST /api/v1/security/sandbox/self-test
+
+Runs the native backend self-test.
+
+### POST /api/v1/security/sandbox/setup
+
+Runs the one-time native setup where supported. This route also requires the
+local loopback API key.
+
+---
+
 ## MCP Servers (client — connect Prométhé to external MCP servers)
 
 Manage Prométhé's connections to *external* MCP servers (e.g. filesystem, GitHub MCP servers). This is the client side; see [MCP Protocol Server](#mcp-protocol-server) below for Prométhé acting as an MCP *server*.
@@ -415,15 +493,39 @@ Lists all tools exposed by connected MCP servers, plus all built-in tools (merge
 curl http://localhost:8080/api/v1/mcp/tools
 ```
 
+### GET /api/v1/approval/mcp/pending
+
+Lists owner-visible form requests emitted by external MCP servers while an outbound tool call is
+waiting for `elicitation/create`. The response identifies the requesting server, the user-facing
+message, the JSON schema, and the expiry time. It does not expose the originating session, MCP
+credentials, headers, or internal errors. Authentication is required.
+
+```bash
+curl http://localhost:8080/api/v1/approval/mcp/pending
+```
+
+### POST /api/v1/approval/mcp/{id}
+
+Resumes a pending MCP form with `accept`, `decline`, or `cancel`. An accepted response must include a
+`content` object matching the requested schema. Invalid actions or content return `400`; an expired,
+completed, or unknown request returns `404`. Requests time out as `cancel` and are not persisted
+across a gateway restart.
+
+```bash
+curl -X POST http://localhost:8080/api/v1/approval/mcp/request-id \
+  -H "Content-Type: application/json" \
+  -d '{"action":"accept","content":{"confirmed":true}}'
+```
+
 ---
 
 ## MCP Protocol Server
 
-Prométhé also exposes its own built-in tools **as an MCP server** (2025-11-05 Streamable HTTP transport), so external MCP clients (IDEs, other agents) can call them. Implemented in `gateway/.../mcp/McpServerEndpoint.kt`, mounted at root (not under `/api`).
+Prométhé also exposes its own built-in tools **as an MCP server**. The same Streamable HTTP endpoint supports stateless `2026-07-28` requests and the legacy `2025-11-25` lifecycle, so external MCP clients can call them. It is implemented in `gateway/.../mcp/McpServerEndpoint.kt` and mounted at root, not under `/api`.
 
 ### GET /.well-known/mcp
 
-Server Card for discovery (name, protocol version, capabilities, `endpoint: "/mcp"`).
+Server Card for discovery (name, supported protocol versions, capabilities, `endpoint: "/mcp"`). The `io.modelcontextprotocol/tasks` extension is present only when durable task storage is active.
 
 ```bash
 curl http://localhost:8080/.well-known/mcp
@@ -431,7 +533,7 @@ curl http://localhost:8080/.well-known/mcp
 
 ### POST /mcp
 
-Full JSON-RPC 2.0 endpoint. Handles `initialize`, `tools/list`, `tools/call`, `tasks/get`, `tasks/cancel`, `notifications/initialized`, `shutdown`. Validates the `MCP-Protocol-Version` header (400 if unsupported), rejects batch JSON-RPC arrays (400), and rejects browser `Origin` values outside `CORS_ALLOWED_ORIGINS` (403). Native MCP clients may omit `Origin`.
+Full JSON-RPC 2.0 endpoint. Modern requests handle `server/discover`, `tools/list`, `tools/call`, `tasks/get`, `tasks/update`, and `tasks/cancel`; legacy requests retain `initialize`, `tools/list`, `tools/call`, `notifications/initialized`, and `shutdown`. Modern Tasks are negotiated per request through `_meta["io.modelcontextprotocol/clientCapabilities"].extensions`, are persisted in SQLite, bound to the authenticated session, and use `taskId` as `Mcp-Name`. The endpoint validates all modern routing headers, rejects unsupported versions and batch arrays with `400`, and rejects browser origins outside `CORS_ALLOWED_ORIGINS` with `403`. Native MCP clients may omit `Origin`.
 
 ```bash
 curl -X POST http://localhost:8080/mcp \
@@ -539,7 +641,39 @@ curl -X POST http://localhost:8080/api/v1/channels/telegram/test
 # → {"status": "ok", "channel": "telegram", "message": "Configuration valid"}
 ```
 
-Supported channel names: `telegram`, `discord`, `slack`, `whatsapp`, `signal`, `matrix`. See [Channel Webhooks](#channel-webhooks-inbound) for the actual inbound receiver endpoints.
+Supported channel names: `telegram`, `discord`, `slack`, `whatsapp`, `signal`, `matrix`, `sms`. See [Channel Webhooks](#channel-webhooks-inbound) for the actual inbound receiver endpoints.
+
+### Discord live policy
+
+All endpoints below require owner authentication. Discord IDs may be numeric IDs or Discord mention
+syntax. Policies are persisted in SQLite and used immediately by the persistent Gateway and signed
+Discord interactions.
+
+| Method | Route | Purpose |
+|---|---|---|
+| `GET` | `/api/v1/channels/discord/policy` | List dynamic user and channel rules |
+| `PUT` | `/api/v1/channels/discord/policy/users/{userId}` | Allow/deny a user and optionally restrict subjects/server/channel |
+| `DELETE` | `/api/v1/channels/discord/policy/users/{userId}` | Remove the exact dynamic rule; optional `guildId` and `channelId` query parameters select its scope |
+| `PUT` | `/api/v1/channels/discord/policy/channels/{channelId}` | Start/stop Open Knowledge capture and optionally associate a project |
+| `DELETE` | `/api/v1/channels/discord/policy/channels/{channelId}` | Remove the dynamic channel override |
+
+Contract signatures: `GET /api/v1/channels/discord/policy`,
+`PUT /api/v1/channels/discord/policy/users/{userId}`,
+`DELETE /api/v1/channels/discord/policy/users/{userId}`,
+`PUT /api/v1/channels/discord/policy/channels/{channelId}` and
+`DELETE /api/v1/channels/discord/policy/channels/{channelId}`.
+
+```bash
+curl -X PUT http://localhost:8080/api/v1/channels/discord/policy/users/123456789012345678 \
+  -H "Authorization: Bearer $PROMETHE_SESSION" \
+  -H "Content-Type: application/json" \
+  -d '{"effect":"ALLOW","allowedTopics":["weather","public release"]}'
+
+curl -X PUT http://localhost:8080/api/v1/channels/discord/policy/channels/345678901234567890 \
+  -H "Authorization: Bearer $PROMETHE_SESSION" \
+  -H "Content-Type: application/json" \
+  -d '{"captureKnowledge":true,"projectId":"project-release"}'
+```
 
 ---
 
@@ -576,55 +710,70 @@ curl -X DELETE http://localhost:8080/api/v1/config/env/GITHUB_TOKEN
 
 Tool calls in `DANGEROUS_TOOLS` (`execute_code`, `write_file`, `browser_eval`, `send_email`, `twilio`) require human
 approval by default (`APPROVAL_MODE=dangerous`, the secure-by-default setting — do not loosen to `auto` without an
-explicit ask). All approval routes below are mounted at **root** (`Route.approvalRoutes` in `SystemAndAuthRoutes.kt`,
-called outside `route("api")`) — there is no `/api/approval/*` variant.
+explicit ask). All approval management routes below are versioned under `/api/v1`.
 
-### GET /approval/pending
+### GET /api/v1/approval/pending
 
 ```bash
-curl http://localhost:8080/approval/pending
+curl http://localhost:8080/api/v1/approval/pending
 ```
 
 **Response**:
 ```json
-[
-  {
+{
+  "pending": [{
     "id": "appr-001",
     "toolName": "execute_command",
-    "args": {"command": "rm -rf /tmp/old"},
+    "args": "{\"executable\":\"git\",\"arguments\":[\"status\"]}",
+    "argsDigest": "sha256-digest",
+    "fingerprint": "exact-invocation-fingerprint",
+    "sessionId": "session-001",
+    "persistentAllowed": false,
     "createdAt": 1718000000000
-  }
-]
+  }]
+}
 ```
 
-### POST /approval/{id}
+### POST /api/v1/approval/{id}
 
 ```bash
 # Approve
-curl -X POST http://localhost:8080/approval/appr-001 \
+curl -X POST http://localhost:8080/api/v1/approval/appr-001 \
   -H "Content-Type: application/json" \
   -d '{"approved": true}'
 
 # Reject
-curl -X POST http://localhost:8080/approval/appr-001 \
+curl -X POST http://localhost:8080/api/v1/approval/appr-001 \
   -H "Content-Type: application/json" \
   -d '{"approved": false}'
+
+# Permanently allow this exact configuration change until it is revoked.
+# PERSISTENT is rejected for non-CONFIG_CHANGE operations.
+curl -X POST http://localhost:8080/api/v1/approval/appr-config-001 \
+  -H "Content-Type: application/json" \
+  -d '{"approved": true, "scope": "PERSISTENT"}'
 ```
 
-### GET /approval/providers/pending
+The local chat renders pending requests inline with `ONCE`, `SESSION`, and, when
+`persistentAllowed=true`, `PERSISTENT` choices. Persistent grants are stored in SQLite using only the
+exact invocation fingerprint, survive gateway restarts, and remain active until the local owner revokes
+them through `DELETE /api/v1/approval/grants/{id}`. Discord can deliver the same request to explicitly configured
+integration approvers; local coding-agent operations remain local-owner-only.
+
+### GET /api/v1/approval/providers/pending
 
 List pending *provider choice* requests (e.g. when a capability like image generation could route to more than one configured provider).
 
 ```bash
-curl http://localhost:8080/approval/providers/pending
+curl http://localhost:8080/api/v1/approval/providers/pending
 ```
 
-### POST /approval/providers/{id}
+### POST /api/v1/approval/providers/{id}
 
 Respond to a provider choice request.
 
 ```bash
-curl -X POST http://localhost:8080/approval/providers/req-002 \
+curl -X POST http://localhost:8080/api/v1/approval/providers/req-002 \
   -H "Content-Type: application/json" \
   -d '{"approved": true, "selectedProviderId": "openai"}'
 ```
@@ -934,11 +1083,11 @@ curl -X POST http://localhost:8080/api/v1/plugins/weather/toggle \
 
 ### GET /api/v1/skills
 
-List all available skills.
+List all managed skills, including non-active lifecycle states. Only `ACTIVE` skills are available to agents.
 
 ```bash
 curl http://localhost:8080/api/v1/skills
-# → {"skills": [{"name": "code_review", "description": "...", "preview": "...", "isSystem": true}]}
+# → {"skills": [{"name": "code_review", "description": "...", "preview": "...", "isSystem": true, "contract": {"lifecycle": "ACTIVE", "contentHash": "..."}}]}
 ```
 
 ### GET /api/v1/skills/{name}
@@ -951,7 +1100,7 @@ curl http://localhost:8080/api/v1/skills/code_review
 
 ### POST /api/v1/skills
 
-Create a new skill.
+Create a new `DRAFT` skill.
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/skills \
@@ -965,13 +1114,62 @@ curl -X POST http://localhost:8080/api/v1/skills \
 
 ### PUT /api/v1/skills/{name}
 
-Update an existing skill.
+Update an existing skill. The edited revision moves to `QUARANTINED` and stops being available to agents, including for system skills. Its previous evaluation and review cannot authorize the changed revision.
 
 ```bash
 curl -X PUT http://localhost:8080/api/v1/skills/data_analysis \
   -H "Content-Type: application/json" \
   -d '{"content": "# Data Analysis v2\n\nContenu mis à jour..."}'
 ```
+
+### PUT /api/v1/skills/{name}/lifecycle
+
+Apply an owner-reviewed lifecycle transition. Direct `DRAFT → ACTIVE` activation is refused; the promotion
+path is `DRAFT → QUARANTINED → CANDIDATE → ACTIVE`. Edited or reconfigured system skills follow the same evaluation/review cycle; unchanged legacy and bundled skills remain active for backward compatibility without new evidence.
+
+Promotion to `CANDIDATE` or `ACTIVE` requires `expectedContentHash` from a fresh skill response, `expectedRevisionHash` from validation state, a nonempty `reviewNote` (at most 2,000 characters), and the latest evaluation run marked `PASSED` for that exact revision. Missing or stale evidence returns `409`. The saved review and passing run are separate requirements; this endpoint does not itself execute evaluations. The revision hash covers body, metadata, revision nonce and suites. Edits, suite configuration and restoration require new evidence; a later failed or interrupted evaluation cannot reuse an older pass.
+
+```bash
+curl -X PUT http://localhost:8080/api/v1/skills/data_analysis/lifecycle \
+  -H "Content-Type: application/json" \
+  -d '{"lifecycle": "QUARANTINED"}'
+```
+
+### Skill evaluation and version history
+
+These endpoints are implemented and [locally validated](reports/SKILL_EVALUATION_LIFECYCLE_2026-09-08.md). The existing authentication requirements apply. Evaluation uses the gateway's configured model through Koog, with a fresh text-only request per case, no tools and no expected answers in the request. **Launching evaluations can incur provider charges.** The implementation validation used deterministic providers without paid calls.
+
+| Method | Route | Request body |
+|---|---|---|
+| `GET` | `/api/v1/skills/{name}/validation` | None |
+| `PUT` | `/api/v1/skills/{name}/evaluation-suites` | `expectedRevisionHash`, `suites` |
+| `POST` | `/api/v1/skills/{name}/evaluations` | `expectedRevisionHash` |
+| `POST` | `/api/v1/skills/{name}/restore` | `expectedRevisionHash`, `versionId` |
+
+Validation state contains `revisionHash`, `suites`, `latestRun`, `canPromote`, `versions` and `runs`. Run statuses are `RUNNING`, `PASSED`, `FAILED`, `ERROR` or `CANCELLED`; case results carry their suite/case IDs, status, optional output hash and reason. Version entries expose their ID, revision hash, capture time, content and lifecycle. Promotion still requires the owner review even when evaluation evidence is ready.
+
+Example body for `PUT .../evaluation-suites`, using the revision hash just read from validation state:
+
+```json
+{
+  "expectedRevisionHash": "<current-revision-hash>",
+  "suites": [
+    {
+      "id": "uppercase",
+      "cases": [
+        {"id": "first", "input": "alpha", "expectedOutput": "ALPHA"},
+        {"id": "second", "input": "beta", "expectedOutput": "BETA"}
+      ]
+    }
+  ]
+}
+```
+
+This example requires a skill whose instruction is to uppercase the input. Limits: 1–8 suites, at least two distinct inputs per suite, at most 20 total cases, texts at most 16,384 characters, and 60 seconds per case. The oracle is exact equality after trimming surrounding whitespace. Read validation state again after configuration, since it changes the revision and quarantines the skill, including system skills.
+
+Use `{"expectedRevisionHash":"<current-revision-hash>"}` for evaluation. `latest.json` is marked `RUNNING` before calls; only the latest passing run for the current revision authorizes the evaluation part of promotion. To restore, send `{"expectedRevisionHash":"<current-revision-hash>","versionId":"<saved-version-id>"}`. Restoration produces a quarantined revision and requires fresh evaluation and review before activation.
+
+Evidence lives locally under `.skillops/{slug}/` in the skills directory. Version snapshots are captured before publication, not a transactional commit journal. History is unsigned and does not resist local owner file modification. Writers and evaluations are serialized within one process, without a cross-process writer guarantee. These evaluations do not validate tool execution, ancillary scripts or persistent memory; the revision fingerprint does not hash transitive dependency contents. The loader rereads content and evidence at each use. See [SKILLS.md](SKILLS.md) for the user workflow.
 
 ### DELETE /api/v1/skills/{name}
 
@@ -983,7 +1181,7 @@ curl -X DELETE http://localhost:8080/api/v1/skills/data_analysis
 
 ### POST /api/v1/skills/curate
 
-Launch automatic curation (deduplication, quality scoring).
+Run a non-destructive quality pass. The response contains quality issues and typed `QUARANTINED` proposals for low-quality or near-duplicate skills. No skill is deleted, merged, or rewritten; legacy `merged` and `deleted` counters remain zero.
 
 ```bash
 curl -X POST http://localhost:8080/api/v1/skills/curate
@@ -1174,7 +1372,7 @@ The former raw HTTP command endpoint and the legacy remote setup route were remo
 
 ### Approval Gate
 
-See the [Tool Approval](#tool-approval) section above — `GET/POST /approval/...` (root, no `/api` prefix).
+See the [Tool Approval](#tool-approval) section above — `GET/POST /api/v1/approval/...`.
 
 ---
 
@@ -1359,6 +1557,7 @@ the message through the shared A2A pipeline.
 | POST | `/webhook/slack` | Slack Events API (HMAC signing secret; handles `url_verification` challenge) |
 | POST | `/webhook/signal` | Signal (via signal-cli REST API) |
 | POST | `/webhook/matrix` | Matrix Appservice |
+| POST | `/webhook/sms` | Twilio SMS (`X-Twilio-Signature`; empty TwiML acknowledgement, asynchronous A2A reply) |
 
 ```bash
 curl -X POST http://localhost:8080/webhook/telegram \
@@ -1397,15 +1596,20 @@ curl http://localhost:8080/api/v1/status
     "executionBackend": "koog"
   },
   "llm": {
-    "totalRequests": 142,
-    "totalPromptTokens": 50000,
-    "totalCompletionTokens": 30000,
-    "totalCostUsd": 0.15,
+    "total_requests": 142,
+    "total_prompt_tokens": 50000,
+    "total_completion_tokens": 30000,
+    "total_cost_usd": 0.15,
     "cache": {
       "hits": 40,
       "misses": 102,
       "size": 40,
-      "hitRate": 0.28
+      "hit_rate": 0.28,
+      "read_tokens": 32000,
+      "write_tokens": 12000,
+      "observable_responses": 142,
+      "prefix_reuse_hits": 120,
+      "prefix_reuse_misses": 22
     }
   },
   "memory": {
@@ -1623,9 +1827,10 @@ supports the capability (missing provider = tool call fails at invocation, not a
 | `twilio` | `TWILIO_ACCOUNT_SID` **and** `TWILIO_AUTH_TOKEN` are set — ⚠️ approval-gated |
 | `web_scrape` | always (no key required) |
 | `execute_code` | `CODE_EXECUTION_ENABLED=true` — ⚠️ approval-gated, sandboxed via `EXEC_BACKEND` (default `local`); Python, JavaScript and Kotlin only |
-| `browser_navigate`, `browser_click`, `browser_type`, `browser_extract`, `browser_screenshot`, `browser_eval`, `browser_scroll`, `browser_back`, `browser_press`, `browser_get_images`, `browser_vision`, `browser_dialog` (12 tools, `BrowserTools.create`) | `BROWSER_CDP_PORT` is set (local CDP backend), **or** `BROWSER_BACKEND=browserbase` with `BROWSERBASE_API_KEY` + `BROWSERBASE_PROJECT_ID` set (cloud backend) |
+| `browser_navigate`, `browser_click`, `browser_type`, `browser_extract`, `browser_screenshot`, `browser_eval`, `browser_scroll`, `browser_back`, `browser_press`, `browser_get_images`, `browser_dialog` (11 tools, `BrowserTools.create`) | `BROWSER_CDP_PORT` is set (local CDP backend), **or** `BROWSER_BACKEND=browserbase` with `BROWSERBASE_API_KEY` + `BROWSERBASE_PROJECT_ID` set (cloud backend) |
 
 `browser_eval` is in `DANGEROUS_TOOLS` and requires approval.
+`browser_vision` is intentionally unavailable and is not registered until a VLM integration performs real screenshot analysis.
 
 ### Extended tools — always registered (`IntegrationRegistrar.registerExtendedTools`)
 
@@ -1646,6 +1851,8 @@ supports the capability (missing provider = tool call fails at invocation, not a
 **AI (3)**: `embedding`, `speech_to_text`, `vector_search`
 
 **Agent-level (11)**: `clarify`, `cronjob`, `send_message`, `session_search`, `mixture_of_agents`, `config_get`, `config_set`, `plugin_list`, `checkpoint_save`, `checkpoint_list`, `render_ui`
+
+**Gateway administration (1)**: `discord_policy` — owner A2A conversations only; mutations require approval.
 
 **Autonomous (1)**: `autonomous_goal`
 

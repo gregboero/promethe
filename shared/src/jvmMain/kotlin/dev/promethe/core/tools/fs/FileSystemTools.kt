@@ -4,8 +4,12 @@ import ai.koog.agents.core.tools.SimpleTool
 import ai.koog.agents.core.tools.annotations.LLMDescription
 import ai.koog.serialization.typeToken
 import dev.promethe.core.SecureDeletedEntry
-import dev.promethe.core.SecureJvmWorkspaceFileMutator
+import dev.promethe.core.CanonicalNioWorkspaceAccess
+import dev.promethe.core.WorkspaceDirectoryResolver
+import dev.promethe.core.WorkspaceFileMutator
+import dev.promethe.core.sandbox.SandboxPolicyFileAccess
 import dev.promethe.core.WorkspacePathPolicy
+import dev.promethe.core.projectScopedPath
 import kotlinx.serialization.Serializable
 import java.nio.channels.Channels
 import java.nio.charset.StandardCharsets
@@ -27,8 +31,10 @@ private val logger = io.github.oshai.kotlinlogging.KotlinLogging.logger {}
  * workspace before a tool gets a chance to apply its policy.
  */
 private class SafeWorkspaceTraversal private constructor(
-    private val root: SecureDirectoryStream<Path>,
+    private val root: SecureDirectoryStream<Path>?,
     private val openedStreams: List<DirectoryStream<Path>>,
+    private val fallbackWorkspaceRoot: Path?,
+    private val fallbackDirectory: Path?,
     private val protectRootMetadata: Boolean,
     val displayName: String,
 ) : AutoCloseable {
@@ -40,7 +46,15 @@ private class SafeWorkspaceTraversal private constructor(
         val children: List<Node>?,
     )
 
-    fun snapshot(maxDepth: Int): List<Node> = snapshot(root, Path.of(""), 0, maxDepth.coerceAtLeast(0), protectRootMetadata)
+    fun snapshot(maxDepth: Int): List<Node> =
+        root?.let { snapshot(it, Path.of(""), 0, maxDepth.coerceAtLeast(0), protectRootMetadata) }
+            ?: snapshotFallback(
+                requireNotNull(fallbackDirectory),
+                Path.of(""),
+                0,
+                maxDepth.coerceAtLeast(0),
+                protectRootMetadata,
+            )
 
     fun search(
         pattern: String,
@@ -58,11 +72,18 @@ private class SafeWorkspaceTraversal private constructor(
             } else {
                 null
             }
-        visit(root, Path.of(""), protectRootMetadata) { _, name, relative, attributes, child ->
-            if (results.size >= maxResults.coerceAtLeast(0)) return@visit false
-            val matches = regex?.matches(name) ?: name.lowercase().contains(loweredPattern)
-            if (matches) results += relative + if (attributes.isDirectory) "/" else ""
-            child
+        root?.let { secureRoot ->
+            visit(secureRoot, Path.of(""), protectRootMetadata) { _, name, relative, attributes, child ->
+                if (results.size >= maxResults.coerceAtLeast(0)) return@visit false
+                val matches = regex?.matches(name) ?: name.lowercase().contains(loweredPattern)
+                if (matches) results += relative + if (attributes.isDirectory) "/" else ""
+                child
+            }
+        } ?: visitFallback(requireNotNull(fallbackDirectory), Path.of(""), protectRootMetadata) { entry, relative ->
+            if (results.size >= maxResults.coerceAtLeast(0)) return@visitFallback false
+            val matches = regex?.matches(entry.name) ?: entry.name.lowercase().contains(loweredPattern)
+            if (matches) results += relative + if (entry.attributes.isDirectory) "/" else ""
+            entry.attributes.isDirectory
         }
         return results
     }
@@ -74,30 +95,53 @@ private class SafeWorkspaceTraversal private constructor(
         maxResults: Int,
     ): List<String> {
         val results = mutableListOf<String>()
-        visit(root, Path.of(""), protectRootMetadata) { directory, name, relative, attributes, child ->
-            if (results.size >= maxResults.coerceAtLeast(0)) return@visit false
-            if (
-                attributes.isRegularFile &&
-                name.substringAfterLast('.', "").lowercase() !in binaryExtensions &&
-                (includeRegex == null || includeRegex.matches(name))
-            ) {
-                directory.newByteChannel(Path.of(name), setOf(READ, NOFOLLOW_LINKS)).use { channel ->
-                    Channels
-                        .newReader(channel, StandardCharsets.UTF_8)
-                        .buffered()
-                        .useLines { lines ->
-                            lines.forEachIndexed lineLoop@{ index, line ->
-                                if (results.size >= maxResults.coerceAtLeast(0)) return@lineLoop
-                                if (regex.containsMatchIn(line)) {
-                                    results += "$relative:${index + 1}: ${line.take(200)}"
-                                }
-                            }
-                        }
+        root?.let { secureRoot ->
+            visit(secureRoot, Path.of(""), protectRootMetadata) { directory, name, relative, attributes, child ->
+                if (results.size >= maxResults.coerceAtLeast(0)) return@visit false
+                if (
+                    attributes.isRegularFile &&
+                    name.substringAfterLast('.', "").lowercase() !in binaryExtensions &&
+                    (includeRegex == null || includeRegex.matches(name))
+                ) {
+                    directory.newByteChannel(Path.of(name), setOf(READ, NOFOLLOW_LINKS)).use { channel ->
+                        Channels
+                            .newReader(channel, StandardCharsets.UTF_8)
+                            .buffered()
+                            .useLines { lines -> collectMatchingLines(lines, regex, relative, maxResults, results) }
+                    }
                 }
+                child
             }
-            child
+        } ?: visitFallback(requireNotNull(fallbackDirectory), Path.of(""), protectRootMetadata) { entry, relative ->
+            if (results.size >= maxResults.coerceAtLeast(0)) return@visitFallback false
+            if (
+                entry.attributes.isRegularFile &&
+                entry.name.substringAfterLast('.', "").lowercase() !in binaryExtensions &&
+                (includeRegex == null || includeRegex.matches(entry.name))
+            ) {
+                val workspaceRoot = requireNotNull(fallbackWorkspaceRoot)
+                val workspaceRelative = workspaceRoot.relativize(entry.path).toString()
+                CanonicalNioWorkspaceAccess
+                    .read(workspaceRoot, workspaceRelative)
+                    .lineSequence()
+                    .let { lines -> collectMatchingLines(lines, regex, relative, maxResults, results) }
+            }
+            entry.attributes.isDirectory
         }
         return results
+    }
+
+    private fun collectMatchingLines(
+        lines: Sequence<String>,
+        regex: Regex,
+        relative: String,
+        maxResults: Int,
+        results: MutableList<String>,
+    ) {
+        lines.forEachIndexed lineLoop@{ index, line ->
+            if (results.size >= maxResults.coerceAtLeast(0)) return@lineLoop
+            if (regex.containsMatchIn(line)) results += "$relative:${index + 1}: ${line.take(200)}"
+        }
     }
 
     private fun snapshot(
@@ -114,6 +158,32 @@ private class SafeWorkspaceTraversal private constructor(
                     directory.newDirectoryStream(Path.of(entry.name), NOFOLLOW_LINKS).use { child ->
                         snapshot(child, relative, depth + 1, maxDepth, false)
                     }
+                } else if (entry.attributes.isDirectory) {
+                    null
+                } else {
+                    emptyList()
+                }
+            Node(
+                name = entry.name,
+                relativePath = relative.toString(),
+                directory = entry.attributes.isDirectory,
+                size = entry.attributes.size(),
+                children = children,
+            )
+        }
+
+    private fun snapshotFallback(
+        directory: Path,
+        prefix: Path,
+        depth: Int,
+        maxDepth: Int,
+        protectMetadata: Boolean,
+    ): List<Node> =
+        fallbackEntries(directory, protectMetadata).map { entry ->
+            val relative = prefix.resolve(entry.name)
+            val children =
+                if (entry.attributes.isDirectory && depth < maxDepth) {
+                    snapshotFallback(entry.path, relative, depth + 1, maxDepth, false)
                 } else if (entry.attributes.isDirectory) {
                     null
                 } else {
@@ -149,6 +219,33 @@ private class SafeWorkspaceTraversal private constructor(
                 }
             }
         }
+    }
+
+    private fun visitFallback(
+        directory: Path,
+        prefix: Path,
+        protectMetadata: Boolean,
+        visitor: (CanonicalNioWorkspaceAccess.Entry, String) -> Boolean,
+    ) {
+        fallbackEntries(directory, protectMetadata).forEach { entry ->
+            val relative = prefix.resolve(entry.name)
+            val visitChildren = visitor(entry, relative.toString())
+            if (entry.attributes.isDirectory && visitChildren) {
+                visitFallback(entry.path, relative, false, visitor)
+            }
+        }
+    }
+
+    private fun fallbackEntries(
+        directory: Path,
+        protectMetadata: Boolean,
+    ): List<CanonicalNioWorkspaceAccess.Entry> {
+        val workspaceRoot = requireNotNull(fallbackWorkspaceRoot)
+        val relative = workspaceRoot.relativize(directory).toString().ifBlank { "." }
+        return CanonicalNioWorkspaceAccess
+            .listDirectory(workspaceRoot, relative)
+            .second
+            .filterNot { protectMetadata && it.name.lowercase() in WorkspacePathPolicy.protectedNames }
     }
 
     private fun entries(
@@ -188,15 +285,41 @@ private class SafeWorkspaceTraversal private constructor(
                 WorkspacePathPolicy.resolve(workDir, requestedPath)?.toPath()?.toAbsolutePath()?.normalize()
                     ?: error("access denied: path must be inside the workspace")
             require(requested.startsWith(workspace)) { "access denied: path must be inside the workspace" }
+            return openResolved(workspace, requested)
+        }
+
+        fun openAbsolute(requestedPath: String): SafeWorkspaceTraversal {
+            val requested = Path.of(requestedPath).toRealPath()
+            require(Files.isDirectory(requested, NOFOLLOW_LINKS)) { "access denied: path must be a directory" }
+            return openResolved(requested, requested)
+        }
+
+        private fun openResolved(
+            workspace: Path,
+            requested: Path,
+        ): SafeWorkspaceTraversal {
             val relative = workspace.relativize(requested)
             val opened = mutableListOf<DirectoryStream<Path>>()
             val workspaceStream = Files.newDirectoryStream(workspace)
             opened += workspaceStream
+            val secureWorkspaceStream = workspaceStream as? SecureDirectoryStream<Path>
+            if (secureWorkspaceStream == null) {
+                opened.asReversed().forEach { stream -> runCatching { stream.close() } }
+                CanonicalNioWorkspaceAccess.listDirectory(
+                    workspace,
+                    workspace.relativize(requested).toString().ifBlank { "." },
+                )
+                return SafeWorkspaceTraversal(
+                    root = null,
+                    openedStreams = emptyList(),
+                    fallbackWorkspaceRoot = workspace,
+                    fallbackDirectory = requested,
+                    protectRootMetadata = relative.toString().isBlank(),
+                    displayName = requested.fileName?.toString() ?: workspace.fileName.toString(),
+                )
+            }
             try {
-                @Suppress("UNCHECKED_CAST")
-                var current =
-                    workspaceStream as? SecureDirectoryStream<Path>
-                        ?: error("secure workspace traversal is unavailable on this filesystem")
+                var current: SecureDirectoryStream<Path> = requireNotNull(secureWorkspaceStream)
                 if (relative.toString().isNotBlank()) {
                     relative.forEach { segment ->
                         val next = current.newDirectoryStream(segment, NOFOLLOW_LINKS)
@@ -207,6 +330,8 @@ private class SafeWorkspaceTraversal private constructor(
                 return SafeWorkspaceTraversal(
                     root = current,
                     openedStreams = opened,
+                    fallbackWorkspaceRoot = null,
+                    fallbackDirectory = null,
                     protectRootMetadata = relative.toString().isBlank(),
                     displayName = requested.fileName?.toString() ?: workspace.fileName.toString(),
                 )
@@ -242,6 +367,14 @@ data class DirectoryTreeArgs(
     val path: String = ".",
     @property:LLMDescription("Maximum depth to recurse. Default 3.")
     val maxDepth: Int = 3,
+    @property:LLMDescription("Include every selected file root when listing the main workspace. Default true.")
+    val includeSelectedRoots: Boolean = true,
+)
+
+@Serializable
+data class WorkspaceRootsArgs(
+    @property:LLMDescription("Include read/write permissions in the result.")
+    val includePermissions: Boolean = true,
 )
 
 @Serializable
@@ -268,26 +401,37 @@ data class CodeGrepArgs(
 
 // ── Tools ────────────────────────────────────────────────────────────
 
+class WorkspaceRootsTool(
+    private val fileAccess: SandboxPolicyFileAccess,
+) : SimpleTool<WorkspaceRootsArgs>(
+        argsType = typeToken<WorkspaceRootsArgs>(),
+        name = "workspace_roots",
+        description = "List the main workspace and additional folders available to file tools. Use this before file operations when no path was supplied.",
+    ) {
+    override suspend fun execute(args: WorkspaceRootsArgs): String = fileAccess.describeRoots(args.includePermissions)
+}
+
 class FileDeleteTool(
     private val workDir: String,
-    private val mutator: SecureJvmWorkspaceFileMutator?,
+    private val mutator: WorkspaceFileMutator?,
 ) : SimpleTool<FileDeleteArgs>(
         argsType = typeToken<FileDeleteArgs>(),
         name = "file_delete",
         description = "Delete a file or directory. Use recursive=true for non-empty directories.",
     ) {
     override suspend fun execute(args: FileDeleteArgs): String {
+        val path = projectScopedPath(args.path)
         val secureMutator =
             mutator
                 ?: return "[ERROR] Secure workspace mutations are unavailable"
         return try {
-            when (secureMutator.delete(args.path, args.recursive)) {
-                SecureDeletedEntry.FILE -> "Deleted file: ${args.path}"
-                SecureDeletedEntry.EMPTY_DIRECTORY -> "Deleted empty directory: ${args.path}"
-                SecureDeletedEntry.RECURSIVE_DIRECTORY -> "Deleted directory recursively: ${args.path}"
+            when (secureMutator.delete(path, args.recursive)) {
+                SecureDeletedEntry.FILE -> "Deleted file: $path"
+                SecureDeletedEntry.EMPTY_DIRECTORY -> "Deleted empty directory: $path"
+                SecureDeletedEntry.RECURSIVE_DIRECTORY -> "Deleted directory recursively: $path"
             }
         } catch (_: DirectoryNotEmptyException) {
-            "[ERROR] Directory not empty: ${args.path}"
+            "[ERROR] Directory not empty: $path"
         } catch (e: Exception) {
             "[ERROR] Delete failed: ${e.message}"
         }
@@ -296,19 +440,21 @@ class FileDeleteTool(
 
 class FileMoveTool(
     private val workDir: String,
-    private val mutator: SecureJvmWorkspaceFileMutator?,
+    private val mutator: WorkspaceFileMutator?,
 ) : SimpleTool<FileMoveArgs>(
         argsType = typeToken<FileMoveArgs>(),
         name = "file_move",
         description = "Move or rename a file or directory.",
     ) {
     override suspend fun execute(args: FileMoveArgs): String {
+        val source = projectScopedPath(args.source)
+        val destination = projectScopedPath(args.destination)
         val secureMutator =
             mutator
                 ?: return "[ERROR] Secure workspace mutations are unavailable"
         return try {
-            secureMutator.move(args.source, args.destination)
-            "Moved ${args.source} → ${args.destination}"
+            secureMutator.move(source, destination)
+            "Moved $source → $destination"
         } catch (e: Exception) {
             "[ERROR] Move failed: ${e.message}"
         }
@@ -317,20 +463,48 @@ class FileMoveTool(
 
 class DirectoryTreeTool(
     private val workDir: String,
+    private val directoryResolver: WorkspaceDirectoryResolver? = null,
 ) : SimpleTool<DirectoryTreeArgs>(
         argsType = typeToken<DirectoryTreeArgs>(),
         name = "directory_tree",
-        description = "Show directory tree structure with configurable depth.",
+        description = "Show a directory tree. Call workspace_roots first when the user did not provide a path.",
     ) {
     override suspend fun execute(args: DirectoryTreeArgs): String =
         try {
-            SafeWorkspaceTraversal.open(workDir, args.path).use { traversal ->
-                val output = StringBuilder().appendLine(traversal.displayName + "/")
-                renderNodes(traversal.snapshot(args.maxDepth), "", output)
-                output.toString()
+            val path = projectScopedPath(args.path)
+            val policyAccess = directoryResolver as? SandboxPolicyFileAccess
+            val roots =
+                if (
+                    args.includeSelectedRoots &&
+                    policyAccess != null &&
+                    policyAccess.isWorkspacePath(path)
+                ) {
+                    policyAccess.readableRoots()
+                } else {
+                    emptyList()
+                }
+            if (roots.size > 1) {
+                roots.joinToString("\n") { root -> renderTraversal(SafeWorkspaceTraversal.openAbsolute(root), args.maxDepth, root) }
+            } else {
+                openTraversal(path).use { traversal -> renderTraversal(traversal, args.maxDepth) }
             }
         } catch (e: Exception) {
             "[ERROR] Directory traversal failed: ${e.message}"
+        }
+
+    private fun openTraversal(path: String): SafeWorkspaceTraversal =
+        directoryResolver?.let { SafeWorkspaceTraversal.openAbsolute(it.resolve(path)) }
+            ?: SafeWorkspaceTraversal.open(workDir, path)
+
+    private fun renderTraversal(
+        traversal: SafeWorkspaceTraversal,
+        maxDepth: Int,
+        heading: String = traversal.displayName,
+    ): String =
+        traversal.use {
+            val output = StringBuilder().appendLine("$heading/")
+            renderNodes(it.snapshot(maxDepth), "", output)
+            output.toString()
         }
 
     private fun renderNodes(
@@ -364,6 +538,7 @@ class DirectoryTreeTool(
 
 class FileSearchTool(
     private val workDir: String,
+    private val directoryResolver: WorkspaceDirectoryResolver? = null,
 ) : SimpleTool<FileSearchArgs>(
         argsType = typeToken<FileSearchArgs>(),
         name = "file_search",
@@ -371,8 +546,9 @@ class FileSearchTool(
     ) {
     override suspend fun execute(args: FileSearchArgs): String =
         try {
+            val path = projectScopedPath(args.path)
             val results =
-                SafeWorkspaceTraversal.open(workDir, args.path).use { traversal ->
+                openTraversal(path).use { traversal ->
                     traversal.search(args.pattern, args.maxResults)
                 }
             if (results.isEmpty()) {
@@ -383,10 +559,15 @@ class FileSearchTool(
         } catch (e: Exception) {
             "[ERROR] File search failed: ${e.message}"
         }
+
+    private fun openTraversal(path: String): SafeWorkspaceTraversal =
+        directoryResolver?.let { SafeWorkspaceTraversal.openAbsolute(it.resolve(path)) }
+            ?: SafeWorkspaceTraversal.open(workDir, path)
 }
 
 class CodeGrepTool(
     private val workDir: String,
+    private val directoryResolver: WorkspaceDirectoryResolver? = null,
 ) : SimpleTool<CodeGrepArgs>(
         argsType = typeToken<CodeGrepArgs>(),
         name = "code_grep",
@@ -394,6 +575,7 @@ class CodeGrepTool(
     ) {
     override suspend fun execute(args: CodeGrepArgs): String =
         try {
+            val path = projectScopedPath(args.path)
             val regex =
                 try {
                     Regex(args.pattern, RegexOption.IGNORE_CASE)
@@ -409,7 +591,7 @@ class CodeGrepTool(
                 }
             val binaryExtensions = setOf("png", "jpg", "jpeg", "gif", "zip", "jar", "class", "exe", "dll", "so", "pdf")
             val results =
-                SafeWorkspaceTraversal.open(workDir, args.path).use { traversal ->
+                openTraversal(path).use { traversal ->
                     traversal.grep(regex, includeRegex, binaryExtensions, args.maxResults)
                 }
             if (results.isEmpty()) {
@@ -421,4 +603,8 @@ class CodeGrepTool(
             logger.debug(e) { "Secure code search failed" }
             "[ERROR] Code search failed: ${e.message}"
         }
+
+    private fun openTraversal(path: String): SafeWorkspaceTraversal =
+        directoryResolver?.let { SafeWorkspaceTraversal.openAbsolute(it.resolve(path)) }
+            ?: SafeWorkspaceTraversal.open(workDir, path)
 }

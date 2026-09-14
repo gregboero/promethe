@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="HarnessCompletionLoopTest[jvm]" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-07T17:08:26.703Z" hostname="BUREAU" time="2.798">
+  <properties/>
+  <testcase name="native clarification also respects explicit completion contract[jvm]" classname="dev.promethe.core.HarnessCompletionLoopTest" time="0.889"/>
+  <testcase name="ordinary tasks keep optional validation disabled[jvm]" classname="dev.promethe.core.HarnessCompletionLoopTest" time="0.312"/>
+  <testcase name="iteration exhaustion cannot end a guarded task successfully[jvm]" classname="dev.promethe.core.HarnessCompletionLoopTest" time="0.358"/>
+  <testcase name="complete wrong values pass completion independently of correctness[jvm]" classname="dev.promethe.core.HarnessCompletionLoopTest" time="0.32"/>
+  <testcase name="partial final fails before success and synthesis despite three successful tools[jvm]" classname="dev.promethe.core.HarnessCompletionLoopTest" time="0.315"/>
+  <testcase name="empty final fails without retry[jvm]" classname="dev.promethe.core.HarnessCompletionLoopTest" time="0.301"/>
+  <testcase name="clarification cannot bypass an explicit completion contract[jvm]" classname="dev.promethe.core.HarnessCompletionLoopTest" time="0.302"/>
+  <system-out><![CDATA[kotlin-logging: initializing... active logger factory: Slf4jLoggerFactory
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

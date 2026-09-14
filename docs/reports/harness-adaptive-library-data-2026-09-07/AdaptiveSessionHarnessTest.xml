@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="AdaptiveSessionHarnessTest[jvm]" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-09-07T23:13:15.385Z" hostname="BUREAU" time="2.152">
+  <properties/>
+  <testcase name="cancelled evaluation closes isolated runner session and never publishes[jvm]" classname="dev.promethe.core.AdaptiveSessionHarnessTest" time="0.065"/>
+  <testcase name="normal path needs distinct large observations contract work and allowance[jvm]" classname="dev.promethe.core.AdaptiveSessionHarnessTest" time="0.132"/>
+  <testcase name="project runtime and trust boundaries prevent reuse[jvm]" classname="dev.promethe.core.AdaptiveSessionHarnessTest" time="0.178"/>
+  <testcase name="activation failure invalidates published version before any transformed observation[jvm]" classname="dev.promethe.core.AdaptiveSessionHarnessTest" time="0.149"/>
+  <testcase name="new session reuses durable source after reopening and revalidates before activation[jvm]" classname="dev.promethe.core.AdaptiveSessionHarnessTest" time="0.292"/>
+  <testcase name="process restart does not restore active task contract[jvm]" classname="dev.promethe.core.AdaptiveSessionHarnessTest" time="0.145"/>
+  <testcase name="heldout regression rejects memorized fixtures and blocks activation[jvm]" classname="dev.promethe.core.AdaptiveSessionHarnessTest" time="0.076"/>
+  <testcase name="cancelled revalidation cannot retain previous activation permission[jvm]" classname="dev.promethe.core.AdaptiveSessionHarnessTest" time="0.158"/>
+  <testcase name="invalidation is visible across active sessions and restoration creates new evidence[jvm]" classname="dev.promethe.core.AdaptiveSessionHarnessTest" time="0.19"/>
+  <testcase name="timeout invalidates reusable version and original survives[jvm]" classname="dev.promethe.core.AdaptiveSessionHarnessTest" time="0.195"/>
+  <testcase name="remaining observation allowance stops applying adaptation[jvm]" classname="dev.promethe.core.AdaptiveSessionHarnessTest" time="0.355"/>
+  <testcase name="unknown format stays unchanged and runtime semantic regression invalidates catalog entry[jvm]" classname="dev.promethe.core.AdaptiveSessionHarnessTest" time="0.215"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

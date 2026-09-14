@@ -1,0 +1,1 @@
+{"experiment":"ten-skills-local-vs-koog","localCatalogChars":188,"koogCatalogChars":930,"koogDiscovered":10,"localExecutable":9,"decision":"Keep the local loader: both support metadata context, and Koog discovery alone includes quarantined skills","limits":"Serialization differs; character counts are not tokenizer measurements or model-quality scores"}

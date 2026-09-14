@@ -26,7 +26,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import dev.promethe.api.SessionInfo
-import dev.promethe.app.network.PrometheClient
+import dev.promethe.api.ProjectInfo
 import dev.promethe.app.util.formatDateTime
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
@@ -37,10 +37,10 @@ private val logger = io.github.oshai.kotlinlogging.KotlinLogging.logger {}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SessionsScreen(
-    client: PrometheClient,
+    viewModel: SessionsViewModel,
     onSessionSelected: (String) -> Unit,
+    onManageProjects: () -> Unit = {},
 ) {
-    val viewModel = remember { SessionsViewModel(client) }
     val state by viewModel.state.collectAsState()
     val colors = MaterialTheme.colorScheme
 
@@ -64,10 +64,22 @@ fun SessionsScreen(
                                 ),
                         )
                     } else {
-                        Text(stringResource(Res.string.sessions_title), style = MaterialTheme.typography.headlineSmall)
+                        Column {
+                            Text(stringResource(Res.string.sessions_title), style = MaterialTheme.typography.headlineSmall)
+                            state.activeProject?.let { project ->
+                                Text(
+                                    project.name,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = colors.primary,
+                                )
+                            }
+                        }
                     }
                 },
                 actions = {
+                    IconButton(onClick = onManageProjects) {
+                        Icon(Icons.Default.FolderOpen, contentDescription = stringResource(Res.string.projects_manage))
+                    }
                     IconButton(onClick = { viewModel.toggleSearch() }) {
                         Icon(
                             if (state.isSearchActive) Icons.Default.Close else Icons.Default.Search,
@@ -160,6 +172,8 @@ fun SessionsScreen(
                                 onDelete = {
                                     viewModel.deleteSession(session.id)
                                 },
+                                projects = state.projects,
+                                onAssignProject = { projectId -> viewModel.assignSessionProject(session.id, projectId) },
                             )
                         }
                     }
@@ -175,6 +189,8 @@ private fun SwipeToDeleteSessionCard(
     session: SessionInfo,
     onClick: () -> Unit,
     onDelete: () -> Unit,
+    projects: List<ProjectInfo>,
+    onAssignProject: (String?) -> Unit,
 ) {
     val colors = MaterialTheme.colorScheme
 
@@ -227,7 +243,12 @@ private fun SwipeToDeleteSessionCard(
         },
         enableDismissFromStartToEnd = false,
     ) {
-        SessionCard(session = session, onClick = onClick)
+        SessionCard(
+            session = session,
+            onClick = onClick,
+            projects = projects,
+            onAssignProject = onAssignProject,
+        )
     }
 }
 
@@ -235,8 +256,12 @@ private fun SwipeToDeleteSessionCard(
 private fun SessionCard(
     session: SessionInfo,
     onClick: () -> Unit,
+    projects: List<ProjectInfo>,
+    onAssignProject: (String?) -> Unit,
 ) {
     val colors = MaterialTheme.colorScheme
+    var showProjectMenu by remember { mutableStateOf(false) }
+    val project = projects.find { it.id == session.projectId }
     val cardDesc = stringResource(Res.string.sessions_card_description, session.title ?: session.id.take(12))
     Card(
         modifier =
@@ -276,6 +301,15 @@ private fun SessionCard(
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.onSurfaceVariant,
                 )
+                project?.let {
+                    Text(
+                        text = it.name,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = colors.primary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
             }
             if (session.messageCount > 0) {
                 Badge(
@@ -283,6 +317,38 @@ private fun SessionCard(
                     contentColor = colors.onPrimaryContainer,
                 ) {
                     Text("${session.messageCount}")
+                }
+            }
+            Box {
+                IconButton(onClick = { showProjectMenu = true }) {
+                    Icon(Icons.Default.MoreVert, contentDescription = stringResource(Res.string.projects_assign))
+                }
+                DropdownMenu(
+                    expanded = showProjectMenu,
+                    onDismissRequest = { showProjectMenu = false },
+                ) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(Res.string.projects_unassigned)) },
+                        leadingIcon = {
+                            if (session.projectId == null) Icon(Icons.Default.Check, contentDescription = null)
+                        },
+                        onClick = {
+                            showProjectMenu = false
+                            onAssignProject(null)
+                        },
+                    )
+                    projects.forEach { candidate ->
+                        DropdownMenuItem(
+                            text = { Text(candidate.name) },
+                            leadingIcon = {
+                                if (session.projectId == candidate.id) Icon(Icons.Default.Check, contentDescription = null)
+                            },
+                            onClick = {
+                                showProjectMenu = false
+                                onAssignProject(candidate.id)
+                            },
+                        )
+                    }
                 }
             }
         }

@@ -1,31 +1,37 @@
 # ── Stage 1: Build ──────────────────────────────────────────
-FROM eclipse-temurin:21-jdk-alpine AS builder
+FROM eclipse-temurin:21-jdk-alpine@sha256:6ea5548706b60ac0a602eaf48af74792cbab012d90e811ca8db6184b16b5c3d6 AS builder
 
 WORKDIR /build
 RUN apk add --no-cache cargo musl-dev rust
 
 # Cache Gradle wrapper
-COPY gradlew settings.gradle.kts build.gradle.kts gradle.properties ./
+COPY gradlew settings.gradle.kts settings-gradle.lockfile build.gradle.kts gradle.properties ./
 COPY gradle/ gradle/
 RUN chmod +x gradlew && ./gradlew --version --no-daemon
 
 # Cache dependencies
-COPY api/build.gradle.kts api/
-COPY shared/build.gradle.kts shared/
-COPY gateway/build.gradle.kts gateway/
-COPY composeApp/build.gradle.kts composeApp/
-RUN ./gradlew :gateway:dependencies --no-daemon || true
+COPY api/build.gradle.kts api/gradle.lockfile api/
+COPY shared/build.gradle.kts shared/gradle.lockfile shared/
+COPY gateway/build.gradle.kts gateway/gradle.lockfile gateway/
+COPY composeApp/build.gradle.kts composeApp/gradle.lockfile composeApp/
+COPY evals/build.gradle.kts evals/gradle.lockfile evals/
+COPY androidApp/build.gradle.kts androidApp/
+COPY web-tooling/ web-tooling/
+COPY kotlin-js-store/ kotlin-js-store/
+RUN ./gradlew -PenableAndroid=false :gateway:dependencies --no-daemon
 
 # Copy sources and build
 COPY api/ api/
 COPY shared/ shared/
 COPY gateway/ gateway/
 COPY composeApp/ composeApp/
+COPY evals/ evals/
+COPY androidApp/ androidApp/
 COPY sandbox-native/ sandbox-native/
-RUN ./gradlew :gateway:shadowJar :composeApp:wasmJsBrowserDistribution --no-daemon -x test
+RUN ./gradlew -PenableAndroid=false :gateway:shadowJar :composeApp:wasmJsBrowserDistribution --no-daemon -x test
 
 # ── Stage 2: Runtime ────────────────────────────────────────
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:21-jre-alpine@sha256:974b08960c5d96694c780e65b2d5705268ab1e1ca1a0dd0caf4ba6c3fe34d699
 
 # Security: run as non-root
 RUN apk add --no-cache bubblewrap coreutils git nodejs python3 ripgrep \

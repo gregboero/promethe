@@ -31,6 +31,7 @@ private data class ApprovalPendingItem(
     val argsDigest: String,
     val fingerprint: String,
     val sessionId: String,
+    val persistentAllowed: Boolean,
     val createdAt: Long,
 )
 
@@ -63,6 +64,7 @@ fun Route.approvalRoutes(approvalGate: ToolApprovalGate?) {
             call.respond(mapOf("error" to "Approval gate not enabled (mode=auto)"))
             return@get
         }
+        val localOwner = AuthMiddleware.isLocalApiKeyAuthentication(call)
         val pending =
             gate.listPending().map { req ->
                 ApprovalPendingItem(
@@ -72,6 +74,7 @@ fun Route.approvalRoutes(approvalGate: ToolApprovalGate?) {
                     argsDigest = req.argsDigest,
                     fingerprint = req.fingerprint,
                     sessionId = req.sessionId,
+                    persistentAllowed = req.persistentAllowed && localOwner,
                     createdAt = req.createdAt,
                 )
             }
@@ -98,6 +101,18 @@ fun Route.approvalRoutes(approvalGate: ToolApprovalGate?) {
         }
         val expiresInMs = body["expiresInMs"]?.jsonPrimitive?.longOrNull
         val localOwner = AuthMiddleware.isLocalApiKeyAuthentication(call)
+        val localOnlyApproval =
+            gate.listPending()
+                .firstOrNull { request -> request.id == requestId }
+                ?.toolName
+                ?.let(ToolApprovalGate::requiresLocalOwner) == true
+        if (approved && localOnlyApproval && !localOwner) {
+            call.respond(
+                HttpStatusCode.Forbidden,
+                ApprovalActionResponse(false, error = "Local coding-agent approval requires the local desktop owner"),
+            )
+            return@post
+        }
         when (gate.respond(requestId, approved, scope, expiresInMs, localOwner)) {
             ToolApprovalGate.ResponseResult.ACCEPTED -> {
                 call.respond(ApprovalActionResponse(true, if (approved) "approved" else "rejected", scope.name))
@@ -107,15 +122,32 @@ fun Route.approvalRoutes(approvalGate: ToolApprovalGate?) {
                 call.respond(HttpStatusCode.NotFound, ApprovalActionResponse(false, error = "Approval request not found"))
             }
 
+            ToolApprovalGate.ResponseResult.LOCAL_OWNER_REQUIRED -> {
+                call.respond(
+                    HttpStatusCode.Forbidden,
+                    ApprovalActionResponse(false, error = "This approval requires the local desktop owner"),
+                )
+            }
+
             ToolApprovalGate.ResponseResult.PERSISTENT_REQUIRES_LOCAL_OWNER -> {
                 call.respond(
                     HttpStatusCode.Forbidden,
-                    ApprovalActionResponse(false, error = "Persistent approval requires the local loopback owner key"),
+                    ApprovalActionResponse(
+                        false,
+                        error = "Persistent approval is limited to exact configuration changes by the local owner",
+                    ),
                 )
             }
 
             ToolApprovalGate.ResponseResult.INVALID_EXPIRATION -> {
                 call.respond(HttpStatusCode.BadRequest, ApprovalActionResponse(false, error = "Invalid approval expiration"))
+            }
+
+            ToolApprovalGate.ResponseResult.PERSISTENCE_FAILED -> {
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    ApprovalActionResponse(false, error = "Persistent approval could not be stored"),
+                )
             }
         }
     }
@@ -162,6 +194,13 @@ fun Route.approvalRoutes(approvalGate: ToolApprovalGate?) {
                 call.respond(
                     HttpStatusCode.Forbidden,
                     ApprovalActionResponse(false, error = "Persistent approval revocation requires the local loopback owner key"),
+                )
+            }
+
+            ToolApprovalGate.RevocationResult.PERSISTENCE_FAILED -> {
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    ApprovalActionResponse(false, error = "Persistent approval could not be revoked"),
                 )
             }
         }

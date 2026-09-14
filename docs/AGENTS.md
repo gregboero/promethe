@@ -1,5 +1,7 @@
 # AI Agent Guide — Internal Architecture
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 > Technical documentation of the Prométhé agent engine: PRA loop, tools, memory, resilience and self-evolution.
 
 ## Overview
@@ -75,7 +77,7 @@ At each iteration, the agent loads:
 | **Skills** | `skillLoader.findRelevantSkills()` | Relevant skills by keyword |
 | **FTS5** | `database.searchMessages()` | Semantic history (5 results) |
 | **Project context** | `ContextFileLoader.loadContextFiles()` | .promethe.md, SOUL.md, AGENTS.md |
-| **Checkpoint** | `database.getLatestCheckpoint()` | Resume after crash |
+| **Session checkpoint** | `database.getLatestCheckpoint()` | Explicit session snapshot and rollback |
 
 ### 3. Reasoning (LLM)
 

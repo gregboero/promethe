@@ -1,5 +1,7 @@
 # Agent-to-Agent (A2A / ACP)
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 ## Overview
 
 Promethe treats every agent in the system — the main agent, dynamically-created sub-agents,

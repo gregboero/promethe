@@ -1,6 +1,7 @@
 package dev.promethe.core
 
 import ai.koog.prompt.Prompt
+import ai.koog.prompt.executor.clients.anthropic.AnthropicCacheControl
 import ai.koog.prompt.executor.clients.anthropic.AnthropicModels
 import ai.koog.prompt.executor.clients.deepseek.DeepSeekLLMClient
 import ai.koog.prompt.executor.clients.google.GoogleModels
@@ -25,11 +26,12 @@ import kotlinx.coroutines.sync.withLock
 open class KoogLlmAdapter(
     protected val config: AgentConfig,
     private val database: PrometheDatabaseApi? = null,
+    private val resourceGovernors: ResourceGovernorRegistry = GlobalResourceGovernorRegistry,
+    private var executor: MultiLLMPromptExecutor? = null,
 ) {
     private val logger = Log.create("KoogLlmAdapter")
 
     // Legacy single executor (for backward compat when router is not set)
-    private var executor: MultiLLMPromptExecutor? = null
     private var pricingClient: io.ktor.client.HttpClient? = null
     private var pricingService: ModelPricingService? = null
     private var apiKeys: Map<String, String> = emptyMap()
@@ -60,19 +62,7 @@ open class KoogLlmAdapter(
     private var totalRequests = 0
     private var totalCost = 0.0
 
-    // ── Prompt cache: hash(systemPrompt) → pre-built Prompt object ──
-    // Reduces overhead when the same system prompt is reused across requests.
-    private data class CachedPrompt(
-        val hash: String,
-        val prompt: Prompt,
-        val lastUsed: Long,
-    )
-
-    private val promptCache = LinkedHashMap<String, CachedPrompt>(16, 0.75f, true)
-    private val promptCacheMutex = Mutex()
-    private val maxCacheSize = 32
-    private var promptCacheHits = 0L
-    private var promptCacheMisses = 0L
+    private val prefixCacheTelemetry = PrefixCacheTelemetry()
 
     /**
      * Legacy initialization — single executor mode.
@@ -234,10 +224,40 @@ open class KoogLlmAdapter(
         provider: String,
         model: String,
     ) {
-        currentProvider = provider
-        currentModel = model
+        val canonicalProvider = dev.promethe.api.ProviderRegistry.canonicalKey(provider)
+        val resolvedModel = resolveModel(canonicalProvider, model)
+        currentProvider = canonicalProvider
+        currentModel = resolvedModel
         // Note: the router executor will be resolved on the next LLM call via completeWithProfile().
         // No need to pre-warm here — the router.getExecutor() is suspend and would require a coroutine.
+    }
+
+    internal fun resolveModel(
+        provider: String,
+        requestedModel: String?,
+    ): String {
+        val canonicalProvider = dev.promethe.api.ProviderRegistry.canonicalKey(provider)
+        val providerInfo =
+            requireNotNull(dev.promethe.api.ProviderRegistry.get(canonicalProvider)) {
+                "Unsupported provider: $provider"
+            }
+        return requestedModel
+            ?.trim()
+            ?.takeIf { it.isNotEmpty() }
+            ?: currentModel
+                .trim()
+                .takeIf {
+                    it.isNotEmpty() &&
+                        dev.promethe.api.ProviderRegistry.canonicalKey(currentProvider) == canonicalProvider
+                }
+            ?: config.modelName
+                .trim()
+                .takeIf {
+                    it.isNotEmpty() &&
+                        dev.promethe.api.ProviderRegistry.canonicalKey(config.provider) == canonicalProvider
+                }
+            ?: providerInfo.defaultModel.trim().takeIf { it.isNotEmpty() }
+            ?: throw IllegalArgumentException("A model is required for provider '$canonicalProvider'")
     }
 
     /**
@@ -269,6 +289,7 @@ open class KoogLlmAdapter(
         reasoningEffort: ReasoningEffort = config.reasoningEffort,
     ): LlmResponse {
         val canonicalProvider = dev.promethe.api.ProviderRegistry.canonicalKey(provider)
+        val resolvedModel = resolveModel(canonicalProvider, model)
         val exec =
             if (router != null) {
                 router!!.getExecutor(canonicalProvider)
@@ -278,7 +299,7 @@ open class KoogLlmAdapter(
         return executeCompletion(
             exec = exec,
             provider = canonicalProvider,
-            model = model,
+            model = resolvedModel,
             temperature = temperature,
             systemPrompt = systemPrompt,
             messages = messages,
@@ -306,9 +327,19 @@ open class KoogLlmAdapter(
             setAttribute("gen_ai.request.model", model)
             setAttribute("gen_ai.request.temperature", temperature)
             setAttribute("gen_ai.request.message_count", messages.size)
+            context?.runId?.let { setAttribute("promethe.run.id", it) }
+            context?.parentRunId?.let { setAttribute("promethe.run.parent_id", it) }
+            context?.stepId?.let { setAttribute("promethe.step.id", it) }
 
-            // Build prompt (with system prompt caching)
-            val prompt = buildCachedPrompt(systemPrompt, messages, pendingToolTurn)
+            val prepared =
+                preparePrompt(
+                    provider = provider,
+                    model = model,
+                    systemPrompt = systemPrompt,
+                    messages = messages,
+                    tools = tools,
+                    pendingToolTurn = pendingToolTurn,
+                )
 
             // ── Build LLModel ────────────────────────────────────────
             // CRITICAL: For Anthropic, we MUST use the pre-defined SDK model objects
@@ -316,15 +347,19 @@ open class KoogLlmAdapter(
             // (data class equality). A custom LLModel with the same id but different
             // capabilities/contextLength won’t match and causes “Unsupported model”.
             val llModel = resolveKnownModel(provider, model, config.xaiApiMode)
-            val providerPrompt = applyProviderParams(prompt, provider, context, reasoningEffort)
+            val providerPrompt = applyProviderParams(prepared.prompt, provider, context, reasoningEffort, llModel)
 
             // ── Execute with 2-level fallback chain ──────────────────────
             // Level 1: same provider, known-good model
             // Level 2: cross-provider safety net (Google gemini-3.1-flash-lite)
             var usedFallback: FallbackModel? = null
+            var usedPrefix = prepared.prefix
+            var reusedPrefix = prepared.reusedPrefix
             val assistantMessage = try {
-                exec.execute(providerPrompt, llModel, tools)
+                admitLlmCall(context, provider)
+                exec.execute(providerPrompt, llModel, prepared.tools)
             } catch (e: Exception) {
+                if (e is kotlinx.coroutines.CancellationException || (e is AgentExecutionException && e.code.startsWith("resource_budget_"))) throw e
                 val msg = e.message.orEmpty()
                 logger.error { "LLM execute failed [provider=$provider, model=$model]: $msg" }
 
@@ -358,12 +393,26 @@ open class KoogLlmAdapter(
                         exec
                     }
                     val fbModel = resolveKnownModel(fb.provider, fb.model, config.xaiApiMode)
-                    val fallbackPrompt = applyProviderParams(prompt, fb.provider, context, reasoningEffort)
+                    val fallbackPrepared =
+                        preparePrompt(
+                            provider = fb.provider,
+                            model = fb.model,
+                            systemPrompt = systemPrompt,
+                            messages = messages,
+                            tools = tools,
+                            pendingToolTurn = pendingToolTurn,
+                        )
+                    val fallbackPrompt =
+                        applyProviderParams(fallbackPrepared.prompt, fb.provider, context, reasoningEffort, fbModel)
                     try {
-                        lastResult = fbExec.execute(fallbackPrompt, fbModel, tools)
+                        admitLlmCall(context, fb.provider)
+                        lastResult = fbExec.execute(fallbackPrompt, fbModel, fallbackPrepared.tools)
                         usedFallback = fb
+                        usedPrefix = fallbackPrepared.prefix
+                        reusedPrefix = fallbackPrepared.reusedPrefix
                         break
                     } catch (e2: Exception) {
+                        if (e2 is kotlinx.coroutines.CancellationException || (e2 is AgentExecutionException && e2.code.startsWith("resource_budget_"))) throw e2
                         logger.warn { "Fallback failed [${fb.provider}/${fb.model}]: ${e2.message}" }
                     }
                 }
@@ -391,6 +440,8 @@ open class KoogLlmAdapter(
             val meta = assistantMessage.metaInfo
             val pTokens = meta.inputTokensCount ?: 0
             val cTokens = meta.outputTokensCount ?: 0
+            val cacheUsage = providerCacheUsage(meta, assistantMessage.rawResponse)
+            prefixCacheTelemetry.recordProviderUsage(cacheUsage)
 
             // Dynamic pricing lookup
             val providerKey = apiKeys[actualProvider.lowercase()] ?: apiKeys["openrouter"] ?: ""
@@ -399,6 +450,9 @@ open class KoogLlmAdapter(
                     ?: ModelPricingService.KNOWN_PRICING[actualModel]
                     ?: ModelPricingService.DEFAULT_PRICING
             val cost = (pTokens / 1_000_000.0) * pRate + (cTokens / 1_000_000.0) * cRate
+            context?.runId?.let { runId ->
+                resourceGovernors.governorForRun(runId)?.recordLlmUsage((pTokens + cTokens).toLong(), cost)
+            }
 
             // Track stats (thread-safe)
             statsMutex.withLock {
@@ -429,6 +483,11 @@ open class KoogLlmAdapter(
             setAttribute("gen_ai.usage.completion_tokens", cTokens)
             setAttribute("gen_ai.response.model", actualModel)
             setAttribute("gen_ai.usage.cost", cost)
+            setAttribute("promethe.prompt.prefix_sha256", usedPrefix.fingerprint)
+            setAttribute("promethe.prompt.prefix_bytes", usedPrefix.bytes.toLong())
+            setAttribute("promethe.prompt.prefix_reused", reusedPrefix)
+            cacheUsage.readTokens?.let { setAttribute("gen_ai.usage.cached_input_tokens", it) }
+            cacheUsage.writeTokens?.let { setAttribute("gen_ai.usage.cache_write_tokens", it) }
 
             LlmResponse(
                 content = content,
@@ -442,13 +501,34 @@ open class KoogLlmAdapter(
             )
         }
 
+    private suspend fun admitLlmCall(
+        context: LlmRequestContext?,
+        provider: String,
+    ) {
+        val admission = try {
+            resourceGovernors.admit(context?.runId, GovernedResource.LLM_CALL, ResourceQuotaScope(provider = provider))
+        } catch (cancelled: kotlinx.coroutines.CancellationException) {
+            throw cancelled
+        } catch (_: Exception) {
+            throw AgentExecutionException("resource_budget_unavailable", "Resource budget admission could not be recorded; provider call blocked")
+        }
+        if (admission is ResourceAdmission.Denied) {
+            throw AgentExecutionException("resource_budget_exceeded", admission.message())
+        }
+    }
+
     private fun applyProviderParams(
         prompt: Prompt,
         provider: String,
         context: LlmRequestContext?,
         reasoningEffort: ReasoningEffort,
+        model: LLModel,
     ): Prompt =
         when (dev.promethe.api.ProviderRegistry.canonicalKey(provider)) {
+            "openai" -> {
+                prompt.withParams(OpenAiCompatibleProviderPolicy.openAIParams(model, reasoningEffort, config.maxTokens))
+            }
+
             "kimi" -> {
                 prompt.withParams(OpenAiCompatibleProviderPolicy.kimiChatParams(context, reasoningEffort))
             }
@@ -486,20 +566,32 @@ open class KoogLlmAdapter(
         val cacheHits: Long,
         val cacheMisses: Long,
         val cacheSize: Int,
+        val cacheReadTokens: Long,
+        val cacheWriteTokens: Long,
+        val cacheObservableResponses: Long,
+        val prefixReuseHits: Long,
+        val prefixReuseMisses: Long,
     )
 
-    suspend fun getStats(): LlmStats =
-        statsMutex.withLock {
+    suspend fun getStats(): LlmStats {
+        val cache = prefixCacheTelemetry.snapshot()
+        return statsMutex.withLock {
             LlmStats(
                 totalRequests = totalRequests,
                 promptTokens = totalPromptTokens,
                 completionTokens = totalCompletionTokens,
                 totalCost = totalCost,
-                cacheHits = promptCacheHits,
-                cacheMisses = promptCacheMisses,
-                cacheSize = promptCache.size,
+                cacheHits = cache.providerHits,
+                cacheMisses = cache.providerMisses,
+                cacheSize = cache.knownPrefixes,
+                cacheReadTokens = cache.providerReadTokens,
+                cacheWriteTokens = cache.providerWriteTokens,
+                cacheObservableResponses = cache.observableResponses,
+                prefixReuseHits = cache.candidateHits,
+                prefixReuseMisses = cache.candidateMisses,
             )
         }
+    }
 
     fun getPoolStats(): Map<String, Int> = router?.getPoolStats() ?: emptyMap()
 
@@ -528,73 +620,56 @@ open class KoogLlmAdapter(
         }
     }
 
-    /**
-     * Build a prompt with system prompt caching.
-     * The system prompt is hashed; if the hash matches a cached entry,
-     * we reuse the pre-built Prompt instead of rebuilding from scratch.
-     * Messages (user/assistant) are always appended fresh.
-     */
-    private suspend fun buildCachedPrompt(
+    private data class PreparedPrompt(
+        val prompt: Prompt,
+        val tools: List<ToolDescriptor>,
+        val prefix: StablePromptPrefix,
+        val reusedPrefix: Boolean,
+    )
+
+    private suspend fun preparePrompt(
+        provider: String,
+        model: String,
         systemPrompt: String,
         messages: List<Pair<String, String>>,
+        tools: List<ToolDescriptor>,
         pendingToolTurn: PendingToolTurn? = null,
-    ): Prompt {
-        // Compute hash for cache key (system prompt only — messages change per request)
-        val hash = systemPrompt.hashCode().toString(36)
-
-        // Check cache
-        val cachedEntry =
-            promptCacheMutex.withLock {
-                promptCache[hash]
-            }
-
-        if (cachedEntry != null) {
-            // Cache hit: rebuild with same system prompt + new messages
-            promptCacheMutex.withLock { promptCacheHits++ }
-        } else {
-            promptCacheMutex.withLock { promptCacheMisses++ }
-        }
-
-        // Koog Prompt is immutable, so the message list is rebuilt while the
-        // cache tracks provider-level reuse of the stable system prefix.
-        val prompt = buildPrompt(systemPrompt, messages, pendingToolTurn)
-
-        // Update cache
-        promptCacheMutex.withLock {
-            if (promptCache.size >= maxCacheSize) {
-                // Evict oldest (LRU via access-order LinkedHashMap)
-                val oldest = promptCache.keys.firstOrNull()
-                if (oldest != null) promptCache.remove(oldest)
-            }
-            promptCache[hash] =
-                CachedPrompt(
-                    hash,
-                    prompt,
-                    kotlin.time.Clock.System
-                        .now()
-                        .toEpochMilliseconds(),
-                )
-        }
-
-        return prompt
+    ): PreparedPrompt {
+        val canonicalProvider = dev.promethe.api.ProviderRegistry.canonicalKey(provider)
+        val systemMessages = listOf(systemPrompt) + messages.filter { it.first == "system" }.map { it.second }
+        val sortedTools = tools.sortedWith(compareBy<ToolDescriptor> { it.name }.thenBy { it.description })
+        val prefix = stablePromptPrefix(canonicalProvider, model, systemMessages, sortedTools)
+        val observation = prefixCacheTelemetry.observe(prefix)
+        return PreparedPrompt(
+            prompt = buildPrompt(systemPrompt, messages, pendingToolTurn, canonicalProvider),
+            tools = preparePromptTools(canonicalProvider, sortedTools),
+            prefix = observation.prefix,
+            reusedPrefix = observation.reused,
+        )
     }
 
     internal fun buildPrompt(
         systemPrompt: String,
         messages: List<Pair<String, String>>,
         pendingToolTurn: PendingToolTurn? = null,
+        provider: String = config.provider,
     ): Prompt {
         val builder = Prompt.builder("promethe-prompt")
-        builder.system(systemPrompt)
-        for ((role, content) in messages) {
-            when (role) {
-                "user" -> builder.user(content)
-                "assistant" -> builder.assistant(content)
-                "system" -> builder.system(content)
-                else -> builder.user(content)
+        val typedTurns = pendingToolTurn?.history.orEmpty().associate { it.messageIndex to it.turn }
+        require(typedTurns.keys.all { it in messages.indices }) { "Native tool history index outside conversation" }
+        val typedStart = typedTurns.keys.minOrNull() ?: messages.size
+        val systemMessages = listOf(systemPrompt) + messages.take(typedStart).filter { it.first == "system" }.map { it.second }
+        val cacheControl =
+            if (dev.promethe.api.ProviderRegistry.canonicalKey(provider) == "anthropic") {
+                AnthropicCacheControl.Default
+            } else {
+                null
             }
+        systemMessages.forEachIndexed { index, content ->
+            builder.system(content, cache = cacheControl.takeIf { index == systemMessages.lastIndex })
         }
-        pendingToolTurn?.let { pending ->
+
+        fun appendTurn(pending: PendingToolTurn) {
             builder.message(pending.assistantMessage)
             builder.toolResult(
                 tool = pending.toolName,
@@ -603,6 +678,21 @@ open class KoogLlmAdapter(
                 isError = pending.result.startsWith("Error:", ignoreCase = true),
             )
         }
+        for ((index, pair) in messages.withIndex()) {
+            val (role, content) = pair
+            val typed = typedTurns[index]
+            if (typed != null) {
+                appendTurn(typed)
+                continue
+            }
+            when (role) {
+                "system" -> if (index >= typedStart) builder.system(content)
+                "user" -> builder.user(content)
+                "assistant" -> builder.assistant(content)
+                else -> builder.user(content)
+            }
+        }
+        if (typedTurns.isEmpty()) pendingToolTurn?.let(::appendTurn)
         return builder.build()
     }
 

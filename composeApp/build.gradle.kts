@@ -1,12 +1,24 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     kotlin("multiplatform")
-    id("com.android.application")
+    id("com.android.kotlin.multiplatform.library") apply false
     id("org.jetbrains.compose")
     id("org.jetbrains.kotlin.plugin.compose")
     kotlin("plugin.serialization")
+}
+
+val enableAndroid = providers.gradleProperty("enableAndroid").map(String::toBoolean).getOrElse(true)
+if (enableAndroid) apply(plugin = "com.android.kotlin.multiplatform.library")
+
+// These coordinates contain the host OS; one shared lockfile cannot require
+// the Windows runtime on Linux/macOS. Keep their versions strictly pinned below.
+dependencyLocking {
+    ignoredDependencies.add("org.jetbrains.compose.desktop:desktop-jvm-*")
+    ignoredDependencies.add("org.jetbrains.skiko:skiko-awt-runtime-*")
 }
 
 kotlin {
@@ -25,7 +37,15 @@ kotlin {
         binaries.executable()
     }
 
-    androidTarget()
+    if (enableAndroid) {
+        targets.withType<KotlinMultiplatformAndroidLibraryTarget>().configureEach {
+            namespace = "dev.promethe.app.shared"
+            compileSdk = 37
+            minSdk = 35
+            androidResources.enable = true
+            compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
+        }
+    }
 
     // iOS targets — only register on macOS where Xcode toolchain is available
     val isMacOs = System.getProperty("os.name").lowercase().contains("mac")
@@ -80,7 +100,7 @@ kotlin {
                 // CLI mode dependencies
                 implementation(libs.mordant)
                 implementation(libs.mordant.markdown)
-                implementation("org.jline:jline:3.27.1")
+                implementation(libs.jline)
             }
         }
         val desktopTest by getting {
@@ -93,10 +113,13 @@ kotlin {
                 implementation(libs.ktor.client.js)
             }
         }
-        val androidMain by getting {
-            dependencies {
-                implementation(libs.ktor.client.okhttp)
-                implementation("androidx.activity:activity-compose:1.9.3")
+        if (enableAndroid) {
+            val androidMain by getting {
+                dependencies {
+                    implementation(project.dependencies.platform(libs.jackson2.bom))
+                    implementation(project.dependencies.platform(libs.jackson3.bom))
+                    implementation(libs.ktor.client.okhttp)
+                }
             }
         }
         if (isMacOs) {
@@ -128,32 +151,16 @@ kotlin {
     }
 }
 
-android {
-    namespace = "dev.promethe.app"
-    compileSdk = 36
-
-    defaultConfig {
-        applicationId = "dev.promethe.app"
-        minSdk = 35
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0"
-    }
-
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            isShrinkResources = false
+dependencies {
+    constraints {
+        for (platform in listOf("linux-x64", "linux-arm64", "windows-x64", "macos-x64", "macos-arm64")) {
+            add("desktopMainImplementation", "org.jetbrains.compose.desktop:desktop-jvm-$platform") {
+                version { strictly(libs.versions.compose.multiplatform.get()) }
+            }
+            add("desktopMainImplementation", "org.jetbrains.skiko:skiko-awt-runtime-$platform") {
+                version { strictly(libs.versions.skiko.get()) }
+            }
         }
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    buildFeatures {
-        compose = true
     }
 }
 

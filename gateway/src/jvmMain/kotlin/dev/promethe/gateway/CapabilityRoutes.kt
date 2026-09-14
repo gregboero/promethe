@@ -1,6 +1,7 @@
 package dev.promethe.gateway
 
 import dev.promethe.api.CapabilityAvailability
+import dev.promethe.api.CapabilityAuthentication
 import dev.promethe.api.CapabilityDescriptor
 import dev.promethe.api.CapabilityListResponse
 import dev.promethe.api.CapabilityMaturity
@@ -12,6 +13,7 @@ import dev.promethe.core.ProviderSecretRegistry
 import dev.promethe.core.ToolApprovalPolicy
 import dev.promethe.core.ToolRegistry
 import dev.promethe.core.config.ConfigProvider
+import dev.promethe.core.coding.LocalCodingAgentService
 import dev.promethe.core.providers.Capability
 import dev.promethe.core.providers.ProviderRegistry
 import dev.promethe.gateway.voice.VoiceProviderRegistry
@@ -23,9 +25,14 @@ import io.ktor.server.routing.get
 
 fun Route.capabilityRoutes(
     providerCatalogSource: ProviderCatalogSource = staticProviderCatalogSource,
+    localCodingAgentService: LocalCodingAgentService? = null,
 ) {
     get("/api/v1/capabilities") {
-        call.respond(CapabilityListResponse(capabilities = CapabilityCatalog.snapshot(providerCatalogSource)))
+        call.respond(
+            CapabilityListResponse(
+                capabilities = CapabilityCatalog.snapshot(providerCatalogSource, localCodingAgentService),
+            ),
+        )
     }
 }
 
@@ -39,9 +46,41 @@ private val staticProviderCatalogSource =
     }
 
 private object CapabilityCatalog {
-    suspend fun snapshot(providerCatalogSource: ProviderCatalogSource): List<CapabilityDescriptor> =
-        (coreCapabilities() + llmCapabilities(providerCatalogSource) + mediaCapabilities() + voiceCapabilities() + toolCapabilities() + channelCapabilities())
+    suspend fun snapshot(
+        providerCatalogSource: ProviderCatalogSource,
+        localCodingAgentService: LocalCodingAgentService?,
+    ): List<CapabilityDescriptor> =
+        (
+            coreCapabilities() +
+                llmCapabilities(providerCatalogSource) +
+                mediaCapabilities() +
+                voiceCapabilities() +
+                localCodingAgentCapabilities(localCodingAgentService) +
+                toolCapabilities() +
+                channelCapabilities()
+        )
             .sortedWith(compareBy(CapabilityDescriptor::category, CapabilityDescriptor::id))
+
+    private fun localCodingAgentCapabilities(service: LocalCodingAgentService?): List<CapabilityDescriptor> =
+        service?.statuses().orEmpty().map { status ->
+            CapabilityDescriptor(
+                id = "integration.coding-agent.${status.kind.id}",
+                name = status.kind.displayName,
+                category = "integration.coding-agent",
+                maturity = CapabilityMaturity.BETA,
+                availability =
+                    when {
+                        !status.available -> CapabilityAvailability.DISABLED
+                        status.authentication == CapabilityAuthentication.AUTHENTICATED -> CapabilityAvailability.AVAILABLE
+                        else -> CapabilityAvailability.MISSING_CONFIGURATION
+                    },
+                platforms = listOf("desktop-windows", "desktop-macos", "desktop-linux"),
+                risk = "EXECUTE",
+                limitations = status.limitations,
+                runtimeVersion = status.version,
+                authentication = status.authentication,
+            )
+        }
 
     private suspend fun coreCapabilities(): List<CapabilityDescriptor> =
         listOf(
@@ -205,7 +244,8 @@ private object CapabilityCatalog {
 
     private suspend fun toolCapabilities(): List<CapabilityDescriptor> =
         ToolRegistry.listTools().map { tool ->
-            val risk = ToolApprovalPolicy.catalogRisk(tool.name)
+            val contract = ToolApprovalPolicy.contractFor(tool.name)
+            val risk = contract.catalogRisk
             CapabilityDescriptor(
                 id = "tool.${tool.name}",
                 name = tool.name,
@@ -213,6 +253,7 @@ private object CapabilityCatalog {
                 maturity = CapabilityMaturity.BETA,
                 availability = CapabilityAvailability.AVAILABLE,
                 risk = risk.name,
+                toolContract = contract.descriptor(),
                 limitations = if (risk.name == "READ") {
                     listOf("Tool certification is required before STABLE")
                 } else {
@@ -225,13 +266,13 @@ private object CapabilityCatalog {
         val config = ConfigProvider.get()
         val definitions = listOf(
             ChannelCatalog("telegram", "Telegram", listOf("TELEGRAM_BOT_TOKEN"), CapabilityMaturity.BETA),
-            ChannelCatalog("discord", "Discord", listOf("DISCORD_BOT_TOKEN", "DISCORD_PUBLIC_KEY"), CapabilityMaturity.BETA),
+            ChannelCatalog("discord", "Discord", listOf("DISCORD_BOT_TOKEN"), CapabilityMaturity.BETA),
             ChannelCatalog("slack", "Slack", listOf("SLACK_BOT_TOKEN", "SLACK_SIGNING_SECRET"), CapabilityMaturity.BETA),
             ChannelCatalog("whatsapp", "WhatsApp Cloud", listOf("WHATSAPP_PHONE_NUMBER_ID", "WHATSAPP_ACCESS_TOKEN"), CapabilityMaturity.BETA),
             ChannelCatalog("signal", "Signal", listOf("SIGNAL_CLI_REST_URL", "SIGNAL_PHONE_NUMBER"), CapabilityMaturity.BETA),
             ChannelCatalog("matrix", "Matrix", listOf("MATRIX_HOMESERVER_URL", "MATRIX_ACCESS_TOKEN"), CapabilityMaturity.BETA),
             ChannelCatalog("email", "Email", listOf("EMAIL_API_KEY", "EMAIL_FROM"), CapabilityMaturity.LAB),
-            ChannelCatalog("sms", "SMS (Twilio)", listOf("TWILIO_ACCOUNT_SID", "TWILIO_AUTH_TOKEN", "TWILIO_PHONE_NUMBER"), CapabilityMaturity.LAB),
+            ChannelCatalog("sms", "SMS (Twilio)", listOf("TWILIO_ACCOUNT_SID", "TWILIO_AUTH_TOKEN", "TWILIO_PHONE_NUMBER"), CapabilityMaturity.BETA),
             ChannelCatalog("teams", "Microsoft Teams", listOf("TEAMS_APP_ID", "TEAMS_APP_PASSWORD"), CapabilityMaturity.LAB),
             ChannelCatalog("mattermost", "Mattermost", listOf("MATTERMOST_URL", "MATTERMOST_TOKEN"), CapabilityMaturity.LAB),
             ChannelCatalog("dingtalk", "DingTalk", listOf("DINGTALK_CLIENT_ID", "DINGTALK_CLIENT_SECRET"), CapabilityMaturity.LAB),

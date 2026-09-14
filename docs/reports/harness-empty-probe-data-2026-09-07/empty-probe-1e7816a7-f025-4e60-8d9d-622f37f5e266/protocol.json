@@ -1,0 +1,82 @@
+{
+  "batch": "empty-probe-1e7816a7-f025-4e60-8d9d-622f37f5e266",
+  "plannedCalls": 15,
+  "repetitions": 3,
+  "model": "gpt-5.6-terra",
+  "endpoint": "https://api.openai.com/v1/chat/completions",
+  "maxCompletionTokens": 4096,
+  "campaignCapMicroUsd": 5000000,
+  "captureCalls": 1,
+  "captureModelCalls": 0,
+  "toolExecutionEnabled": false,
+  "historicalSystemPromptWasArchived": false,
+  "variants": [
+    {
+      "name": "text_user",
+      "prompt": "Reply exactly OK.",
+      "history": null,
+      "reasoningEffort": "none"
+    },
+    {
+      "name": "text_roles",
+      "prompt": "You are a helpful assistant.",
+      "history": [
+        {
+          "role": "user",
+          "content": "Reply exactly OK."
+        }
+      ],
+      "reasoningEffort": "none"
+    },
+    {
+      "name": "json_roles",
+      "prompt": "You are a helpful assistant.",
+      "history": [
+        {
+          "role": "user",
+          "content": "Return exactly this JSON and nothing else: {\"action\":{\"tool_name\":\"json_query\",\"args\":{\"page\":0}}}"
+        }
+      ],
+      "reasoningEffort": "none"
+    },
+    {
+      "name": "reconstructed_none",
+      "prompt": "            You are Promethe Agent, a self-improving agent framework.\n\n            == CURRENT DATE & TIME ==\n            Monday 7 September 2026, 13:24\n\n            == USER PROFILE ==\n            \n\n            == PROJECT CONTEXT ==\n            No project context files found.\n\n            == SYSTEM MEMORY ==\n            \n            \n\n            == AVAILABLE TOOLS ==\n            - **json_query**: Read one numbered page (0 through 7) of this task. Returns an answer field, CSV answer column, DATA answer value, or result.value, plus optional irrelevant diagnostics. Read each page once.\n  Parameters: (page: Integer)\n\n- **execute_command**: Execute one program with literal arguments in the configured sandbox.\n  Parameters: {\"type\":\"object\",\"properties\":{\"executable\":{\"type\":\"string\"},\"arguments\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}}},\"required\":[\"executable\"]}\n\n            == LEARNED SKILLS ==\n            No learned skills match this query.\n\n            == RELEVANT HISTORY (FTS5) ==\n            No relevant history found.\n\n            You can call tools using JSON format. Output format for tool call:\n            {\n              \"action\": {\n                \"tool_name\": \"name_of_tool\",\n                \"args\": { ... }\n              }\n            }\n            If you want to reply directly to user, output standard text.\n\n            == IMPORTANT: TOOL EFFICIENCY ==\n            - When a tool returns useful results, use them immediately to answer. Do NOT call the same tool again with a rephrased query.\n            - One successful web_search is enough. Do not retry with accent variations, translations, or reformulations.\n            - If results are partial, synthesize what you have rather than searching again.",
+      "history": [
+        {
+          "role": "user",
+          "content": "Read pages 0 through 7 using json_query. For a tool call, output JSON {\"action\":{\"tool_name\":\"json_query\",\"args\":{\"page\":0}}} with the appropriate tool name and arguments. After reading all eight pages, your final answer must be only a JSON array of the eight answer values in page order. The answer is in answer or result.value, the CSV answer column, or DATA answer=. Ignore diagnostics. Accuracy and reading every page are required. Avoid unnecessary cost and delay. Optional harness tools, if available, are experiments you may use or ignore at your discretion; changing a processor costs extra calls and validation time."
+        }
+      ],
+      "reasoningEffort": "none"
+    },
+    {
+      "name": "reconstructed_default",
+      "prompt": "            You are Promethe Agent, a self-improving agent framework.\n\n            == CURRENT DATE & TIME ==\n            Monday 7 September 2026, 13:24\n\n            == USER PROFILE ==\n            \n\n            == PROJECT CONTEXT ==\n            No project context files found.\n\n            == SYSTEM MEMORY ==\n            \n            \n\n            == AVAILABLE TOOLS ==\n            - **json_query**: Read one numbered page (0 through 7) of this task. Returns an answer field, CSV answer column, DATA answer value, or result.value, plus optional irrelevant diagnostics. Read each page once.\n  Parameters: (page: Integer)\n\n- **execute_command**: Execute one program with literal arguments in the configured sandbox.\n  Parameters: {\"type\":\"object\",\"properties\":{\"executable\":{\"type\":\"string\"},\"arguments\":{\"type\":\"array\",\"items\":{\"type\":\"string\"}}},\"required\":[\"executable\"]}\n\n            == LEARNED SKILLS ==\n            No learned skills match this query.\n\n            == RELEVANT HISTORY (FTS5) ==\n            No relevant history found.\n\n            You can call tools using JSON format. Output format for tool call:\n            {\n              \"action\": {\n                \"tool_name\": \"name_of_tool\",\n                \"args\": { ... }\n              }\n            }\n            If you want to reply directly to user, output standard text.\n\n            == IMPORTANT: TOOL EFFICIENCY ==\n            - When a tool returns useful results, use them immediately to answer. Do NOT call the same tool again with a rephrased query.\n            - One successful web_search is enough. Do not retry with accent variations, translations, or reformulations.\n            - If results are partial, synthesize what you have rather than searching again.",
+      "history": [
+        {
+          "role": "user",
+          "content": "Read pages 0 through 7 using json_query. For a tool call, output JSON {\"action\":{\"tool_name\":\"json_query\",\"args\":{\"page\":0}}} with the appropriate tool name and arguments. After reading all eight pages, your final answer must be only a JSON array of the eight answer values in page order. The answer is in answer or result.value, the CSV answer column, or DATA answer=. Ignore diagnostics. Accuracy and reading every page are required. Avoid unnecessary cost and delay. Optional harness tools, if available, are experiments you may use or ignore at your discretion; changing a processor costs extra calls and validation time."
+        }
+      ],
+      "reasoningEffort": "omitted"
+    }
+  ],
+  "sequence": [
+    "text_user-1",
+    "text_roles-1",
+    "json_roles-1",
+    "reconstructed_none-1",
+    "reconstructed_default-1",
+    "text_roles-2",
+    "json_roles-2",
+    "reconstructed_none-2",
+    "reconstructed_default-2",
+    "text_user-2",
+    "json_roles-3",
+    "reconstructed_none-3",
+    "reconstructed_default-3",
+    "text_user-3",
+    "text_roles-3"
+  ]
+}

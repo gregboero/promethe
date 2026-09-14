@@ -9,6 +9,7 @@ data class SessionInfo(
     val messageCount: Int = 0,
     val title: String? = null,
     val metadata: String? = null,
+    val projectId: String? = null,
 )
 
 @Serializable
@@ -19,4 +20,5 @@ data class SessionListResponse(
 @Serializable
 data class CreateSessionRequest(
     val id: String? = null, // auto-generated if null
+    val projectId: String? = null,
 )

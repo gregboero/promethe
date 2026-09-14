@@ -75,9 +75,11 @@ fun gatewayModule(
         OmnichannelGateway(
             agent = get(),
             database = get(),
+            resourceGovernors = get(),
             llmAdapter = get(),
             feedbackCollector = get(),
             mcpBridge = get(),
+            mcpElicitationBroker = get(),
             memoryLayer = get(),
             taskScheduler = getOrNull(),
             hookManager = getOrNull(),
@@ -96,6 +98,7 @@ fun gatewayModule(
             actionExecutor = get(),
             sandboxManager = get(),
             sandboxRuntimePolicy = get(),
+            localCodingAgentService = get(),
             oauthManager = oauthManager,
         )
     }

@@ -31,6 +31,7 @@ object KoinBootstrap {
             single<AgentConfig> { stack.config }
             single<PrometheDatabaseApi> { stack.database }
             single<HttpClient> { stack.httpClient }
+            single<ResourceGovernorRegistry> { stack.resourceGovernors }
 
             // ── Agent ──
             single<AIAgent> { stack.agent }
@@ -40,6 +41,7 @@ object KoinBootstrap {
             single<FeedbackCollector> { stack.feedbackCollector }
             single<AgentOrchestrator> { stack.orchestrator }
             single<McpBridge> { stack.mcpBridge }
+            single<McpElicitationBroker> { stack.mcpElicitationBroker }
             single<MemoryLayer> { stack.memoryLayer }
             single<AgentA2ARegistry> { stack.registry }
             single<HookManager> { stack.hookManager }
@@ -47,6 +49,7 @@ object KoinBootstrap {
             single<dev.promethe.core.sandbox.SandboxManager> { stack.sandboxManager }
             single<dev.promethe.core.sandbox.SandboxRuntimePolicy> { stack.sandboxRuntimePolicy }
             single<dev.promethe.core.sandbox.SandboxedCommandRunner> { stack.sandboxCommandRunner }
+            single<dev.promethe.core.coding.LocalCodingAgentService> { stack.localCodingAgentService }
 
             // ── Optional services ──
             stack.pluginLoader?.let { pl ->

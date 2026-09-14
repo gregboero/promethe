@@ -4,6 +4,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 /**
  * Serialization round-trip tests for all API data classes.
@@ -36,7 +37,7 @@ class SerializationRoundTripTest {
     fun chatRequest() = assertRoundTrip(ChatRequest(message = "Bonjour", sessionId = "s-1"))
 
     @Test
-    fun chatEvent() = assertRoundTrip(ChatEvent(type = "response", content = "Réponse"))
+    fun chatEvent() = assertRoundTrip(ChatEvent(type = "response", content = "Réponse", timestamp = 1718000000000))
 
     @Test
     fun sessionInfo() = assertRoundTrip(SessionInfo(id = "s-1", createdAt = 1718000000000, messageCount = 5, title = "Test"))
@@ -49,6 +50,110 @@ class SerializationRoundTripTest {
 
     @Test
     fun createSessionRequest() = assertRoundTrip(CreateSessionRequest(id = "s-new"))
+
+    @Test
+    fun projectModels() {
+        val project =
+            ProjectInfo(
+                id = "project-1",
+                name = "Promethe public release",
+                workspacePath = "projects/project-1",
+                memoryNamespace = "project:project-1",
+                active = true,
+                sessionCount = 3,
+                memoryCount = 5,
+                createdAt = 1,
+                updatedAt = 2,
+            )
+        assertRoundTrip(project)
+        assertRoundTrip(ProjectListResponse(listOf(project), project.id))
+        assertRoundTrip(CreateProjectRequest("Promethe public release", instructions = "Keep security tests green"))
+        assertRoundTrip(UpdateProjectRequest(description = "Public release work"))
+        assertRoundTrip(AssignSessionProjectRequest(project.id))
+    }
+
+    @Test
+    fun discordPolicyModels() {
+        val policy =
+            DiscordAccessPolicy(
+                userRules =
+                    listOf(
+                        DiscordUserAccessRule(
+                            userId = "111",
+                            guildId = "222",
+                            effect = DiscordUserRuleEffect.ALLOW,
+                            allowedTopics = listOf("weather"),
+                        ),
+                    ),
+                channelRules =
+                    listOf(
+                        DiscordChannelListenRule(
+                            channelId = "333",
+                            captureKnowledge = true,
+                            projectId = "project-1",
+                        ),
+                    ),
+                updatedAt = 1,
+            )
+        assertRoundTrip(policy)
+        assertRoundTrip(UpsertDiscordUserRuleRequest(allowedTopics = listOf("weather")))
+        assertRoundTrip(UpsertDiscordChannelRuleRequest(projectId = "project-1"))
+    }
+
+    @Test
+    fun evalModels() {
+        val assertion =
+            EvalAssertion(
+                id = "contains-answer",
+                kind = EvalAssertionKind.CONTAINS,
+                expected = "42",
+            )
+        val case =
+            EvalCase(
+                id = "answer",
+                capability = "agent",
+                description = "Produces the expected answer",
+                input = "What is six times seven?",
+                assertions = listOf(assertion),
+                tags = setOf("golden"),
+            )
+        val suite = EvalSuite("phase0", 1, "Phase 0 golden set", listOf(case))
+        val assertionResult = EvalAssertionResult(assertion.id, passed = true, actual = "42")
+        val caseResult = EvalCaseResult(case.id, EvalCaseStatus.PASSED, 12, listOf(assertionResult))
+
+        assertRoundTrip(suite)
+        assertRoundTrip(EvalObservation(output = "42", metadata = mapOf("provider" to "fixture")))
+        assertRoundTrip(
+            EvalRun(
+                id = "eval-1",
+                suiteId = suite.id,
+                suiteVersion = suite.version,
+                startedAt = 1,
+                finishedAt = 13,
+                status = EvalRunStatus.PASSED,
+                results = listOf(caseResult),
+            ),
+        )
+    }
+
+    @Test
+    fun skillCurationProposals() {
+        assertRoundTrip(
+            SkillCurationReport(
+                analyzed = 2,
+                issues = listOf("old-skill: score=1"),
+                proposals =
+                    listOf(
+                        SkillCurationProposalDto(
+                            action = SkillCurationActionDto.REVIEW_LOW_QUALITY,
+                            skill = "old-skill",
+                            score = 1,
+                            rationale = "Manual review required",
+                        ),
+                    ),
+            ),
+        )
+    }
 
     // ═══════════════════════════════════════════════════════════════════════════
     // Export Models
@@ -122,7 +227,70 @@ class SerializationRoundTripTest {
     @Test
     fun agentExecutionEvent() =
         assertRoundTrip(
-            AgentExecutionEvent(agentId = "a-1", type = "step", content = "Processing", timestamp = 1718000000000),
+            AgentExecutionEvent(
+                agentId = "a-1",
+                type = "step",
+                content = "Processing",
+                timestamp = 1718000000000,
+                runId = "run-12345678",
+                stepId = "run-12345678-step-0001",
+            ),
+        )
+
+    @Test
+    fun agentRunRecord() =
+        assertRoundTrip(
+            AgentRunRecord(
+                runId = "run-12345678",
+                parentRunId = "run-parent-12345678",
+                sessionId = "session-1",
+                origin = "A2A",
+                projectId = "project-1",
+                status = AgentRunStatus.RUNNING,
+                stepCount = 2,
+                lastStepId = "run-12345678-step-0002",
+                createdAt = 100,
+                startedAt = 101,
+                updatedAt = 110,
+            ),
+        )
+
+    @Test
+    fun agentRunEventRecord() =
+        assertRoundTrip(
+            AgentRunEventRecord(
+                eventId = "event-12345678",
+                runId = "run-12345678",
+                sequence = 3,
+                type = AgentRunEventType.APPROVAL_RESOLVED,
+                sessionId = "session-1",
+                stepId = "run-12345678-step-0001",
+                intentId = "tool-12345678",
+                toolName = "send_message",
+                approvalId = "approval-12345678",
+                approvalAllowed = true,
+                approvalScope = AgentApprovalScope.ONCE,
+                createdAt = 102,
+            ),
+        )
+
+    @Test
+    fun toolIntentRecord() =
+        assertRoundTrip(
+            ToolIntentRecord(
+                intentId = "tool-12345678",
+                idempotencyKeyHash = "a".repeat(64),
+                invocationHash = "b".repeat(64),
+                runId = "run-12345678",
+                stepId = "run-12345678-step-0001",
+                sessionId = "session-1",
+                toolName = "send_message",
+                risk = ToolRisk.EXTERNAL_EFFECT,
+                status = ToolIntentStatus.EXECUTING,
+                createdAt = 100,
+                startedAt = 101,
+                updatedAt = 101,
+            ),
         )
 
     @Test
@@ -183,6 +351,27 @@ class SerializationRoundTripTest {
 
     @Test
     fun healthResponse() = assertRoundTrip(HealthResponse(status = "ok", timestamp = 1718000000000))
+
+    @Test
+    fun cacheStatus() {
+        val status =
+            CacheStatus(
+                hits = 4,
+                misses = 2,
+                size = 3,
+                hitRate = 2.0 / 3.0,
+                readTokens = 1_024,
+                writeTokens = 256,
+                observableResponses = 6,
+                prefixReuseHits = 5,
+                prefixReuseMisses = 1,
+            )
+
+        assertRoundTrip(status)
+        val encoded = json.encodeToString(status)
+        assertTrue("\"read_tokens\":1024" in encoded)
+        assertTrue("\"prefix_reuse_hits\":5" in encoded)
+    }
 
     @Test
     fun errorResponse() = assertRoundTrip(ErrorResponse(error = "Not found"))
@@ -320,7 +509,23 @@ class SerializationRoundTripTest {
     @Test
     fun discordInteractionResponse() =
         assertRoundTrip(
-            DiscordInteractionResponse(type = 4, data = DiscordResponseData(content = "Response")),
+            DiscordInteractionResponse(type = 4, data = DiscordResponseData(content = "Response", flags = 64)),
+        )
+
+    @Test
+    fun discordInteractionUser() =
+        assertRoundTrip(
+            DiscordInteraction(
+                id = "interaction-1",
+                type = 2,
+                channel_id = "channel-1",
+                guild_id = "guild-1",
+                member =
+                    DiscordInteractionMember(
+                        user = DiscordInteractionUser(id = "user-1", username = "alice", global_name = "Alice"),
+                        nick = "Ali",
+                    ),
+            ),
         )
 
     @Test

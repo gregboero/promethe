@@ -125,10 +125,20 @@ fun LlmSection(
                             }
                             .clickable {
                                 onUpdate {
+                                    val selectedModel =
+                                        llmModels[info.key]
+                                            ?.takeIf { it.isNotBlank() }
+                                            ?: info.defaultModel
                                     copy(
                                         selectedProvider = providerIndex,
                                         llmApiKey = llmApiKeys[info.key] ?: "",
-                                        llmModel = llmModels[info.key] ?: "",
+                                        llmModel = selectedModel,
+                                        llmModels =
+                                            if (selectedModel.isBlank()) {
+                                                llmModels
+                                            } else {
+                                                llmModels + (info.key to selectedModel)
+                                            },
                                     )
                                 }
                             }

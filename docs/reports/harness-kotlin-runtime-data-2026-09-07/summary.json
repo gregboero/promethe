@@ -1,0 +1,70 @@
+{
+  "successfulRuns": 6,
+  "correctPages": 48,
+  "medianByMode": {
+    "baseline": {
+      "wallMillis": 18586,
+      "setupMillis": 6054,
+      "compilationMillis": 2506,
+      "evaluationMillis": 70,
+      "stagingMillis": 4303,
+      "processMillis": 12702,
+      "medianPageMillis": 1493.0,
+      "medianRunnerStatusMillis": 0,
+      "medianRunnerCleanupMillis": 1160,
+      "medianRunnerTotalMillis": 18392,
+      "medianWarmEvaluationSandboxMillis": 941,
+      "medianWarmEvaluationChildMillis": 602,
+      "medianWarmEvaluationWorkerUptimeMillis": 521
+    },
+    "optimized": {
+      "wallMillis": 15992,
+      "setupMillis": 6228,
+      "compilationMillis": 2516,
+      "evaluationMillis": 71,
+      "stagingMillis": 6639,
+      "processMillis": 9043,
+      "medianPageMillis": 1196.0,
+      "medianRunnerStatusMillis": 0,
+      "medianRunnerCleanupMillis": 13,
+      "medianRunnerTotalMillis": 15767,
+      "medianWarmEvaluationSandboxMillis": 554,
+      "medianWarmEvaluationChildMillis": 217,
+      "medianWarmEvaluationWorkerUptimeMillis": 184
+    }
+  },
+  "pairedDifferences": [
+    {
+      "repetition": 0,
+      "savedMillis": 2410,
+      "reductionPercent": 12.966749166038948
+    },
+    {
+      "repetition": 1,
+      "savedMillis": 11124,
+      "reductionPercent": 41.023749815607026
+    },
+    {
+      "repetition": 2,
+      "savedMillis": 2623,
+      "reductionPercent": 14.189883689477956
+    }
+  ],
+  "wallReductionPercent": 13.956741633487567,
+  "modelCalls": 0,
+  "addedCostMicroUsd": 0,
+  "budgetRowsUnchanged": true,
+  "sourcesUnchanged": true,
+  "jvmTests": 1028,
+  "nativeTests": 1,
+  "isolation": {
+    "freshProcessState": true,
+    "cachedTimeoutEnforced": true,
+    "failedArtifactRecompiled": true,
+    "sessionCacheCleaned": true
+  },
+  "campaignRequests": 737,
+  "consumedMicroUsd": 4624197,
+  "remainingMicroUsd": 375803,
+  "limitations": "Windows/Java 21, three alternating pairs and one synthetic extraction task; no provider or full application latency measurement; per-call cleanup excludes endSession cleanup, which is included in wallMillis"
+}

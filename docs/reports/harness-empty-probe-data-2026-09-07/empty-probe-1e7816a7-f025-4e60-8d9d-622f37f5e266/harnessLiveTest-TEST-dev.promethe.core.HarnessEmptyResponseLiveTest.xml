@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.promethe.core.HarnessEmptyResponseLiveTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-09-07T17:24:26.898Z" hostname="BUREAU" time="42.608">
+  <properties/>
+  <testcase name="isolate empty responses across minimal and reconstructed prompts" classname="dev.promethe.core.HarnessEmptyResponseLiveTest" time="42.605"/>
+  <system-out><![CDATA[kotlin-logging: initializing... active logger factory: Slf4jLoggerFactory
+]]></system-out>
+  <system-err><![CDATA[SLF4J(W): No SLF4J providers were found.
+SLF4J(W): Defaulting to no-operation (NOP) logger implementation
+SLF4J(W): See https://www.slf4j.org/codes.html#noProviders for further details.
+]]></system-err>
+</testsuite>

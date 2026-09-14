@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dev.promethe.evals.KoogSkillsExperimentTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-09-07T17:49:19.963Z" hostname="BUREAU" time="0.284">
+  <properties/>
+  <testcase name="bounded discovery reduces prompt context and has explicit collision policy" classname="dev.promethe.evals.KoogSkillsExperimentTest" time="0.11"/>
+  <testcase name="missing description is rejected without promoting an incomplete skill" classname="dev.promethe.evals.KoogSkillsExperimentTest" time="0.008"/>
+  <testcase name="ten skill catalog preserves local quarantine while comparing metadata context" classname="dev.promethe.evals.KoogSkillsExperimentTest" time="0.165"/>
+  <system-out><![CDATA[kotlin-logging: initializing... active logger factory: Slf4jLoggerFactory
+]]></system-out>
+  <system-err><![CDATA[SLF4J(W): No SLF4J providers were found.
+SLF4J(W): Defaulting to no-operation (NOP) logger implementation
+SLF4J(W): See https://www.slf4j.org/codes.html#noProviders for further details.
+]]></system-err>
+</testsuite>

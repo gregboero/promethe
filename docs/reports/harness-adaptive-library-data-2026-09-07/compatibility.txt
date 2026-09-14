@@ -1,0 +1,1 @@
+kotlin-adaptation-v1:Windows 11:amd64:89addbfbf597fe8870ba5ad5342b823d692e73def8c539a3ce732dcc9fa889b7

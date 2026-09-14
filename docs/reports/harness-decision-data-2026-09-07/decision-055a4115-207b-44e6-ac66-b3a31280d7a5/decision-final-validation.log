@@ -1,0 +1,107 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.5.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :gateway:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :evals:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :evals:processResources NO-SOURCE
+> Task :api:kmpPartiallyResolvedDependenciesChecker
+> Task :api:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :evals:processTestResources UP-TO-DATE
+> Task :gateway:processResources UP-TO-DATE
+> Task :gateway:processTestResources NO-SOURCE
+> Task :shared:loadKtlintReporters UP-TO-DATE
+> Task :shared:runKtlintCheckOverCommonMainSourceSet UP-TO-DATE
+> Task :api:compileKotlinJvm UP-TO-DATE
+> Task :api:compileJvmMainJava NO-SOURCE
+> Task :api:jvmProcessResources NO-SOURCE
+> Task :shared:ktlintCommonMainSourceSetCheck UP-TO-DATE
+> Task :api:processJvmMainResources SKIPPED
+> Task :api:jvmMainClasses UP-TO-DATE
+> Task :shared:runKtlintCheckOverCommonTestSourceSet UP-TO-DATE
+> Task :shared:ktlintCommonTestSourceSetCheck UP-TO-DATE
+> Task :api:jvmJar UP-TO-DATE
+> Task :shared:runKtlintCheckOverJvmMainSourceSet UP-TO-DATE
+> Task :shared:ktlintJvmMainSourceSetCheck UP-TO-DATE
+> Task :api:compileTestKotlinJvm UP-TO-DATE
+> Task :api:compileJvmTestJava NO-SOURCE
+> Task :api:jvmTestProcessResources NO-SOURCE
+> Task :api:processJvmTestResources SKIPPED
+> Task :api:jvmTestClasses UP-TO-DATE
+> Task :api:jvmTest UP-TO-DATE
+> Task :shared:runKtlintCheckOverKotlinScripts UP-TO-DATE
+> Task :shared:ktlintKotlinScriptCheck UP-TO-DATE
+> Task :shared:kmpPartiallyResolvedDependenciesChecker
+> Task :shared:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :composeApp:checkDesktopMainComposeLibrariesCompatibility
+> Task :shared:compileKotlinJvm UP-TO-DATE
+> Task :shared:compileJvmMainJava NO-SOURCE
+> Task :shared:buildSandboxNative UP-TO-DATE
+> Task :shared:syncSandboxNative UP-TO-DATE
+> Task :shared:jvmProcessResources UP-TO-DATE
+> Task :shared:processJvmMainResources SKIPPED
+> Task :shared:jvmMainClasses UP-TO-DATE
+> Task :composeApp:kmpPartiallyResolvedDependenciesChecker
+> Task :composeApp:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :composeApp:convertXmlValueResourcesForCommonMain UP-TO-DATE
+> Task :composeApp:copyNonXmlValueResourcesForCommonMain NO-SOURCE
+> Task :composeApp:prepareComposeResourcesTaskForCommonMain UP-TO-DATE
+> Task :composeApp:generateResourceAccessorsForCommonMain UP-TO-DATE
+> Task :composeApp:convertXmlValueResourcesForDesktopMain NO-SOURCE
+> Task :composeApp:copyNonXmlValueResourcesForDesktopMain NO-SOURCE
+> Task :composeApp:prepareComposeResourcesTaskForDesktopMain NO-SOURCE
+> Task :composeApp:generateResourceAccessorsForDesktopMain NO-SOURCE
+> Task :composeApp:generateActualResourceCollectorsForDesktopMain UP-TO-DATE
+> Task :composeApp:generateComposeResClass UP-TO-DATE
+> Task :composeApp:generateExpectResourceCollectorsForCommonMain UP-TO-DATE
+> Task :composeApp:checkDesktopTestComposeLibrariesCompatibility
+> Task :composeApp:assembleDesktopMainResources UP-TO-DATE
+> Task :composeApp:desktopProcessResources UP-TO-DATE
+> Task :composeApp:processDesktopMainResources SKIPPED
+> Task :composeApp:convertXmlValueResourcesForCommonTest NO-SOURCE
+> Task :composeApp:copyNonXmlValueResourcesForCommonTest NO-SOURCE
+> Task :composeApp:prepareComposeResourcesTaskForCommonTest NO-SOURCE
+> Task :composeApp:generateResourceAccessorsForCommonTest NO-SOURCE
+> Task :composeApp:convertXmlValueResourcesForDesktopTest NO-SOURCE
+> Task :composeApp:copyNonXmlValueResourcesForDesktopTest NO-SOURCE
+> Task :composeApp:prepareComposeResourcesTaskForDesktopTest NO-SOURCE
+> Task :composeApp:generateResourceAccessorsForDesktopTest NO-SOURCE
+> Task :composeApp:assembleDesktopTestResources UP-TO-DATE
+> Task :composeApp:desktopTestProcessResources UP-TO-DATE
+> Task :composeApp:processDesktopTestResources SKIPPED
+> Task :shared:jvmJar
+> Task :shared:jvmTestProcessResources NO-SOURCE
+> Task :shared:processJvmTestResources SKIPPED
+> Task :shared:runKtlintCheckOverJvmTestSourceSet
+> Task :shared:ktlintJvmTestSourceSetCheck
+> Task :shared:ktlintCheck
+> Task :evals:compileKotlin
+> Task :evals:compileJava NO-SOURCE
+> Task :evals:classes UP-TO-DATE
+> Task :evals:jar UP-TO-DATE
+> Task :evals:compileTestKotlin
+> Task :evals:compileTestJava NO-SOURCE
+> Task :evals:testClasses UP-TO-DATE
+> Task :gateway:compileKotlin
+> Task :gateway:compileJava NO-SOURCE
+> Task :gateway:classes UP-TO-DATE
+> Task :gateway:jar UP-TO-DATE
+> Task :gateway:compileTestKotlin
+> Task :gateway:compileTestJava NO-SOURCE
+> Task :gateway:testClasses UP-TO-DATE
+> Task :composeApp:compileKotlinDesktop
+> Task :composeApp:compileDesktopMainJava NO-SOURCE
+> Task :composeApp:desktopMainClasses
+> Task :composeApp:desktopJar UP-TO-DATE
+> Task :composeApp:compileTestKotlinDesktop
+> Task :composeApp:compileDesktopTestJava NO-SOURCE
+> Task :composeApp:desktopTestClasses
+> Task :composeApp:desktopTest
+> Task :evals:test
+> Task :shared:compileTestKotlinJvm
+> Task :shared:compileJvmTestJava NO-SOURCE
+> Task :shared:jvmTestClasses
+> Task :gateway:test
+> Task :shared:jvmTest
+
+BUILD SUCCESSFUL in 1m 16s
+51 actionable tasks: 19 executed, 32 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.5.1/userguide/configuration_cache_enabling.html

@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="skills_evaluations">Skill evaluations</string>
+    <string name="skills_evaluations_passed">This revision passed its declared cases. Owner review is still required for promotion.</string>
+    <string name="skills_evaluations_required">Current passing evaluations are required before promotion.</string>
+    <string name="skills_test_cases">Test cases</string>
+    <string name="skills_run_evaluations">Run tests</string>
+    <string name="skills_version_history">History</string>
+    <string name="skills_evaluation_cost">Tests use the configured model and may incur costs. Up to 20 text cases, without tools.</string>
+    <string name="skills_test_cases_help">Provide at least two different tasks and exact expected answers. Saving cases puts this skill in quarantine.</string>
+    <string name="skills_case_input">Task</string>
+    <string name="skills_expected_answer">Exact expected answer</string>
+    <string name="skills_add_case">Add a case</string>
+    <string name="skills_restore_help">Restoring creates a quarantined revision. Run its tests and review it before activation.</string>
+    <string name="skills_restore_version">Restore this version</string>
+    <string name="skills_review_note">Review evidence and observations</string>
+    <string name="skills_review_scope">Describe the checks you performed on this version. This owner review does not run automated evaluations.</string>
     <!-- ═══════════════════════════════════════════════════════════════
          Promethe — English strings (default locale)
          Generated for v0.1.0 release
@@ -94,6 +109,14 @@
     <string name="chat_keyboard_hint">Enter to send · Shift+Enter for new line</string>
     <string name="chat_scroll_to_bottom">Scroll to bottom</string>
     <string name="chat_connection_error">Connection error: %1$s</string>
+    <string name="chat_approval_required">Authorization required</string>
+    <string name="chat_approval_tool">Tool: %1$s</string>
+    <string name="chat_approval_arguments">Arguments</string>
+    <string name="chat_approval_reject">Reject</string>
+    <string name="chat_approval_allow_once">Allow once</string>
+    <string name="chat_approval_allow_session">Allow for session</string>
+    <string name="chat_approval_allow_persistent">Always allow this exact configuration</string>
+    <string name="chat_approval_resolution_error">Could not resolve this request: %1$s</string>
 
     <!-- ── components/ (MessageBubble, AgentReasoningBlock) ── -->
     <string name="component_message_bubble_copy_a11y">Copy message</string>
@@ -188,8 +211,15 @@
     <string name="settings_integrations_bot_token_label">Bot Token</string>
     <string name="settings_integrations_telegram_hint">From @BotFather</string>
     <string name="settings_integrations_secret_token_label">Secret Token (optional)</string>
-    <string name="settings_integrations_discord_desc">Discord bot — servers and channels</string>
-    <string name="settings_integrations_app_public_key_label">Application Public Key</string>
+    <string name="settings_integrations_discord_desc">Discord bot — direct messages and server mentions</string>
+    <string name="settings_integrations_discord_message_content_label">Listen for messages addressed to the bot (Message Content)</string>
+    <string name="settings_integrations_discord_allowed_users_label">Allowed user IDs (optional)</string>
+    <string name="settings_integrations_discord_allowed_users_hint">Comma-separated Discord user IDs. Empty allows every user who can reach the bot.</string>
+    <string name="settings_integrations_discord_approvers_label">Approval manager user IDs</string>
+    <string name="settings_integrations_discord_approvers_hint">Discord user IDs that receive private authorization requests. They must share a server with the bot and allow direct messages.</string>
+    <string name="settings_integrations_discord_knowledge_channels_label">Knowledge channel IDs (optional)</string>
+    <string name="settings_integrations_discord_knowledge_channels_hint">Messages in these channels are archived as JSON-LD and used as untrusted conversation context.</string>
+    <string name="settings_integrations_app_public_key_label">Application Public Key (slash commands only)</string>
     <string name="settings_integrations_slack_desc">Slack bot — workspaces and channels</string>
     <string name="settings_integrations_slack_hint">xoxb-… from api.slack.com</string>
     <string name="settings_integrations_signing_secret_label">Signing Secret</string>
@@ -273,7 +303,6 @@
     <string name="settings_observability_title">Observability</string>
     <string name="settings_observability_description">Tracing and monitoring</string>
     <string name="settings_observability_tracing_label">Tracing Backend</string>
-    <string name="settings_observability_tracy_warning">⚠️ Tracing export is currently disabled (Tracy compiler plugin is incompatible with Kotlin 2.4.0). Spans are recorded but not exported. Configuration will take effect once Tracy support is restored.</string>
     <string name="settings_observability_langfuse_public_label">Langfuse Public Key</string>
     <string name="settings_observability_langfuse_secret_label">Langfuse Secret Key</string>
     <string name="settings_observability_langfuse_host_label">Langfuse Host</string>
@@ -455,6 +484,7 @@
     <string name="agents_reasoning_effort_low">Low</string>
     <string name="agents_reasoning_effort_medium">Medium</string>
     <string name="agents_reasoning_effort_high">High</string>
+    <string name="agents_reasoning_effort_none">None</string>
     <string name="agents_max_iterations_label">Max iterations</string>
     <string name="agents_selected_count">%1$d selected</string>
     <string name="agents_no_items_selected">No items selected</string>
@@ -479,6 +509,9 @@
     <string name="monitor_approve">Approve</string>
     <string name="monitor_reject">Reject</string>
     <string name="monitor_provider_choice">Provider Choice</string>
+    <string name="monitor_mcp_input_title">MCP input requested</string>
+    <string name="monitor_mcp_input_submit">Submit</string>
+    <string name="monitor_mcp_input_warning">Never enter passwords, tokens, payment details, or other secrets.</string>
     <string name="monitor_select_agent">Select an agent</string>
     <string name="monitor_details">Details</string>
     <string name="monitor_detail_agent">Agent</string>
@@ -723,11 +756,14 @@
     <string name="stats_prompt_tokens">Prompt Tokens</string>
     <string name="stats_completion_tokens">Completion Tokens</string>
     <string name="stats_cost_usd">Cost USD</string>
-    <string name="stats_cache">Cache</string>
-    <string name="stats_hits">Hits</string>
-    <string name="stats_misses">Misses</string>
-    <string name="stats_size">Size</string>
-    <string name="stats_rate">Rate</string>
+    <string name="stats_cache">Provider cache</string>
+    <string name="stats_hits">Provider hits</string>
+    <string name="stats_misses">Provider misses</string>
+    <string name="stats_size">Known prefixes</string>
+    <string name="stats_rate">Provider hit rate</string>
+    <string name="stats_cache_read_tokens">Cached tokens read</string>
+    <string name="stats_cache_write_tokens">Cached tokens written</string>
+    <string name="stats_prefix_reuse">Stable prefix reuse</string>
     <string name="stats_scheduler">Scheduler</string>
     <string name="stats_state">State</string>
     <string name="stats_scheduler_active">🟢 Active</string>
@@ -834,6 +870,8 @@
     <string name="skills_delete_skill_title">Delete skill</string>
     <string name="skills_delete_skill_confirm">Are you sure you want to delete skill \'%1$s\'?</string>
     <string name="skills_system_badge">SYSTEM</string>
+    <string name="skills_lifecycle">Lifecycle: %1$s</string>
+    <string name="skills_move_to_lifecycle">Move to %1$s</string>
     <string name="skills_delete_skill_a11y">Delete skill</string>
     <string name="skills_architect_title">🧑‍🎨 Skill Architect</string>
     <string name="skills_architect_thinking">Architect is thinking…</string>
@@ -1171,19 +1209,59 @@
     <string name="settings_sandbox_title">Sandbox</string>
     <string name="settings_sandbox_description">Isolated execution for tools and processes</string>
     <string name="settings_sandbox_backend">Backend</string>
+    <string name="settings_sandbox_backend_windows">Windows native</string>
     <string name="settings_sandbox_unavailable">Sandbox unavailable</string>
+    <string name="settings_sandbox_setup_required">Install the sandbox once to enable process tools.</string>
     <string name="settings_sandbox_self_test">Run self-test</string>
+    <string name="settings_sandbox_install">Install sandbox</string>
+    <string name="settings_sandbox_repair">Repair sandbox</string>
     <string name="settings_sandbox_self_test_passed">Sandbox self-test passed</string>
     <string name="settings_sandbox_self_test_failed">Sandbox needs attention</string>
     <string name="settings_sandbox_refresh">Refresh sandbox status</string>
     <string name="settings_sandbox_mode">Permission profile</string>
     <string name="settings_sandbox_read_only">Read-only</string>
     <string name="settings_sandbox_workspace">Workspace</string>
-    <string name="settings_sandbox_full_access">Full local access (unavailable)</string>
+    <string name="settings_sandbox_full_access">Full local access</string>
+    <string name="settings_sandbox_full_access_warning">Full local access</string>
+    <string name="settings_sandbox_full_access_confirm">This disables file confinement for file tools on this local desktop. Commands remain sandboxed and approvals stay enabled. Only enable this if you trust the agent and the workspace.</string>
+    <string name="settings_sandbox_full_access_confirm_button">Enable full access</string>
+    <string name="settings_sandbox_full_access_local_only">Local desktop only. File tools are unconstrained; commands remain sandboxed and approvals stay active.</string>
+    <string name="settings_sandbox_main_workspace">Main workspace</string>
+    <string name="settings_sandbox_selected_folders">Additional folders</string>
+    <string name="settings_sandbox_no_selected_folders">No additional folders selected.</string>
+    <string name="settings_sandbox_add_folder">Add folder</string>
+    <string name="settings_sandbox_remove_folder">Remove folder</string>
+    <string name="settings_sandbox_folder_writable">Writable</string>
     <string name="settings_sandbox_limits">Resource limits</string>
     <string name="settings_sandbox_timeout">Timeout</string>
     <string name="settings_sandbox_memory">Memory</string>
     <string name="settings_sandbox_processes">Processes</string>
     <string name="settings_sandbox_network">Network</string>
     <string name="settings_sandbox_network_off">Disabled</string>
+    <string name="settings_local_agents_title">Development agents</string>
+    <string name="settings_local_agents_description">Local Codex and Claude Code delegation</string>
+    <string name="settings_local_agents_refresh">Detect local development agents again</string>
+    <string name="settings_local_agents_empty">No supported local development agent was detected.</string>
+    <string name="settings_local_agents_version">Version</string>
+    <string name="settings_local_agents_auth">Authentication</string>
+    <string name="nav_projects">Projects</string>
+    <string name="projects_title">Projects</string>
+    <string name="projects_new">New project</string>
+    <string name="projects_edit">Edit project</string>
+    <string name="projects_name">Name</string>
+    <string name="projects_description">Description</string>
+    <string name="projects_instructions">Project instructions</string>
+    <string name="projects_active">Active</string>
+    <string name="projects_activate">Activate</string>
+    <string name="projects_archive">Archive project</string>
+    <string name="projects_restore">Restore project</string>
+    <string name="projects_archived">Archived</string>
+    <string name="projects_show_archived">Archived</string>
+    <string name="projects_empty">No project yet</string>
+    <string name="projects_workspace">Workspace: %1$s</string>
+    <string name="projects_session_count">Conversations: %1$d</string>
+    <string name="projects_memory_count">Memories: %1$d</string>
+    <string name="projects_manage">Manage projects</string>
+    <string name="projects_unassigned">No project</string>
+    <string name="projects_assign">Assign to project</string>
 </resources>

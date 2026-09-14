@@ -1,5 +1,7 @@
 # AI Capability Providers
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 > Reference for the ~28 AI capability providers (image generation, vision, embeddings,
 > video generation, video analysis, TTS, STT) and how Promethé picks one per request.
 

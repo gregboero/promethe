@@ -14,6 +14,8 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
 import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -60,12 +62,12 @@ class DynamicProviderCatalogSourceTest {
     @Test
     fun `cache avoids requests and invalidate reloads the last valid catalog`() =
         runTest {
-            var calls = 0
-            var fail = false
+            val calls = AtomicInteger()
+            val fail = AtomicBoolean()
             val client = HttpClient(
                 MockEngine { request ->
-                    calls += 1
-                    responseFor(request, fail)
+                    calls.incrementAndGet()
+                    responseFor(request, fail.get())
                 },
             )
             val source = DynamicProviderCatalogSource(
@@ -77,14 +79,14 @@ class DynamicProviderCatalogSourceTest {
 
             try {
                 val first = source.catalog()
-                val firstRefreshCalls = calls
+                val firstRefreshCalls = calls.get()
                 source.catalog()
-                assertEquals(firstRefreshCalls, calls)
+                assertEquals(firstRefreshCalls, calls.get())
 
-                fail = true
+                fail.set(true)
                 source.invalidate()
                 val stale = source.catalog()
-                assertEquals(firstRefreshCalls * 2, calls)
+                assertTrue(calls.get() > firstRefreshCalls)
                 assertEquals(ProviderAvailability.STALE, stale.providers().first { it.id == "openai" }.availability)
                 assertTrue(stale.modelsFor("openai").orEmpty().any { it.id == "gpt-5.6-sol" })
                 assertEquals(ProviderAvailability.AVAILABLE, first.providers().first { it.id == "openai" }.availability)

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="HarnessCompletionLoopTest[jvm]" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-09-07T17:01:59.876Z" hostname="BUREAU" time="2.121">
+  <properties/>
+  <testcase name="native clarification also respects explicit completion contract[jvm]" classname="dev.promethe.core.HarnessCompletionLoopTest" time="0.295"/>
+  <testcase name="ordinary tasks keep optional validation disabled[jvm]" classname="dev.promethe.core.HarnessCompletionLoopTest" time="0.288"/>
+  <testcase name="iteration exhaustion cannot end a guarded task successfully[jvm]" classname="dev.promethe.core.HarnessCompletionLoopTest" time="0.336"/>
+  <testcase name="complete wrong values pass completion independently of correctness[jvm]" classname="dev.promethe.core.HarnessCompletionLoopTest" time="0.303"/>
+  <testcase name="partial final fails before success and synthesis despite three successful tools[jvm]" classname="dev.promethe.core.HarnessCompletionLoopTest" time="0.298"/>
+  <testcase name="empty final fails without retry[jvm]" classname="dev.promethe.core.HarnessCompletionLoopTest" time="0.298"/>
+  <testcase name="clarification cannot bypass an explicit completion contract[jvm]" classname="dev.promethe.core.HarnessCompletionLoopTest" time="0.302"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[sept. 07, 2026 1:02:00 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.llm_call' : eb93856d3672c7c803721a0484e353c7 23b25eac83dae4a4 INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.tool_count=2, agent.model=test-model, agent.provider=openrouter, agent.history_size=1}, capacity=128, totalAddedValues=4}
+sept. 07, 2026 1:02:00 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.tool.execute' : eb93856d3672c7c803721a0484e353c7 5e3a1559e5ce0eb8 INTERNAL [tracer: dev.promethe:] AttributesMap{data={tool.name=clarify, tool.success=true, policy.version=promethe-policy-1, tool.result.length=32, tool.origin=AGENT, promethe.run.id=completion-run, promethe.step.id=completion-run-step-0001, tool.risk=READ, tool.args_keys=question, policy.effect=ALLOW}, capacity=128, totalAddedValues=10}
+sept. 07, 2026 1:02:00 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.run' : eb93856d3672c7c803721a0484e353c7 5df071b365721048 INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.origin=INTERNAL, promethe.run.id=completion-run}, capacity=128, totalAddedValues=2}
+sept. 07, 2026 1:02:00 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.llm_call' : 2085491ea00ac797554521aa2c7c672d dc5a75aa0bd8c289 INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.tool_count=1, agent.model=test-model, agent.provider=openrouter, agent.history_size=1}, capacity=128, totalAddedValues=4}
+sept. 07, 2026 1:02:00 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.run' : 2085491ea00ac797554521aa2c7c672d 98ce1b3ffe25c5b6 INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.origin=INTERNAL, promethe.run.id=completion-run}, capacity=128, totalAddedValues=2}
+sept. 07, 2026 1:02:00 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.llm_call' : b5b43c320721ce8bcf4f39edc09833c6 107b60341fe75796 INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.tool_count=1, agent.model=test-model, agent.provider=openrouter, agent.history_size=1}, capacity=128, totalAddedValues=4}
+sept. 07, 2026 1:02:00 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.tool.execute' : b5b43c320721ce8bcf4f39edc09833c6 2e00ae5fd24a7501 INTERNAL [tracer: dev.promethe:] AttributesMap{data={tool.name=json_query, tool.success=true, policy.version=promethe-policy-1, tool.result.length=8, tool.origin=AGENT, promethe.run.id=completion-run, promethe.step.id=completion-run-step-0001, tool.risk=READ, tool.args_keys=page, policy.effect=ALLOW}, capacity=128, totalAddedValues=10}
+sept. 07, 2026 1:02:00 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.llm_call' : b5b43c320721ce8bcf4f39edc09833c6 05b12204dda7e4a5 INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.tool_count=1, agent.model=test-model, agent.provider=openrouter, agent.history_size=3}, capacity=128, totalAddedValues=4}
+sept. 07, 2026 1:02:00 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.tool.execute' : b5b43c320721ce8bcf4f39edc09833c6 48c03e0bc080bc0f INTERNAL [tracer: dev.promethe:] AttributesMap{data={tool.name=json_query, tool.success=true, policy.version=promethe-policy-1, tool.result.length=8, tool.origin=AGENT, promethe.run.id=completion-run, promethe.step.id=completion-run-step-0002, tool.risk=READ, tool.args_keys=page, policy.effect=ALLOW}, capacity=128, totalAddedValues=10}
+sept. 07, 2026 1:02:00 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.llm_call' : b5b43c320721ce8bcf4f39edc09833c6 660a4c6b18577a3a INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.tool_count=1, agent.model=test-model, agent.provider=openrouter, agent.history_size=5}, capacity=128, totalAddedValues=4}
+sept. 07, 2026 1:02:00 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.tool.execute' : b5b43c320721ce8bcf4f39edc09833c6 0a52aacdd21c2ffd INTERNAL [tracer: dev.promethe:] AttributesMap{data={tool.name=json_query, tool.success=true, policy.version=promethe-policy-1, tool.result.length=8, tool.origin=AGENT, promethe.run.id=completion-run, promethe.step.id=completion-run-step-0003, tool.risk=READ, tool.args_keys=page, policy.effect=ALLOW}, capacity=128, totalAddedValues=10}
+sept. 07, 2026 1:02:00 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.llm_call' : b5b43c320721ce8bcf4f39edc09833c6 45777cecc47b6415 INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.tool_count=1, agent.model=test-model, agent.provider=openrouter, agent.history_size=7}, capacity=128, totalAddedValues=4}
+sept. 07, 2026 1:02:00 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.tool.execute' : b5b43c320721ce8bcf4f39edc09833c6 846b34e0458931c8 INTERNAL [tracer: dev.promethe:] AttributesMap{data={tool.name=json_query, tool.success=true, policy.version=promethe-policy-1, tool.result.length=8, tool.origin=AGENT, promethe.run.id=completion-run, promethe.step.id=completion-run-step-0004, tool.risk=READ, tool.args_keys=page, policy.effect=ALLOW}, capacity=128, totalAddedValues=10}
+sept. 07, 2026 1:02:00 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.llm_call' : b5b43c320721ce8bcf4f39edc09833c6 0cdecbf29a0073ac INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.tool_count=1, agent.model=test-model, agent.provider=openrouter, agent.history_size=9}, capacity=128, totalAddedValues=4}
+sept. 07, 2026 1:02:00 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.tool.execute' : b5b43c320721ce8bcf4f39edc09833c6 2ed3209753373961 INTERNAL [tracer: dev.promethe:] AttributesMap{data={tool.name=json_query, tool.success=true, policy.version=promethe-policy-1, tool.result.length=8, tool.origin=AGENT, promethe.run.id=completion-run, promethe.step.id=completion-run-step-0005, tool.risk=READ, tool.args_keys=page, policy.effect=ALLOW}, capacity=128, totalAddedValues=10}
+sept. 07, 2026 1:02:00 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.llm_call' : b5b43c320721ce8bcf4f39edc09833c6 d332ada8534908fd INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.tool_count=1, agent.model=test-model, agent.provider=openrouter, agent.history_size=11}, capacity=128, totalAddedValues=4}
+sept. 07, 2026 1:02:00 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.tool.execute' : b5b43c320721ce8bcf4f39edc09833c6 f59daaa6090188c6 INTERNAL [tracer: dev.promethe:] AttributesMap{data={tool.name=json_query, tool.success=true, policy.version=promethe-policy-1, tool.result.length=8, tool.origin=AGENT, promethe.run.id=completion-run, promethe.step.id=completion-run-step-0006, tool.risk=READ, tool.args_keys=page, policy.effect=ALLOW}, capacity=128, totalAddedValues=10}
+sept. 07, 2026 1:02:00 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.llm_call' : b5b43c320721ce8bcf4f39edc09833c6 2c93b8b647fedf8a INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.tool_count=1, agent.model=test-model, agent.provider=openrouter, agent.history_size=13}, capacity=128, totalAddedValues=4}
+sept. 07, 2026 1:02:00 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.tool.execute' : b5b43c320721ce8bcf4f39edc09833c6 44354f8ca4197085 INTERNAL [tracer: dev.promethe:] AttributesMap{data={tool.name=json_query, tool.success=true, policy.version=promethe-policy-1, tool.result.length=8, tool.origin=AGENT, promethe.run.id=completion-run, promethe.step.id=completion-run-step-0007, tool.risk=READ, tool.args_keys=page, policy.effect=ALLOW}, capacity=128, totalAddedValues=10}
+sept. 07, 2026 1:02:00 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.llm_call' : b5b43c320721ce8bcf4f39edc09833c6 f350b9c597c0c238 INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.tool_count=1, agent.model=test-model, agent.provider=openrouter, agent.history_size=15}, capacity=128, totalAddedValues=4}
+sept. 07, 2026 1:02:00 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.tool.execute' : b5b43c320721ce8bcf4f39edc09833c6 2f873ff587fca2c0 INTERNAL [tracer: dev.promethe:] AttributesMap{data={tool.name=json_query, tool.success=true, policy.version=promethe-policy-1, tool.result.length=8, tool.origin=AGENT, promethe.run.id=completion-run, promethe.step.id=completion-run-step-0008, tool.risk=READ, tool.args_keys=page, policy.effect=ALLOW}, capacity=128, totalAddedValues=10}
+sept. 07, 2026 1:02:00 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.llm_call' : b5b43c320721ce8bcf4f39edc09833c6 511d3ac68928c44a INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.tool_count=1, agent.model=test-model, agent.provider=openrouter, agent.history_size=17}, capacity=128, totalAddedValues=4}
+sept. 07, 2026 1:02:00 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.tool.execute' : b5b43c320721ce8bcf4f39edc09833c6 1d725a00ddfe732f INTERNAL [tracer: dev.promethe:] AttributesMap{data={tool.name=json_query, tool.success=true, policy.version=promethe-policy-1, tool.result.length=8, tool.origin=AGENT, promethe.run.id=completion-run, promethe.step.id=completion-run-step-0009, tool.risk=READ, tool.args_keys=page, policy.effect=ALLOW}, capacity=128, totalAddedValues=10}
+sept. 07, 2026 1:02:00 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.llm_call' : b5b43c320721ce8bcf4f39edc09833c6 0066965cfbb9a186 INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.tool_count=1, agent.model=test-model, agent.provider=openrouter, agent.history_size=19}, capacity=128, totalAddedValues=4}
+sept. 07, 2026 1:02:00 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.tool.execute' : b5b43c320721ce8bcf4f39edc09833c6 8ceeca206c170708 INTERNAL [tracer: dev.promethe:] AttributesMap{data={tool.name=json_query, tool.success=true, policy.version=promethe-policy-1, tool.result.length=8, tool.origin=AGENT, promethe.run.id=completion-run, promethe.step.id=completion-run-step-0010, tool.risk=READ, tool.args_keys=page, policy.effect=ALLOW}, capacity=128, totalAddedValues=10}
+sept. 07, 2026 1:02:00 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.run' : b5b43c320721ce8bcf4f39edc09833c6 aa31f4e0d86de4db INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.origin=INTERNAL, promethe.run.id=completion-run}, capacity=128, totalAddedValues=2}
+sept. 07, 2026 1:02:01 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.llm_call' : 5d0e2aa9f010b2130f748568c0b49a57 3b726f1d4592cf16 INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.tool_count=1, agent.model=test-model, agent.provider=openrouter, agent.history_size=1}, capacity=128, totalAddedValues=4}
+sept. 07, 2026 1:02:01 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.tool.execute' : 5d0e2aa9f010b2130f748568c0b49a57 3c59e0c4a9ea8e0f INTERNAL [tracer: dev.promethe:] AttributesMap{data={tool.name=json_query, tool.success=true, policy.version=promethe-policy-1, tool.result.length=8, tool.origin=AGENT, promethe.run.id=completion-run, promethe.step.id=completion-run-step-0001, tool.risk=READ, tool.args_keys=page, policy.effect=ALLOW}, capacity=128, totalAddedValues=10}
+sept. 07, 2026 1:02:01 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.llm_call' : 5d0e2aa9f010b2130f748568c0b49a57 fc3d472dbe580fc7 INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.tool_count=1, agent.model=test-model, agent.provider=openrouter, agent.history_size=3}, capacity=128, totalAddedValues=4}
+sept. 07, 2026 1:02:01 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.tool.execute' : 5d0e2aa9f010b2130f748568c0b49a57 77fc18746f5a4879 INTERNAL [tracer: dev.promethe:] AttributesMap{data={tool.name=json_query, tool.success=true, policy.version=promethe-policy-1, tool.result.length=8, tool.origin=AGENT, promethe.run.id=completion-run, promethe.step.id=completion-run-step-0002, tool.risk=READ, tool.args_keys=page, policy.effect=ALLOW}, capacity=128, totalAddedValues=10}
+sept. 07, 2026 1:02:01 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.llm_call' : 5d0e2aa9f010b2130f748568c0b49a57 895913aaac6683dd INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.tool_count=1, agent.model=test-model, agent.provider=openrouter, agent.history_size=5}, capacity=128, totalAddedValues=4}
+sept. 07, 2026 1:02:01 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.tool.execute' : 5d0e2aa9f010b2130f748568c0b49a57 68e102a67c009ad8 INTERNAL [tracer: dev.promethe:] AttributesMap{data={tool.name=json_query, tool.success=true, policy.version=promethe-policy-1, tool.result.length=8, tool.origin=AGENT, promethe.run.id=completion-run, promethe.step.id=completion-run-step-0003, tool.risk=READ, tool.args_keys=page, policy.effect=ALLOW}, capacity=128, totalAddedValues=10}
+sept. 07, 2026 1:02:01 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.llm_call' : 5d0e2aa9f010b2130f748568c0b49a57 5ec3dc9b33ef57b7 INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.tool_count=1, agent.model=test-model, agent.provider=openrouter, agent.history_size=7}, capacity=128, totalAddedValues=4}
+sept. 07, 2026 1:02:01 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.tool.execute' : 5d0e2aa9f010b2130f748568c0b49a57 1f849529aecc2b58 INTERNAL [tracer: dev.promethe:] AttributesMap{data={tool.name=json_query, tool.success=true, policy.version=promethe-policy-1, tool.result.length=8, tool.origin=AGENT, promethe.run.id=completion-run, promethe.step.id=completion-run-step-0004, tool.risk=READ, tool.args_keys=page, policy.effect=ALLOW}, capacity=128, totalAddedValues=10}
+sept. 07, 2026 1:02:01 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.llm_call' : 5d0e2aa9f010b2130f748568c0b49a57 8cb38dcca8d61abd INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.tool_count=1, agent.model=test-model, agent.provider=openrouter, agent.history_size=9}, capacity=128, totalAddedValues=4}
+sept. 07, 2026 1:02:01 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.run' : 5d0e2aa9f010b2130f748568c0b49a57 5de76898e1526faf INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.origin=INTERNAL, promethe.run.id=completion-run}, capacity=128, totalAddedValues=2}
+sept. 07, 2026 1:02:01 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.llm_call' : 23619ede8725af5ad75662f71e0636d8 3bef526e08436a4f INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.tool_count=1, agent.model=test-model, agent.provider=openrouter, agent.history_size=1}, capacity=128, totalAddedValues=4}
+sept. 07, 2026 1:02:01 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.tool.execute' : 23619ede8725af5ad75662f71e0636d8 bd257c0a99e194a2 INTERNAL [tracer: dev.promethe:] AttributesMap{data={tool.name=json_query, tool.success=true, policy.version=promethe-policy-1, tool.result.length=8, tool.origin=AGENT, promethe.run.id=completion-run, promethe.step.id=completion-run-step-0001, tool.risk=READ, tool.args_keys=page, policy.effect=ALLOW}, capacity=128, totalAddedValues=10}
+sept. 07, 2026 1:02:01 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.llm_call' : 23619ede8725af5ad75662f71e0636d8 c193ff42f13f9fc7 INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.tool_count=1, agent.model=test-model, agent.provider=openrouter, agent.history_size=3}, capacity=128, totalAddedValues=4}
+sept. 07, 2026 1:02:01 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.tool.execute' : 23619ede8725af5ad75662f71e0636d8 3f393284f8b5ff2a INTERNAL [tracer: dev.promethe:] AttributesMap{data={tool.name=json_query, tool.success=true, policy.version=promethe-policy-1, tool.result.length=8, tool.origin=AGENT, promethe.run.id=completion-run, promethe.step.id=completion-run-step-0002, tool.risk=READ, tool.args_keys=page, policy.effect=ALLOW}, capacity=128, totalAddedValues=10}
+sept. 07, 2026 1:02:01 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.llm_call' : 23619ede8725af5ad75662f71e0636d8 deed453c2eb4f4ad INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.tool_count=1, agent.model=test-model, agent.provider=openrouter, agent.history_size=5}, capacity=128, totalAddedValues=4}
+sept. 07, 2026 1:02:01 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.tool.execute' : 23619ede8725af5ad75662f71e0636d8 26f746574fdf9e5c INTERNAL [tracer: dev.promethe:] AttributesMap{data={tool.name=json_query, tool.success=true, policy.version=promethe-policy-1, tool.result.length=8, tool.origin=AGENT, promethe.run.id=completion-run, promethe.step.id=completion-run-step-0003, tool.risk=READ, tool.args_keys=page, policy.effect=ALLOW}, capacity=128, totalAddedValues=10}
+sept. 07, 2026 1:02:01 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.llm_call' : 23619ede8725af5ad75662f71e0636d8 e55409f1e484bdd7 INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.tool_count=1, agent.model=test-model, agent.provider=openrouter, agent.history_size=7}, capacity=128, totalAddedValues=4}
+sept. 07, 2026 1:02:01 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.run' : 23619ede8725af5ad75662f71e0636d8 f692388c9f6c0e03 INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.origin=INTERNAL, promethe.run.id=completion-run}, capacity=128, totalAddedValues=2}
+sept. 07, 2026 1:02:01 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.llm_call' : 3aab94d2381cf4a1d5772acd47efa9fa a5ec20bf950d1ca6 INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.tool_count=1, agent.model=test-model, agent.provider=openrouter, agent.history_size=1}, capacity=128, totalAddedValues=4}
+sept. 07, 2026 1:02:01 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.run' : 3aab94d2381cf4a1d5772acd47efa9fa fc1086b4c5a01a87 INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.origin=INTERNAL, promethe.run.id=completion-run}, capacity=128, totalAddedValues=2}
+sept. 07, 2026 1:02:01 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.llm_call' : c4a7ad8dbedfd96aa2016cdeed078aad 2a26d484c196929c INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.tool_count=2, agent.model=test-model, agent.provider=openrouter, agent.history_size=1}, capacity=128, totalAddedValues=4}
+sept. 07, 2026 1:02:01 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.tool.execute' : c4a7ad8dbedfd96aa2016cdeed078aad 9fccbd4dbd77bcf3 INTERNAL [tracer: dev.promethe:] AttributesMap{data={tool.name=clarify, tool.success=true, policy.version=promethe-policy-1, tool.result.length=32, tool.origin=AGENT, promethe.run.id=completion-run, promethe.step.id=completion-run-step-0001, tool.risk=READ, tool.args_keys=question, policy.effect=ALLOW}, capacity=128, totalAddedValues=10}
+sept. 07, 2026 1:02:01 P.M. io.opentelemetry.exporter.logging.LoggingSpanExporter export
+INFOS: 'agent.run' : c4a7ad8dbedfd96aa2016cdeed078aad 5714559515b0cab2 INTERNAL [tracer: dev.promethe:] AttributesMap{data={agent.origin=INTERNAL, promethe.run.id=completion-run}, capacity=128, totalAddedValues=2}
+]]></system-err>
+</testsuite>

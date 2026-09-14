@@ -1,0 +1,13 @@
+[
+  {
+    "id": "d6a2c08f-f4f0-4eab-af26-82ccfaed0c5e",
+    "sessionId": "agent-live-31ca419f-3455-4c62-a269-77d639f21f0f",
+    "baseRevision": null,
+    "source": "import kotlinx.serialization.json.*\n\nval text = observation.text\nval result = try {\n    val el = Json.parseToJsonElement(text)\n    if (el is JsonObject && el.containsKey(\"answer\")) {\n        val value = el[\"answer\"]\n        if (value is JsonPrimitive) value.content else text\n    } else text\n} catch (_: Exception) {\n    val csv = Regex(\"(?m)^\\\\s*[^,\\\\r\\\\n]*,answer\\\\s*\\\\r?\\\\n\\\\s*[^,\\\\r\\\\n]*,([^\\\\r\\\\n]+)\\\\s*$\").find(text)\n    if (csv != null) csv.groupValues[1].trim()\n    else {\n        val data = Regex(\"^DATA\\\\s+answer=([^\\\\s]+)\\\\s*$\").find(text)\n        if (data != null) data.groupValues[1] else text\n    }\n}\nresult",
+    "hash": "0d2e2ac3300b16bd14532fbace31dad8758aa897423af28d4dbce9eeb1502013",
+    "toolName": "json_query",
+    "createdAt": 1788795485581,
+    "language": "KOTLIN",
+    "validated": true
+  }
+]

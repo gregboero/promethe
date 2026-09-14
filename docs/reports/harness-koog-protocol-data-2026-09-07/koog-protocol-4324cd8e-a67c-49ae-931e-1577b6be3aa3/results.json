@@ -1,0 +1,103 @@
+[
+  {
+    "session": "koog-protocol-4324cd8e-a67c-49ae-931e-1577b6be3aa3-1-text",
+    "mode": "text",
+    "calls": 3,
+    "nativeCalls": 0,
+    "readPages": [
+      0,
+      1
+    ],
+    "completed": true,
+    "failure": null,
+    "final": "[3471,8063]",
+    "correct": true,
+    "completion": {
+      "complete": true,
+      "reason": "complete",
+      "missingPages": [],
+      "answerCount": 2
+    },
+    "registryCleaned": true,
+    "receiptAccounting": {
+      "attemptedCalls": 3,
+      "settledCalls": 3,
+      "uncertainCalls": 0,
+      "unknownUsageCalls": 0,
+      "usageComplete": true,
+      "inputTokens": 1192,
+      "outputTokens": 70,
+      "costUpperBoundMicroUsd": 3821,
+      "uncertainReservationMicroUsd": 0
+    },
+    "apiMillis": 7059
+  },
+  {
+    "session": "koog-protocol-4324cd8e-a67c-49ae-931e-1577b6be3aa3-1-structured",
+    "mode": "structured",
+    "calls": 3,
+    "nativeCalls": 2,
+    "readPages": [
+      0,
+      1
+    ],
+    "completed": true,
+    "failure": null,
+    "final": "[3471,8063]",
+    "correct": true,
+    "completion": {
+      "complete": true,
+      "reason": "complete",
+      "missingPages": [],
+      "answerCount": 2
+    },
+    "registryCleaned": true,
+    "receiptAccounting": {
+      "attemptedCalls": 3,
+      "settledCalls": 3,
+      "uncertainCalls": 0,
+      "unknownUsageCalls": 0,
+      "usageComplete": true,
+      "inputTokens": 1552,
+      "outputTokens": 47,
+      "costUpperBoundMicroUsd": 4445,
+      "uncertainReservationMicroUsd": 0
+    },
+    "apiMillis": 3864
+  },
+  {
+    "session": "koog-protocol-4324cd8e-a67c-49ae-931e-1577b6be3aa3-2-structured",
+    "mode": "structured",
+    "calls": 5,
+    "nativeCalls": 4,
+    "readPages": [
+      0,
+      1,
+      0,
+      1
+    ],
+    "completed": false,
+    "failure": "task_duplicate_page_read",
+    "final": "[5192,2847]",
+    "correct": true,
+    "completion": {
+      "complete": false,
+      "reason": "duplicate_page_read",
+      "missingPages": [],
+      "answerCount": null
+    },
+    "registryCleaned": true,
+    "receiptAccounting": {
+      "attemptedCalls": 5,
+      "settledCalls": 5,
+      "uncertainCalls": 0,
+      "unknownUsageCalls": 0,
+      "usageComplete": true,
+      "inputTokens": 2783,
+      "outputTokens": 83,
+      "costUpperBoundMicroUsd": 7955,
+      "uncertainReservationMicroUsd": 0
+    },
+    "apiMillis": 5432
+  }
+]

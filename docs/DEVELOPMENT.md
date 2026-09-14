@@ -1,5 +1,7 @@
 # Development Guide
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 > Local setup, project structure, conventions, CI/CD, and guides for contributing.
 
 ## Prerequisites
@@ -29,6 +31,7 @@ promethe/
 │   ├── wasmJsMain/  #   Web entry point
 │   └── iosMain/     #   Swift/Kotlin bridge
 ├── api/             # Shared API models (JVM + wasmJs)
+├── evals/           # Deterministic eval runner, golden sets, adversarial metrics
 └── docs/            # Documentation
 ```
 
@@ -38,8 +41,8 @@ promethe/
 # Compile the whole project
 ./gradlew build
 
-# Unit tests (shared)
-./gradlew shared:jvmTest
+# Unit, contract, security, and golden evaluation tests
+./gradlew api:jvmTest evals:test shared:jvmTest gateway:test
 
 # Run the gateway
 ./gradlew gateway:run
@@ -92,14 +95,7 @@ ktlint_standard_import-ordering = disabled
 
 ## CI Pipeline
 
-The `.github/workflows/ci.yml` file defines 4 jobs:
-
-| Job | Trigger | Description |
-|---|---|---|
-| **test** | push/PR | `shared:jvmTest` |
-| **build** | after test | 5 targets: Desktop, Android, WasmJS, Gateway, iOS |
-| **docker** | main only | Build + push `ghcr.io/.../promethe-gateway:latest` |
-| **desktop-package** | main only | Linux/macOS/Windows installers |
+The `.github/workflows/ci.yml` pipeline compiles the gateway, API, shared core, evals, Desktop and Wasm clients. It runs unit, contract, security, golden eval, Desktop, documentation and lint checks, plus dependency, CodeQL, Trivy and Qodana analysis. Main additionally validates Docker images and desktop packages without publishing them.
 
 ## Practical guides
 
@@ -133,20 +129,33 @@ The `.github/workflows/ci.yml` file defines 4 jobs:
 ### Adding a new agent tool
 
 1. Create a class that extends `ToolBase<Input, Output>`
-2. Register it in `BuiltinTools.kt`:
+2. Add an explicit entry to `ToolContractRegistry`. Declare every read and effectful operation, its
+   approval policy, idempotency, owner restriction and egress. Unknown names are deliberately
+   rejected by the startup coverage audit.
+3. Register it in `BuiltinTools.kt`:
    ```kotlin
    ToolRegistry.register(MyTool())
    ```
-3. The tool will automatically be available in the system prompt
+4. Add a negative policy test for every operation that can write, execute, delete, change
+   configuration, control a device or cause an external effect.
+5. Run `./gradlew shared:jvmTest`. `ToolContractCoverageArchitectureTest` inventories literal
+   `SimpleTool` declarations, validates dynamic MCP/ACP families and fails when an effect lacks
+   mandatory approval.
+
+The gateway validates the live `ToolRegistry` again during startup. MCP and ACP tools use explicit
+fail-closed family contracts; only MCP tools explicitly certified by the server owner can be reduced
+to read-only risk.
 
 ## Running tests
 
-The suite is split across three modules (~404 tests total):
+The suite is split across four backend modules plus the Desktop client:
 
 ```bash
 ./gradlew shared:jvmTest    # Agent engine, memory providers, tools, tracing (shared/src/jvmTest, shared/src/commonTest)
 ./gradlew gateway:test      # Route/integration tests — routes, rate limiter, MCP, scheduler (gateway/src/test)
 ./gradlew api:jvmTest       # kotlinx-serialization round-trip tests (api/src/commonTest)
+./gradlew evals:test         # Golden sets, eval runner and adversarial baseline (evals/src/test)
+./gradlew composeApp:desktopTest
 
 # E2E tests (requires the gateway to be running)
 ./test-e2e.ps1

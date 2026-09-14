@@ -1,0 +1,206 @@
+[
+  {
+    "session": "koog-protocol-31c5d6b8-df11-4929-9ffb-fae79e58ae0e-1-text",
+    "mode": "text",
+    "calls": 3,
+    "nativeCalls": 0,
+    "readPages": [
+      0,
+      1
+    ],
+    "completed": true,
+    "failure": null,
+    "final": "[3471,8063]",
+    "correct": true,
+    "completion": {
+      "complete": true,
+      "reason": "complete",
+      "missingPages": [],
+      "answerCount": 2
+    },
+    "registryCleaned": true,
+    "receiptAccounting": {
+      "attemptedCalls": 3,
+      "settledCalls": 3,
+      "uncertainCalls": 0,
+      "unknownUsageCalls": 0,
+      "usageComplete": true,
+      "inputTokens": 1192,
+      "outputTokens": 76,
+      "costUpperBoundMicroUsd": 3893,
+      "uncertainReservationMicroUsd": 0
+    },
+    "apiMillis": 5756,
+    "nativeHistoryFullyCarried": true
+  },
+  {
+    "session": "koog-protocol-31c5d6b8-df11-4929-9ffb-fae79e58ae0e-1-structured",
+    "mode": "structured",
+    "calls": 3,
+    "nativeCalls": 2,
+    "readPages": [
+      0,
+      1
+    ],
+    "completed": true,
+    "failure": null,
+    "final": "[3471,8063]",
+    "correct": true,
+    "completion": {
+      "complete": true,
+      "reason": "complete",
+      "missingPages": [],
+      "answerCount": 2
+    },
+    "registryCleaned": true,
+    "receiptAccounting": {
+      "attemptedCalls": 3,
+      "settledCalls": 3,
+      "uncertainCalls": 0,
+      "unknownUsageCalls": 0,
+      "usageComplete": true,
+      "inputTokens": 1575,
+      "outputTokens": 47,
+      "costUpperBoundMicroUsd": 4502,
+      "uncertainReservationMicroUsd": 0
+    },
+    "apiMillis": 3367,
+    "nativeHistoryFullyCarried": true
+  },
+  {
+    "session": "koog-protocol-31c5d6b8-df11-4929-9ffb-fae79e58ae0e-2-structured",
+    "mode": "structured",
+    "calls": 3,
+    "nativeCalls": 2,
+    "readPages": [
+      0,
+      1
+    ],
+    "completed": true,
+    "failure": null,
+    "final": "[5192,2847]",
+    "correct": true,
+    "completion": {
+      "complete": true,
+      "reason": "complete",
+      "missingPages": [],
+      "answerCount": 2
+    },
+    "registryCleaned": true,
+    "receiptAccounting": {
+      "attemptedCalls": 3,
+      "settledCalls": 3,
+      "uncertainCalls": 0,
+      "unknownUsageCalls": 0,
+      "usageComplete": true,
+      "inputTokens": 1575,
+      "outputTokens": 47,
+      "costUpperBoundMicroUsd": 4502,
+      "uncertainReservationMicroUsd": 0
+    },
+    "apiMillis": 3390,
+    "nativeHistoryFullyCarried": true
+  },
+  {
+    "session": "koog-protocol-31c5d6b8-df11-4929-9ffb-fae79e58ae0e-2-text",
+    "mode": "text",
+    "calls": 3,
+    "nativeCalls": 0,
+    "readPages": [
+      0,
+      1
+    ],
+    "completed": true,
+    "failure": null,
+    "final": "[5192,2847]",
+    "correct": true,
+    "completion": {
+      "complete": true,
+      "reason": "complete",
+      "missingPages": [],
+      "answerCount": 2
+    },
+    "registryCleaned": true,
+    "receiptAccounting": {
+      "attemptedCalls": 3,
+      "settledCalls": 3,
+      "uncertainCalls": 0,
+      "unknownUsageCalls": 0,
+      "usageComplete": true,
+      "inputTokens": 1192,
+      "outputTokens": 70,
+      "costUpperBoundMicroUsd": 3821,
+      "uncertainReservationMicroUsd": 0
+    },
+    "apiMillis": 3841,
+    "nativeHistoryFullyCarried": true
+  },
+  {
+    "session": "koog-protocol-31c5d6b8-df11-4929-9ffb-fae79e58ae0e-3-text",
+    "mode": "text",
+    "calls": 3,
+    "nativeCalls": 0,
+    "readPages": [
+      0,
+      1
+    ],
+    "completed": true,
+    "failure": null,
+    "final": "[6904,1358]",
+    "correct": true,
+    "completion": {
+      "complete": true,
+      "reason": "complete",
+      "missingPages": [],
+      "answerCount": 2
+    },
+    "registryCleaned": true,
+    "receiptAccounting": {
+      "attemptedCalls": 3,
+      "settledCalls": 3,
+      "uncertainCalls": 0,
+      "unknownUsageCalls": 0,
+      "usageComplete": true,
+      "inputTokens": 1192,
+      "outputTokens": 51,
+      "costUpperBoundMicroUsd": 3593,
+      "uncertainReservationMicroUsd": 0
+    },
+    "apiMillis": 3631,
+    "nativeHistoryFullyCarried": true
+  },
+  {
+    "session": "koog-protocol-31c5d6b8-df11-4929-9ffb-fae79e58ae0e-3-structured",
+    "mode": "structured",
+    "calls": 3,
+    "nativeCalls": 2,
+    "readPages": [
+      0,
+      1
+    ],
+    "completed": true,
+    "failure": null,
+    "final": "[6904,1358]",
+    "correct": true,
+    "completion": {
+      "complete": true,
+      "reason": "complete",
+      "missingPages": [],
+      "answerCount": 2
+    },
+    "registryCleaned": true,
+    "receiptAccounting": {
+      "attemptedCalls": 3,
+      "settledCalls": 3,
+      "uncertainCalls": 0,
+      "unknownUsageCalls": 0,
+      "usageComplete": true,
+      "inputTokens": 1575,
+      "outputTokens": 47,
+      "costUpperBoundMicroUsd": 4502,
+      "uncertainReservationMicroUsd": 0
+    },
+    "apiMillis": 2727,
+    "nativeHistoryFullyCarried": true
+  }
+]

@@ -1,0 +1,132 @@
+{
+  "batch": "kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3",
+  "protocolVersion": 6,
+  "plannedRuns": 6,
+  "recordedRuns": 5,
+  "completeCohort": false,
+  "completedRuns": 3,
+  "structurallyCompleteRuns": 3,
+  "correctRuns": 3,
+  "failureCodes": {
+    "campaign_empty_content": 2
+  },
+  "completionReasons": {
+    "empty_final_response": 2,
+    "complete": 3
+  },
+  "responseErrors": {
+    "campaign_empty_content": 2
+  },
+  "finishReasons": {
+    "stop": 32
+  },
+  "contentStates": {
+    "text": 30,
+    "empty": 2
+  },
+  "httpStatuses": {
+    "200": 32
+  },
+  "requestIdsAvailable": 32,
+  "receiptAccounting": {
+    "attemptedCalls": 32,
+    "settledCalls": 32,
+    "uncertainCalls": 0,
+    "unknownUsageCalls": 0,
+    "usageComplete": true,
+    "inputTokens": 81268,
+    "outputTokens": 1735,
+    "costUpperBoundMicroUsd": 223997,
+    "uncertainReservationMicroUsd": 0
+  },
+  "campaignBefore": {
+    "requests": 591,
+    "settledMicroUsd": 3603075
+  },
+  "campaignAfter": {
+    "requests": 623,
+    "settledMicroUsd": 3827072,
+    "uncertainReservations": 0,
+    "remainingMicroUsd": 1172928
+  },
+  "priorBudgetRowsUnchanged": true,
+  "proposals": 0,
+  "activations": 0,
+  "taskNativeWorkerCalls": 0,
+  "allSessionsCleaned": true,
+  "allCachesCleaned": true,
+  "allToolRegistriesCleaned": true,
+  "allObservedRawLedgersPreserved": true,
+  "sourceSha256": {
+    "shared/src/jvmTest/kotlin/dev/promethe/core/HarnessDecisionLiveTest.kt": "bceb5da51ae8faa25fc0de3f2dea11f9c7e94def9f53f1f95241f76f1218b935",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/HarnessLiveCampaignTest.kt": "6e29ff757dbf0cb995dcab51d1f31b1f5986d4b9fa03a5f02799de1fddbb6765",
+    "shared/src/jvmTest/kotlin/dev/promethe/core/CampaignResponseDiagnostics.kt": "800bae85caa28bf5a96fe3f6cdc5a89597aa93e418cd5b52818d838506f59a8d",
+    "shared/src/commonMain/kotlin/dev/promethe/core/AIAgent.kt": "9db5529dda8e26a0f9b4e9f37d854c5c3d93d403eecbe4e7fb4042a951d11dbd",
+    "shared/src/jvmMain/kotlin/dev/promethe/core/HarnessTaskCompletion.kt": "1f16741cb96535547863cade1b3b87953eb5ba8202e48997af728951e8dbfb80",
+    "scripts/report-harness-diagnostic-pilot.py": "0c7302ebd560f7e8682ad8830a77e9bc53f610a7a206fb11b0faea1d65a2f987"
+  },
+  "measurementInputSha256": {
+    "build/reports/harness-iteration/live/kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3/kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-long_json-1-conditional-transcript.json": "639bff97c8c3f5de9622de18c166e1e440241d13ff54416369e727a882e2a1af",
+    "build/reports/harness-iteration/live/kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3/kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-long_json-1-free-transcript.json": "aa65c9f5622866d07001007a5f1537a6543e5212a36912726649a5f555c36da4",
+    "build/reports/harness-iteration/live/kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3/kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-long_json-1-original-transcript.json": "a758f6686f359b49053c940cd9266e64035390bdefa59e5ae8ba178bb62fd87d",
+    "build/reports/harness-iteration/live/kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3/kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-small_mixed-1-conditional-transcript.json": "9bea000900a262d3f22b9334c7c5951064f277136c701cbafac80bc1d6a1f794",
+    "build/reports/harness-iteration/live/kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3/kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3-small_mixed-1-original-transcript.json": "aa65c9f5622866d07001007a5f1537a6543e5212a36912726649a5f555c36da4",
+    "build/reports/harness-iteration/live/kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3/long_json-1-corpus.json": "85954d93c41863e5f6b0cf20eca463fcb0c668f412ee374d693ac00adcc3e572",
+    "build/reports/harness-iteration/live/kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3/protocol.json": "b67375482654bec420d360bc9cfdd4e324b5dbeb48bd9f5fd5f30406e17248cc",
+    "build/reports/harness-iteration/live/kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3/results.json": "2400e8409e9aae5ca5793ac0e4da47bd31c50e5cf35437d3a4a7f37d6af93097",
+    "build/reports/harness-iteration/live/kotlin-exposure-05a8adc3-3173-4eaa-95e3-85b9765168c3/small_mixed-1-corpus.json": "790b44901d2a96bf7c760fc837a113125069a38e1ccd58a3a9925e81b923d957",
+    "build/reports/harness-iteration/live/request-02640aa3-67a2-409b-a2c2-9cb29ec8b929.json": "e37889d386b3e0013a85d2b7a82b26c0022457d33f957b885b93383026ac559f",
+    "build/reports/harness-iteration/live/request-028d503f-585e-4bd8-92a4-b5b27ea50b43.json": "4b4e07f7623832de715fc77fedc3209de426fce1930f169a8fba7aa0188d3ff0",
+    "build/reports/harness-iteration/live/request-0c0524ec-9e54-4af4-b218-8a2dcb6420d6.json": "41a46b72c405efd980089ff856e17a5dec2cdcceec47d2315feb732f4c6ea7bb",
+    "build/reports/harness-iteration/live/request-267f1db2-471e-458f-99c5-d7485a030154.json": "a716085ca08cd2bb6a4fb57d89fa000ade3892693ab511c0fcf22290d376bb11",
+    "build/reports/harness-iteration/live/request-2f90e649-533d-46e3-887c-ea9602eb1213.json": "7d2dc927f878273147aae482c3bad3ef32d02cb5a2dff5a9a3354593e8af2c07",
+    "build/reports/harness-iteration/live/request-31b16d1a-1507-4a83-9895-899bfe545aae.json": "04af0490725e34de0cc4933e8839e0c627dd5cbbe01fd2da89842ee1c818546d",
+    "build/reports/harness-iteration/live/request-31d03d60-303e-4b70-86d9-7bf122c33d8f.json": "00244c076a0d7d06c3f61e9e1b87428778621b6bc4f1024b88fa42e91341a7c1",
+    "build/reports/harness-iteration/live/request-3477b288-c591-4aa0-8fb7-b7ef21d9a81d.json": "895260dab29bc71070184792559bf6b784e6a57ee72d3a2b5a645247a526ed12",
+    "build/reports/harness-iteration/live/request-36e68ecd-c358-47ba-96c4-8a23d1dfd187.json": "55e7f2955649dd651b918e1cb72b0abbb15b46636541850d4a50f709f8fd4aea",
+    "build/reports/harness-iteration/live/request-3a50a7c8-d503-4676-a5c4-26a6c6f09747.json": "1b13f264aa1ec002e43cfa5b3c4858eadb0633ac535638dd0f739e246c103991",
+    "build/reports/harness-iteration/live/request-4093220e-711e-47a8-8893-876484913800.json": "9254422da02ce7e4a9ddd40354f3e0b3a76d70b998e24cb8ffb2badbe2ae2447",
+    "build/reports/harness-iteration/live/request-6955280e-4397-4c49-95e9-b934c29173b3.json": "72ad245296e06b9f137b81313f27de59fb67b855aad9003aa5c27e9ff2d7f271",
+    "build/reports/harness-iteration/live/request-738234e5-2bf4-4543-a2cd-e7ce3fe9f001.json": "9bcafbb22c4aee13b8a57842e26e157ee1522f497ae3d653a1ece5a55f1c61e0",
+    "build/reports/harness-iteration/live/request-894c7e06-159b-4c44-b49a-4c9d88a65581.json": "73a0869c79340fab9817f1581fcda5d55638a60c68552524774ffcb49bb073b0",
+    "build/reports/harness-iteration/live/request-8c54ac63-e15b-48ca-a9a7-02243c1907d9.json": "bc0d8c950c771fd48d0dfc0c657630486a7b0a8a734ef40511c990dcd76bc589",
+    "build/reports/harness-iteration/live/request-a6d249f8-88d0-49d9-ad7f-e8abd90bd9b4.json": "5265984feaaafa85fe390205de27d47e02e33c4553d28b3c4514d9e7f664998a",
+    "build/reports/harness-iteration/live/request-a884e734-3739-4d25-8ef3-0e44c0da16c7.json": "a676fccb5768c771a9ab29373bd7d86aff1fdc026cb024f51e35eba2a5c83021",
+    "build/reports/harness-iteration/live/request-a8a32266-241e-4a05-858a-b1ab3b09361d.json": "132660bd1d18d51883ad3a4fed594375059461c35b61dc5b2018a05fa68d6806",
+    "build/reports/harness-iteration/live/request-aae71575-1b02-45e1-bcce-5c6df1473c33.json": "0e72727451139d953380a82a0966dea11d69c4d691bcac174d5a0ddf981b33e0",
+    "build/reports/harness-iteration/live/request-ad3dc61f-1c5d-4f19-b15c-5c695431ac34.json": "3a599109d425f5a46e80dfbcede3297d76ce85321be0c6d3c4e3a5152bfd4e49",
+    "build/reports/harness-iteration/live/request-ae746d74-4c45-4dff-9db7-7c87c7d610c0.json": "d9a9e84ec8f6aaa4f0082d252a6885343a88c6d67db385c20c0ba0254720953c",
+    "build/reports/harness-iteration/live/request-bb4975df-2e3e-4fcb-8966-3a1143e22d9c.json": "37566b9821db5776a110753a39c88b3323bd0397542a04c162037bda40a63afe",
+    "build/reports/harness-iteration/live/request-bcd81676-2e9d-4935-a459-34676fbde9e6.json": "2692354c852ab1d7327dd2a48f26fc0746c606135432a858004ab194567551de",
+    "build/reports/harness-iteration/live/request-db320fb4-3054-4bcb-af8d-a69ec7e33704.json": "f860b3223c8aa5326b5059649cce26dd0fad4949beeb3a0aa8f2c61ad1c95253",
+    "build/reports/harness-iteration/live/request-e187e9e5-85d4-4542-9a3f-f68ec3c6639c.json": "4f07dd1d6758b46253d05248bc10d9646d05c9daa1c8801f6ab6aa88ec2629d7",
+    "build/reports/harness-iteration/live/request-e5fff325-1db5-4197-a074-6d569e207969.json": "1f4c14894fc7ef7bbce5f8a2fc2fc262a4f5234b318aa83f7d65bf291d7a6562",
+    "build/reports/harness-iteration/live/request-eb3ea939-c791-4cbe-8aef-ff9af1c6ad7b.json": "b2103d1f55bac6d4c0390af8fafa341affed60a1b89b641c9b527f5c96f67f31",
+    "build/reports/harness-iteration/live/request-eff66428-3f12-4a12-b2ca-caa0f8cf5304.json": "10f82830267034bafff39582336fdbcdf33ab5ee20929afa870bb56a89f7d882",
+    "build/reports/harness-iteration/live/request-f504b20c-9eeb-4ad2-ac72-3b5bf112ae3b.json": "057bcca47d54632d9e99a98299191fa2fa6eb23c53404afac8950add31ad4edb",
+    "build/reports/harness-iteration/live/request-f554dc80-7e73-437a-b30e-0ccc2accb9f8.json": "e74fd66dd1211254c4b44fb063dc92374ac83fd425304621acdf452d4509dcd2",
+    "build/reports/harness-iteration/live/request-f9d04be1-c4f6-4c7c-a8e3-7014ad36fd72.json": "a17b5bbc30db23a174a4ebe7a6556f012dee9378ddd59c95a5275578459b6d4e",
+    "build/reports/harness-iteration/live/request-fa04d01f-c53c-4ce4-94f5-8ab66d51a0df.json": "da77be22f6f5174db72dfb6ac25b26afd96777d5de932eb69e2aead6b64d89f0"
+  },
+  "validation": {
+    "shared:jvmTest": {
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "shared:harnessLiveTest": {
+      "tests": 1,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "historicalFinishReasonsStillUnknown": true,
+  "unexecutedRuns": [
+    "small_mixed/1/free"
+  ],
+  "rawPageReads": 24,
+  "nativePreflightCompletedBeforePaidCalls": true,
+  "validationScope": "15 targeted offline shared tests and shared:ktlintCheck; live test may stop on the baseline guard"
+}

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="HarnessKotlinRunnerTest[jvm]" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-09-07T22:25:24.523Z" hostname="BUREAU" time="0.416">
+  <properties/>
+  <testcase name="worker request is isolated bounded and cleaned on success and failure[jvm]" classname="dev.promethe.core.HarnessKotlinRunnerTest" time="0.416"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,9 +1,12 @@
 package dev.promethe.gateway
 
+import dev.promethe.api.ErrorResponse
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
@@ -22,14 +25,15 @@ object RateLimiter {
 
     private val counters = ConcurrentHashMap<String, WindowCounter>()
 
-    // Default: 60 requests per minute per IP
-    private var maxRequests: Int = 60
+    // Remote interactive clients generate several REST and SSE requests per action.
+    private var maxRequests: Int = 600
     private var webhookMaxRequests: Int = 120
     private var windowMs: Long = 60_000L
     private val cleanupTicker = AtomicLong(0)
+    private val jsonEncoder = Json { encodeDefaults = true }
 
     fun configure(
-        maxRequestsPerWindow: Int = 60,
+        maxRequestsPerWindow: Int = 600,
         windowDurationMs: Long = 60_000L,
         maxWebhookRequestsPerWindow: Int = 120,
     ) {
@@ -40,13 +44,18 @@ object RateLimiter {
 
     /**
      * Install the rate limiter as a Ktor interceptor.
-     * Health checks are skipped; public webhooks have their own stricter bucket.
+     * Health/discovery and the authenticated local desktop client are skipped;
+     * public webhooks have their own stricter bucket.
      */
     fun install(app: Application) {
         app.intercept(ApplicationCallPipeline.Plugins) {
             val path = call.request.path()
 
-            if (path == "/health") {
+            if (
+                path == "/health" ||
+                path.startsWith("/.well-known/") ||
+                AuthMiddleware.isLocalApiKeyAuthentication(call)
+            ) {
                 return@intercept
             }
 
@@ -79,12 +88,20 @@ object RateLimiter {
             // Add rate limit headers
             call.response.header("X-RateLimit-Limit", requestLimit.toString())
             call.response.header("X-RateLimit-Remaining", remaining.toString())
-            call.response.header("X-RateLimit-Reset", ((windowMs - elapsed) / 1000).toString())
+            val retryAfterSeconds = ((windowMs - elapsed).coerceAtLeast(0L) / 1000L).coerceAtLeast(1L)
+            call.response.header("X-RateLimit-Reset", retryAfterSeconds.toString())
 
             if (currentCount > requestLimit) {
-                call.respond(
-                    HttpStatusCode.TooManyRequests,
-                    mapOf("error" to "Rate limit exceeded. Try again in ${(windowMs - elapsed) / 1000}s."),
+                // This interceptor runs before route-scoped ContentNegotiation. Serializing here
+                // avoids turning an intended 429 into Ktor's 406 Not Acceptable response.
+                call.response.header(HttpHeaders.RetryAfter, retryAfterSeconds.toString())
+                call.respondText(
+                    text =
+                        jsonEncoder.encodeToString(
+                            ErrorResponse("Rate limit exceeded. Try again in ${retryAfterSeconds}s."),
+                        ),
+                    contentType = ContentType.Application.Json,
+                    status = HttpStatusCode.TooManyRequests,
                 )
                 finish()
                 return@intercept

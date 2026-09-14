@@ -1,10 +1,18 @@
 package dev.promethe.core
 
+import dev.promethe.api.ACTIVE_PROJECT_SETTING_KEY
+import dev.promethe.api.AgentRunRecord
+import dev.promethe.api.AgentRunStatus
 import dev.promethe.db.PrometheDatabaseApi
+import dev.promethe.db.ProjectRow
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonPrimitive
 import kotlin.time.Clock
@@ -35,23 +43,35 @@ data class AgentExecutionRequest(
     val model: String? = null,
     val origin: AgentExecutionOrigin = AgentExecutionOrigin.INTERNAL,
     val channelHint: String = "internal",
+    val externalContext: String? = null,
+    val projectId: String? = null,
+    val runId: String? = null,
+    val parentRunId: String? = null,
+    val resourceBudget: ResourceBudget = ResourceBudget.DEFAULT,
 )
 
 sealed interface AgentExecutionEvent {
+    val runId: String
+
     data class Step(
         val index: Int,
         val trajectory: ConversationTrajectory,
+        override val runId: String,
+        val stepId: String,
     ) : AgentExecutionEvent
 
     data class Completed(
         val response: String,
         val steps: Int,
+        override val runId: String,
     ) : AgentExecutionEvent
 
     data class Failed(
         val code: String,
         val message: String,
         val steps: Int,
+        override val runId: String,
+        val stepId: String? = null,
     ) : AgentExecutionEvent
 }
 
@@ -62,45 +82,296 @@ class AgentExecutionException(
 ) : IllegalStateException(message, cause)
 
 /**
- * The single application service allowed to enter [AIAgent.executeLoop].
- * Network protocols and background jobs adapt their requests to this contract.
+ * The single application service exposed to network protocols and background jobs.
+ * The execution graph is the only component allowed to enter [AIAgent.executeLoop].
  */
 class AgentExecutionService(
-    private val agent: AIAgent,
+    agent: AIAgent,
     private val database: PrometheDatabaseApi,
-) : AgentExecutionPort {
+    private val executionIdGenerator: ExecutionIdGenerator = DefaultExecutionIdGenerator,
+    private val runLedger: RunLedger = PersistentRunLedger(database),
+    private val executionGraph: ExecutionGraph = DurableExecutionGraph(agent.asLoopExecutor(), runLedger),
+    private val recoveryService: RunRecoveryService =
+        RunRecoveryService(runLedger, PersistentRunEventLedger(database)),
+    private val resourceGovernors: ResourceGovernorRegistry = GlobalResourceGovernorRegistry,
+) : RecoverableAgentExecutionPort {
     private val logger = Log.create("AgentExecutionService")
 
-    override fun execute(request: AgentExecutionRequest): Flow<AgentExecutionEvent> {
+    override fun execute(request: AgentExecutionRequest): Flow<AgentExecutionEvent> = executeInternal(request, resume = false)
+
+    override fun resume(request: AgentExecutionRequest): Flow<AgentExecutionEvent> = executeInternal(request, resume = true)
+
+    override suspend fun auditInterruptedRuns(): List<RunRecoveryAssessment> = recoveryService.auditInterruptedRuns()
+
+    private fun executeInternal(
+        request: AgentExecutionRequest,
+        resume: Boolean,
+    ): Flow<AgentExecutionEvent> {
         var stepCount = 0
-        return flow {
+        var lastStepId: String? = null
+        var ledgerStarted = false
+        var terminalRecorded = false
+        var governorAcquired = false
+        var resumedRun: AgentRunRecord? = null
+        val generatedRunId = executionIdGenerator.nextId("run")
+        val effectiveRunId = request.runId ?: generatedRunId
+        val requestFingerprint = agentExecutionRequestFingerprint(request)
+        return channelFlow {
+            if (resume && request.runId == null) {
+                send(
+                    AgentExecutionEvent.Failed(
+                        code = "resume_run_id_required",
+                        message = "A durable run identifier is required to resume execution",
+                        steps = 0,
+                        runId = generatedRunId,
+                    ),
+                )
+                return@channelFlow
+            }
+            val identityIsValid =
+                isValidExecutionId(effectiveRunId) &&
+                    (request.parentRunId == null || isValidExecutionId(request.parentRunId))
+            val ledgerRunId = effectiveRunId.takeIf(::isValidExecutionId) ?: generatedRunId
+            val createdAt = Clock.System.now().toEpochMilliseconds()
+            if (resume && !identityIsValid) {
+                send(
+                    AgentExecutionEvent.Failed(
+                        code = "invalid_run_identity",
+                        message = "Run identifiers must contain only letters, digits, '.', '_', ':', or '-'",
+                        steps = 0,
+                        runId = ledgerRunId,
+                    ),
+                )
+                return@channelFlow
+            }
+            try {
+                if (resume) {
+                    val existing = runLedger.get(ledgerRunId)
+                    if (existing == null) {
+                        send(
+                            AgentExecutionEvent.Failed(
+                                code = "run_not_found",
+                                message = "The run to resume does not exist",
+                                steps = 0,
+                                runId = ledgerRunId,
+                            ),
+                        )
+                        return@channelFlow
+                    }
+                    val contextMatches =
+                        existing.sessionId == request.sessionId &&
+                            existing.origin == request.origin.name &&
+                            (request.projectId == null || existing.projectId == request.projectId) &&
+                            existing.requestFingerprint == requestFingerprint
+                    if (!contextMatches) {
+                        send(
+                            AgentExecutionEvent.Failed(
+                                code = "resume_context_mismatch",
+                                message = "The resume request does not match the original run context",
+                                steps = existing.stepCount,
+                                runId = ledgerRunId,
+                                stepId = existing.lastStepId,
+                            ),
+                        )
+                        return@channelFlow
+                    }
+                    val assessment = recoveryService.assess(ledgerRunId)
+                    if (assessment?.disposition != RunRecoveryDisposition.RECOVERABLE) {
+                        val needsReview = assessment?.disposition == RunRecoveryDisposition.NEEDS_REVIEW
+                        send(
+                            AgentExecutionEvent.Failed(
+                                code = if (needsReview) "run_needs_review" else "run_not_recoverable",
+                                message =
+                                    if (needsReview) {
+                                        "The run has an external effect with an uncertain outcome"
+                                    } else {
+                                        "The run cannot be resumed from its current state"
+                                    },
+                                steps = existing.stepCount,
+                                runId = ledgerRunId,
+                                stepId = existing.lastStepId,
+                            ),
+                        )
+                        return@channelFlow
+                    }
+                    when (val acquisition = resourceGovernors.acquire(ledgerRunId, request.sessionId, request.resourceBudget)) {
+                        is ResourceGovernorAcquisition.Acquired -> {
+                            governorAcquired = true
+                        }
+
+                        is ResourceGovernorAcquisition.Conflict -> {
+                            send(
+                                AgentExecutionEvent.Failed(
+                                    code = "run_resume_conflict",
+                                    message = "Another governed run is already active for this session",
+                                    steps = existing.stepCount,
+                                    runId = ledgerRunId,
+                                    stepId = existing.lastStepId,
+                                ),
+                            )
+                            return@channelFlow
+                        }
+                    }
+                    val claimed = recoveryService.claimResume(ledgerRunId)
+                    if (claimed == null) {
+                        send(
+                            AgentExecutionEvent.Failed(
+                                code = "run_resume_conflict",
+                                message = "The run was claimed by another execution",
+                                steps = existing.stepCount,
+                                runId = ledgerRunId,
+                                stepId = existing.lastStepId,
+                            ),
+                        )
+                        return@channelFlow
+                    }
+                    stepCount = claimed.stepCount
+                    lastStepId = claimed.lastStepId
+                    resumedRun = claimed
+                    ledgerStarted = true
+                    if (!recoveryService.markResumed(ledgerRunId)) {
+                        throw AgentExecutionException("run_ledger_write_failed", "Failed to mark the run as resumed")
+                    }
+                } else {
+                    ledgerStarted =
+                        runLedger.begin(
+                            AgentRunRecord(
+                                runId = ledgerRunId,
+                                parentRunId = request.parentRunId?.takeIf(::isValidExecutionId),
+                                sessionId = request.sessionId,
+                                origin = request.origin.name,
+                                projectId = request.projectId,
+                                requestFingerprint = requestFingerprint,
+                                status = AgentRunStatus.PENDING,
+                                createdAt = createdAt,
+                                updatedAt = createdAt,
+                            ),
+                        )
+                }
+            } catch (error: Exception) {
+                logger.error(error) { "Run ledger initialization failed for $ledgerRunId" }
+                send(
+                    AgentExecutionEvent.Failed(
+                        code = "run_ledger_unavailable",
+                        message = "The durable run ledger is unavailable",
+                        steps = 0,
+                        runId = ledgerRunId,
+                    ),
+                )
+                return@channelFlow
+            }
+            if (!ledgerStarted) {
+                send(
+                    AgentExecutionEvent.Failed(
+                        code = "duplicate_run_id",
+                        message = "The run identifier already exists",
+                        steps = 0,
+                        runId = ledgerRunId,
+                    ),
+                )
+                return@channelFlow
+            }
+            if (!identityIsValid) {
+                terminalRecorded = runLedger.fail(ledgerRunId, 0, null, "invalid_run_identity", createdAt)
+                send(
+                    AgentExecutionEvent.Failed(
+                        code = "invalid_run_identity",
+                        message = "Run identifiers must contain only letters, digits, '.', '_', ':', or '-'",
+                        steps = 0,
+                        runId = ledgerRunId,
+                    ),
+                )
+                return@channelFlow
+            }
+            val runIdentity = AgentRunIdentity(effectiveRunId, resumedRun?.parentRunId ?: request.parentRunId)
             val input = request.text.trim()
             if (input.isBlank()) {
-                emit(AgentExecutionEvent.Failed("empty_input", "Agent input must contain text", 0))
-                return@flow
+                terminalRecorded = runLedger.fail(runIdentity.runId, 0, null, "empty_input", createdAt)
+                send(AgentExecutionEvent.Failed("empty_input", "Agent input must contain text", 0, runIdentity.runId))
+                return@channelFlow
+            }
+
+            if (!governorAcquired) {
+                when (val acquisition = resourceGovernors.acquire(runIdentity.runId, request.sessionId, request.resourceBudget)) {
+                    is ResourceGovernorAcquisition.Acquired -> {
+                        governorAcquired = true
+                    }
+
+                    is ResourceGovernorAcquisition.Conflict -> {
+                        terminalRecorded =
+                            runLedger.fail(
+                                runIdentity.runId,
+                                stepCount,
+                                lastStepId,
+                                "resource_governor_conflict",
+                                Clock.System.now().toEpochMilliseconds(),
+                            )
+                        send(
+                            AgentExecutionEvent.Failed(
+                                code = "resource_governor_conflict",
+                                message = "Another governed run is already active for this session",
+                                steps = stepCount,
+                                runId = runIdentity.runId,
+                                stepId = lastStepId,
+                            ),
+                        )
+                        return@channelFlow
+                    }
+                }
             }
 
             val resolved = resolveProfile(request)
-            persistHistory(request)
+            val project = resolveProject(request)
+            if (!resume) persistHistory(request)
 
             var finalResponse: String? = null
-            agent.executeLoop(
-                sessionId = request.sessionId,
-                userInput = input,
-                overrideProvider = resolved.provider,
-                overrideModel = resolved.model,
-                personaOverlay = resolved.persona,
-                personaSkillNames = resolved.skills,
-                toolCallOrigin = request.origin.toToolCallOrigin(),
-                overrideReasoningEffort = resolved.reasoningEffort,
-                llmRequestContext = LlmRequestContext(request.sessionId, request.origin),
-            ).collect { trajectory ->
-                stepCount++
-                emit(AgentExecutionEvent.Step(stepCount, trajectory))
-                trajectory.outputs["response"]
-                    ?.trim()
-                    ?.takeIf { it.isNotBlank() }
-                    ?.let { finalResponse = it }
+            Tracing.span(
+                name = "agent.run",
+                attributes =
+                    buildMap {
+                        put("promethe.run.id", runIdentity.runId)
+                        put("agent.origin", request.origin.name)
+                        runIdentity.parentRunId?.let { put("promethe.run.parent_id", it) }
+                    },
+            ) {
+                executionGraph
+                    .execute(
+                        ExecutionGraphRequest(
+                            identity = runIdentity,
+                            startingStepIndex = stepCount,
+                            sessionId = request.sessionId,
+                            userInput = input,
+                            overrideProvider = resolved.provider,
+                            overrideModel = resolved.model,
+                            personaOverlay = resolved.persona,
+                            personaSkillNames = resolved.skills,
+                            origin = request.origin,
+                            toolCallOrigin = request.origin.toToolCallOrigin(),
+                            overrideReasoningEffort = resolved.reasoningEffort,
+                            externalContext = request.externalContext,
+                            projectId = project?.id,
+                            projectContext = project?.toPromptContext(),
+                            memoryNamespace = project?.memoryNamespace ?: "default",
+                            workspaceRelativePath = project?.workspacePath,
+                        ),
+                    ).collect { transition ->
+                        if (transition is ExecutionGraphTransition.StepPersisted) {
+                            stepCount = transition.index
+                            lastStepId = transition.stepId
+                            send(
+                                AgentExecutionEvent.Step(
+                                    index = transition.index,
+                                    trajectory = transition.trajectory,
+                                    runId = transition.runId,
+                                    stepId = transition.stepId,
+                                ),
+                            )
+                            transition.trajectory.outputs["response"]
+                                ?.trim()
+                                ?.takeIf { it.isNotBlank() }
+                                ?.let { finalResponse = it }
+                        }
+                    }
             }
 
             val response = finalResponse
@@ -109,25 +380,83 @@ class AgentExecutionService(
                     "Agent execution ended without a final response: " +
                         "session=${request.sessionId}, origin=${request.origin}, steps=$stepCount"
                 }
-                emit(
+                terminalRecorded =
+                    runLedger.fail(
+                        runIdentity.runId,
+                        stepCount,
+                        lastStepId,
+                        "missing_final_response",
+                        Clock.System.now().toEpochMilliseconds(),
+                    )
+                send(
                     AgentExecutionEvent.Failed(
                         code = "missing_final_response",
                         message = "The agent completed without producing a final response",
                         steps = stepCount,
+                        runId = runIdentity.runId,
+                        stepId = stepCount.takeIf { it > 0 }?.let(runIdentity::step)?.stepId,
                     ),
                 )
             } else {
-                emit(AgentExecutionEvent.Completed(response, stepCount))
+                terminalRecorded =
+                    runLedger.complete(
+                        runIdentity.runId,
+                        stepCount,
+                        lastStepId,
+                        Clock.System.now().toEpochMilliseconds(),
+                    )
+                if (!terminalRecorded) {
+                    throw AgentExecutionException("run_ledger_write_failed", "Failed to complete agent run")
+                }
+                send(AgentExecutionEvent.Completed(response, stepCount, runIdentity.runId))
             }
         }.catch { e ->
             logger.error(e) { "Agent execution failed for session ${request.sessionId}" }
+            if (ledgerStarted && !terminalRecorded) {
+                terminalRecorded =
+                    try {
+                        runLedger.fail(
+                            effectiveRunId.takeIf(::isValidExecutionId) ?: generatedRunId,
+                            stepCount,
+                            lastStepId,
+                            (e as? AgentExecutionException)?.code ?: "agent_execution_failed",
+                            Clock.System.now().toEpochMilliseconds(),
+                        )
+                    } catch (ledgerError: Exception) {
+                        logger.error(ledgerError) { "Failed to persist terminal run failure" }
+                        false
+                    }
+            }
             emit(
                 AgentExecutionEvent.Failed(
-                    code = "agent_execution_failed",
+                    code = (e as? AgentExecutionException)?.code ?: "agent_execution_failed",
                     message = e.message ?: "Agent execution failed",
                     steps = stepCount,
+                    runId = effectiveRunId.takeIf(::isValidExecutionId) ?: generatedRunId,
+                    stepId =
+                    lastStepId,
                 ),
             )
+        }.onCompletion { cause ->
+            if ((cause is CancellationException && ledgerStarted && !terminalRecorded) || governorAcquired) {
+                withContext(NonCancellable) {
+                    if (cause is CancellationException && ledgerStarted && !terminalRecorded) {
+                        terminalRecorded =
+                            runLedger.cancel(
+                                effectiveRunId.takeIf(::isValidExecutionId) ?: generatedRunId,
+                                stepCount,
+                                lastStepId,
+                                Clock.System.now().toEpochMilliseconds(),
+                            )
+                    }
+                    if (governorAcquired) {
+                        resourceGovernors.release(
+                            effectiveRunId.takeIf(::isValidExecutionId) ?: generatedRunId,
+                            request.sessionId,
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -162,6 +491,38 @@ class AgentExecutionService(
                     timestamp = now + index,
                 )
             }
+    }
+
+    private suspend fun resolveProject(request: AgentExecutionRequest): ProjectRow? {
+        val existingSession = database.getSession(request.sessionId)
+        val isNewSession = existingSession == null
+        if (isNewSession) {
+            database.insertSessionOrIgnore(
+                request.sessionId,
+                Clock.System.now().toEpochMilliseconds(),
+                "{}",
+            )
+        }
+
+        val projectId =
+            request.projectId
+                ?: existingSession?.projectId
+                ?: (if (isNewSession) database.getSetting(ACTIVE_PROJECT_SETTING_KEY) else null)
+                ?: return null
+        val project = database.getProject(projectId)
+        if (project == null || project.archived) {
+            if (request.projectId != null) {
+                throw AgentExecutionException("invalid_project", "Project '$projectId' does not exist or is archived")
+            }
+            if (database.getSetting(ACTIVE_PROJECT_SETTING_KEY) == projectId) {
+                database.deleteSetting(ACTIVE_PROJECT_SETTING_KEY)
+            }
+            return null
+        }
+        if (existingSession?.projectId != project.id) {
+            database.assignSessionToProject(request.sessionId, project.id)
+        }
+        return project
     }
 
     private suspend fun resolveProfile(request: AgentExecutionRequest): ResolvedExecution {
@@ -225,4 +586,58 @@ class AgentExecutionService(
         val skills: List<String>,
         val reasoningEffort: dev.promethe.api.ReasoningEffort?,
     )
+
+    private fun ProjectRow.toPromptContext(): String =
+        buildString {
+            appendLine("Active project: $name")
+            appendLine("Project id: $id")
+            appendLine("Workspace: $workspacePath")
+            if (description.isNotBlank()) appendLine("Description: $description")
+            if (instructions.isNotBlank()) {
+                appendLine("Project instructions:")
+                appendLine(instructions)
+            }
+            append("Relative file and process paths must use this project workspace.")
+        }
+}
+
+internal fun agentExecutionRequestFingerprint(request: AgentExecutionRequest): String =
+    toolIntentDigest(
+        buildString {
+            appendFingerprintField("promethe-agent-request-v1")
+            appendFingerprintField(request.sessionId)
+            appendFingerprintField(request.text.trim())
+            appendFingerprintField(request.profileId)
+            appendFingerprintField(request.provider)
+            appendFingerprintField(request.model)
+            appendFingerprintField(request.origin.name)
+            appendFingerprintField(request.channelHint)
+            appendFingerprintField(request.externalContext)
+            appendFingerprintField(request.projectId)
+            appendFingerprintField(request.parentRunId)
+            request.history.forEach { message ->
+                appendFingerprintField(message.role)
+                appendFingerprintField(message.content)
+            }
+            if (request.resourceBudget != ResourceBudget.DEFAULT) {
+                appendFingerprintField("resource-budget-v1")
+                appendFingerprintField(request.resourceBudget.maxTokens.toString())
+                appendFingerprintField(request.resourceBudget.maxCostDollars.toString())
+                appendFingerprintField(request.resourceBudget.maxLlmCalls.toString())
+                appendFingerprintField(request.resourceBudget.maxToolStarts.toString())
+                appendFingerprintField(request.resourceBudget.maxSubAgents.toString())
+                appendFingerprintField(request.resourceBudget.maxDurationMs.toString())
+            }
+        },
+    )
+
+private fun StringBuilder.appendFingerprintField(value: String?) {
+    if (value == null) {
+        append("-1:")
+    } else {
+        append(value.length)
+        append(':')
+        append(value)
+    }
+    append('\u0000')
 }

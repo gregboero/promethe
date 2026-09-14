@@ -11,7 +11,10 @@ import dev.promethe.core.hooks.HookResult
 import dev.promethe.core.sandbox.SandboxCommandExecutor
 import dev.promethe.core.sandbox.renderCommandOutput
 import io.ktor.client.*
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.*
+import kotlin.time.Clock
 
 /**
  * Dangerous commands that should never be executed locally.
@@ -75,7 +78,22 @@ class ActionExecutor(
     private val hookManager: HookManager? = null,
     private val approvalGate: ApprovalGate? = null,
     private val sandboxCommandExecutor: SandboxCommandExecutor? = null,
+    private val toolIntentLedger: ToolIntentLedger = NoOpToolIntentLedger,
+    private val policyKernel: PolicyKernel = PolicyKernel(),
+    private val policyAuditSink: PolicyAuditSink = NoOpPolicyAuditSink,
+    artifactStore: ArtifactStore? = null,
+    private val resourceGovernors: ResourceGovernorRegistry = GlobalResourceGovernorRegistry,
+    private val observationProcessor: ObservationProcessor? = null,
 ) : SecureToolExecutor {
+    private val logger = Log.create("ActionExecutor")
+    private val artifactExternalizer =
+        artifactStore?.let { store ->
+            ArtifactObservationExternalizer(
+                store = store,
+                maxInlineBytes = minOf(config.maxOutputBytes, ArtifactObservationExternalizer.DEFAULT_MAX_INLINE_BYTES),
+            )
+        }
+
     /** Shared Koog-compatible serializer backed by kotlinx-serialization. */
     private val koogSerializer = KotlinxSerializer()
 
@@ -94,6 +112,18 @@ class ActionExecutor(
         dedupCache.clear()
     }
 
+    suspend fun beginHarnessStep(
+        sessionId: String,
+        runId: String?,
+        stepId: String?,
+    ) {
+        observationProcessor?.beginStep(sessionId, runId, stepId)
+    }
+
+    suspend fun endHarnessSession(sessionId: String) {
+        observationProcessor?.endSession(sessionId)
+    }
+
     /** Tools that are safe to deduplicate (read-only, no side effects). */
     private val dedupSafeTools = setOf(
         "web_search",
@@ -103,6 +133,8 @@ class ActionExecutor(
         "get_current_datetime",
         "get_config",
         "list_profiles",
+        "workspace_roots",
+        "artifact_read",
     )
 
     @OptIn(InternalAgentToolsApi::class)
@@ -127,13 +159,61 @@ class ActionExecutor(
             setAttribute("tool.name", toolName)
             setAttribute("tool.origin", request.origin.name)
             setAttribute("tool.args_keys", args.keys.joinToString(","))
+            request.runId?.let { setAttribute("promethe.run.id", it) }
+            request.stepId?.let { setAttribute("promethe.step.id", it) }
+
+            val contract = ToolApprovalPolicy.contractFor(toolName)
+            val policy = policyKernel.evaluate(request, contract)
+            setAttribute("tool.risk", policy.risk.name)
+            setAttribute("policy.version", policy.policyVersion)
+            setAttribute("policy.effect", policy.effect.name)
 
             // ── DEDUP CHECK — return cached result for identical read-only calls ──
-            if (toolName in dedupSafeTools) {
-                val cacheKey = "$toolName|$args"
+            if (toolName in dedupSafeTools && observationProcessor == null) {
+                val cacheKey = "${request.sessionId}|${observationProcessor?.revisionKey(request.sessionId)}|$toolName|$args"
                 dedupCache[cacheKey]?.let { cached ->
                     return@span "$cached\n\n[NOTE: Cached result — you already called this tool with identical arguments. Use the information above to formulate your response.]"
                 }
+            }
+
+            val intentId =
+                try {
+                    when (
+                        val admission =
+                            toolIntentLedger.prepare(
+                                request = request,
+                                risk = policy.risk,
+                                now = Clock.System.now().toEpochMilliseconds(),
+                            )
+                    ) {
+                        is ToolIntentAdmission.Proceed -> admission.intentId
+                        is ToolIntentAdmission.Replay -> return@span admission.message
+                        is ToolIntentAdmission.Denied -> return@span "[BLOCKED] ${admission.message}"
+                    }
+                } catch (error: Exception) {
+                    logger.error(error) { "Tool intent ledger unavailable for '$toolName'" }
+                    if (policy.risk != ToolRisk.READ) {
+                        return@span "[BLOCKED] The durable tool intent ledger is unavailable"
+                    }
+                    null
+                }
+
+            val policyAuditRecorded =
+                runCatching {
+                    policyAuditSink.record(
+                        request = request,
+                        contract = contract,
+                        decision = policy,
+                        createdAt = Clock.System.now().toEpochMilliseconds(),
+                    )
+                }.getOrDefault(false)
+            if (!policyAuditRecorded && policy.risk != ToolRisk.READ) {
+                recordBlocked(intentId, "policy_audit_failed")
+                return@span "[BLOCKED] The policy decision could not be recorded durably"
+            }
+            if (policy.effect == PolicyEffect.DENY) {
+                recordBlocked(intentId, "policy_denied")
+                return@span "[BLOCKED] ${policy.denialReason}"
             }
 
             // ── BEFORE_TOOL_CALL hook ──
@@ -141,37 +221,104 @@ class ActionExecutor(
                 val beforeCtx =
                     HookContext(
                         event = HookEvent.BEFORE_TOOL_CALL,
+                        sessionId = request.sessionId,
+                        metadata = mapOf("runId" to (request.runId ?: ""), "stepId" to (request.stepId ?: "")),
                         toolName = toolName,
                         toolArgs = args,
                     )
-                val hookResult = hookManager.fire(beforeCtx)
+                val hookResult =
+                    try {
+                        hookManager.fire(beforeCtx)
+                    } catch (error: Exception) {
+                        withContext(NonCancellable) { recordBlocked(intentId, "hook_failed") }
+                        throw error
+                    }
                 if (hookResult is HookResult.Abort) {
+                    recordBlocked(intentId, "hook_aborted")
                     return@span "[BLOCKED] ${hookResult.reason}"
                 }
             }
 
             // ── APPROVAL GATE — human-in-the-loop for dangerous tools ──
-            val policy = ToolApprovalPolicy.evaluate(toolName, args)
-            val requiresMandatoryApproval = policy.mandatoryApproval
-            setAttribute("tool.risk", policy.risk.name)
+            val unconfinedFileAccess =
+                toolName in fileAccessTools && sandboxCommandExecutor?.hasUnconfinedFileAccess() == true
+            if (unconfinedFileAccess && request.origin !in localInteractiveOrigins) {
+                recordBlocked(intentId, "remote_full_file_access")
+                return@span "[BLOCKED] Full local file access is unavailable from ${request.origin.name.lowercase()}"
+            }
+            val requiresMandatoryApproval = policy.requiresApproval || unconfinedFileAccess
             if (requiresMandatoryApproval && approvalGate == null) {
+                recordBlocked(intentId, "approval_service_required")
                 return@span "[BLOCKED] A human approval service is required for '$toolName'"
             }
             if (approvalGate != null) {
                 val canonicalArguments =
                     canonicalJson(args) +
-                        if (toolName in processBackedTools) {
-                            "\n[sandbox-policy=${sandboxCommandExecutor?.approvalContext() ?: "unavailable"}]"
+                        if (toolName in processBackedTools || toolName in fileAccessTools) {
+                            "\n[workspace=${request.workspaceRelativePath ?: "."}]" +
+                                "\n[sandbox-policy=${sandboxCommandExecutor?.approvalContext() ?: "unavailable"}]"
                         } else {
                             ""
                         }
                 val approvalResult =
-                    if (requiresMandatoryApproval) {
-                        approvalGate.checkMandatory(toolName, canonicalArguments, request.sessionId)
-                    } else {
-                        approvalGate.check(toolName, canonicalArguments, request.sessionId)
+                    try {
+                        if (requiresMandatoryApproval) {
+                            approvalGate.checkMandatory(toolName, canonicalArguments, request.sessionId)
+                        } else {
+                            approvalGate.check(toolName, canonicalArguments, request.sessionId)
+                        }
+                    } catch (error: Exception) {
+                        withContext(NonCancellable) { recordBlocked(intentId, "approval_interrupted") }
+                        throw error
                     }
-                if (!approvalResult.allowed) return@span "[BLOCKED] Approval denied: ${approvalResult.reason}"
+                val approvalRecorded =
+                    runCatching {
+                        toolIntentLedger.recordApproval(
+                            intentId = intentId,
+                            request = request,
+                            result = approvalResult,
+                            now = Clock.System.now().toEpochMilliseconds(),
+                        )
+                    }.getOrElse { error ->
+                        logger.error(error) { "Failed to record approval decision for '$toolName'" }
+                        false
+                    }
+                if (!approvalRecorded && policy.risk != ToolRisk.READ) {
+                    recordBlocked(intentId, "approval_audit_failed")
+                    return@span "[BLOCKED] The approval decision could not be recorded durably"
+                }
+                if (!approvalResult.allowed) {
+                    recordBlocked(intentId, "approval_denied")
+                    return@span "[BLOCKED] Approval denied: ${approvalResult.reason}"
+                }
+            }
+
+            run {
+                val admission = try {
+                    resourceGovernors.admit(request.runId, GovernedResource.TOOL_START, ResourceQuotaScope(toolName = toolName))
+                } catch (cancelled: kotlinx.coroutines.CancellationException) {
+                    throw cancelled
+                } catch (_: Exception) {
+                    recordBlocked(intentId, "resource_budget_unavailable")
+                    return@span "[BLOCKED] Resource budget admission could not be recorded; tool start blocked"
+                }
+                if (admission is ResourceAdmission.Denied) {
+                    recordBlocked(intentId, "resource_budget_exceeded")
+                    return@span "[BLOCKED] ${admission.message()}"
+                }
+            }
+
+            if (intentId != null) {
+                val executionClaimed =
+                    runCatching {
+                        toolIntentLedger.markExecuting(intentId, Clock.System.now().toEpochMilliseconds())
+                    }.getOrElse { error ->
+                        logger.error(error) { "Failed to claim tool intent '$intentId'" }
+                        false
+                    }
+                if (!executionClaimed) {
+                    return@span "[BLOCKED] This tool intent is no longer eligible for execution"
+                }
             }
 
             val result =
@@ -187,11 +334,13 @@ class ActionExecutor(
                             val typedArgs = tool.decodeArgs(koogArgs, koogSerializer)
 
                             // 3. Execute with type-erased dispatch
-                            val execResult = tool.executeUnsafe(typedArgs)
+                            val execResult =
+                                withContext(ToolInvocationContext(request)) {
+                                    tool.executeUnsafe(typedArgs)
+                                }
 
-                            // 4. Coerce result to String, truncate
-                            val raw = execResult?.toString() ?: ""
-                            truncateOutput(raw, config.maxOutputBytes)
+                            // Hooks inspect the complete result before it is compacted or externalized.
+                            execResult?.toString() ?: ""
                         } catch (e: Exception) {
                             "[ERROR] Tool execution failed: ${e.message}"
                         }
@@ -206,7 +355,12 @@ class ActionExecutor(
 
                         // Generic command execution never falls back to the host.
                         // The external sandbox receives an executable plus arguments.
-                        return@run runSandboxCommand(executable, arguments, request.sessionId)
+                        return@run runSandboxCommand(
+                            executable,
+                            arguments,
+                            request.sessionId,
+                            request.workspaceRelativePath ?: ".",
+                        )
                     }
 
                     "Error: Tool '$toolName' is not registered"
@@ -218,6 +372,8 @@ class ActionExecutor(
                     val afterCtx =
                         HookContext(
                             event = HookEvent.AFTER_TOOL_CALL,
+                            sessionId = request.sessionId,
+                            metadata = mapOf("runId" to (request.runId ?: ""), "stepId" to (request.stepId ?: "")),
                             toolName = toolName,
                             toolArgs = args,
                             toolResult = result,
@@ -230,17 +386,100 @@ class ActionExecutor(
                     result
                 }
 
-            setAttribute("tool.result.length", finalResult.length)
-            setAttribute("tool.success", !finalResult.startsWith("[ERROR]") && !finalResult.startsWith("[BLOCKED]"))
+            val successful = !isToolFailure(result)
+            // Persist the original observation, never a mutation's interpretation of success.
+            val rawObservation = if (successful && artifactExternalizer != null) {
+                try {
+                    artifactExternalizer.externalize(result, request.runId, request.stepId, intentId, toolName)
+                } catch (cancelled: kotlinx.coroutines.CancellationException) {
+                    throw cancelled
+                } catch (_: Exception) {
+                    ExternalizedObservation(truncateOutput(result, config.maxOutputBytes))
+                }
+            } else {
+                ExternalizedObservation(truncateOutput(result, config.maxOutputBytes))
+            }
+            recordOutcome(intentId, rawObservation.text, rawObservation.artifact?.hash)
+            val presented = if (successful && observationProcessor != null) {
+                observationProcessor.process(request, result).let { if (it.revision == null) finalResult else it.text }
+            } else if (successful) {
+                finalResult
+            } else {
+                result
+            }
+            val observation =
+                if (successful && artifactExternalizer != null) {
+                    runCatching {
+                        artifactExternalizer.externalize(
+                            content = presented,
+                            runId = request.runId,
+                            stepId = request.stepId,
+                            intentId = intentId,
+                            toolName = toolName,
+                        )
+                    }.getOrElse { error ->
+                        logger.warn(error) { "Failed to externalize output for '$toolName'; returning a bounded result" }
+                        ExternalizedObservation(truncateOutput(presented, config.maxOutputBytes))
+                    }
+                } else {
+                    ExternalizedObservation(truncateOutput(presented, config.maxOutputBytes))
+                }
+
+            setAttribute("tool.result.length", observation.text.length)
+            setAttribute("tool.success", successful)
+            observation.artifact?.hash?.let { hash -> setAttribute("artifact.hash", hash) }
 
             // ── STORE in dedup cache for safe tools ──
-            if (toolName in dedupSafeTools && !finalResult.startsWith("[ERROR]") && !finalResult.startsWith("[BLOCKED]")) {
-                dedupCache["$toolName|$args"] = finalResult
+            if (toolName in dedupSafeTools && successful && observationProcessor == null) {
+                dedupCache["${request.sessionId}|${observationProcessor?.revisionKey(request.sessionId)}|$toolName|$args"] = observation.text
             }
 
-            finalResult
+            observation.text
         }
     }
+
+    private suspend fun recordBlocked(
+        intentId: String?,
+        errorCode: String,
+    ) {
+        if (intentId == null) return
+        runCatching {
+            toolIntentLedger.markBlocked(intentId, errorCode, Clock.System.now().toEpochMilliseconds())
+        }.onFailure { error ->
+            logger.error(error) { "Failed to mark tool intent '$intentId' as blocked" }
+        }
+    }
+
+    private suspend fun recordOutcome(
+        intentId: String?,
+        result: String,
+        artifactHash: String?,
+    ) {
+        if (intentId == null) return
+        val now = Clock.System.now().toEpochMilliseconds()
+        val recorded =
+            runCatching {
+                when {
+                    result.startsWith("[BLOCKED]") -> toolIntentLedger.markBlocked(intentId, "tool_blocked", now)
+
+                    result.startsWith("[ERROR]") ||
+                        result.startsWith("Error:") ||
+                        result.startsWith("[SANDBOX") -> toolIntentLedger.markFailed(intentId, "tool_failed", now)
+
+                    else -> toolIntentLedger.markSucceeded(intentId, result, now, artifactHash)
+                }
+            }.getOrElse { error ->
+                logger.error(error) { "Failed to finish tool intent '$intentId'" }
+                false
+            }
+        if (!recorded) logger.warn { "Tool intent '$intentId' did not accept its terminal transition" }
+    }
+
+    private fun isToolFailure(result: String): Boolean =
+        result.startsWith("[BLOCKED]") ||
+            result.startsWith("[ERROR]") ||
+            result.startsWith("Error:") ||
+            result.startsWith("[SANDBOX")
 
     private val processBackedTools =
         setOf(
@@ -257,10 +496,27 @@ class ActionExecutor(
             "web_screenshot",
         )
 
+    private val fileAccessTools =
+        setOf(
+            "read_file",
+            "write_file",
+            "file_delete",
+            "file_move",
+            "directory_tree",
+            "file_search",
+            "code_grep",
+            "patch",
+            "csv",
+            "workspace_roots",
+        )
+
+    private val localInteractiveOrigins = setOf(ToolCallOrigin.AGENT, ToolCallOrigin.A2A)
+
     private suspend fun runSandboxCommand(
         command: String,
         args: List<String>,
         sessionId: String,
+        workingDirectory: String,
     ): String {
         val executor =
             sandboxCommandExecutor
@@ -269,7 +525,7 @@ class ActionExecutor(
             .executeCommand(
                 executable = command,
                 arguments = args,
-                workingDirectory = ".",
+                workingDirectory = workingDirectory,
                 sessionId = sessionId,
                 timeoutMillis = config.executionTimeoutMs,
             ).renderCommandOutput()

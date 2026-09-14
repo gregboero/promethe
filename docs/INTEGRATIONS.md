@@ -1,5 +1,7 @@
 # External Service Integrations
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 > Reference for the external service tools Promethe can expose to its agent loop: GitHub, Email,
 > Google Calendar, Notion, Jira, Twilio, Slack, Discord, Signal, the web scraper, browser
 > automation (CDP/Browserbase), and Home Assistant.
@@ -131,18 +133,21 @@ gated on).
 ## Twilio (SMS / WhatsApp)
 
 **Tool**: `twilio` (`TwilioTool`)
-**Condition**: `TWILIO_ACCOUNT_SID` and `TWILIO_AUTH_TOKEN` are both non-blank
-(`TWILIO_PHONE_NUMBER` is read but not itself gated on).
+**Condition**: always registered; credentials are resolved for every invocation so values saved
+from Settings apply without restarting the gateway.
 
 | Env var | Required |
 |---|---|
 | `TWILIO_ACCOUNT_SID` | Yes |
 | `TWILIO_AUTH_TOKEN` | Yes |
-| `TWILIO_PHONE_NUMBER` | Read, used as the `From` number — not itself gated |
+| `TWILIO_PHONE_NUMBER` | Yes for sending; used as the `From` number |
 
 **Capabilities** (`action` argument): `send_sms`, `send_whatsapp`, `list_messages`, `get_message`.
 WhatsApp messages are sent by prefixing both `From`/`To` numbers with `whatsapp:`. Supports
 `mediaUrl` for MMS/WhatsApp image attachments.
+
+Incoming SMS messages use the signed `POST /webhook/sms` endpoint and are routed through the
+A2A agent loop. Configure the exact public HTTPS origin through `PUBLIC_BASE_URL`.
 
 ---
 
@@ -215,13 +220,15 @@ against the Home Assistant Conversation/REST API.
 
 ## Browser automation
 
-**Tools**: 12 `browser_*` tools, created by `BrowserTools.create(backend)` in
+**Tools**: 11 registered `browser_*` tools, created by `BrowserTools.create(backend)` in
 `promethe/shared/src/jvmMain/kotlin/dev/promethe/core/tools/builtin/BrowserTools.kt`:
 
 Core 6 — `browser_navigate`, `browser_click`, `browser_type`, `browser_extract`,
 `browser_screenshot`, `browser_eval`.
-Extended 6 — `browser_scroll`, `browser_back`, `browser_press`, `browser_get_images`,
-`browser_vision`, `browser_dialog`.
+Extended 5 — `browser_scroll`, `browser_back`, `browser_press`, `browser_get_images`,
+`browser_dialog`.
+
+`browser_vision` is unavailable and intentionally absent from the tool registry until a configured VLM actually analyzes the screenshot.
 
 **Condition**: a `BrowserBackend` must be constructed successfully. `IntegrationRegistrar` picks
 one of two backends based on `BROWSER_BACKEND`:
@@ -257,7 +264,7 @@ browserBackend?.let { backend -> BrowserTools.create(backend).forEach { ToolRegi
 
 If `BROWSER_BACKEND` is anything other than `"browserbase"` (including unset), the registrar falls
 through to the CDP path and requires `BROWSER_CDP_PORT`. If neither path yields a usable backend,
-none of the 12 tools are registered.
+none of the 11 tools are registered.
 
 For driving the Promethe Compose/WASM app itself with a browser agent (Playwright/CDP,
 accessibility tree test tags, JS bridge functions like `prometheLogin`/`prometheNavigate`), see

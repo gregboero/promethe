@@ -34,6 +34,7 @@ val coreModule = module {
 
     // HttpClient — created with plugins
     // single { HttpClient { ... } } → registered by AgentBootstrap
+    single<ResourceGovernorRegistry> { PersistentResourceGovernorRegistry(get()) }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -41,7 +42,16 @@ val coreModule = module {
 // ═══════════════════════════════════════════════════════════════
 val agentModule = module {
     // ActionExecutor — needs HttpClient + config + hookManager
-    single { ActionExecutor(get(), get(), hookManager = get()) }
+    single {
+        ActionExecutor(
+            config = get(),
+            httpClient = get(),
+            hookManager = get(),
+            toolIntentLedger = PersistentToolIntentLedger(get()),
+            policyAuditSink = PersistentPolicyAuditSink(get()),
+            resourceGovernors = get(),
+        )
+    }
 
     // Skills
     single { SkillLoader(getFileSystem(), get(named("skillsDir"))) }
@@ -95,6 +105,7 @@ val orchestratorModule = module {
             skillWriter = get(),
             trajectoryEvaluator = get(),
             registry = getOrNull(),
+            resourceGovernors = get(),
         )
     }
 

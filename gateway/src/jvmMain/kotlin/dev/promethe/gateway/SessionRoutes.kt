@@ -30,6 +30,7 @@ fun Route.sessionRoutes(database: PrometheDatabaseApi) {
                 messageCount = counts[s.id] ?: 0,
                 title = s.title,
                 metadata = s.metadata,
+                projectId = s.projectId,
             )
         }
         call.respond(SessionListResponse(infos))
@@ -39,8 +40,48 @@ fun Route.sessionRoutes(database: PrometheDatabaseApi) {
         val req = call.receive<CreateSessionRequest>()
         val id = req.id ?: "session-${System.currentTimeMillis()}"
         val now = System.currentTimeMillis()
+        val requestedProjectId = req.projectId ?: database.getSetting(ACTIVE_PROJECT_SETTING_KEY)
+        val project = requestedProjectId?.let { database.getProject(it) }
+        if (requestedProjectId != null && (project == null || project.archived)) {
+            return@post call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Unknown or archived project"))
+        }
         database.insertSessionOrIgnore(id, now, "{}")
-        call.respond(HttpStatusCode.Created, SessionInfo(id, now, 0))
+        if (requestedProjectId != null) database.assignSessionToProject(id, requestedProjectId)
+        val session = database.getSession(id)
+        call.respond(
+            HttpStatusCode.Created,
+            SessionInfo(
+                id = id,
+                createdAt = session?.createdAt ?: now,
+                messageCount = 0,
+                title = session?.title,
+                metadata = session?.metadata,
+                projectId = requestedProjectId,
+            ),
+        )
+    }
+
+    patch("/sessions/{id}/project") {
+        val sessionId = call.parameters["id"]
+            ?: return@patch call.respond(HttpStatusCode.BadRequest)
+        val session = database.getSession(sessionId)
+            ?: return@patch call.respond(HttpStatusCode.NotFound, mapOf("error" to "Session not found"))
+        val request = call.receive<AssignSessionProjectRequest>()
+        val project = request.projectId?.let { database.getProject(it) }
+        if (request.projectId != null && (project == null || project.archived)) {
+            return@patch call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Unknown or archived project"))
+        }
+        database.assignSessionToProject(sessionId, request.projectId)
+        call.respond(
+            SessionInfo(
+                id = session.id,
+                createdAt = session.createdAt,
+                messageCount = database.getSessionMessageCounts()[session.id] ?: 0,
+                title = session.title,
+                metadata = session.metadata,
+                projectId = request.projectId,
+            ),
+        )
     }
 
     delete("/sessions/{id}") {
@@ -54,12 +95,22 @@ fun Route.sessionRoutes(database: PrometheDatabaseApi) {
         val sessionId = call.parameters["id"]
             ?: return@get call.respond(HttpStatusCode.BadRequest)
         val messages = database.getMessagesForSession(sessionId)
-        val events = messages.map { m ->
-            ChatEvent(
-                type = if (m.role == "user") "user" else "response",
-                content = m.content,
-            )
-        }
+        val events =
+            messages.mapNotNull { message ->
+                val type =
+                    when (message.role.lowercase()) {
+                        "user" -> "user"
+                        "assistant" -> "response"
+                        else -> null
+                    }
+                type?.let {
+                    ChatEvent(
+                        type = it,
+                        content = message.content,
+                        timestamp = message.timestamp,
+                    )
+                }
+            }
         call.respond(events)
     }
 

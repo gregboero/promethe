@@ -1,0 +1,704 @@
+# Rapport de faisabilité et roadmap agentique 2026
+
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
+> **Document de planification — 17 août 2026.** Ce rapport n'est pas une source de vérité sur les capacités disponibles. La disponibilité et la maturité publiques restent déterminées par `GET /api/v1/capabilities` et par [la procédure de certification](release/CAPABILITY_CERTIFICATION.md).
+
+## Revue du 6 septembre 2026 — périmètre sandbox personnel
+
+La roadmap reste pertinente pour Prométhé : evals, journal durable, idempotence, politiques, contrats, budgets et artefacts précèdent les expériences cognitives. Elle décrit des pistes de recherche personnelles, **sans destination production ni engagement de livraison**. Les estimations historiques à deux développeurs ne constituent pas un calendrier pour ce sandbox. Les niveaux `STABLE`/`BETA`/`LAB` ne changent pas ce statut.
+
+L'[audit du 6 septembre](reports/AUDIT_2026-09-06.md) examine l'état de travail local, y compris des modifications non commitées. Les mentions `FAIT` ci-dessous signifient « implémenté » ; la réussite d'une phase demande ses preuves de sortie, une révision identifiable et les validations manuelles applicables. Aucun pourcentage global d'avancement n'est déduit du nombre de fichiers ou de propositions.
+
+| Priorité actuelle | État observé | Prochaine preuve attendue |
+|---|---|---|
+| P0 — Evals et comportement réel | Suites JVM et golden existantes ; premières frontières déterministes testées | Archiver révision/diff, résultats, configuration et limites ; compléter les parcours réels sans assimiler mocks et tests de fournisseurs |
+| P0-P1 — Runtime et sécurité | [Quotas agrégés de départs livrés](reports/RESOURCE_AGGREGATE_QUOTAS_2026-09-07.md) : profil local, fournisseur et outil, persistance SQLite et diagnostic `token_budget` ; 1 058 tests dont 17 nouveaux réussis | Périmètre validé localement ; concurrence testée avec quatre banques dans une JVM, sans stress multiprocessus. Plafonds tokens/USD et identité multi-utilisateur authentifiée hors périmètre |
+| P1 — Maintenance | Koog 1.2.0 / 1.2.0-beta installés et Ktor 3.5.2 aligné ; contrats HTTP/SSE/MCP/A2A testés | Voir le rapport d'implémentation pour la campagne finale et les limites Docker/plateformes |
+| P1-P2 — Skills et mémoire | [Cycle de skills évalués livré](reports/SKILL_EVALUATION_LIFECYCLE_2026-09-08.md) : révision corps/métadonnées/suites, tests exacts et revue obligatoires, snapshots et restauration en quarantaine ; 1 071 tests réussis | Réutilisation sur deux tâches avec pile/loader renouvelés et fournisseur déterministe validée. Pas de gain modèle réel, d'évaluation d'effets d'outils ou de mémoire persistante ; dialogue compilé mais non manipulé manuellement |
+| P2 — Comparaison des harnesses — clôturée | Sondes Koog/DeepSeek/Hermes, tests Cordis et comparaisons conservés dans les rapports historiques | Aucun nouvel essai prévu dans le chantier actuel ; limites et pistes non exécutées conservées à titre historique |
+| P1-P2 — Auto-mutation expérimentale — clôturée | Cycle dirigé, mesures de décision et bibliothèque adaptative LAB livrés ; utilité spontanée non démontrée | Aucune poursuite automatique de ce chantier ; priorité transférée aux quotas agrégés |
+| P1-P2 — Scripting Kotlin choisi par le propriétaire | [Préparation du runtime livrée](reports/HARNESS_KOTLIN_RUNTIME_OPTIMIZATION_2026-09-07.md), puis [mode adaptatif et bibliothèque durable livrés](reports/HARNESS_ADAPTIVE_LIBRARY_2026-09-07.md) : contrat `answer-extraction-v1`, cas distincts obligatoires, versions/preuves/invalidation et opt-in applicatif ; 1 041 tests JVM et un test natif réussis | Intégration LAB achevée via les outils existants ; 12 transformations natives correctes, source antérieure épinglée, aucun appel modèle. Persistance et décision déterministe ne prouvent ni utilité spontanée, ni gain global de coût ou apprentissage général |
+
+**Chantier harness clôturé le 7 septembre 2026 à la demande du propriétaire.** Le mode adaptatif reste disponible sous opt-in LAB, avec ses limites documentées. Les comparaisons et propositions ci-dessous sont historiques, sans nouvelle campagne ou reprise implicite ; le chantier actif passe aux quotas agrégés du `ResourceGovernor`. Cette clôture ne transforme pas les pistes non évaluées en capacités validées.
+
+Le [rapport d'implémentation](reports/IMPLEMENTATION_2026-09-06.md) distingue les sondes exécutées des objectifs historiques de comparaison ci-dessous. **DeepSeek et Hermes sont des objets d'étude pour améliorer Prométhé ; leur remplacement du runtime de Prométhé n'est pas un objectif.** Les six sondes prouvent uniquement un parcours technique modèle-outil-résultat, aucun gain de qualité ni auto-mutation. Le SDK DeepSeek publié testé est `0.1.2rc1`, distinct de la préversion source `dsh-v0.1.3-alpha.1`.
+
+Le [backlog réordonné après clarification](reports/NEXT_STEPS_HARNESSES_2026-09-06.md) détaille les ajouts, leurs dépendances et les preuves attendues.
+
+Les trois axes de comparaison historiques étaient les suivants ; ils ne constituent pas le chantier actif :
+
+1. **Koog Skills 1.2.0-beta** : comparer découverte et contexte progressif au loader local sur dix skills, en conservant les contrôles `DRAFT`/`QUARANTINED`/`ACTIVE`. Mesurer tokens, sélection et qualité ; conserver le mécanisme local si aucun gain reproductible. Le premier test vérifie seulement les métadonnées, collisions et bornes de parcours ; la lecture des fichiers reste anticipée.
+2. **DeepSeek Harness** : examiner en priorité comment le modèle peut proposer, modifier et activer des améliorations de son harness pendant une session. La comparaison source est désormais épinglée au commit `d347e703908d0406b7a7ef80e3a0e594d86b2215` ; 102 tests amont Cordis sélectionnés passent. Cela complète les sondes du SDK `0.1.2rc1`, sans démontrer un gain autonome avec modèle réel. Poursuivre la comparaison du cycle des plugins, de la portée de session, des échecs de mise à jour et de l'annulation.
+3. **Hermes Agent / Bot Mode** : cartographier les mécanismes d'apprentissage et de réutilisation, puis comparer rappel après compression, continuité d'une tâche planifiée et coordination de deux agents avec budget partagé. Version de comparaison : `v2026.8.31` (Hermes 0.21.0), commit `29112bef099274229cadff79cdff7bf7b99c4b77`. La sonde synthétique crée, modifie et liste un skill puis le recharge depuis un autre processus ; elle ne teste pas un apprentissage autonome. Vérifier ensuite déduplication, provenance et bénéfice sur une autre tâche. Bot Mode reste non exécuté.
+
+**Première itération expérimentale exécutée : auto-mutation du harness dans Prométhé.** Le [prototype LAB de présentation des observations](HARNESS_MUTATION.md) possède inspection, propositions versionnées, cinq fixtures, activation à la frontière d'étape, retour arrière et conservation du brut. Il exige un opt-in du processus et la sandbox native. Le protocole apparié a exécuté neuf comparaisons avec `gpt-5.6-terra` : trois familles et trois répétitions, réponses correctes 9/9 avec et sans mutation. Le JSON bruité passe de 7 726 à 167 octets ; CSV/log de 16 à 167 octets, provenance comprise. La réduction de volume dépend donc de l'observation et aucun gain de qualité n'est montré. Ce protocole historique conserve le garde-fou de taille désactivé pour rester reproductible.
+
+L'essai complémentaire où le modèle pilote les outils dans `AIAgent` est réussi : réponse `1037`, une observation transformée, hash brut conservé et session nettoyée. Il suit une consigne explicite sur une tâche synthétique ; il ne prouve pas la découverte spontanée d'un besoin de mutation. Ses sept appels réels incluent la synthèse de skill existante après la réponse, sans preuve de réutilisation de ce skill. Le bilan de toute l'itération, échecs et reprises compris, est de 70 appels et 0,296785 USD de comptabilité conservatrice, avec zéro réservation incertaine, sous le plafond partagé de 5 USD. Voir le [rapport clôturé le 7 septembre](reports/HARNESS_ITERATION_2026-09-06.md), les [résultats appariés](reports/harness-iteration-data-2026-09-06/paired-results.json) et le [résultat de la boucle réelle](reports/harness-iteration-data-2026-09-06/agent-loop-result.json). L'apprentissage procédural durable inspiré de Hermes reste une itération suivante.
+
+**Deuxième itération exécutée : décider d'adapter ou de s'abstenir.** Les trois modes original, processeur fixe et décision libre terminent les 18 parcours avec réponse correcte après lecture des quatre pages distinctes ; les hashes bruts et le nettoyage de session sont vérifiés. Le modèle ne propose aucune révision dans ses six parcours libres : la capacité d'exécuter une mutation est acquise, mais son utilité spontanée n'est pas démontrée. Sur les gros JSON, le processeur fixe réduit le coût modèle cumulé des deux parcours de 0,119188 à 0,033817 USD (environ −71,6 %), tout en augmentant la durée médiane de 9,56 à 28,20 secondes. Le garde-fou désormais actif évite huit traitements de petits résultats et conserve quatre observations au schéma inconnu ; il ne supprime pas le coût de validation déjà engagé. Voir le [rapport de décision et de coût complet](reports/HARNESS_DECISIONS_2026-09-07.md) et ses [métriques](reports/harness-decision-data-2026-09-07/decision-055a4115-207b-44e6-ac66-b3a31280d7a5/metrics.json).
+
+Cette nouvelle itération représente 199 appels et 1,241507 USD, diagnostics compris ; son lot final compte 108 appels et 0,710014 USD. Le cumul partagé avec la première atteint 269 appels et 1,538292 USD de comptabilité conservatrice, sans réservation incertaine, sous le plafond de 5 USD. Les validations finales passent avec 977 tests applicatifs et 36 contrôles documentaires. L'option initialement proposée pour la suite était un [plan déclaratif borné en Kotlin](reports/HARNESS_LANGUAGE_DECISION_2026-09-07.md), sans benchmark Kotlin ni migration réalisés ; la préférence actualisée figure ci-dessous. Six tâches synthétiques et deux répétitions ne permettent pas de généraliser ; les diagnostics antérieurs restent archivés séparément.
+
+**Préférence actualisée du propriétaire : vrai scripting Kotlin.** Le [prototype `.kts`](HARNESS_KOTLIN.md) précédent a passé les contrôles natifs Windows et un parcours de la vraie boucle `AIAgent` : sept appels modèle, réponse `1037`, une observation traitée, hash brut préservé et session nettoyée. La consigne demandait explicitement la mutation ; aucune décision spontanée ni réutilisation de skill n'est démontrée. Sur trois lots alternés de cinq cas identiques, tous corrects, sa durée médiane était de 3,690 s contre 0,867 s pour JavaScript, compilation comprise. Le [rapport technique historique](reports/HARNESS_KOTLIN_2026-09-07.md) conserve ces mesures.
+
+L'[itération du cache](reports/HARNESS_KOTLIN_CACHE_2026-09-07.md) ajoute un cache de bytecode opaque en mémoire, borné et lié à la session, sans chargement des classes dans Prométhé. Compilation et évaluation utilisent deux processus natifs distincts au premier appel ; une réutilisation valide conserve un nouveau processus d'évaluation. Les 27 lots comparés et leurs 135 observations sont corrects. La médiane d'une séquence Kotlin de trois lots passe de 13,083 s sans cache à 7,074 s avec cache (−45,93 %), contre 2,587 s pour JavaScript. La clôture passe avec `ktlintCheck`, 983 tests ordinaires, quatre tests natifs et un parcours réel `AIAgent`. Ce dernier donne `1037` en sept appels modèle, traite une observation et préserve le hash brut ; deux réutilisations du cache limitent le parcours à une compilation et quatre processus, puis session et cache sont nettoyés. Son coût conservateur est de 0,045063 USD ; le cumul partagé atteint 283 appels et 1,628185 USD, sans réservation incertaine, sous le plafond de 5 USD. Les [preuves finales](reports/harness-kotlin-cache-data-2026-09-07/summary.json) accompagnent le rapport. La mutation était demandée explicitement : ce cache technique ne prouve pas une décision spontanée pertinente ni un apprentissage durable. La lecture Windows couvre toujours tout le workspace enregistré. JavaScript reste comparateur et langage par défaut, sans remplacement du runtime principal. Le plan déclaratif reste une piste secondaire ; les rapports et chiffres antérieurs restent historiques.
+
+La [comparaison suivante de décisions Kotlin](reports/HARNESS_KOTLIN_DECISIONS_2026-09-07.md) termine 27 parcours corrects, avec intégrité du brut et nettoyage des sessions/caches vérifiés. Le fixe réduit la dépense modèle sur gros JSON de 0,176959 à 0,053179 USD (trois parcours), mais fait passer la durée médiane de 9,842 à 30,655 s ; sa création n'est pas comptée, sa préparation l'est. Les neuf parcours libres ne proposent aucune mutation, sans preuve qu'ils connaissent les raisons de s'abstenir. Leur surcroît d'environ 3 645 tokens d'entrée motive la prochaine mesure de l'exposition conditionnelle des outils, avec indications et budget sur des tâches plus longues, en gardant le choix libre. Cette itération ajoute 163 appels / 1,068052 USD ; cumul partagé 446 appels / 2,696237 USD, sans réservation incertaine. Les 656 tests JVM de shared, son ktlintCheck et le test réel passent ; les autres suites restent historiques. Aucun bénéfice spontané ni réutilisation de skill n'est démontré.
+
+L'[exposition conditionnelle expérimentée ensuite](reports/HARNESS_TOOL_EXPOSURE_2026-09-07.md) conserve 18 parcours, dont 14 corrects et 15 terminés. Trois réponses vides et une réponse partielle restent dans le bilan ; seuls les cinq parcours jamais exécutés ont été continués après l'arrêt initial. Les tokens du premier appel passent de 1 215 à 486, sans preuve de réduction générale du coût des tâches : seules trois paires conditionnel/libre ont deux réponses correctes. Aucune mutation ni worker natif pendant les tâches ; hashes observés et nettoyage vérifiés. La campagne coûte 145 appels / 0,906838 USD ; cumul partagé 591 appels / 3,603075 USD, sans réservation incertaine. La politique reste LAB, sans intégration concurrente. Les diagnostics de réponse vide et la vérification d'achèvement deviennent prioritaires avant une nouvelle campagne payante de qualité ; les résultats antérieurs restent historiques.
+
+Les [diagnostics et contrôles d'achèvement](reports/HARNESS_RESPONSE_DIAGNOSTICS_2026-09-07.md) sont ensuite validés entièrement hors ligne : reçus LAB v2, comptabilité connue/incertaine distinguée, validateur facultatif absent par défaut avant réponse, clarification et synthèse. La relecture retrouve 14 réponses complètes, trois vides et une partielle ; les motifs historiques restent inconnus et les archives intactes. Les 1 005 tests JVM, deux tests Python et le ktlint partagé passent, sans nouvel appel ni coût ; cumul inchangé de 591 appels / 3,603075 USD. Le contrat vérifie la complétude, pas les valeurs : une réponse complète mais fausse peut encore conduire à une synthèse. La suite proposée est un petit essai instrumenté dans une nouvelle cohorte de protocole 6 sous budget restant, non exécuté ici. La version 5 ne peut pas être reprise en changeant silencieusement le contrat ; aucun gain de qualité n'est démontré.
+
+Le [pilote réel instrumenté suivant](reports/HARNESS_DIAGNOSTIC_PILOT_2026-09-07.md) s'arrête sur le témoin incomplet : cinq parcours sur six, trois complets et corrects, deux contenus vides rejetés ; aucun rejeu ni continuation. Les deux vides ont HTTP 200, un motif stop et un usage de sortie connu, sans cause établie. Aucun worker de mutation pendant les tâches ; nettoyage vérifié. Les 15 tests ciblés et le ktlint passent, tandis que le test réel échoue au garde-fou. Coût ajouté 32 appels / 0,223997 USD ; cumul 623 appels / 3,827072 USD, sans réservation incertaine, reste 1,172928 USD sous 5 USD. La priorité proposée devient d'isoler la compatibilité des réponses avec le protocole textuel minimal avant de poursuivre les mesures de mutation. Aucun essai supplémentaire ni gain de qualité n'est revendiqué.
+
+La [sonde minimale suivante](reports/HARNESS_EMPTY_RESPONSE_PROBE_2026-09-07.md) conserve 15 premiers tours sans relance : 12 conformes, contre deux [] et un contenu vide pour le prompt reconstruit avec option omise. L'audit indépendant confirme que le nouveau vide existe dans le corps reçu ; il exclut une perte locale pour ce cas, sans expliquer le fournisseur ou les incidents historiques. Aucun outil ou worker exécuté, aucune tâche complète évaluée. Huit tests ciblés, le ktlint et un test réel passent ; ce dernier valide l'enregistrement des 15 sondes, pas leur conformité. Coût ajouté 0,024867 USD ; cumul 638 appels / 3,851939 USD, sans réservation incertaine, reste 1,148061 USD sous 5 USD. Le défaut n'est pas un remède et none n'est pas garanti fiable. La prochaine expérience proposée compare les appels structurés via Koog au JSON textuel, en conservant les contrôles et les résultats historiques.
+
+Pour chaque expérience : corpus identique, modèle identique lorsque possible, au plus vingt tâches rejouables, budget maximal renseigné **avant les appels payants**, trois répétitions, oracle sur l'état final et conservation des échecs. Critère proposé : aucun nouveau contournement de politique, aucun double effet et gain d'au moins 5 % à coût égal ; sinon différer ou abandonner. Il s'agit d'un protocole proposé, pas de résultats acquis.
+
+Sources : [Koog 1.2.0](https://github.com/JetBrains/koog/releases/tag/1.2.0), [DeepSeek preview](https://github.com/deepseek-ai/deepseek-harness/releases/tag/dsh-v0.1.3-alpha.1), [Hermes 0.21.0](https://github.com/NousResearch/hermes-agent/releases/tag/v2026.8.31).
+
+La cible MCP 2026-07-28 est confirmée ; Roots, Sampling et Logging sont **dépréciés, pas immédiatement supprimés**. Garder les tests des pairs historiques et distinguer le protocole implémenté par Prométhé de celui fourni par Koog. [Changelog officiel](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/changelog.mdx).
+
+## 1. Objet et périmètre
+
+Ce rapport consolide toutes les améliorations étudiées pendant la revue technologique de Promethe. Les dix listes reçues contenaient 58 formulations, dont une liste dupliquée et de nombreux recouvrements. Elles ont été ramenées à des programmes d'architecture cohérents, puis comparées au code actuel.
+
+L'objectif n'est pas d'accumuler des technologies dites « SOTA », mais de répondre à quatre questions :
+
+1. Qu'est-ce qui existe réellement dans Promethe ?
+2. Qu'est-ce qui est faisable et utile maintenant ?
+3. Qu'est-ce qui mérite une expérimentation isolée ?
+4. Qu'est-ce qui doit être différé ou écarté ?
+
+Les estimations de durée supposent une petite équipe de deux développeurs, avec une revue sécurité/QA ponctuelle. Elles indiquent un ordre de grandeur et non une date de livraison contractuelle.
+
+## 2. Résumé exécutif
+
+Promethe possède déjà des bases solides : boucle agentique, outils typés, approbation humaine obligatoire pour les effets externes, sandbox native, mémoire multi-fournisseur, profils et skills, orchestration multi-agent, checkpoints, A2UI, MCP, voix temps réel et tests de sécurité.
+
+La Phase 0 a posé les premières fondations du **harness de preuve** : evals-as-code, golden sets, identifiants de run/step et traces OpenTelemetry. La clarification du propriétaire remet l'auto-mutation de composants du harness parmi les expériences prioritaires ; elle se construit avec des mesures avant/après. Les déficits restants sont notamment :
+
+- `agent_runs`, `tool_intents` et `agent_run_events` couvrent le cycle durable des runs, intentions, approbations et résultats ; il manque encore le chaînage cryptographique du journal ;
+- le budget partagé d'un arbre de runs est persisté dans SQLite avant chaque admission, restauré après redémarrage et protégé par version optimiste ; les [quotas agrégés de départs](reports/RESOURCE_AGGREGATE_QUOTAS_2026-09-07.md) sont livrés et validés localement par profil, fournisseur et outil. Les plafonds agrégés de tokens/USD et une identité multi-utilisateur authentifiée restent hors du périmètre livré ;
+- les sorties textuelles volumineuses d'outils sont désormais conservées dans un `ArtifactStore` adressé par SHA-256 et récupérables par segments ; les captures, fichiers, pages, audio et traces ne sont pas encore externalisés ;
+- les skills disposent d'un reçu de revue propriétaire et d'un [cycle d'évaluation lié à la révision livré](reports/SKILL_EVALUATION_LIFECYCLE_2026-09-08.md), avec suites déclaratives, historique local et restauration en quarantaine ; les snapshots ne constituent pas un journal transactionnel et les tests textuels ne certifient pas tous les usages métier ;
+- la synthèse multi-agent n'a pas encore de juge fondé sur des preuves ;
+- `browser_vision` reste indisponible tant qu'aucun VLM n'analyse réellement la capture ;
+- MCP doit suivre la spécification 2026 plutôt que développer `sampling` et `roots`, désormais dépréciés.
+
+La stratégie recommandée est donc :
+
+1. **Mesurer et certifier** : evals-as-code, traces réelles, métriques, jeux de régression.
+2. **Durcir le runtime** : graphe d'exécution typé, journal durable, idempotence, budgets et artefacts.
+3. **Sécuriser les capacités** : contrats d'outils et de skills, `PolicyKernel`, séparation des données non fiables, red-team automatique isolé.
+4. **Améliorer le raisonnement** : mémoire temporelle, vérificateurs, moteur symbolique, calcul adaptatif et topologies limitées.
+5. **Étendre l'interaction** : computer use hybride, A2UI gouverné, certification de la voix temps réel.
+
+Les technologies matérielles et cryptographiques lourdes — PIM/CXL, SNN, quantique, zkML, interprétabilité mécanistique en production, hyperréseaux — ne sont pas justifiées pour Promethe à ce stade.
+
+## 3. Méthode de classement
+
+### 3.1 État du code
+
+| État | Signification |
+|---|---|
+| `EXISTANT` | Une implémentation concrète est présente dans le dépôt. Elle n'est pas nécessairement certifiée `STABLE`. |
+| `PARTIEL` | Une brique existe, mais il manque une propriété déterminante, une intégration ou une preuve. |
+| `ABSENT` | Aucune implémentation significative n'a été trouvée. |
+
+### 3.2 Décision
+
+| Décision | Signification |
+|---|---|
+| `ADOPTER` | À intégrer à la trajectoire produit. |
+| `EXPÉRIMENTER` | À tester derrière un flag `LAB`, avec budget et condition d'abandon. |
+| `DIFFÉRER` | Potentiellement utile, mais sans besoin produit ou fondations suffisantes. |
+| `ÉCARTER` | Mauvais rapport valeur/risque, promesse non fondée ou hors périmètre. |
+
+### 3.3 Priorité
+
+| Priorité | Interprétation |
+|---|---|
+| `P0` | Prérequis de preuve, sûreté ou intégrité. |
+| `P1` | Forte valeur produit à court terme. |
+| `P2` | À construire après les fondations P0/P1. |
+| `P3` | Laboratoire ou besoin spécialisé. |
+| `P4` | Hors roadmap active. |
+
+Une technologie n'est promue que si elle possède un propriétaire, des métriques, des cas négatifs et des preuves reproductibles conformes à [CAPABILITY_CERTIFICATION.md](release/CAPABILITY_CERTIFICATION.md).
+
+## 4. État actuel vérifié de Promethe
+
+| Domaine | État vérifié | Diagnostic |
+|---|---|---|
+| Boucle agentique | `EXISTANT` | [`AIAgent.executeLoop`](../shared/src/commonMain/kotlin/dev/promethe/core/AIAgent.kt#L51) reste une boucle impérative limitée à dix itérations. Une migration progressive vers un graphe est possible ; une réécriture totale immédiate serait risquée. |
+| Run ledger et reprise | `PARTIEL` | `AgentExecutionService` persiste l'identité, l'origine, la progression et l'état terminal dans `agent_runs`. `ActionExecutor` persiste chaque intention, son empreinte, sa clé d'idempotence et ses transitions terminales dans `tool_intents`, en refusant de rejouer une exécution à l'issue incertaine. `agent_run_events` conserve un journal append-only ordonné des runs, étapes, intentions, décisions d'approbation et outils sans contenu sensible. `RunRecoveryService` classe les exécutions interrompues en `RECOVERABLE` ou `NEEDS_REVIEW`, réclame atomiquement une reprise et poursuit la numérotation des étapes. Les sorties textuelles volumineuses sont reliées par hash à l'`ArtifactStore`. Le chaînage cryptographique du journal et la restauration automatique du contexte complet restent à faire. |
+| Approbation et politique | `EXISTANT` | [`ActionExecutor`](../shared/src/commonMain/kotlin/dev/promethe/core/ActionExecutor.kt#L155) classe le risque et impose l'approbation obligatoire. [`ToolApprovalGate`](../shared/src/jvmMain/kotlin/dev/promethe/core/ToolApprovalGate.kt#L136) ne permet pas au mode `auto` de contourner `checkMandatory`. |
+| Sandbox | `EXISTANT` | Sandbox native Rust, politique réseau et racines canoniques. WASI ou microVM seraient des backends supplémentaires, pas des remplacements immédiats. Voir [SANDBOX.md](SANDBOX.md). |
+| Contexte | `PARTIEL` | [`ContextCompressor`](../shared/src/commonMain/kotlin/dev/promethe/core/ContextCompressor.kt#L42) compresse l'historique et [`ToolOutputPruner`](../shared/src/commonMain/kotlin/dev/promethe/core/ToolOutputPruner.kt#L34) réduit les sorties. [`ArtifactObservationExternalizer`](../shared/src/commonMain/kotlin/dev/promethe/core/ArtifactStore.kt) remplace les grandes sorties textuelles par un aperçu, un hash et une URI durable, lisibles par segments avec `artifact_read`. Le préfixe système et les outils sont désormais ordonnés de façon déterministe ; les breakpoints Anthropic et les tokens de cache signalés par les fournisseurs sont mesurés séparément de la simple réutilisation locale du préfixe. Des quotas de 16 MiB par artefact et 256 MiB au total sont appliqués par défaut ; un plan de rétention en lecture seule exclut les références fournies. L'externalisation binaire et multimodale, le chiffrement, la collecte exhaustive des références et la purge restent à compléter. |
+| Routage LLM | `PARTIEL` | [`MultiModelRouter`](../shared/src/commonMain/kotlin/dev/promethe/core/MultiModelRouter.kt#L26) route par profil/fournisseur et construit des fallbacks, mais ne choisit pas encore selon risque, coût, latence ou difficulté. |
+| Budget autonome | `PARTIEL` | [`ResourceGovernor`](../shared/src/commonMain/kotlin/dev/promethe/core/ResourceGovernor.kt) réserve les appels LLM, départs d'outil et sous-agents d'un même arbre de runs. Il bloque le départ suivant après dépassement de tokens, coût, durée ou compteurs. Son état et ses liaisons de sessions sont persistés dans SQLite et restaurés après redémarrage. Les [quotas agrégés de départs](reports/RESOURCE_AGGREGATE_QUOTAS_2026-09-07.md) sont livrés et validés entre sessions du profil local, par fournisseur et outil, avec conservation prudente des réservations après échec. Ils ne plafonnent pas les tokens/USD agrégés et ne créent pas une identité multi-utilisateur authentifiée. `AutonomousExecutor` conserve en parallèle son enveloppe de tâches historique. |
+| Skills et GEPA | `PARTIEL` | Loader, writer, synthèse et évolution existent. [`SkillCurator`](../shared/src/commonMain/kotlin/dev/promethe/core/SkillCurator.kt) reste en mode proposition. Le [cycle d'évaluation livré](reports/SKILL_EVALUATION_LIFECYCLE_2026-09-08.md) lie corps, métadonnées et suites à une révision ; promotion conditionnée au dernier run réussi et à la revue, restauration en quarantaine. GEPA produit `DRAFT` ou `QUARANTINED`, sans contourner les évaluations. Les skills legacy intacts restent actifs par compatibilité. Les cas textuels exacts ne remplacent pas toutes les évaluations métier ; dépendances transitives non hachées, historique local non transactionnel/signé, verrous limités au processus. |
+| Évaluation de trajectoire | `PARTIEL` | [`TrajectoryEvaluator`](../shared/src/commonMain/kotlin/dev/promethe/core/TrajectoryEvaluator.kt#L25) juge surtout le nombre d'outils, l'absence de chaîne `[ERROR]` et l'existence d'une réponse. Ce n'est pas une validation comportementale. |
+| Multi-agent | `PARTIEL` | [`AgentOrchestrator`](../shared/src/jvmMain/kotlin/dev/promethe/core/AgentOrchestrator.kt#L19) gère délégation et concurrence. Le pseudo-mode `vote` a été retiré ; `best_of` et `merge` restent disponibles sans prétendre fournir un consensus vérifié. |
+| Mémoire | `PARTIEL` | Mémoire L0-L3, namespaces, confiance et backends multiples. Pas de temps de validité, temps de transaction, supersession ou provenance complète. Voir [MEMORY.md](MEMORY.md). |
+| Observabilité | `PARTIEL` | [`Tracing.jvm.kt`](../shared/src/jvmMain/kotlin/dev/promethe/core/Tracing.jvm.kt) utilise désormais OpenTelemetry avec export console, OTLP ou Langfuse, propagation coroutine et filtrage des contenus sensibles. Les métriques durables et SLO restent à compléter. |
+| MCP | `PARTIEL` | Stdio, SSE et Streamable HTTP, découverte et proxy d'outils sont présents dans [`McpBridge`](../shared/src/commonMain/kotlin/dev/promethe/core/McpBridge.kt#L23). Il manque l'alignement complet sur MCP 2026-07-28. |
+| Voix temps réel | `EXISTANT` | OpenAI Realtime et Gemini Live implémentent WebSocket, audio bidirectionnel, outils et interruption : [`OpenAIRealtimeRelay`](../gateway/src/jvmMain/kotlin/dev/promethe/gateway/voice/OpenAIRealtimeRelay.kt#L16), [`GeminiLiveRelay`](../gateway/src/jvmMain/kotlin/dev/promethe/gateway/voice/GeminiLiveRelay.kt#L20). Le besoin est la certification, pas une réécriture. |
+| A2UI | `EXISTANT` | Registre de composants et état dynamique sont présents dans [`A2UIRegistry`](../composeApp/src/commonMain/kotlin/dev/promethe/app/a2ui/A2UIRegistry.kt#L12). Les composants générés doivent rester déclaratifs et whitelistés. |
+| Computer use visuel | `PARTIEL` | Le navigateur sait utiliser des sélecteurs et prendre une capture. `browser_vision` n'est plus enregistré comme outil tant qu'aucune inférence visuelle n'est réellement exécutée. |
+| Bus d'événements | `PARTIEL` | [`AgentEventBus`](../gateway/src/jvmMain/kotlin/dev/promethe/gateway/AgentEventBus.kt#L16) diffuse en mémoire vers les WebSockets, tandis que `agent_run_events` fournit l'historique durable des exécutions. Il manque encore la projection temps réel depuis ce journal et un runtime actor supervisé. |
+
+## 5. Architecture cible
+
+L'architecture cible conserve les composants utiles et ajoute un harness déterministe autour de l'inférence probabiliste.
+
+```mermaid
+flowchart TB
+    I["Canaux, API, UI et A2A"] --> T["Classification de confiance"]
+    T --> H["Agent Harness"]
+    H --> G["ExecutionGraph typé"]
+    H --> B["ResourceGovernor"]
+    H --> P["PolicyKernel et ApprovalGate"]
+    H --> L["RunLedger durable et idempotence"]
+    G --> R["Routeur de modèles"]
+    G --> C["ContextPlanner et ArtifactStore"]
+    G --> V["Vérificateurs déterministes"]
+    G --> O["ToolContractRegistry"]
+    O --> S["Sandbox native, Wasm LAB ou microVM LAB"]
+    C --> M["MemoryLedger temporel"]
+    C --> K["ConstraintEngine et connaissances symboliques"]
+    E["Evals, red-team et observabilité"] -.-> H
+    E -.-> O
+    E -.-> M
+    E -.-> K
+```
+
+### 5.1 Invariants de conception
+
+- Un LLM peut **proposer** une action, jamais contourner une politique.
+- Toute action avec effet possède une intention persistée, une clé d'idempotence et un résultat durable.
+- Les données externes sont non fiables par défaut.
+- Les données brutes volumineuses vivent dans un artefact adressé par hash, pas dans le contexte.
+- Les changements de politique, de skill, de mémoire permanente ou de code sont proposés, testés, versionnés et approuvés.
+- Un solveur garantit le respect du modèle encodé, pas la justesse de la traduction faite par le LLM.
+- Une architecture multi-agent n'est utilisée que si les evals démontrent un gain supérieur à son coût.
+
+## 6. Programmes de mise en œuvre
+
+### Programme A — Evals et observabilité
+
+**Décision : `ADOPTER`, P0.**
+
+Livrables :
+
+- `EvalCase`, `EvalSuite`, `EvalRun` et `EvalAssertion` versionnés ;
+- jeux golden par capacité, skill, fournisseur et niveau de risque ;
+- oracles déterministes : schéma, compilation, tests, diff, état final, politique ;
+- traces OpenTelemetry réelles avec `runId`, `stepId`, modèle, tokens, coût, latence, cache, outil, risque et décision ;
+- tableau de bord de taux de succès, coût par tâche, boucles, reprises et régressions ;
+- `AdversarialEvalLab` isolé pour injections, faux résultats d'outils, MCP malveillant, exfiltration et contournement d'approbation.
+
+Critères de sortie :
+
+- 100 % des étapes d'un run ont un `runId` et un `stepId` ;
+- chaque capacité P1 possède au moins un succès, un échec fournisseur et un cas sécurité négatif ;
+- une régression connue bloque la CI ;
+- aucune découverte red-team ne modifie automatiquement la production.
+
+### Programme B — Harness, graphe et exécution durable
+
+**Décision : `ADOPTER`, P0-P1.**
+
+Introduire d'abord un graphe enveloppant la boucle existante :
+
+```text
+Receive → BuildContext → Plan/Respond → ValidateIntent
+       → Approve → Execute → Verify → Persist → Continue/Finish
+```
+
+Livrables :
+
+- `ExecutionGraph` et transitions scellées ;
+- `RunLedger` append-only : `RunStarted`, `IntentProposed`, `ApprovalResolved`, `ToolStarted`, `ToolCompleted`, `VerificationCompleted`, `RunFinished` ;
+- snapshots versionnés reconstruits depuis les événements ;
+- idempotence persistante pour tout outil à effet ;
+- pause/reprise sans thread actif ;
+- fork d'une session logique sans prétendre restaurer automatiquement tout l'OS.
+
+Critères de sortie :
+
+- crash simulé avant, pendant et après un outil sans double effet ;
+- replay déterministe des transitions non-LLM ;
+- migration progressive sans casser l'API `AgentExecutionService` ;
+- zéro boucle non bornée.
+
+L'actor model intégral n'est pas requis. Des acteurs/coroutines isolés sont utiles pour les runs et sous-agents, tandis que le journal durable reste la source de vérité.
+
+### Programme C — Gouverneur de ressources et routage adaptatif
+
+**Décision : `ADOPTER`, P1.**
+
+Créer un `ResourceGovernor` commun aux appels LLM, outils et sous-agents :
+
+- réservation puis comptabilisation tokens/coût/temps/appels ;
+- limites par run, session, utilisateur, fournisseur et outil ;
+- détection de boucle, répétition et absence de progrès ;
+- circuit breakers fournisseurs ;
+- cascade SLM/rapide/frontier selon risque et complexité ;
+- effort de raisonnement adaptatif ;
+- escalade vers vérificateur ou comité seulement sur les tâches risquées.
+
+Les « pulsions homéostatiques », enchères et cautions sont remplacées par des primitives mesurables : quotas, leases, priorités, backpressure et budgets.
+
+### Programme D — ContextPlanner et ArtifactStore
+
+**Décision : `ADOPTER`, P1.**
+
+Livrables :
+
+- prompt ordonné du plus stable au plus variable afin de favoriser le prefix caching ;
+- `ArtifactStore` content-addressed pour sorties d'outils, captures, fichiers, pages, audio et traces ;
+- observations compactes contenant faits extraits, provenance, hash et URI d'artefact ;
+- pages de contexte sélectionnées par sous-tâche, avec contraintes épinglées non évictables ;
+- mesure des tokens utiles, cache hits et erreurs causées par compression.
+
+Ne pas implémenter un faux système de « RAM virtuelle » piloté librement par le LLM. Le paging doit rester déterministe, observable et récupérable.
+
+### Programme E — ToolOps, SkillOps et MCP
+
+**Décision : `ADOPTER`, P1.**
+
+`ToolContract` doit déclarer :
+
+- schémas d'entrée et de sortie ;
+- effets `READ`, `WRITE`, `DESTRUCTIVE`, `EXTERNAL` ;
+- idempotence et stratégie de retry ;
+- permissions, domaines réseau et sensibilité des données ;
+- timeout, budget et vérificateur de résultat ;
+- compatibilité sandbox.
+
+`SkillContract` doit ajouter :
+
+- triggers et anti-triggers ;
+- dépendances d'outils et de skills ;
+- invariants, fixtures et eval suite ;
+- provenance, version, propriétaire et maturité ;
+- cycle `DRAFT → QUARANTINED → CANDIDATE → ACTIVE → DEPRECATED`.
+
+Actions immédiates :
+
+- remplacer les suppressions automatiques de `SkillCurator` par des propositions mises en quarantaine ;
+- faire passer GEPA sur des jeux d'évaluation avant toute promotion ;
+- charger les descriptions d'outils à la demande plutôt que synthétiser librement du code ;
+- limiter le code-as-tools à une sandbox, un budget, des APIs autorisées et des artefacts éphémères ;
+- viser MCP 2026-07-28 : HTTP stateless, MRTR, extension Tasks et JSON Schema 2020-12. Ne pas investir dans `roots` et `sampling`, dépréciés par SEP-2577.
+
+### Programme F — PolicyKernel et défense contre les données non fiables
+
+**Décision : `ADOPTER`, P0-P1.**
+
+Livrables :
+
+- noyau de politiques typées, versionnées et testables ;
+- hiérarchie immuable entre politique système, organisation, projet et session ;
+- séparation `UntrustedReader` sans outils à effet / `PrivilegedController` ;
+- validation de provenance des sorties d'outils et ressources MCP ;
+- contrôle d'egress, classification des données et redaction des secrets ;
+- audit append-only avec chaîne de hash, sans le présenter comme une blockchain ;
+- workflow d'amendement : proposition, analyse de conflit, evals, approbation, signature, canary, rollback.
+
+Cette séparation réduit l'impact des injections indirectes, mais ne crée pas d'« immunité absolue ». Une constitution auto-modifiable par le modèle est explicitement interdite.
+
+La vérification formelle est utile sur quelques invariants finis, par exemple :
+
+```text
+EXTERNAL_EFFECT ⇒ HumanApproved
+DESTRUCTIVE ⇒ SandboxBounded ∧ HumanApproved
+UntrustedReader ⇒ no effectful tools
+BudgetExceeded ⇒ no new tool starts
+```
+
+Elle ne peut pas prouver la correction générale d'un LLM.
+
+### Programme G — Mémoire temporelle et consolidation contrôlée
+
+**Décision : `ADOPTER`, P2.**
+
+Étendre le schéma de fait avec :
+
+- `validFrom`, `validTo` : période de validité dans le monde ;
+- `recordedAt`, `supersededAt` : histoire dans Promethe ;
+- source, artefact, namespace, niveau de sensibilité et confiance ;
+- relation `supersedes` au lieu d'une suppression silencieuse ;
+- accès, renforcement et politique d'archivage.
+
+La consolidation planifiée peut proposer fusion, contradiction, anonymisation et archivage. Par défaut elle ne supprime pas et ne fusionne pas les mémoires de plusieurs utilisateurs ou personas.
+
+La mémoire fédérée/différentiellement privée n'a de sens qu'en présence d'un produit multi-tenant et d'un budget de confidentialité formel. Elle est différée.
+
+### Programme H — Vérification, symbolique et causalité
+
+**Décision : `ADOPTER` pour le symbolique ciblé ; `EXPÉRIMENTER` pour le causal, P2-P3.**
+
+Construire un `ConstraintEngine` :
+
+```text
+Demande → IR typée → validation → SAT/SMT/ASP → témoin
+        → explication → approbation → exécution
+```
+
+Cas adaptés : allocation, planning, permissions, conformité de configuration et règles métier. Le solveur garantit la solution par rapport au modèle encodé, pas la fidélité de la traduction LLM.
+
+Les vérificateurs d'étape doivent préférer les oracles déterministes. Un PRM ou un juge LLM peut aider à router ou classer, jamais devenir la seule barrière d'une action critique.
+
+Un `CausalIncidentLab` expérimental peut relier traces, dépendances, hypothèses et fault injection. Ses sorties sont des causes candidates avec incertitude. Il ne doit jamais annoncer une cause « certaine » à partir de simples logs observationnels.
+
+### Programme I — Multi-agent adaptatif
+
+**Décision : `ADOPTER` de façon limitée, P2.**
+
+Corriger d'abord le vote actuel, puis sélectionner selon les evals entre quatre patrons :
+
+1. agent unique ;
+2. acteur + vérificateur ;
+3. pipeline de spécialistes ;
+4. exécution parallèle + juge indépendant.
+
+Chaque délégation reçoit un budget, un contrat de résultat et un espace mémoire. La topologie est choisie parmi des templates testés ; aucun essaim P2P ou réseau librement auto-assemblé n'est autorisé en production.
+
+Les scores de réputation peuvent informer le routage. Le staking, le slashing, la « majorité byzantine » entre copies corrélées d'un même modèle et les phéromones numériques ne garantissent ni vérité ni alignement.
+
+### Programme J — Computer use et interfaces multimodales
+
+**Décision : `ADOPTER`, P2.**
+
+Pour le navigateur et l'OS :
+
+```text
+DOM/accessibilité → action sémantique → observation
+          échec ↘ capture + grounding visuel ↗
+                         ↓
+               vérification post-action
+```
+
+Livrables :
+
+- véritable passage de la capture à un modèle multimodal ;
+- cibles visuelles ancrées avec coordonnées et score ;
+- observation après chaque action ;
+- détection d'absence de progrès et d'actions répétées ;
+- approbation pour effets externes ou sensibles ;
+- scénarios OSWorld-like reproductibles.
+
+A2UI reste déclaratif, whitelisté et séparé de l'exécution de code. La voix full-duplex existante doit passer les tests de latence, interruption, coût, coupure fournisseur et sécurité des tool calls.
+
+Un « tenseur synesthésique unique » est écarté. Promethe doit utiliser des événements multimodaux typés, synchronisés par temps et reliés à des artefacts avec provenance.
+
+### Programme K — Isolation transactionnelle et self-healing supervisé
+
+**Décision : `ADOPTER` le workflow supervisé ; `EXPÉRIMENTER` les nouveaux backends, P2-P3.**
+
+Le self-healing acceptable suit ce cycle :
+
+```text
+Alerte → reproducer → sandbox → test rouge → patch minimal
+       → tests et evals → PR signée → revue humaine
+       → canary → promotion ou rollback
+```
+
+L'agent ne modifie ni son cœur en production, ni sa politique de sécurité, ni son classloader. Le hot-reload reste limité aux plugins versionnés et désactivables.
+
+Backends optionnels :
+
+- **WASI Component Model** : laboratoire après les contrats d'outils, pour modules compatibles et capacités explicites ;
+- **microVM CoW** : seulement si le threat model exige une frontière VM et si les mesures démontrent un gain par rapport à la sandbox native ;
+- **workspace transactionnel** : snapshots de fichiers, diff, commit/discard et rollback applicatif avant d'émuler une machine entière.
+
+## 7. Roadmap d'implémentation
+
+### Phase 0 — Baseline de preuve et corrections immédiates
+
+**Durée indicative : 2 à 4 semaines. Priorité P0.**
+
+| Chantier | Livrable | Critère de sortie |
+|---|---|---|
+| Evals | Modèles `EvalSuite`/`EvalRun`, premier golden set agent/outils/sécurité | Exécution locale et CI reproductible ; une régression bloque la PR |
+| Observabilité | Backend OTLP ou OpenTelemetry compatible Kotlin 2.4 | Un run complet est visible avec coût, tokens, durée et outils |
+| Skill safety | Curation en mode proposition/quarantaine | Aucun fichier de skill supprimé par une note LLM |
+| Multi-agent | Remplacement du pseudo-vote | Le vote s'appuie sur critères/evidence ou est retiré |
+| Browser vision | Capacité marquée indisponible ou réellement connectée à un VLM | Aucun succès fictif fondé sur la seule taille du base64 |
+| Baseline sécurité | Corpus prompt injection, MCP poisoning, secrets, approval bypass | Résultats et ASR de référence archivés |
+
+**Gate 0 :** aucune évolution cognitive automatique n'est autorisée tant que les evals et traces ne sont pas opérationnelles.
+
+### Phase 1 — Runtime durable et économique
+
+**Durée indicative : 6 à 8 semaines. Priorité P0-P1.**
+
+1. **FAIT** — Étendre le premier `RunLedger` persistant avec les IDs d'intention et un journal append-only des transitions d'outil.
+2. **FAIT** — Ajouter les clés d'idempotence et états d'outil persistants.
+3. **FAIT** — Envelopper `executeLoop` dans le premier `ExecutionGraph`, classifier les runs interrompus et permettre leur reprise explicite sans thread actif.
+4. **PARTIEL** — `ResourceGovernor` partage le budget des sous-agents locaux. Les admissions atomiques couvrent les tentatives LLM, outils et sous-agents. La définition, la consommation et les liaisons de sessions sont persistées dans SQLite avant autorisation, restaurées après redémarrage et protégées par version optimiste. Les liaisons terminales abandonnées sont nettoyées sans libérer un run actif. Les [quotas agrégés de départs](reports/RESOURCE_AGGREGATE_QUOTAS_2026-09-07.md) par profil local, fournisseur et outil sont livrés et validés : 17 nouveaux tests, dont partage entre parents et refus sur stockage indisponible. Les plafonds agrégés tokens/USD et une identité multi-utilisateur authentifiée restent hors périmètre ; leur absence ne signifie plus que les quotas de départs restent à créer.
+5. **PARTIEL** — Introduire `ArtifactStore` et observations référencées par hash. Les sorties textuelles d'outils sont adressées par SHA-256, reliées aux intentions et événements, et récupérables par segments. Les quotas de 16 MiB par artefact et 256 MiB au total sont appliqués par défaut, avec un plan de candidats à la rétention en lecture seule. Il reste les artefacts binaires et multimodaux, le chiffrement, la collecte exhaustive des références et la purge.
+6. **PARTIEL** — Stabiliser l'ordre du prompt et mesurer le prefix cache. Les messages système précèdent désormais l'historique, les outils sont triés, le préfixe est identifié par SHA-256 et Anthropic reçoit des breakpoints explicites. Les hits, misses et tokens réellement signalés par le fournisseur sont séparés des candidats locaux réutilisés. Il reste la ventilation durable par fournisseur/modèle et l'exposition des métriques de cache OpenAI que Koog ne propage pas encore dans toutes ses réponses.
+
+**Gate 1 — VALIDÉ PAR TESTS AUTOMATISÉS :** les trois scénarios crash avant, pendant et après un effet passent sans double effet. La consommation et l'épuisement du budget survivent au redémarrage, et un budget dépassé interdit tout nouveau départ d'outil.
+
+### Phase 2 — Contrats, politiques et supply chain agentique
+
+**Durée indicative : 6 à 10 semaines. Priorité P1.**
+
+1. **PARTIEL** — `ToolContractRegistry` et migration des outils sensibles. Le registre typé est la source unique pour le risque, l'approbation, l'idempotence, l'egress et la restriction propriétaire ; l'API de capacités expose le même contrat et les outils inconnus échouent fermés. Les 112 noms distincts de `SimpleTool` actuellement inventoriés selon les racines et la règle de `ToolContractCoverageArchitectureTest`, les outils locaux et les familles dynamiques MCP/ACP ont un contrat explicite. Un audit du registre bloque le démarrage en cas d'écart et un test d'architecture impose la couverture dans la CI. Il reste les schémas I/O, domaines autorisés, timeouts, budgets, vérificateurs et la compatibilité sandbox déclarative.
+2. **PARTIEL** — `SkillContract`, états de maturité et suites d'evals par skill. Le cycle typé `DRAFT → QUARANTINED → CANDIDATE → ACTIVE → DEPRECATED`, les dépendances déclaratives et le filtrage des skills actifs sont implémentés. Le [lot d'évaluation textuelle livré](reports/SKILL_EVALUATION_LIFECYCLE_2026-09-08.md) ajoute preuves de révision exactes, tests obligatoires et revue propriétaire avant promotion, snapshots locaux et restauration en quarantaine. GEPA crée un `DRAFT` ou met la modification en `QUARANTINED`. Aucun passage automatique en `ACTIVE` sur la seule réussite des tests. Signature des décisions, contenus transitifs des dépendances et évaluations d'effets d'outils restent hors de ce lot.
+3. **PARTIEL** — `PolicyKernel`, contrôle d'egress et audit hash-chained. Le noyau typé applique des règles système immuables, accepte des surcouches organisation/projet/session qui ne peuvent que renforcer la décision, bloque les outils inconnus et les effets issus de contenu non fiable, et empêche les données `SECRET` de sortir. `ActionExecutor` ainsi que les exports MCP et voix appliquent le verdict. Le journal de sécurité SQLite est append-only et chaîné par SHA-256 sans stocker les arguments bruts. Il reste la propagation d'une identité propriétaire explicite, les destinations et domaines d'egress, la gouvernance des mutations REST, la signature/export externe du journal et le workflow d'amendement complet.
+4. **PARTIEL** — `UntrustedReader`/`PrivilegedController` pour web, e-mail et canaux. Les observations provenant du web, de MCP, ACP, intégrations, plugins et agents locaux sont échappées, étiquetées avec leur provenance et réinjectées comme données non fiables. Le contrôleur propage cette contamination jusqu'à la fin du run ; `PolicyKernel` interdit alors toute écriture, exécution, commande de périphérique ou nouvel egress, y compris depuis un outil de lecture distant. Le contexte de conversation externe démarre lui aussi en mode non fiable. Il reste les identités de canal explicites, la promotion déterministe de faits vérifiés, la séparation de processus/modèle du lecteur et les contrats de provenance signés.
+5. **PARTIEL** — `AdversarialEvalLab` déterministe sur runtime isolé. La CI exécute six attaques sans réseau ni fournisseur payant contre les vraies frontières agent/politique : injection web, MCP empoisonné, contexte externe, faux préfixe d'erreur, exfiltration et contamination inter-run. Le rapport calcule l'ASR global et par capacité, refuse les cas qui sélectionnent un fournisseur live et vérifie le nombre réel d'effets exécutés. Il reste la génération planifiée d'attaques dans une sandbox jetable, la déduplication/curation des découvertes, les budgets dédiés et la conservation d'évidence expurgée.
+6. **PARTIEL** — cœur MCP 2026-07-28 dual-era, MRTR bidirectionnel et Tasks durable. Le client Streamable HTTP sonde `server/discover`, envoie les métadonnées et headers routables par requête, puis ne retombe sur le lifecycle 2025-11-25 qu'après détection d'un serveur legacy. Il traite `input_required` par reprises bornées, identifiants JSON-RPC atomiques et corrélés, réponses du tour et réinjection exacte de `requestState`. Les méthodes d'entrée sont enregistrées explicitement, leurs capacités sont dérivées et la taille de chaque tour est limitée, avec échec fermé sans gestionnaire correspondant. Le pont propriétaire `elicitation/create` affiche les formulaires dans le Moniteur, les lie à l'invocation sécurisée, refuse les champs sensibles et réinjecte une réponse typée ou une annulation après expiration. Le serveur valide les enveloppes stateless, publie des catalogues déterministes et cacheables, conserve le lifecycle historique sur la même route et peut suspendre une exécution synchrone pour émettre `input_required`. La coroutine originale est reprise sans rejouer l'outil ; l'état opaque à usage unique est borné, expirant et lié à la session, à l'outil, aux arguments et aux capacités client. Les schémas d'entrée 2020-12 sont générés canoniquement depuis les descripteurs Koog et partagés avec la voix. L'extension `io.modelcontextprotocol/tasks` est négociée par requête, persistée dans SQLite avant exécution, liée à la session propriétaire et couvre création, polling, input, annulation, TTL et interruption par redémarrage. Le client sait suivre et annuler ces tâches. Il reste les abonnements/push Tasks, le mode URL et les rendus de schémas complexes.
+
+**Gate 2 :** 100 % des outils avec effet possèdent contrat, approbation obligatoire et cas sécurité négatif ; aucun contenu non fiable brut ne peut directement déclencher un outil sensible.
+
+### Phase 3 — Mémoire et raisonnement vérifiable
+
+**Durée indicative : 8 à 12 semaines. Priorité P2.**
+
+1. Migration bitemporelle et provenance de la mémoire.
+2. Consolidation `proposal-only`, archivage et supersession.
+3. `VerifierRegistry` pour schémas, tests, compilation et état final.
+4. `ConstraintEngine` sur deux cas métier délimités.
+5. Calcul adaptatif : effort, best-of-N et critique seulement selon risque.
+6. `AdaptiveExecutionPlanner` limité aux quatre topologies approuvées.
+7. Prototype `CausalIncidentLab` sur des pannes injectées.
+
+**Gate 3 :** le moteur symbolique améliore les cas ciblés sans hausse du taux de faux succès ; les changements mémoire restent réversibles et attribuables.
+
+### Phase 4 — Interaction avancée et isolation optionnelle
+
+**Durée indicative : 8 à 12 semaines. Priorité P2-P3.**
+
+1. Boucle computer use hybride avec vérification visuelle.
+2. Certification A2UI déclarative et voix full-duplex.
+3. Workspace transactionnel commit/discard.
+4. Self-healing supervisé jusqu'à la PR et au canary.
+5. PoC WASI sur un outil sans réseau et un outil réseau restreint.
+6. PoC microVM seulement si la sandbox native ne satisfait pas le threat model.
+
+**Gate 4 :** aucun contenu UI généré n'exécute de code arbitraire ; le computer use ne valide pas une action sans observation postérieure ; le self-healing ne déploie jamais sans approbation.
+
+### Phase LAB — Recherche conditionnelle
+
+Ces travaux n'entrent dans une version produit que sur besoin explicite et benchmark favorable :
+
+- PRM spécialisé et RLVR hors ligne ;
+- export DPO/KTO avec consentement et dé-identification ;
+- WASI ou microVM à plus grande échelle ;
+- TEE pour clients réglementés ;
+- x402 pour marketplace A2A payante ;
+- confidentialité différentielle pour apprentissage multi-tenant ;
+- causalité avancée.
+
+## 8. Dépendances et ordre obligatoire
+
+| Avant de construire… | Il faut d'abord… |
+|---|---|
+| Graphes adaptatifs, PRM, test-time compute | Evals, traces et budgets |
+| Durable execution, self-healing | Journal d'événements et idempotence |
+| Code mode, JIT tools, WASI | `ToolContract`, sandbox et egress control |
+| SkillOpt/GEPA autonome | Contrats de skills, golden sets et promotion contrôlée |
+| Mémoire temporelle/consolidation | Provenance, namespaces et artefacts |
+| VLA/computer use | PolicyKernel, observation post-action et approval |
+| Neuro-symbolique | IR typée, validation et cas métier borné |
+| Red-team continu | Environnement isolé, métriques et triage humain |
+| Self-healing production | Reproducer, evals, PR, canary et rollback |
+
+## 9. Matrice consolidée des 58 propositions
+
+### 9.1 Runtime, orchestration et coût
+
+| Proposition originale | État | Décision | Priorité | Forme retenue ou motif |
+|---|---|---|---|---|
+| Graph/Flow Engineering et Agent Harness | `PARTIEL` | `ADOPTER` | P1 | Graphe progressif autour de la boucle, transitions typées et PolicyKernel. |
+| Speculative Tool Execution | `ABSENT` | `EXPÉRIMENTER` | P3 | Lecture seule, annulable, cacheable, après contrats et mesures de latence. |
+| Durable Execution et time travel | `PARTIEL` | `ADOPTER` | P0-P1 | Ledger, idempotence, pause/reprise et fork logique ; pas rollback magique du monde externe. |
+| SLM-first cascade | `PARTIEL` | `ADOPTER` | P1 | Routage selon difficulté, risque, coût et confidentialité. |
+| Dual-system verifier/critic | `PARTIEL` | `ADOPTER` | P1-P2 | Oracle déterministe d'abord, juge LLM en complément. |
+| Test-time compute/MCTS/Best-of-N | `PARTIEL` | `EXPÉRIMENTER` | P2-P3 | Sélectif et budgété ; MCTS seulement si benchmark utile. |
+| Process Reward Model | `ABSENT` | `EXPÉRIMENTER` | P3 | Score par étape comme signal, jamais barrière unique. |
+| Actor model et event-sourced runtime | `PARTIEL` | `ADOPTER` reformulé | P0-P2 | `RunLedger` durable et isolation par run/sous-agent ; pas de réécriture « zero-lock ». |
+| Dynamic topology morphing | `PARTIEL` | `EXPÉRIMENTER` | P2 | Sélection parmi quatre templates évalués. |
+| Cognitive allostasis | `PARTIEL` | `ADOPTER` reformulé | P1 | `ResourceGovernor`, pas de métaphore biologique ni purge brutale. |
+
+### 9.2 Contexte et mémoire
+
+| Proposition originale | État | Décision | Priorité | Forme retenue ou motif |
+|---|---|---|---|---|
+| Prefix-cache alignment | `PARTIEL` | `ADOPTER` | P1 | Prompt stable → semi-stable → dynamique, avec mesure réelle des gains. |
+| Tool output compaction/masking | `PARTIEL` | `ADOPTER` | P1 | Résumé + hash + artefact récupérable. |
+| Context virtualization/demand paging | `PARTIEL` | `ADOPTER` reformulé | P1-P2 | `ContextPlanner` déterministe et contraintes épinglées. |
+| Temporal Knowledge Graph | `PARTIEL` | `ADOPTER` | P2 | Mémoire bitemporelle et relations de supersession avant un graphe complet. |
+| Nocturnal consolidation | `PARTIEL` | `EXPÉRIMENTER` | P2 | Propositions réversibles, jamais suppression autonome. |
+| Ebbinghaus decay/garbage collection | `ABSENT` | `EXPÉRIMENTER` | P2-P3 | Archivage par utilité et politique, pas oubli irréversible par ancienneté. |
+| Hardware KV-cache streaming/attention sinks | `ABSENT` | `ÉCARTER` | P4 | Relève du serveur d'inférence/modèle, pas du cœur Promethe. |
+| Federated/differential-private memory | `ABSENT` | `DIFFÉRER` | P3-P4 | Seulement avec vrai apprentissage multi-tenant et budget DP. |
+| Cross-modal synesthetic state space | `ABSENT` | `ÉCARTER` | P4 | Remplacer par événements typés, timestamps et artefacts multimodaux. |
+
+### 9.3 Outils, skills, connaissances et protocoles
+
+| Proposition originale | État | Décision | Priorité | Forme retenue ou motif |
+|---|---|---|---|---|
+| SkillOps et contrats | `PARTIEL` | `ADOPTER` | P1 | Contrats, dépendances, evals, provenance et promotion. |
+| Dynamic tool synthesis/code mode | `PARTIEL` | `EXPÉRIMENTER` | P2-P3 | Orchestration de capacités autorisées en sandbox ; pas enregistrement automatique permanent. |
+| Next-gen MCP sampling/roots | `ABSENT` | `ÉCARTER` sous cette forme | P0 | Cibles dépréciées ; adopter MRTR, Tasks et stateless MCP 2026-07-28. |
+| Symbolic knowledge compiler | `ABSENT` | `ADOPTER` ciblé | P2 | Compiler uniquement les règles autoritatives et versionnées. |
+| Neuro-symbolic ASP/SMT | `ABSENT` | `ADOPTER` ciblé | P2 | IR typée, preuve/témoin et validation de traduction. |
+
+### 9.4 Sécurité, identité et gouvernance
+
+| Proposition originale | État | Décision | Priorité | Forme retenue ou motif |
+|---|---|---|---|---|
+| Cryptographic action provenance | `PARTIEL` | `ADOPTER` | P1 | Journal append-only hash-chained et signatures sur artefacts critiques. |
+| Dual-LLM privilege separation | `PARTIEL` | `ADOPTER` | P1 | Lecteur non privilégié + contrôleur, sans promesse d'immunité. |
+| CoW microVM snapshots | `ABSENT` | `EXPÉRIMENTER` | P3 | Seulement sur threat model et benchmark favorables. |
+| DID/verifiable credentials | `ABSENT` | `DIFFÉRER` | P3-P4 | OAuth/mTLS/signatures suffisent tant qu'il n'existe pas de fédération ouverte. |
+| Mental sandbox/world simulation | `PARTIEL` | `ADOPTER` reformulé | P2 | Workspace transactionnel et exécution réelle isolée, pas world model omniscient. |
+| WASI Component sandbox | `ABSENT` | `EXPÉRIMENTER` | P3 | Backend pour outils compatibles après `ToolContract`. |
+| Conformal uncertainty gating | `ABSENT` | `EXPÉRIMENTER` | P3 | Seulement avec jeux échangeables et calibration empirique ; aucune garantie universelle. |
+| Representation engineering/activation steering | `ABSENT` | `ÉCARTER` | P4 | Nécessite accès aux activations et ne remplace pas un contrôle déterministe. |
+| Formal verification TLA+/Z3/LTL | `ABSENT` | `ADOPTER` ciblé | P2 | Prouver quelques invariants finis du graphe et des politiques. |
+| Confidential computing/TEE | `ABSENT` | `DIFFÉRER` | P4 | Besoin de déploiement cloud réglementé et d'attestation opérationnelle. |
+| Mechanistic interpretability/SAE live | `ABSENT` | `ÉCARTER` | P4 | Recherche modèle, pas contrôle d'application fiable. |
+| Zero-knowledge compliance/zkML | `ABSENT` | `DIFFÉRER` | P4 | Coût et complexité non justifiés ; commencer par audit et minimisation. |
+| Continuous generative red-teaming | `ABSENT` | `ADOPTER` | P1 | Exécution isolée, cas de régression et correctifs proposés/revus. |
+| Dynamic constitutional AI | `ABSENT` | `ADOPTER` reformulé | P1-P2 | Constitution immuable, amendements proposés puis approuvés. |
+| Side-channel/steganographic defense | `ABSENT` | `DIFFÉRER` | P3 | Prioriser allowlists egress, DLP, quotas et réduction des secrets exposés. |
+
+### 9.5 Apprentissage et auto-évolution
+
+| Proposition originale | État | Décision | Priorité | Forme retenue ou motif |
+|---|---|---|---|---|
+| Continuous evals-as-code | `PARTIEL` | `ADOPTER` | P0 | Fondement de toutes les promotions de prompt, skill, modèle et politique. |
+| Trajectory self-distillation/DPO | `PARTIEL` | `EXPÉRIMENTER` | P3 | Export consenti, filtré et dé-identifié ; entraînement hors ligne. |
+| RL from verifiable rewards | `PARTIEL` | `EXPÉRIMENTER` | P3 | Oracles réutilisables immédiatement ; entraînement seulement si volume suffisant. |
+| Autonomous self-healing/auto-PR | `PARTIEL` | `ADOPTER` supervisé | P2 | Jusqu'à PR, canary et rollback ; jamais déploiement libre. |
+| Auto-mutation de composants du harness / hot-swap | `PARTIEL` — cycle sur consigne réussi ; 18 parcours comparatifs corrects mais aucune mutation proposée en mode libre | `EXPÉRIMENTER` après clarification du propriétaire | P1-P2 | Processeur fixe : coût modèle réduit sur gros JSON, durée accrue ; garde-fou de taille actif, utilité spontanée et apprentissage durable non prouvés. Voir [le guide de l'expérience](HARNESS_MUTATION.md). |
+| Genetic persona cross-breeding | `PARTIEL` | `ÉCARTER` sous cette forme | P4 | Composer profils, skills et mémoires isolées ; ne pas fusionner les mémoires. |
+| Hypernetworks/dynamic LoRA | `ABSENT` | `ÉCARTER` | P4 | Recherche de modèle sans justification produit. |
+
+### 9.6 Multi-agent, économie et réseau
+
+| Proposition originale | État | Décision | Priorité | Forme retenue ou motif |
+|---|---|---|---|---|
+| Multi-agent deliberation/consensus | `PARTIEL` | `EXPÉRIMENTER` | P2 | Vérificateurs diversifiés et juge ; pas « Byzantine-resistant » par défaut. |
+| x402 agent payments | `ABSENT` | `DIFFÉRER` | P4 | Seulement si Promethe devient une marketplace payante d'agents. |
+| P2P gossip/knowledge mesh | `ABSENT` | `DIFFÉRER` | P4 | Complexité, cohérence et supply-chain risk sans besoin actuel. |
+| Stigmergic swarms | `ABSENT` | `ÉCARTER` | P4 | Les marqueurs partagés ne donnent ni O(1) global ni coordination fiable. |
+| Mechanism design/staking/slashing | `ABSENT` | `ÉCARTER` | P4 | Remplacer par quotas, budgets, leases, SLA et scores évalués. |
+
+### 9.7 Interfaces et matériel
+
+| Proposition originale | État | Décision | Priorité | Forme retenue ou motif |
+|---|---|---|---|---|
+| Full-duplex WebRTC/speech-to-speech | `EXISTANT` | `ADOPTER`/certifier | P1-P2 | WebSocket full-duplex déjà présent ; tester latence, barge-in, outils et résilience. |
+| GenUI/Wasm artifacts | `EXISTANT` partiel | `ADOPTER` reformulé | P2 | A2UI déclaratif et whitelisté, pas micro-app arbitraire compilée à la volée. |
+| VLA/pixel grounding | `PARTIEL` | `ADOPTER` hybride | P2 | Sémantique d'abord, vision en fallback, validation post-action. |
+| PIM/CXL acceleration | `ABSENT` | `ÉCARTER` | P4 | CXL est un interconnect cohérent ; aucune charge Promethe ne justifie du PIM. |
+| Neuromorphic SNN wake loops | `ABSENT` | `ÉCARTER` | P4 | Webhooks et event loops suffisent ; éventuellement firmware spécialisé hors Promethe. |
+| Quantum-classical planning | `ABSENT` | `ÉCARTER` | P4 | Utiliser CP-SAT/MILP/SMT ; aucun optimum instantané garanti par QAOA/annealing. |
+
+### 9.8 Raisonnement causal
+
+| Proposition originale | État | Décision | Priorité | Forme retenue ou motif |
+|---|---|---|---|---|
+| Causal/counterfactual reasoning | `ABSENT` | `EXPÉRIMENTER` | P3 | Graphe causal déclaré, interventions sandboxées et incertitude explicite. |
+
+## 10. Éléments explicitement non faisables ou non souhaitables
+
+Dans leur formulation originale, les promesses suivantes doivent être rejetées :
+
+- « zéro hallucination » grâce à ASP/SMT ;
+- « immunité architecturale absolue » aux injections par dual-LLM ;
+- retour arrière automatique de tout effet externe grâce à un checkpoint ;
+- contexte infini sans dégradation grâce aux attention sinks ;
+- cause racine certaine déduite de logs observationnels ;
+- alignement mathématique garanti par staking/VCG ;
+- consensus byzantin obtenu avec trois personas LLM ;
+- self-refactoring et hot-swap libre du cœur en production ;
+- fusion héréditaire des mémoires de personas ;
+- constitution de sécurité auto-amendée par l'agent ;
+- détection fiable de « circuits de tromperie » avant le premier token ;
+- exécution Wasm « mathématiquement impossible à évader » ;
+- traversée PIM/CXL en microsecondes comme propriété de l'application ;
+- ordonnancement quantique optimal instantané d'un problème NP-difficile.
+
+Ces formulations confondent souvent preuve locale, hypothèses du modèle, résultats de benchmark et garantie système.
+
+## 11. Indicateurs de pilotage
+
+| Dimension | Indicateurs |
+|---|---|
+| Qualité | Taux de réussite golden, exactitude par skill, faux succès du vérificateur, satisfaction humaine |
+| Fiabilité | Reprises réussies, doubles effets, taux de boucle, erreurs par outil, rollback/canary |
+| Sécurité | Attack success rate, contournements d'approbation, exfiltrations, outils non contractés, secrets exposés |
+| Coût | Coût par tâche réussie, tokens utiles, appels spéculatifs jetés, coût des comités multi-agents |
+| Latence | p50/p95 total, TTFT, temps outil, temps d'approbation, temps de reprise |
+| Contexte | Taille moyenne, ratio artefact/résumé, cache hit, erreurs attribuées à la compression |
+| Mémoire | Faits sourcés, contradictions ouvertes, supersessions, restaurations après consolidation |
+| Gouvernance | Promotions avec preuves, changements non approuvés, âge des revues, capacités déclassées |
+
+Conditions d'abandon d'une expérimentation : gain inférieur à 5 % sur la qualité à coût égal, coût supérieur à 2× sans gain de sûreté mesurable, hausse des faux succès, impossibilité de reproduire les résultats ou absence de propriétaire.
+
+## 12. Registre des décisions prioritaires
+
+| ID | Décision | Priorité |
+|---|---|---|
+| ADR-F01 | Les evals et traces précèdent toute auto-évolution | P0 |
+| ADR-F02 | Le runtime devient durable par événements et idempotence, pas par snapshot seul | P0 |
+| ADR-F03 | Les outils avec effet restent derrière politique et approbation obligatoires | P0 |
+| ADR-F04 | Les skills sont mis en quarantaine et promus par preuve ; aucune suppression LLM directe | P0 |
+| ADR-F05 | Le contexte brut volumineux est externalisé dans un `ArtifactStore` | P1 |
+| ADR-F06 | MCP cible la spécification 2026-07-28 ; `roots` et `sampling` ne sont pas de nouvelles cibles | P0 |
+| ADR-F07 | La mémoire devient bitemporelle et réversible avant toute consolidation automatique | P2 |
+| ADR-F08 | Le symbolique est limité à des domaines formalisés avec validation de traduction | P2 |
+| ADR-F09 | Le multi-agent utilise des templates évalués, pas des essaims libres | P2 |
+| ADR-F10 | L'auto-réparation s'arrête à la PR/canary sous contrôle humain | P2 |
+| ADR-F11 | L'UI générée reste déclarative ; le computer use est hybride et vérifié | P2 |
+| ADR-F12 | Les axes matériels/quantique restent hors roadmap active | P4 |
+
+## 13. Références
+
+### Documentation interne
+
+- [Architecture](ARCHITECTURE.md)
+- [Agents et orchestration](AGENTS.md)
+- [Sécurité](SECURITY.md)
+- [Sandbox](SANDBOX.md)
+- [Résilience et contexte](RESILIENCE.md)
+- [Mémoire](MEMORY.md)
+- [Observabilité](OBSERVABILITY.md)
+- [GEPA](GEPA.md)
+- [MCP](MCP.md)
+- [A2UI](A2UI.md)
+- [Plugins](PLUGINS.md)
+
+### Sources externes primaires ou techniques
+
+- [MCP 2026-07-28 : MRTR, Tasks, stateless et dépréciations](https://blog.modelcontextprotocol.io/posts/2026-07-28/)
+- [SEP-2577 : dépréciation de Roots, Sampling et Logging](https://modelcontextprotocol.io/seps/2577-deprecate-roots-sampling-and-logging)
+- [GPT-Red : red-teaming automatique par self-play](https://arxiv.org/abs/2607.26115)
+- [AutoMalTool : red-team des outils MCP](https://arxiv.org/abs/2509.21011)
+- [OSWorld : benchmark d'agents multimodaux sur ordinateur](https://arxiv.org/abs/2404.07972)
+- [LLM+ASP : raisonnement non monotone et autocorrection](https://arxiv.org/abs/2604.27960)
+- [Limites des contrefactuels sous incertitude](https://arxiv.org/abs/2503.23820)
+- [AMAS : topologies multi-agents adaptatives](https://arxiv.org/abs/2510.01617)
+- [Constitution de Claude 2026](https://www.anthropic.com/news/claude-new-constitution)
+- [CXL : interconnect cohérent pour mémoire et accélérateurs](https://computeexpresslink.org/about-cxl/)
+- [Loihi 2 : plateforme neuromorphique](https://www.intel.com/content/dam/www/central-libraries/us/en/documents/neuromorphic-computing-loihi-2-brief.pdf)
+- [Limites comparées du recuit quantique en optimisation](https://www.nature.com/articles/s41598-025-96220-2)
+- [x402 : protocole de paiement HTTP](https://docs.x402.org/introduction)
+
+## 14. Conclusion
+
+La trajectoire réaliste vers un Promethe de haut niveau ne passe pas par 58 composants indépendants. Elle passe par un petit nombre de fondations composables : preuves, journal durable, politiques, contrats, budgets, artefacts, mémoire temporelle et vérification.
+
+Une fois ces fondations certifiées, Promethe pourra expérimenter sans danger le raisonnement adaptatif, le neuro-symbolique, la causalité, WASI et le computer use avancé. Sans elles, les capacités dites « frontier » augmenteraient surtout la surface d'attaque, le coût et l'imprévisibilité.

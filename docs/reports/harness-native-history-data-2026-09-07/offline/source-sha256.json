@@ -1,0 +1,13 @@
+{
+  "shared/src/commonMain/kotlin/dev/promethe/core/AIAgent.kt": "08cf9bcdd52efe377b380fd0934ba382530524635f480c43fd194e43fee58854",
+  "shared/src/commonMain/kotlin/dev/promethe/core/PendingToolTurn.kt": "6fa2dbf7787f157e2e86fa024470da2cd4b3bc362ed1b39084f8f407a85f01e3",
+  "shared/src/commonMain/kotlin/dev/promethe/core/NativeToolHistory.kt": "66848f93b9d9f3f77eada2e71db16862c535ffe5e3f667dfda0d89f4841bb772",
+  "shared/src/commonMain/kotlin/dev/promethe/core/KoogLlmAdapter.kt": "ed566fa7e90ed4579282c6d3f714b2972ee22ad2d55c9cbbfda52015306e5773",
+  "shared/src/commonMain/kotlin/dev/promethe/core/OpenAiCompatibleProviderPolicy.kt": "ca06e66af3511bf427eaf0998d2bc502c1c213f72dba27d7a61ee3087150fb30",
+  "shared/src/jvmTest/kotlin/dev/promethe/core/HarnessKoogProtocolLiveTest.kt": "fca764a29a4015c377c71fb832d0b35ea09751258374ca7d150a4787698b9d3f",
+  "shared/src/jvmTest/kotlin/dev/promethe/core/HarnessKoogProtocolFixture.kt": "dff448966b476032e4e858a98b4d97580376e6d7fe94cdb8c004ad374aaf1b2e",
+  "shared/src/jvmTest/kotlin/dev/promethe/core/CampaignKoogRelay.kt": "5c71cfc2cb3c18096d72c2b224ec4b3ea4f8fa12368b25a7e98019f59f2b9c27",
+  "shared/src/jvmTest/kotlin/dev/promethe/core/KoogProtocolRelayTest.kt": "e9c65e6f0485499d886a0cd2f59eef3b545e9a1802f006bf2975c262dd7013a8",
+  "shared/src/jvmTest/kotlin/dev/promethe/core/NativeToolHistoryTest.kt": "c79fc6bd80e619eba0f344307ca18af98de63344e3bf137a9635b2dd8c8e6615",
+  "scripts/report-harness-koog-protocol.py": "81063099cdb7d44e7aade2f1ead4e855ef6a07bc91829311255f282f3002ec4d"
+}

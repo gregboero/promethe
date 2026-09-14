@@ -1,0 +1,97 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.5.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :api:kmpPartiallyResolvedDependenciesChecker
+> Task :kotlinWasmKotlinNpmCachesSetup
+> Task :api:wasmJsPackageJson UP-TO-DATE
+> Task :api:wasmJsTestPackageJson UP-TO-DATE
+> Task :composeApp:wasmJsResolveResourcesFromDependencies UP-TO-DATE
+> Task :api:wasmJsPublicPackageJson UP-TO-DATE
+> Task :api:wasmJsTestPublicPackageJson UP-TO-DATE
+> Task :api:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :api:compileKotlinWasmJs UP-TO-DATE
+> Task :kotlinWasmNodeJsSetup UP-TO-DATE
+> Task :composeApp:wasmJsPackageJson UP-TO-DATE
+> Task :kotlinWasmRestoreYarnLock UP-TO-DATE
+> Task :composeApp:wasmJsTestPackageJson UP-TO-DATE
+> Task :kotlinWasmYarnSetup UP-TO-DATE
+> Task :composeApp:wasmJsPublicPackageJson UP-TO-DATE
+> Task :composeApp:wasmJsTestPublicPackageJson UP-TO-DATE
+> Task :composeApp:convertXmlValueResourcesForCommonMain UP-TO-DATE
+> Task :composeApp:copyNonXmlValueResourcesForCommonMain NO-SOURCE
+> Task :composeApp:prepareComposeResourcesTaskForCommonMain UP-TO-DATE
+> Task :composeApp:convertXmlValueResourcesForWasmJsMain NO-SOURCE
+> Task :composeApp:copyNonXmlValueResourcesForWasmJsMain NO-SOURCE
+> Task :composeApp:prepareComposeResourcesTaskForWasmJsMain NO-SOURCE
+> Task :composeApp:assembleWasmJsMainResources UP-TO-DATE
+> Task :composeApp:wasmJsResolveSelfResourcesCopyHierarchicalMultiplatformResources UP-TO-DATE
+> Task :composeApp:wasmJsAggregateResources UP-TO-DATE
+> Task :composeApp:wasmJsProcessResources UP-TO-DATE
+> Task :composeApp:kmpPartiallyResolvedDependenciesChecker
+> Task :composeApp:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :composeApp:checkWasmJsMainComposeLibrariesCompatibility
+> Task :composeApp:generateResourceAccessorsForCommonMain UP-TO-DATE
+> Task :composeApp:generateResourceAccessorsForWasmJsMain NO-SOURCE
+> Task :composeApp:generateActualResourceCollectorsForWasmJsMain UP-TO-DATE
+> Task :composeApp:generateComposeResClass UP-TO-DATE
+> Task :composeApp:generateExpectResourceCollectorsForCommonMain UP-TO-DATE
+> Task :composeApp:compileKotlinWasmJs UP-TO-DATE
+> Task :composeApp:wasmJsMainClasses UP-TO-DATE
+> Task :composeApp:compileProductionExecutableKotlinWasmJs UP-TO-DATE
+> Task :composeApp:kotlinWasmBinaryenSetup UP-TO-DATE
+> Task :composeApp:compileProductionExecutableKotlinWasmJsOptimize UP-TO-DATE
+> Task :composeApp:unpackSkikoWasmRuntime UP-TO-DATE
+> Task :composeApp:processSkikoRuntimeForKWasm UP-TO-DATE
+> Task :composeApp:wasmJsProductionExecutableCompileSync UP-TO-DATE
+
+> Task :installWebTooling
+npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+npm warn deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+npm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
+
+added 515 packages in 9s
+
+> Task :kotlinWasmPackageJsonUmbrella UP-TO-DATE
+> Task :wasmRootPackageJson UP-TO-DATE
+> Task :kotlinWasmNpmInstall UP-TO-DATE
+> Task :kotlinWasmStoreYarnLock UP-TO-DATE
+> Task :kotlinWasmToolingSetup SKIPPED
+> Task :auditWebTooling
+
+> Task :composeApp:wasmJsBrowserProductionWebpack
+Critical dependency: the request of a dependency is an expression
+assets by status 17.8 MiB [cached] 2 assets
+asset promethe.js 547 KiB [emitted] [compared for emit] [minimized] [big] (name: main) 2 related assets
+runtime modules 4.36 KiB 7 modules
+built modules 948 KiB (javascript) 17.8 MiB (asset) [built]
+  javascript modules 948 KiB
+    modules by path ./kotlin/*.mjs 556 KiB
+      ./kotlin/promethe-composeApp.mjs 2.78 KiB [built] [code generated]
+      ./kotlin/promethe-composeApp.import-object.mjs 58.8 KiB [built] [code generated]
+      ./kotlin/skiko.mjs 492 KiB [built] [code generated]
+asset size limit: The following asset(s) exceed the recommended size limit (244 KiB).
+This can impact web performance.
+Assets: 
+  promethe.js (547 KiB)
+    Largest modules: ./kotlin/promethe-composeApp.wasm (9.58 MiB), ./kotlin/skiko.wasm (8.24 MiB), ./kotlin/skiko.mjs (492 KiB)
+  4ff6dc77de8bcaeda511.wasm (9.58 MiB)
+  bfa5198fb2fe683c613a.wasm (8.24 MiB)
+      ./kotlin/promethe-composeApp.js-builtins.mjs 2.05 KiB [built] [code generated]
+entrypoint size limit: The following entrypoint(s) combined asset size exceeds the recommended limit (244 KiB). This can impact web performance.
+Entrypoints:
+  main (547 KiB)
+      promethe.js
+    ../../node_modules/@js-joda/core/dist/js-joda.esm.js 392 KiB [built] [code generated]
+webpack performance recommendations: 
+You can limit the size of your bundles by using import() or require.ensure to lazy load some parts of your application.
+For more info visit https://webpack.js.org/guides/code-splitting/
+    ./kotlin/ lazy strict namespace object 160 bytes [built] [code generated]
+  asset modules 17.8 MiB (asset) 84 bytes (javascript)
+    ./kotlin/promethe-composeApp.wasm 9.58 MiB (asset) 42 bytes (javascript) [built] [code generated]
+    ./kotlin/skiko.wasm 8.24 MiB (asset) 42 bytes (javascript) [built] [code generated]
+webpack 5.110.3 compiled with 4 warnings in 2697 ms
+
+> Task :composeApp:wasmJsBrowserDistribution
+
+BUILD SUCCESSFUL in 34s
+41 actionable tasks: 8 executed, 33 up-to-date

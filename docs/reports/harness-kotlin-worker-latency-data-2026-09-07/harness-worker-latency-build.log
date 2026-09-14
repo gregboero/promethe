@@ -1,0 +1,36 @@
+> Task :harness-kotlin:loadKtlintReporters UP-TO-DATE
+> Task :shared:loadKtlintReporters UP-TO-DATE
+> Task :harness-kotlin:runKtlintFormatOverKotlinScripts UP-TO-DATE
+> Task :harness-kotlin:ktlintKotlinScriptFormat UP-TO-DATE
+> Task :harness-kotlin:runKtlintFormatOverTestSourceSet NO-SOURCE
+> Task :harness-kotlin:ktlintTestSourceSetFormat SKIPPED
+> Task :harness-kotlin:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :harness-kotlin:processResources NO-SOURCE
+> Task :harness-kotlin:compileKotlin
+> Task :shared:runKtlintFormatOverKotlinScripts
+> Task :shared:runKtlintFormatOverCommonMainSourceSet UP-TO-DATE
+> Task :shared:ktlintCommonMainSourceSetFormat UP-TO-DATE
+> Task :shared:runKtlintFormatOverCommonTestSourceSet UP-TO-DATE
+> Task :shared:ktlintCommonTestSourceSetFormat UP-TO-DATE
+> Task :harness-kotlin:runKtlintFormatOverMainSourceSet
+> Task :shared:ktlintKotlinScriptFormat UP-TO-DATE
+> Task :shared:runKtlintFormatOverJvmMainSourceSet
+> Task :shared:ktlintJvmMainSourceSetFormat
+> Task :shared:runKtlintFormatOverJvmTestSourceSet
+> Task :shared:ktlintJvmTestSourceSetFormat
+> Task :shared:ktlintFormat
+
+> Task :harness-kotlin:windowsLauncher
+windows-launcher.c
+
+> Task :harness-kotlin:compileJava NO-SOURCE
+> Task :harness-kotlin:classes UP-TO-DATE
+> Task :harness-kotlin:jar
+> Task :harness-kotlin:ktlintMainSourceSetFormat
+> Task :harness-kotlin:startScripts
+> Task :harness-kotlin:ktlintFormat
+> Task :harness-kotlin:installDist
+
+BUILD SUCCESSFUL in 6s
+21 actionable tasks: 12 executed, 9 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.5.1/userguide/configuration_cache_enabling.html

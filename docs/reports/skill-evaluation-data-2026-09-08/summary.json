@@ -1,0 +1,39 @@
+{
+  "scope": "Version-bound text skill evaluations, owner-reviewed promotion, durable snapshots and quarantined restoration",
+  "jvmTests": 1071,
+  "addedTests": 13,
+  "failures": 0,
+  "kotlinStyleChecks": "passed: api, shared, composeApp, harness-kotlin",
+  "paidModelCallsThisIteration": 0,
+  "historicalBudgetRowsUnchanged": true,
+  "historicalCampaignRequests": 737,
+  "historicalConsumedMicroUsd": 4624197,
+  "historicalUnsettledReservations": 0,
+  "reuseScenario": {
+    "oracleInputs": [
+      "invoice 2",
+      "invoice 3"
+    ],
+    "agentTaskInputs": [
+      "invoice 5",
+      "invoice 6"
+    ],
+    "assertedAgentAnswers": [
+      "10",
+      "12"
+    ],
+    "freshAgentAndLoaderPerTask": true,
+    "provider": "deterministic fixture, no remote model",
+    "evidence": "SkillReuseAgentLoopTest.xml"
+  },
+  "limitations": [
+    "Exact text-output cases only; does not evaluate tool effects, auxiliary scripts or transitive dependency contents.",
+    "Real AIAgent context assembly with scripted provider proves reuse wiring, not model quality improvement.",
+    "Unmodified legacy and bundled skills retain compatibility without new evaluation evidence.",
+    "Local snapshots and owner review are unsigned; not a transaction history or a boundary against the filesystem owner.",
+    "Writers and evaluations are serialized within one process; no cross-process writer stress or locking claim.",
+    "Desktop code compiled and desktop suite passed; new dialog not manually exercised on a running desktop.",
+    "User-triggered application evaluations use the configured model and may incur provider costs."
+  ],
+  "documentationChecks": "36/36"
+}

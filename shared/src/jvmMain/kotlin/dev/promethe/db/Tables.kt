@@ -2,14 +2,201 @@ package dev.promethe.db
 
 import org.jetbrains.exposed.v1.core.Table
 
+/** agent_runs — durable lifecycle state for each entry into the agent loop. */
+object AgentRuns : Table("agent_runs") {
+    val runId = varchar("run_id", 160)
+    val parentRunId = varchar("parent_run_id", 160).nullable()
+    val sessionId = varchar("session_id", 255)
+    val origin = varchar("origin", 64)
+    val projectId = varchar("project_id", 64).nullable()
+    val requestFingerprint = varchar("request_fingerprint", 64).nullable()
+    val status = varchar("status", 32)
+    val stepCount = integer("step_count").default(0)
+    val lastStepId = varchar("last_step_id", 200).nullable()
+    val errorCode = varchar("error_code", 128).nullable()
+    val createdAt = long("created_at")
+    val startedAt = long("started_at").nullable()
+    val finishedAt = long("finished_at").nullable()
+    val updatedAt = long("updated_at")
+
+    override val primaryKey = PrimaryKey(runId)
+
+    init {
+        index(isUnique = false, sessionId)
+        index(isUnique = false, status)
+        index(isUnique = false, parentRunId)
+    }
+}
+
+/** tool_intents — durable idempotency boundary around tool side effects. */
+object ToolIntents : Table("tool_intents") {
+    val intentId = varchar("intent_id", 160)
+    val idempotencyKeyHash = varchar("idempotency_key_hash", 64)
+    val invocationHash = varchar("invocation_hash", 64)
+    val runId = varchar("run_id", 160).nullable()
+    val stepId = varchar("step_id", 200).nullable()
+    val sessionId = varchar("session_id", 255)
+    val toolName = varchar("tool_name", 255)
+    val risk = varchar("risk", 32)
+    val status = varchar("status", 32)
+    val resultHash = varchar("result_hash", 64).nullable()
+    val artifactHash = varchar("artifact_hash", 64).nullable()
+    val errorCode = varchar("error_code", 128).nullable()
+    val createdAt = long("created_at")
+    val startedAt = long("started_at").nullable()
+    val finishedAt = long("finished_at").nullable()
+    val updatedAt = long("updated_at")
+
+    override val primaryKey = PrimaryKey(intentId)
+
+    init {
+        uniqueIndex(idempotencyKeyHash)
+        index(isUnique = false, runId)
+        index(isUnique = false, status)
+        index(isUnique = false, artifactHash)
+    }
+}
+
+/** agent_run_events - append-only execution history without prompts, arguments, or raw results. */
+object AgentRunEvents : Table("agent_run_events") {
+    val eventId = varchar("event_id", 200)
+    val runId = varchar("run_id", 160)
+    val sequence = long("sequence")
+    val eventType = varchar("event_type", 40)
+    val parentRunId = varchar("parent_run_id", 160).nullable()
+    val sessionId = varchar("session_id", 255).nullable()
+    val origin = varchar("origin", 64).nullable()
+    val projectId = varchar("project_id", 64).nullable()
+    val requestFingerprint = varchar("request_fingerprint", 64).nullable()
+    val stepId = varchar("step_id", 200).nullable()
+    val stepCount = integer("step_count").nullable()
+    val intentId = varchar("intent_id", 160).nullable()
+    val idempotencyKeyHash = varchar("idempotency_key_hash", 64).nullable()
+    val invocationHash = varchar("invocation_hash", 64).nullable()
+    val toolName = varchar("tool_name", 255).nullable()
+    val risk = varchar("risk", 32).nullable()
+    val runStatus = varchar("run_status", 32).nullable()
+    val intentStatus = varchar("intent_status", 32).nullable()
+    val resultHash = varchar("result_hash", 64).nullable()
+    val artifactHash = varchar("artifact_hash", 64).nullable()
+    val errorCode = varchar("error_code", 128).nullable()
+    val approvalId = varchar("approval_id", 200).nullable()
+    val approvalAllowed = bool("approval_allowed").nullable()
+    val approvalScope = varchar("approval_scope", 32).nullable()
+    val createdAt = long("created_at")
+    val eventVersion = integer("event_version").default(1)
+
+    override val primaryKey = PrimaryKey(eventId)
+
+    init {
+        uniqueIndex(runId, sequence)
+        index(isUnique = false, intentId)
+        index(isUnique = false, eventType)
+        index(isUnique = false, artifactHash)
+    }
+}
+
+/** resource_governors - durable budget definition and consumption for a root run tree. */
+object ResourceGovernors : Table("resource_governors") {
+    val rootRunId = varchar("root_run_id", 160)
+    val maxTokens = long("max_tokens")
+    val maxCostDollars = double("max_cost_dollars")
+    val maxLlmCalls = integer("max_llm_calls")
+    val maxToolStarts = integer("max_tool_starts")
+    val maxSubAgents = integer("max_sub_agents")
+    val maxDurationMs = long("max_duration_ms")
+    val startedAt = long("started_at")
+    val tokensUsed = long("tokens_used").default(0)
+    val costDollars = double("cost_dollars").default(0.0)
+    val llmCallsStarted = integer("llm_calls_started").default(0)
+    val toolsStarted = integer("tools_started").default(0)
+    val subAgentsStarted = integer("sub_agents_started").default(0)
+    val version = long("version").default(0)
+    val updatedAt = long("updated_at")
+
+    override val primaryKey = PrimaryKey(rootRunId)
+
+    init {
+        index(isUnique = false, updatedAt)
+    }
+}
+
+/** resource_governor_bindings - active root and child sessions sharing one budget. */
+object ResourceGovernorBindings : Table("resource_governor_bindings") {
+    val sessionId = varchar("session_id", 255)
+    val rootRunId = varchar("root_run_id", 160)
+    val runId = varchar("run_id", 160).nullable()
+    val createdAt = long("created_at")
+    val updatedAt = long("updated_at")
+
+    override val primaryKey = PrimaryKey(sessionId)
+
+    init {
+        index(isUnique = false, rootRunId)
+        uniqueIndex(runId)
+    }
+}
+
+/** mcp_tasks - durable state for the MCP Tasks extension. */
+object McpTasks : Table("mcp_tasks") {
+    val taskId = varchar("task_id", 160)
+    val ownerSessionId = varchar("owner_session_id", 255)
+    val method = varchar("method", 80)
+    val resourceName = varchar("resource_name", 255)
+    val runId = varchar("run_id", 160).nullable()
+    val status = varchar("status", 32)
+    val statusMessage = text("status_message").nullable()
+    val resultJson = text("result_json").nullable()
+    val errorJson = text("error_json").nullable()
+    val inputRequestsJson = text("input_requests_json").nullable()
+    val createdAt = long("created_at")
+    val lastUpdatedAt = long("last_updated_at")
+    val ttlMs = long("ttl_ms").nullable()
+    val pollIntervalMs = long("poll_interval_ms").nullable()
+
+    override val primaryKey = PrimaryKey(taskId)
+
+    init {
+        index(isUnique = false, ownerSessionId)
+        index(isUnique = false, status)
+        index(isUnique = false, lastUpdatedAt)
+        index(isUnique = false, runId)
+    }
+}
+
+/** projects — durable work contexts grouping sessions, memory and a workspace. */
+object Projects : Table("projects") {
+    val id = varchar("id", 64)
+    val name = varchar("name", 120)
+    val description = text("description").default("")
+    val instructions = text("instructions").default("")
+    val workspacePath = varchar("workspace_path", 500)
+    val memoryNamespace = varchar("memory_namespace", 255)
+    val archived = bool("archived").default(false)
+    val createdAt = long("created_at")
+    val updatedAt = long("updated_at")
+
+    override val primaryKey = PrimaryKey(id)
+
+    init {
+        uniqueIndex(workspacePath)
+        uniqueIndex(memoryNamespace)
+    }
+}
+
 /** sessions — agent conversation sessions */
 object Sessions : Table("sessions") {
     val id = varchar("id", 255)
     val createdAt = long("created_at")
     val metadata = text("metadata").nullable()
     val title = varchar("title", 500).nullable()
+    val projectId = varchar("project_id", 64).references(Projects.id).nullable()
 
     override val primaryKey = PrimaryKey(id)
+
+    init {
+        index(isUnique = false, projectId)
+    }
 }
 
 /** messages — individual messages within a session */
@@ -19,12 +206,15 @@ object Messages : Table("messages") {
     val role = varchar("role", 50) // "user", "assistant", "system"
     val content = text("content")
     val timestamp = long("timestamp")
+    val dataTrust = varchar("data_trust", 32).default("TRUSTED")
+    val sourceRunId = varchar("source_run_id", 160).nullable()
 
     override val primaryKey = PrimaryKey(id)
 
     init {
         index(isUnique = false, sessionId)
         index(isUnique = false, sessionId, timestamp)
+        index(isUnique = false, sourceRunId)
     }
 }
 
@@ -140,6 +330,22 @@ object Settings : Table("settings") {
     override val primaryKey = PrimaryKey(key)
 }
 
+/** approval_grants — durable, revocable grants for exact configuration-change fingerprints. */
+object ApprovalGrants : Table("approval_grants") {
+    val id = varchar("id", 160)
+    val fingerprint = varchar("fingerprint", 64)
+    val allowed = bool("allowed")
+    val createdAt = long("created_at")
+    val expiresAt = long("expires_at")
+
+    override val primaryKey = PrimaryKey(id)
+
+    init {
+        index(isUnique = false, fingerprint)
+        index(isUnique = false, expiresAt)
+    }
+}
+
 /** llm_usage_logs — per-request LLM usage for persistent stats */
 object LlmUsageLogs : Table("llm_usage_logs") {
     val id = integer("id").autoIncrement()
@@ -235,6 +441,8 @@ object SecurityAuditLogs : Table("security_audit_logs") {
     val remoteAddress = varchar("remote_address", 255).default("")
     val detail = text("detail").default("")
     val createdAt = long("created_at")
+    val previousHash = varchar("previous_hash", 64).default("")
+    val entryHash = varchar("entry_hash", 64).default("")
 
     override val primaryKey = PrimaryKey(id)
 

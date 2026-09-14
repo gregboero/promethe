@@ -3,6 +3,7 @@ package dev.promethe.core
 import ai.koog.agents.core.tools.SimpleTool
 import ai.koog.agents.core.tools.annotations.LLMDescription
 import ai.koog.serialization.typeToken
+import dev.promethe.core.config.ConfigProvider
 import io.ktor.client.*
 import io.ktor.client.plugins.timeout
 import io.ktor.client.request.*
@@ -37,33 +38,28 @@ data class TwilioArgs(
 
 class TwilioTool(
     private val httpClient: HttpClient,
-    private val accountSid: String,
-    private val authToken: String,
-    private val fromNumber: String,
+    private val accountSidOverride: String = "",
+    private val authTokenOverride: String = "",
+    private val fromNumberOverride: String = "",
 ) : SimpleTool<TwilioArgs>(
         argsType = typeToken<TwilioArgs>(),
         name = "twilio",
         description = "Send SMS and WhatsApp messages via Twilio. List and retrieve message history.",
     ) {
     private val json = PrometheJson
-    private val baseUrl = "https://api.twilio.com/2010-04-01/Accounts/$accountSid"
-    private val authHeader =
-        "Basic " +
-            Base64
-                .getEncoder()
-                .encodeToString("$accountSid:$authToken".toByteArray())
 
     override suspend fun execute(args: TwilioArgs): String {
-        if (accountSid.isBlank() || authToken.isBlank()) {
+        val credentials = resolveCredentials()
+        if (credentials.accountSid.isBlank() || credentials.authToken.isBlank()) {
             return "[ERROR] Twilio not configured. Set TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN."
         }
 
         return try {
             when (args.action.lowercase()) {
-                "send_sms" -> sendMessage(args.to, args.body, args.mediaUrl, whatsapp = false)
-                "send_whatsapp" -> sendMessage(args.to, args.body, args.mediaUrl, whatsapp = true)
-                "list_messages" -> listMessages(args.limit)
-                "get_message" -> getMessage(args.messageSid)
+                "send_sms" -> sendMessage(credentials, args.to, args.body, args.mediaUrl, whatsapp = false)
+                "send_whatsapp" -> sendMessage(credentials, args.to, args.body, args.mediaUrl, whatsapp = true)
+                "list_messages" -> listMessages(credentials, args.limit)
+                "get_message" -> getMessage(credentials, args.messageSid)
                 else -> "[ERROR] Unknown Twilio action: ${args.action}. Use: send_sms, send_whatsapp, list_messages, get_message"
             }
         } catch (e: Exception) {
@@ -72,6 +68,7 @@ class TwilioTool(
     }
 
     private suspend fun sendMessage(
+        credentials: TwilioCredentials,
         to: String,
         body: String,
         mediaUrl: String,
@@ -79,13 +76,14 @@ class TwilioTool(
     ): String {
         if (to.isBlank()) return "[ERROR] Recipient phone number required"
         if (body.isBlank()) return "[ERROR] Message body required"
+        if (credentials.fromNumber.isBlank()) return "[ERROR] TWILIO_PHONE_NUMBER is required to send messages"
 
-        val from = if (whatsapp) "whatsapp:$fromNumber" else fromNumber
+        val from = if (whatsapp) "whatsapp:${credentials.fromNumber}" else credentials.fromNumber
         val toFormatted = if (whatsapp) "whatsapp:$to" else to
 
         val response =
-            httpClient.post("$baseUrl/Messages.json") {
-                header("Authorization", authHeader)
+            httpClient.post("${credentials.baseUrl}/Messages.json") {
+                header("Authorization", credentials.authHeader)
                 timeout { requestTimeoutMillis = 15_000 }
                 setBody(
                     FormDataContent(
@@ -112,10 +110,13 @@ class TwilioTool(
         }
     }
 
-    private suspend fun listMessages(limit: Int): String {
+    private suspend fun listMessages(
+        credentials: TwilioCredentials,
+        limit: Int,
+    ): String {
         val response =
-            httpClient.get("$baseUrl/Messages.json?PageSize=$limit") {
-                header("Authorization", authHeader)
+            httpClient.get("${credentials.baseUrl}/Messages.json?PageSize=${limit.coerceIn(1, 1000)}") {
+                header("Authorization", credentials.authHeader)
                 timeout { requestTimeoutMillis = 15_000 }
             }
 
@@ -134,12 +135,15 @@ class TwilioTool(
             }.ifBlank { "No messages found." }
     }
 
-    private suspend fun getMessage(sid: String): String {
+    private suspend fun getMessage(
+        credentials: TwilioCredentials,
+        sid: String,
+    ): String {
         if (sid.isBlank()) return "[ERROR] Message SID required"
 
         val response =
-            httpClient.get("$baseUrl/Messages/$sid.json") {
-                header("Authorization", authHeader)
+            httpClient.get("${credentials.baseUrl}/Messages/$sid.json") {
+                header("Authorization", credentials.authHeader)
                 timeout { requestTimeoutMillis = 15_000 }
             }
 
@@ -155,5 +159,30 @@ class TwilioTool(
             val price = msg["price"]?.jsonPrimitive?.content
             if (price != null) appendLine("Price: $price ${msg["price_unit"]?.jsonPrimitive?.content}")
         }
+    }
+
+    private fun resolveCredentials(): TwilioCredentials {
+        val config = ConfigProvider.get()
+        return TwilioCredentials(
+            accountSid = accountSidOverride.ifBlank { config.get("TWILIO_ACCOUNT_SID", "") },
+            authToken = authTokenOverride.ifBlank { config.get("TWILIO_AUTH_TOKEN", "") },
+            fromNumber = fromNumberOverride.ifBlank { config.get("TWILIO_PHONE_NUMBER", "") },
+        )
+    }
+
+    private data class TwilioCredentials(
+        val accountSid: String,
+        val authToken: String,
+        val fromNumber: String,
+    ) {
+        val baseUrl: String
+            get() = "https://api.twilio.com/2010-04-01/Accounts/$accountSid"
+
+        val authHeader: String
+            get() =
+                "Basic " +
+                    Base64
+                        .getEncoder()
+                        .encodeToString("$accountSid:$authToken".toByteArray())
     }
 }

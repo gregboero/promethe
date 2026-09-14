@@ -12,6 +12,51 @@ data class SkillDto(
     val content: String,
     val preview: String = "",
     val isSystem: Boolean = false,
+    val contract: SkillContract = SkillContract(),
+)
+
+@Serializable
+enum class SkillLifecycle {
+    DRAFT,
+    QUARANTINED,
+    CANDIDATE,
+    ACTIVE,
+    DEPRECATED,
+
+    ;
+
+    fun canTransitionTo(target: SkillLifecycle): Boolean =
+        target == this ||
+            target in
+            when (this) {
+                DRAFT -> setOf(QUARANTINED)
+                QUARANTINED -> setOf(DRAFT, CANDIDATE)
+                CANDIDATE -> setOf(QUARANTINED, ACTIVE)
+                ACTIVE -> setOf(QUARANTINED, DEPRECATED)
+                DEPRECATED -> setOf(DRAFT)
+            }
+}
+
+@Serializable
+data class SkillContract(
+    val lifecycle: SkillLifecycle = SkillLifecycle.ACTIVE,
+    val triggers: List<String> = emptyList(),
+    val antiTriggers: List<String> = emptyList(),
+    val requiredTools: List<String> = emptyList(),
+    val requiredSkills: List<String> = emptyList(),
+    val evalSuite: List<String> = emptyList(),
+    val provenance: String? = null,
+    val version: String = "1",
+    val owner: String? = null,
+    val contentHash: String? = null,
+    val reviewedContentHash: String? = null,
+    val reviewNote: String? = null,
+    val reviewedAt: String? = null,
+    val validationRequired: Boolean = false,
+    val revisionId: String? = null,
+    val revisionHash: String? = null,
+    val evaluatedRunId: String? = null,
+    val reviewedRevisionHash: String? = null,
 )
 
 @Serializable
@@ -30,6 +75,15 @@ data class CreateSkillRequest(
 @Serializable
 data class UpdateSkillRequest(
     val content: String,
+    val expectedRevisionHash: String? = null,
+)
+
+@Serializable
+data class UpdateSkillLifecycleRequest(
+    val lifecycle: SkillLifecycle,
+    val expectedContentHash: String? = null,
+    val reviewNote: String? = null,
+    val expectedRevisionHash: String? = null,
 )
 
 @Serializable
@@ -44,6 +98,24 @@ data class SkillCurationReport(
     val issues: List<String> = emptyList(),
     val merged: Int = 0,
     val deleted: Int = 0,
+    val proposals: List<SkillCurationProposalDto> = emptyList(),
+)
+
+@Serializable
+enum class SkillCurationActionDto {
+    REVIEW_LOW_QUALITY,
+    REVIEW_DUPLICATE,
+}
+
+@Serializable
+data class SkillCurationProposalDto(
+    val action: SkillCurationActionDto,
+    val skill: String,
+    val relatedSkills: List<String> = emptyList(),
+    val score: Int? = null,
+    val similarity: Double? = null,
+    val rationale: String,
+    val status: SkillLifecycle = SkillLifecycle.QUARANTINED,
 )
 
 @Serializable
@@ -67,6 +139,7 @@ data class SkillSummaryDto(
     val description: String,
     val source: SkillSource = SkillSource.CUSTOM,
     val requirements: SkillRequirements = SkillRequirements(),
+    val contract: SkillContract = SkillContract(),
 )
 
 /**

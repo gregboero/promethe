@@ -15,6 +15,8 @@ sealed interface PrometheRoute {
 
     @Serializable data object Sessions : PrometheRoute
 
+    @Serializable data object Projects : PrometheRoute
+
     @Serializable data class Chat(
         val sessionId: String,
     ) : PrometheRoute
@@ -57,6 +59,7 @@ sealed interface PrometheRoute {
         fun fromId(id: String): PrometheRoute? =
             when (id) {
                 "sessions" -> Sessions
+                "projects" -> Projects
                 "agents" -> Agents
                 "monitor" -> Monitor
                 "stats" -> Stats
@@ -84,6 +87,8 @@ sealed interface PrometheRoute {
                 is Sessions -> "sessions"
 
                 is Chat -> "sessions"
+
+                is Projects -> "projects"
 
                 // Chat is a sub-route of sessions
                 is Agents -> "agents"

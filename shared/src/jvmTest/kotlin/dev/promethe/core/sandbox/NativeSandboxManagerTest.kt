@@ -35,6 +35,28 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class NativeSandboxManagerTest {
+    @Test fun `broker response grace does not extend the child execution limit`() =
+        runBlocking {
+            val factory = ScriptedProcessFactory { request, respond ->
+                if (request.operation == SandboxIpcOperation.EXECUTE) {
+                    val execution = requireNotNull(request.execution)
+                    assertEquals(1L, execution.profile.limits.timeoutMillis)
+                    thread(isDaemon = true) {
+                        Thread.sleep(3_000) // Exceeds the former two-second transport margin.
+                        respond(executionResponse(execution.executionId))
+                    }
+                } else {
+                    respond(controlResponse(request.operation))
+                }
+            }
+            NativeSandboxManager(Path.of("trusted-helper"), factory, transportGraceMillis = 20_000).use { manager ->
+                val input = request("broker-delay")
+                val result = manager.execute(input.copy(profile = input.profile.copy(limits = input.profile.limits.copy(timeoutMillis = 1))))
+                assertFalse(result.timedOut)
+                assertEquals("broker-delay", result.stdout)
+            }
+        }
+
     @Test
     fun `persistent helper correlates concurrent executions by execution id`() =
         runBlocking {
@@ -42,6 +64,7 @@ class NativeSandboxManagerTest {
                 ScriptedProcessFactory { request, respond ->
                     when (request.operation) {
                         SandboxIpcOperation.EXECUTE -> {
+                            assertEquals(null, request.executionId, "EXECUTE carries its ID only inside the execution payload")
                             val execution = requireNotNull(request.execution)
                             thread(isDaemon = true) {
                                 if (execution.executionId == "slow") {
@@ -106,7 +129,7 @@ class NativeSandboxManagerTest {
                         respond(SandboxIpcResponse(operation = SandboxIpcOperation.CANCEL))
                     }
                 }
-            NativeSandboxManager(Path.of("trusted-helper"), factory).use { manager ->
+            NativeSandboxManager(Path.of("trusted-helper"), factory, transportGraceMillis = 50).use { manager ->
                 val result =
                     manager.execute(
                         request("timeout").copy(

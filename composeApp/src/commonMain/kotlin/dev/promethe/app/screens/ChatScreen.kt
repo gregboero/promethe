@@ -27,6 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
 import promethe.composeapp.generated.resources.*
@@ -52,7 +54,14 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.longOrNull
+import kotlinx.serialization.json.put
 import kotlin.time.Clock
 
 private val logger = io.github.oshai.kotlinlogging.KotlinLogging.logger {}
@@ -67,6 +76,21 @@ private data class DisplayItem(
     val isVoice: Boolean = false,
 )
 
+internal data class PendingChatApproval(
+    val id: String,
+    val toolName: String,
+    val arguments: String,
+    val sessionId: String,
+    val persistentAllowed: Boolean,
+    val createdAt: Long?,
+)
+
+private enum class ChatApprovalScope {
+    ONCE,
+    SESSION,
+    PERSISTENT,
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(
@@ -80,6 +104,9 @@ fun ChatScreen(
     var items by remember { mutableStateOf(listOf<DisplayItem>()) }
     var isStreaming by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    var pendingApprovals by remember(sessionId) { mutableStateOf(emptyList<PendingChatApproval>()) }
+    var resolvingApprovalIds by remember(sessionId) { mutableStateOf(emptySet<String>()) }
+    var approvalResolutionErrors by remember(sessionId) { mutableStateOf(emptyMap<String, String>()) }
 
     val streamingScope = rememberCoroutineScope()
 
@@ -184,6 +211,7 @@ fun ChatScreen(
                     DisplayItem(
                         event = ev,
                         isUser = ev.type == "user",
+                        timestamp = ev.timestamp ?: Clock.System.now().toEpochMilliseconds(),
                     )
                 }
         } catch (e: Exception) {
@@ -191,15 +219,36 @@ fun ChatScreen(
         }
     }
 
+    // Approval requests are interactive and session-scoped, so keep this polling
+    // loop tied to the visible chat composition.
+    LaunchedEffect(sessionId, client) {
+        while (true) {
+            try {
+                val polled = pendingChatApprovalsForSession(client.getPendingApprovals(), sessionId)
+                pendingApprovals = polled.filterNot { it.id in resolvingApprovalIds }
+                approvalResolutionErrors = approvalResolutionErrors.filterKeys { errorId ->
+                    polled.any { it.id == errorId }
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                logger.debug(e) { "Failed to poll approvals for session $sessionId" }
+            }
+            delay(APPROVAL_POLL_INTERVAL_MS)
+        }
+    }
+
     // Group intermediate steps
     val groupedItems = remember(items, isStreaming) {
         groupChatItems(items, isStreaming)
     }
+    val lastChatListIndex =
+        groupedItems.size + pendingApprovals.size + (if (isStreaming) 1 else 0) - 1
 
     // Auto-scroll when new messages arrive (only if user is near bottom)
-    LaunchedEffect(groupedItems.size) {
-        if (groupedItems.isNotEmpty() && !showScrollToBottom) {
-            listState.animateScrollToItem(groupedItems.lastIndex)
+    LaunchedEffect(lastChatListIndex) {
+        if (lastChatListIndex >= 0 && !showScrollToBottom) {
+            listState.animateScrollToItem(lastChatListIndex)
         }
     }
 
@@ -275,6 +324,33 @@ fun ChatScreen(
                 }
             } finally {
                 isStreaming = false
+            }
+        }
+    }
+
+    fun resolveApproval(
+        approval: PendingChatApproval,
+        approved: Boolean,
+        scope: ChatApprovalScope,
+    ) {
+        if (approval.id in resolvingApprovalIds) return
+
+        resolvingApprovalIds = resolvingApprovalIds + approval.id
+        approvalResolutionErrors = approvalResolutionErrors - approval.id
+        pendingApprovals = pendingApprovals.filterNot { it.id == approval.id }
+
+        uiScope.launch {
+            try {
+                client.respondToApproval(approval.id, approved, scope.name)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                logger.warn(e) { "Failed to resolve approval ${approval.id}" }
+                pendingApprovals = (pendingApprovals + approval).distinctBy { it.id }
+                approvalResolutionErrors = approvalResolutionErrors +
+                    (approval.id to e.message.orEmpty())
+            } finally {
+                resolvingApprovalIds = resolvingApprovalIds - approval.id
             }
         }
     }
@@ -429,6 +505,42 @@ fun ChatScreen(
                         }
                     }
 
+                    items(pendingApprovals, key = { "approval_${it.id}" }) { approval ->
+                        InlineApprovalCard(
+                            approval = approval,
+                            isResolving = approval.id in resolvingApprovalIds,
+                            resolutionError = approvalResolutionErrors[approval.id],
+                            onReject = {
+                                resolveApproval(
+                                    approval = approval,
+                                    approved = false,
+                                    scope = ChatApprovalScope.ONCE,
+                                )
+                            },
+                            onApproveOnce = {
+                                resolveApproval(
+                                    approval = approval,
+                                    approved = true,
+                                    scope = ChatApprovalScope.ONCE,
+                                )
+                            },
+                            onApproveSession = {
+                                resolveApproval(
+                                    approval = approval,
+                                    approved = true,
+                                    scope = ChatApprovalScope.SESSION,
+                                )
+                            },
+                            onApprovePersistent = {
+                                resolveApproval(
+                                    approval = approval,
+                                    approved = true,
+                                    scope = ChatApprovalScope.PERSISTENT,
+                                )
+                            },
+                        )
+                    }
+
                     // Typing indicator
                     if (isStreaming) {
                         item {
@@ -577,8 +689,8 @@ fun ChatScreen(
                                         } else {
                                             voiceVM.startDictation(
                                                 VoiceSessionConfig(
-                                                    provider = voiceSttProvider.takeIf { it.isNotBlank() } ?: "google_stt",
-                                                    model = voiceSttModel.takeIf { it.isNotBlank() } ?: "gemini-3.5-flash",
+                                                    provider = voiceSttProvider.takeIf { it.isNotBlank() } ?: "openai_stt",
+                                                    model = voiceSttModel,
                                                     mode = "stt",
                                                 ),
                                             )
@@ -674,8 +786,8 @@ fun ChatScreen(
                 SmallFloatingActionButton(
                     onClick = {
                         uiScope.launch {
-                            if (groupedItems.isNotEmpty()) {
-                                listState.animateScrollToItem(groupedItems.lastIndex)
+                            if (lastChatListIndex >= 0) {
+                                listState.animateScrollToItem(lastChatListIndex)
                             }
                         }
                     },
@@ -695,6 +807,105 @@ fun ChatScreen(
                 onEndSession = { voiceVM.stopSession() },
                 modifier = Modifier.align(Alignment.BottomCenter),
             )
+        }
+    }
+}
+
+@Composable
+private fun InlineApprovalCard(
+    approval: PendingChatApproval,
+    isResolving: Boolean,
+    resolutionError: String?,
+    onReject: () -> Unit,
+    onApproveOnce: () -> Unit,
+    onApproveSession: () -> Unit,
+    onApprovePersistent: () -> Unit,
+) {
+    val colors = MaterialTheme.colorScheme
+    Surface(
+        color = colors.secondaryContainer,
+        contentColor = colors.onSecondaryContainer,
+        shape = RoundedCornerShape(8.dp),
+        tonalElevation = 1.dp,
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 6.dp)
+                .testTag("chat_approval_${approval.id}"),
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Text(
+                text = stringResource(Res.string.chat_approval_required),
+                style = MaterialTheme.typography.titleSmall,
+            )
+            Text(
+                text = stringResource(Res.string.chat_approval_tool, approval.toolName),
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            Text(
+                text = stringResource(Res.string.chat_approval_arguments),
+                style = MaterialTheme.typography.labelMedium,
+                color = colors.onSecondaryContainer.copy(alpha = 0.75f),
+            )
+            Text(
+                text = approval.arguments,
+                style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
+                maxLines = 4,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.testTag("chat_approval_args_${approval.id}"),
+            )
+
+            resolutionError?.let { message ->
+                Text(
+                    text =
+                        stringResource(
+                            Res.string.chat_approval_resolution_error,
+                            message.ifBlank { stringResource(Res.string.error_unknown) },
+                        ),
+                    color = colors.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.testTag("chat_approval_error_${approval.id}"),
+                )
+            }
+
+            OutlinedButton(
+                onClick = onReject,
+                enabled = !isResolving,
+                modifier = Modifier.fillMaxWidth().testTag("chat_approval_reject_${approval.id}"),
+            ) {
+                Text(stringResource(Res.string.chat_approval_reject))
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                TextButton(
+                    onClick = onApproveOnce,
+                    enabled = !isResolving,
+                    modifier = Modifier.weight(1f).testTag("chat_approval_once_${approval.id}"),
+                ) {
+                    Text(stringResource(Res.string.chat_approval_allow_once))
+                }
+                Button(
+                    onClick = onApproveSession,
+                    enabled = !isResolving,
+                    modifier = Modifier.weight(1f).testTag("chat_approval_session_${approval.id}"),
+                ) {
+                    Text(stringResource(Res.string.chat_approval_allow_session))
+                }
+            }
+            if (approval.persistentAllowed) {
+                Button(
+                    onClick = onApprovePersistent,
+                    enabled = !isResolving,
+                    modifier = Modifier.fillMaxWidth().testTag("chat_approval_persistent_${approval.id}"),
+                ) {
+                    Text(stringResource(Res.string.chat_approval_allow_persistent))
+                }
+            }
         }
     }
 }
@@ -729,6 +940,34 @@ private fun TypingIndicator() {
         }
     }
 }
+
+internal fun pendingChatApprovalsForSession(
+    response: JsonObject,
+    currentSessionId: String,
+): List<PendingChatApproval> {
+    val pending = response["pending"]?.jsonArray ?: return emptyList()
+    return pending.mapNotNull { element ->
+        val approval = element as? JsonObject ?: return@mapNotNull null
+        val sessionId = approval["sessionId"]?.jsonPrimitive?.contentOrNull
+        if (sessionId != currentSessionId) return@mapNotNull null
+
+        val id = approval["id"]?.jsonPrimitive?.contentOrNull?.takeIf { it.isNotBlank() }
+            ?: return@mapNotNull null
+        val toolName = approval["toolName"]?.jsonPrimitive?.contentOrNull?.takeIf { it.isNotBlank() }
+            ?: return@mapNotNull null
+
+        PendingChatApproval(
+            id = id,
+            toolName = toolName,
+            arguments = approval["args"]?.jsonPrimitive?.contentOrNull ?: "{}",
+            sessionId = sessionId,
+            persistentAllowed = approval["persistentAllowed"]?.jsonPrimitive?.booleanOrNull ?: false,
+            createdAt = approval["createdAt"]?.jsonPrimitive?.longOrNull,
+        )
+    }
+}
+
+private const val APPROVAL_POLL_INTERVAL_MS = 750L
 
 private sealed interface ChatUiItem {
     val id: String

@@ -1,5 +1,7 @@
 # JavaScript Bridge API
 
+> **Personal research sandbox — not for production / Projet expérimental — non destiné à la production.** See [project status / statut du projet](EXPERIMENTAL_STATUS.md).
+
 The Promethe WASM app exposes a JavaScript bridge on `window` after the WASM module loads.
 All functions are available at `http://localhost:56708`.
 

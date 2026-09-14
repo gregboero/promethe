@@ -1,0 +1,18 @@
+{
+  "id": "provider-errors",
+  "version": 1,
+  "description": "Provider failures remain structured and non-retryable when invalid",
+  "cases": [
+    {
+      "id": "provider-invalid-request",
+      "capability": "provider-error",
+      "description": "An invalid provider request returns a structured failure",
+      "input": "empty-provider-request",
+      "assertions": [
+        { "id": "code", "field": "errorCode", "kind": "EQUALS", "expected": "provider_invalid_request" },
+        { "id": "retry", "field": "metadata.retryable", "kind": "EQUALS", "expected": "false" }
+      ],
+      "tags": ["golden", "provider", "negative"]
+    }
+  ]
+}
